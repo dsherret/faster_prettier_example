@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "prettier": "prettier --end-of-line lf --write \"files/**/*.{js,ts}\"",
-    "dprint": "dprint fmt"
+    "prettier": "prettier --check --end-of-line lf \"files/**/*.{js,ts}\"",
+    "dprint": "dprint check"
   },
   "author": "",
   "license": "MIT",
