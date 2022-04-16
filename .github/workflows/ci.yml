@@ -14,12 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: cache dprint's cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.npm
+          ~/.cache/dprint
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
     - run: npm install
-    - name: Prettier
+    - name: prettier
       run: npm run prettier
-    - name: Dprint
+    - name: dprint
       run: npm run dprint
