@@ -1,0 +1,13 @@
+{
+  "incremental": true,
+  "includes": [
+    "files/**/*.{js,ts}"
+  ],
+  "excludes": [],
+  "prettier": {
+    "lineWidth": 80
+  },
+  "plugins": [
+    "https://plugins.dprint.dev/prettier-0.6.2.exe-plugin@36dd4f8b9710ab323c471017ecd00a20cf1dca2728c12242c7dabb8dfacad0e2"
+  ]
+}

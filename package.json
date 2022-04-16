@@ -1,0 +1,15 @@
+{
+  "name": "faster_prettier_example",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "prettier": "prettier --end-of-line lf --write \"files/**/*.{js,ts}\"",
+    "dprint": "dprint fmt"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "dprint": "^0.25.0",
+    "prettier": "^2.6.2"
+  }
+}
