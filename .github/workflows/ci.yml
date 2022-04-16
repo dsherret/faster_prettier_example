@@ -28,6 +28,7 @@ jobs:
       with:
         node-version: '16'
     - run: npm install
+    - run: echo "$PWD"
     - name: prettier
       run: npm run prettier
     - name: dprint
