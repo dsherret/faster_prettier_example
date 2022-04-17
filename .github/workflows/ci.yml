@@ -27,6 +27,8 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
+    - run: cat ~/.cache/dprint/cache/cache-manifest.json
+    - run: cat ~/.cache/dprint/cache/dprint.incremental
     - run: npm install
     - run: echo "$PWD"
     - name: prettier
