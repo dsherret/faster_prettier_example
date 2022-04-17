@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "prettier": "prettier --check --end-of-line lf \"files/**/*.{js,ts}\"",
+    "prettier": "prettier --check --end-of-line lf \"src/**/*.{js,ts}\"",
     "dprint": "dprint check"
   },
   "author": "",
