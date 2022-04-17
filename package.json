@@ -9,7 +9,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "dprint": "^0.25.0",
+    "dprint": "^0.25.1",
     "prettier": "^2.6.2"
   }
 }
