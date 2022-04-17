@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "prettier": "prettier --check --end-of-line lf \"files/**/*.{js,ts}\"",
-    "dprint": "dprint check"
+    "dprint": "dprint check --verbose"
   },
   "author": "",
   "license": "MIT",
