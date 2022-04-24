@@ -28,7 +28,5 @@ jobs:
         node-version: '16'
     - run: npm ci
     - run: echo "$PWD"
-    - name: prettier
-      run: npm run prettier
     - name: dprint w/ dprint-plugin-typescript
       run: npm run dprint

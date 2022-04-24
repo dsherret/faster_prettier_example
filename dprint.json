@@ -1,5 +1,4 @@
 {
-  "incremental": true,
   "includes": [
     "src/**/*.{js,ts}"
   ],
