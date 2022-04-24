@@ -21,7 +21,7 @@ jobs:
         path: |
           ~/.npm
           ~/.cache/dprint
-        key: ${{ runner.os }}-node-${{ hashFiles('**/{package-lock,dprint}.json') }}
+        key: 1-${{ runner.os }}-node-${{ hashFiles('**/{package-lock,dprint}.json') }}
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
