@@ -7,7 +7,7 @@ interface Atomics {
   add(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 
   /**
@@ -18,7 +18,7 @@ interface Atomics {
   and(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 
   /**
@@ -30,7 +30,7 @@ interface Atomics {
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
     expectedValue: bigint,
-    replacementValue: bigint
+    replacementValue: bigint,
   ): bigint;
 
   /**
@@ -41,7 +41,7 @@ interface Atomics {
   exchange(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 
   /**
@@ -58,7 +58,7 @@ interface Atomics {
   or(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 
   /**
@@ -68,7 +68,7 @@ interface Atomics {
   store(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 
   /**
@@ -79,7 +79,7 @@ interface Atomics {
   sub(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 
   /**
@@ -92,7 +92,7 @@ interface Atomics {
     typedArray: BigInt64Array,
     index: number,
     value: bigint,
-    timeout?: number
+    timeout?: number,
   ): "ok" | "not-equal" | "timed-out";
 
   /**
@@ -112,6 +112,6 @@ interface Atomics {
   xor(
     typedArray: BigInt64Array | BigUint64Array,
     index: number,
-    value: bigint
+    value: bigint,
   ): bigint;
 }

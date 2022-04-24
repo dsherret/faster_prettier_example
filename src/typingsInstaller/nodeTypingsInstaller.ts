@@ -21,7 +21,7 @@ namespace ts.server.typingsInstaller {
       try {
         fs.appendFileSync(
           this.logFile,
-          `[${nowString()}] ${text}${sys.newLine}`
+          `[${nowString()}] ${text}${sys.newLine}`,
         );
       } catch (e) {
         this.logFile = undefined;
@@ -33,7 +33,7 @@ namespace ts.server.typingsInstaller {
   function getDefaultNPMLocation(
     processName: string,
     validateDefaultNpmLocation: boolean,
-    host: InstallTypingHost
+    host: InstallTypingHost,
   ): string {
     if (path.basename(processName).indexOf("node") === 0) {
       const npmPath = path.join(path.dirname(process.argv[0]), "npm");
@@ -54,27 +54,27 @@ namespace ts.server.typingsInstaller {
   function loadTypesRegistryFile(
     typesRegistryFilePath: string,
     host: InstallTypingHost,
-    log: Log
+    log: Log,
   ): ESMap<string, MapLike<string>> {
     if (!host.fileExists(typesRegistryFilePath)) {
       if (log.isEnabled()) {
         log.writeLine(
-          `Types registry file '${typesRegistryFilePath}' does not exist`
+          `Types registry file '${typesRegistryFilePath}' does not exist`,
         );
       }
       return new Map<string, MapLike<string>>();
     }
     try {
       const content = JSON.parse(
-        host.readFile(typesRegistryFilePath)!
+        host.readFile(typesRegistryFilePath)!,
       ) as TypesRegistryFile;
       return new Map(getEntries(content.entries));
     } catch (e) {
       if (log.isEnabled()) {
         log.writeLine(
-          `Error when loading types registry file '${typesRegistryFilePath}': ${
-            (e as Error).message
-          }, ${(e as Error).stack}`
+          `Error when loading types registry file '${typesRegistryFilePath}': ${(e as Error).message}, ${
+            (e as Error).stack
+          }`,
         );
       }
       return new Map<string, MapLike<string>>();
@@ -83,11 +83,11 @@ namespace ts.server.typingsInstaller {
 
   const typesRegistryPackageName = "types-registry";
   function getTypesRegistryFileLocation(
-    globalTypingsCacheLocation: string
+    globalTypingsCacheLocation: string,
   ): string {
     return combinePaths(
       normalizeSlashes(globalTypingsCacheLocation),
-      `node_modules/${typesRegistryPackageName}/index.json`
+      `node_modules/${typesRegistryPackageName}/index.json`,
     );
   }
 
@@ -113,44 +113,43 @@ namespace ts.server.typingsInstaller {
       npmLocation: string | undefined,
       validateDefaultNpmLocation: boolean,
       throttleLimit: number,
-      log: Log
+      log: Log,
     ) {
       super(
         sys,
         globalTypingsCacheLocation,
         typingSafeListLocation
           ? toPath(
-              typingSafeListLocation,
-              "",
-              createGetCanonicalFileName(sys.useCaseSensitiveFileNames)
-            )
+            typingSafeListLocation,
+            "",
+            createGetCanonicalFileName(sys.useCaseSensitiveFileNames),
+          )
           : toPath(
-              "typingSafeList.json",
-              __dirname,
-              createGetCanonicalFileName(sys.useCaseSensitiveFileNames)
-            ),
+            "typingSafeList.json",
+            __dirname,
+            createGetCanonicalFileName(sys.useCaseSensitiveFileNames),
+          ),
         typesMapLocation
           ? toPath(
-              typesMapLocation,
-              "",
-              createGetCanonicalFileName(sys.useCaseSensitiveFileNames)
-            )
+            typesMapLocation,
+            "",
+            createGetCanonicalFileName(sys.useCaseSensitiveFileNames),
+          )
           : toPath(
-              "typesMap.json",
-              __dirname,
-              createGetCanonicalFileName(sys.useCaseSensitiveFileNames)
-            ),
+            "typesMap.json",
+            __dirname,
+            createGetCanonicalFileName(sys.useCaseSensitiveFileNames),
+          ),
         throttleLimit,
-        log
+        log,
       );
-      this.npmPath =
-        npmLocation !== undefined
-          ? npmLocation
-          : getDefaultNPMLocation(
-              process.argv[0],
-              validateDefaultNpmLocation,
-              this.installTypingHost
-            );
+      this.npmPath = npmLocation !== undefined
+        ? npmLocation
+        : getDefaultNPMLocation(
+          process.argv[0],
+          validateDefaultNpmLocation,
+          this.installTypingHost,
+        );
 
       // If the NPM path contains spaces and isn't wrapped in quotes, do so.
       if (stringContains(this.npmPath, " ") && this.npmPath[0] !== `"`) {
@@ -161,10 +160,10 @@ namespace ts.server.typingsInstaller {
         this.log.writeLine(
           `NPM location: ${this.npmPath} (explicit '${Arguments.NpmLocation}' ${
             npmLocation === undefined ? "not " : ""
-          } provided)`
+          } provided)`,
         );
         this.log.writeLine(
-          `validateDefaultNpmLocation: ${validateDefaultNpmLocation}`
+          `validateDefaultNpmLocation: ${validateDefaultNpmLocation}`,
         );
       }
       ({ execSync: this.nodeExecSync } = require("child_process"));
@@ -174,12 +173,12 @@ namespace ts.server.typingsInstaller {
       try {
         if (this.log.isEnabled()) {
           this.log.writeLine(
-            `Updating ${typesRegistryPackageName} npm package...`
+            `Updating ${typesRegistryPackageName} npm package...`,
           );
         }
         this.execSyncAndLog(
           `${this.npmPath} install --ignore-scripts ${typesRegistryPackageName}@${this.latestDistTag}`,
-          { cwd: globalTypingsCacheLocation }
+          { cwd: globalTypingsCacheLocation },
         );
         if (this.log.isEnabled()) {
           this.log.writeLine(`Updated ${typesRegistryPackageName} npm package`);
@@ -187,9 +186,7 @@ namespace ts.server.typingsInstaller {
       } catch (e) {
         if (this.log.isEnabled()) {
           this.log.writeLine(
-            `Error updating ${typesRegistryPackageName} package: ${
-              (e as Error).message
-            }`
+            `Error updating ${typesRegistryPackageName} package: ${(e as Error).message}`,
           );
         }
         // store error info to report it later when it is known that server is already listening to events from typings installer
@@ -203,7 +200,7 @@ namespace ts.server.typingsInstaller {
       this.typesRegistry = loadTypesRegistryFile(
         getTypesRegistryFileLocation(globalTypingsCacheLocation),
         this.installTypingHost,
-        this.log
+        this.log,
       );
     }
 
@@ -235,9 +232,8 @@ namespace ts.server.typingsInstaller {
           }
           case "installPackage": {
             const { fileName, packageName, projectName, projectRootPath } = req;
-            const cwd =
-              getDirectoryOfPackageJson(fileName, this.installTypingHost) ||
-              projectRootPath;
+            const cwd = getDirectoryOfPackageJson(fileName, this.installTypingHost)
+              || projectRootPath;
             if (cwd) {
               this.installWorker(-1, [packageName], cwd, (success) => {
                 const message = success
@@ -271,7 +267,7 @@ namespace ts.server.typingsInstaller {
     protected sendResponse(response: TypingInstallerResponseUnion) {
       if (this.log.isEnabled()) {
         this.log.writeLine(
-          `Sending response:\n    ${JSON.stringify(response)}`
+          `Sending response:\n    ${JSON.stringify(response)}`,
         );
       }
       process.send!(response); // TODO: GH#18217
@@ -284,11 +280,11 @@ namespace ts.server.typingsInstaller {
       requestId: number,
       packageNames: string[],
       cwd: string,
-      onRequestCompleted: RequestCompletedAction
+      onRequestCompleted: RequestCompletedAction,
     ): void {
       if (this.log.isEnabled()) {
         this.log.writeLine(
-          `#${requestId} with arguments'${JSON.stringify(packageNames)}'.`
+          `#${requestId} with arguments'${JSON.stringify(packageNames)}'.`,
         );
       }
       const start = Date.now();
@@ -296,11 +292,11 @@ namespace ts.server.typingsInstaller {
         this.npmPath,
         version,
         packageNames,
-        (command) => this.execSyncAndLog(command, { cwd })
+        (command) => this.execSyncAndLog(command, { cwd }),
       );
       if (this.log.isEnabled()) {
         this.log.writeLine(
-          `npm install #${requestId} took: ${Date.now() - start} ms`
+          `npm install #${requestId} took: ${Date.now() - start} ms`,
         );
       }
       onRequestCompleted(!hasError);
@@ -309,7 +305,7 @@ namespace ts.server.typingsInstaller {
     /** Returns 'true' in case of error. */
     private execSyncAndLog(
       command: string,
-      options: Pick<ExecSyncOptions, "cwd">
+      options: Pick<ExecSyncOptions, "cwd">,
     ): boolean {
       if (this.log.isEnabled()) {
         this.log.writeLine(`Exec: ${command}`);
@@ -321,16 +317,14 @@ namespace ts.server.typingsInstaller {
         });
         if (this.log.isEnabled()) {
           this.log.writeLine(
-            `    Succeeded. stdout:${indent(sys.newLine, stdout)}`
+            `    Succeeded. stdout:${indent(sys.newLine, stdout)}`,
           );
         }
         return false;
       } catch (error) {
         const { stdout, stderr } = error;
         this.log.writeLine(
-          `    Failed. stdout:${indent(sys.newLine, stdout)}${
-            sys.newLine
-          }    stderr:${indent(sys.newLine, stderr)}`
+          `    Failed. stdout:${indent(sys.newLine, stdout)}${sys.newLine}    stderr:${indent(sys.newLine, stderr)}`,
         );
         return true;
       }
@@ -339,7 +333,7 @@ namespace ts.server.typingsInstaller {
 
   function getDirectoryOfPackageJson(
     fileName: string,
-    host: InstallTypingHost
+    host: InstallTypingHost,
   ): string | undefined {
     return forEachAncestorDirectory(getDirectoryPath(fileName), (directory) => {
       if (host.fileExists(combinePaths(directory, "package.json"))) {
@@ -350,13 +344,13 @@ namespace ts.server.typingsInstaller {
 
   const logFilePath = findArgument(Arguments.LogFile);
   const globalTypingsCacheLocation = findArgument(
-    Arguments.GlobalCacheLocation
+    Arguments.GlobalCacheLocation,
   );
   const typingSafeListLocation = findArgument(Arguments.TypingSafeListLocation);
   const typesMapLocation = findArgument(Arguments.TypesMapLocation);
   const npmLocation = findArgument(Arguments.NpmLocation);
   const validateDefaultNpmLocation = hasArgument(
-    Arguments.ValidateDefaultNpmLocation
+    Arguments.ValidateDefaultNpmLocation,
   );
 
   const log = new FileLog(logFilePath);
@@ -378,7 +372,7 @@ namespace ts.server.typingsInstaller {
     npmLocation,
     validateDefaultNpmLocation,
     /*throttleLimit*/ 5,
-    log
+    log,
   ); // TODO: GH#18217
   installer.listen();
 

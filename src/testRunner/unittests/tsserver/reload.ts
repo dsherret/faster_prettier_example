@@ -34,7 +34,7 @@ namespace ts.projectSystem {
       assert.equal(
         getSnapshotText(snap1),
         tmp.content,
-        "content should be equal to the content of temp file"
+        "content should be equal to the content of temp file",
       );
 
       // reload from original file file
@@ -50,7 +50,7 @@ namespace ts.projectSystem {
       assert.equal(
         getSnapshotText(snap2),
         f1.content,
-        "content should be equal to the content of original file"
+        "content should be equal to the content of original file",
       );
     });
 
@@ -110,7 +110,7 @@ namespace ts.projectSystem {
       } as server.protocol.OpenRequest);
       checkScriptInfoAndProjects(
         f1.content,
-        "contents of file when opened without specifying contents"
+        "contents of file when opened without specifying contents",
       );
       const snap = info.getSnapshot();
 
@@ -148,7 +148,7 @@ namespace ts.projectSystem {
 
       function checkScriptInfoAndProjects(
         contentsOfInfo: string,
-        captionForContents: string
+        captionForContents: string,
       ) {
         checkNumberOfProjects(projectService, { inferredProjects: 1 });
         assert.strictEqual(projectService.getScriptInfo(f1.path), info);
@@ -157,13 +157,13 @@ namespace ts.projectSystem {
 
       function checkScriptInfoContents(
         contentsOfInfo: string,
-        captionForContents: string
+        captionForContents: string,
       ) {
         const snap = info.getSnapshot();
         assert.equal(
           getSnapshotText(snap),
           contentsOfInfo,
-          "content should be equal to " + captionForContents
+          "content should be equal to " + captionForContents,
         );
       }
     });

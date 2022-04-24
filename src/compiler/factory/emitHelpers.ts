@@ -7,22 +7,22 @@ namespace ts {
       decoratorExpressions: readonly Expression[],
       target: Expression,
       memberName?: Expression,
-      descriptor?: Expression
+      descriptor?: Expression,
     ): Expression;
     createMetadataHelper(
       metadataKey: string,
-      metadataValue: Expression
+      metadataValue: Expression,
     ): Expression;
     createParamHelper(
       expression: Expression,
-      parameterOffset: number
+      parameterOffset: number,
     ): Expression;
     // ES2018 Helpers
     createAssignHelper(attributesSegments: readonly Expression[]): Expression;
     createAwaitHelper(expression: Expression): Expression;
     createAsyncGeneratorHelper(
       generatorFunc: FunctionExpression,
-      hasLexicalThis: boolean
+      hasLexicalThis: boolean,
     ): Expression;
     createAsyncDelegatorHelper(expression: Expression): Expression;
     createAsyncValuesHelper(expression: Expression): Expression;
@@ -31,31 +31,31 @@ namespace ts {
       value: Expression,
       elements: readonly BindingOrAssignmentElement[],
       computedTempVariables: readonly Expression[] | undefined,
-      location: TextRange
+      location: TextRange,
     ): Expression;
     // ES2017 Helpers
     createAwaiterHelper(
       hasLexicalThis: boolean,
       hasLexicalArguments: boolean,
       promiseConstructor: EntityName | Expression | undefined,
-      body: Block
+      body: Block,
     ): Expression;
     // ES2015 Helpers
     createExtendsHelper(name: Identifier): Expression;
     createTemplateObjectHelper(
       cooked: ArrayLiteralExpression,
-      raw: ArrayLiteralExpression
+      raw: ArrayLiteralExpression,
     ): Expression;
     createSpreadArrayHelper(
       to: Expression,
       from: Expression,
-      packFrom: boolean
+      packFrom: boolean,
     ): Expression;
     // ES2015 Destructuring Helpers
     createValuesHelper(expression: Expression): Expression;
     createReadHelper(
       iteratorRecord: Expression,
-      count: number | undefined
+      count: number | undefined,
     ): Expression;
     // ES2015 Generator Helpers
     createGeneratorHelper(body: FunctionExpression): Expression;
@@ -63,45 +63,41 @@ namespace ts {
     createCreateBindingHelper(
       module: Expression,
       inputName: Expression,
-      outputName: Expression | undefined
+      outputName: Expression | undefined,
     ): Expression;
     createImportStarHelper(expression: Expression): Expression;
     createImportStarCallbackHelper(): Expression;
     createImportDefaultHelper(expression: Expression): Expression;
     createExportStarHelper(
       moduleExpression: Expression,
-      exportsExpression?: Expression
+      exportsExpression?: Expression,
     ): Expression;
     // Class Fields Helpers
     createClassPrivateFieldGetHelper(
       receiver: Expression,
       state: Identifier,
       kind: PrivateIdentifierKind,
-      f: Identifier | undefined
+      f: Identifier | undefined,
     ): Expression;
     createClassPrivateFieldSetHelper(
       receiver: Expression,
       state: Identifier,
       value: Expression,
       kind: PrivateIdentifierKind,
-      f: Identifier | undefined
+      f: Identifier | undefined,
     ): Expression;
     createClassPrivateFieldInHelper(
       state: Identifier,
-      receiver: Expression
+      receiver: Expression,
     ): Expression;
   }
 
   export function createEmitHelperFactory(
-    context: TransformationContext
+    context: TransformationContext,
   ): EmitHelperFactory {
     const factory = context.factory;
-    const immutableTrue = memoize(() =>
-      setEmitFlags(factory.createTrue(), EmitFlags.Immutable)
-    );
-    const immutableFalse = memoize(() =>
-      setEmitFlags(factory.createFalse(), EmitFlags.Immutable)
-    );
+    const immutableTrue = memoize(() => setEmitFlags(factory.createTrue(), EmitFlags.Immutable));
+    const immutableFalse = memoize(() => setEmitFlags(factory.createFalse(), EmitFlags.Immutable));
 
     return {
       getUnscopedHelperName,
@@ -146,7 +142,7 @@ namespace ts {
     function getUnscopedHelperName(name: string) {
       return setEmitFlags(
         factory.createIdentifier(name),
-        EmitFlags.HelperName | EmitFlags.AdviseOnEmitNode
+        EmitFlags.HelperName | EmitFlags.AdviseOnEmitNode,
       );
     }
 
@@ -156,7 +152,7 @@ namespace ts {
       decoratorExpressions: Expression[],
       target: Expression,
       memberName?: Expression,
-      descriptor?: Expression
+      descriptor?: Expression,
     ) {
       context.requestEmitHelper(decorateHelper);
 
@@ -164,8 +160,8 @@ namespace ts {
       argumentsArray.push(
         factory.createArrayLiteralExpression(
           decoratorExpressions,
-          /*multiLine*/ true
-        )
+          /*multiLine*/ true,
+        ),
       );
       argumentsArray.push(target);
       if (memberName) {
@@ -178,35 +174,35 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__decorate"),
         /*typeArguments*/ undefined,
-        argumentsArray
+        argumentsArray,
       );
     }
 
     function createMetadataHelper(
       metadataKey: string,
-      metadataValue: Expression
+      metadataValue: Expression,
     ) {
       context.requestEmitHelper(metadataHelper);
       return factory.createCallExpression(
         getUnscopedHelperName("__metadata"),
         /*typeArguments*/ undefined,
-        [factory.createStringLiteral(metadataKey), metadataValue]
+        [factory.createStringLiteral(metadataKey), metadataValue],
       );
     }
 
     function createParamHelper(
       expression: Expression,
       parameterOffset: number,
-      location?: TextRange
+      location?: TextRange,
     ) {
       context.requestEmitHelper(paramHelper);
       return setTextRange(
         factory.createCallExpression(
           getUnscopedHelperName("__param"),
           /*typeArguments*/ undefined,
-          [factory.createNumericLiteral(parameterOffset + ""), expression]
+          [factory.createNumericLiteral(parameterOffset + ""), expression],
         ),
-        location
+        location,
       );
     }
 
@@ -219,17 +215,17 @@ namespace ts {
         return factory.createCallExpression(
           factory.createPropertyAccessExpression(
             factory.createIdentifier("Object"),
-            "assign"
+            "assign",
           ),
           /*typeArguments*/ undefined,
-          attributesSegments
+          attributesSegments,
         );
       }
       context.requestEmitHelper(assignHelper);
       return factory.createCallExpression(
         getUnscopedHelperName("__assign"),
         /*typeArguments*/ undefined,
-        attributesSegments
+        attributesSegments,
       );
     }
 
@@ -238,13 +234,13 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__await"),
         /*typeArguments*/ undefined,
-        [expression]
+        [expression],
       );
     }
 
     function createAsyncGeneratorHelper(
       generatorFunc: FunctionExpression,
-      hasLexicalThis: boolean
+      hasLexicalThis: boolean,
     ) {
       context.requestEmitHelper(awaitHelper);
       context.requestEmitHelper(asyncGeneratorHelper);
@@ -261,7 +257,7 @@ namespace ts {
           hasLexicalThis ? factory.createThis() : factory.createVoidZero(),
           factory.createIdentifier("arguments"),
           generatorFunc,
-        ]
+        ],
       );
     }
 
@@ -271,7 +267,7 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__asyncDelegator"),
         /*typeArguments*/ undefined,
-        [expression]
+        [expression],
       );
     }
 
@@ -280,7 +276,7 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__asyncValues"),
         /*typeArguments*/ undefined,
-        [expression]
+        [expression],
       );
     }
 
@@ -293,20 +289,20 @@ namespace ts {
       value: Expression,
       elements: readonly BindingOrAssignmentElement[],
       computedTempVariables: readonly Expression[] | undefined,
-      location: TextRange
+      location: TextRange,
     ): Expression {
       context.requestEmitHelper(restHelper);
       const propertyNames: Expression[] = [];
       let computedTempVariableOffset = 0;
       for (let i = 0; i < elements.length - 1; i++) {
         const propertyName = getPropertyNameOfBindingOrAssignmentElement(
-          elements[i]
+          elements[i],
         );
         if (propertyName) {
           if (isComputedPropertyName(propertyName)) {
             Debug.assertIsDefined(
               computedTempVariables,
-              "Encountered computed property name but 'computedTempVariables' argument was not provided."
+              "Encountered computed property name but 'computedTempVariables' argument was not provided.",
             );
             const temp = computedTempVariables[computedTempVariableOffset];
             computedTempVariableOffset++;
@@ -317,12 +313,12 @@ namespace ts {
                 /*questionToken*/ undefined,
                 temp,
                 /*colonToken*/ undefined,
-                factory.createAdd(temp, factory.createStringLiteral(""))
-              )
+                factory.createAdd(temp, factory.createStringLiteral("")),
+              ),
             );
           } else {
             propertyNames.push(
-              factory.createStringLiteralFromNode(propertyName)
+              factory.createStringLiteralFromNode(propertyName),
             );
           }
         }
@@ -334,9 +330,9 @@ namespace ts {
           value,
           setTextRange(
             factory.createArrayLiteralExpression(propertyNames),
-            location
+            location,
           ),
-        ]
+        ],
       );
     }
 
@@ -346,7 +342,7 @@ namespace ts {
       hasLexicalThis: boolean,
       hasLexicalArguments: boolean,
       promiseConstructor: EntityName | Expression | undefined,
-      body: Block
+      body: Block,
     ) {
       context.requestEmitHelper(awaiterHelper);
 
@@ -357,7 +353,7 @@ namespace ts {
         /*typeParameters*/ undefined,
         /*parameters*/ [],
         /*type*/ undefined,
-        body
+        body,
       );
 
       // Mark this node as originally an async function
@@ -377,7 +373,7 @@ namespace ts {
             ? createExpressionFromEntityName(factory, promiseConstructor)
             : factory.createVoidZero(),
           generatorFunc,
-        ]
+        ],
       );
     }
 
@@ -392,35 +388,35 @@ namespace ts {
           name,
           factory.createUniqueName(
             "_super",
-            GeneratedIdentifierFlags.Optimistic |
-              GeneratedIdentifierFlags.FileLevel
+            GeneratedIdentifierFlags.Optimistic
+              | GeneratedIdentifierFlags.FileLevel,
           ),
-        ]
+        ],
       );
     }
 
     function createTemplateObjectHelper(
       cooked: ArrayLiteralExpression,
-      raw: ArrayLiteralExpression
+      raw: ArrayLiteralExpression,
     ) {
       context.requestEmitHelper(templateObjectHelper);
       return factory.createCallExpression(
         getUnscopedHelperName("__makeTemplateObject"),
         /*typeArguments*/ undefined,
-        [cooked, raw]
+        [cooked, raw],
       );
     }
 
     function createSpreadArrayHelper(
       to: Expression,
       from: Expression,
-      packFrom: boolean
+      packFrom: boolean,
     ) {
       context.requestEmitHelper(spreadArrayHelper);
       return factory.createCallExpression(
         getUnscopedHelperName("__spreadArray"),
         /*typeArguments*/ undefined,
-        [to, from, packFrom ? immutableTrue() : immutableFalse()]
+        [to, from, packFrom ? immutableTrue() : immutableFalse()],
       );
     }
 
@@ -431,13 +427,13 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__values"),
         /*typeArguments*/ undefined,
-        [expression]
+        [expression],
       );
     }
 
     function createReadHelper(
       iteratorRecord: Expression,
-      count: number | undefined
+      count: number | undefined,
     ) {
       context.requestEmitHelper(readHelper);
       return factory.createCallExpression(
@@ -445,7 +441,7 @@ namespace ts {
         /*typeArguments*/ undefined,
         count !== undefined
           ? [iteratorRecord, factory.createNumericLiteral(count + "")]
-          : [iteratorRecord]
+          : [iteratorRecord],
       );
     }
 
@@ -456,7 +452,7 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__generator"),
         /*typeArguments*/ undefined,
-        [factory.createThis(), body]
+        [factory.createThis(), body],
       );
     }
 
@@ -465,7 +461,7 @@ namespace ts {
     function createCreateBindingHelper(
       module: Expression,
       inputName: Expression,
-      outputName: Expression | undefined
+      outputName: Expression | undefined,
     ) {
       context.requestEmitHelper(createBindingHelper);
       return factory.createCallExpression(
@@ -476,7 +472,7 @@ namespace ts {
           module,
           inputName,
           ...(outputName ? [outputName] : []),
-        ]
+        ],
       );
     }
 
@@ -485,7 +481,7 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__importStar"),
         /*typeArguments*/ undefined,
-        [expression]
+        [expression],
       );
     }
 
@@ -499,20 +495,20 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__importDefault"),
         /*typeArguments*/ undefined,
-        [expression]
+        [expression],
       );
     }
 
     function createExportStarHelper(
       moduleExpression: Expression,
-      exportsExpression: Expression = factory.createIdentifier("exports")
+      exportsExpression: Expression = factory.createIdentifier("exports"),
     ) {
       context.requestEmitHelper(exportStarHelper);
       context.requestEmitHelper(createBindingHelper);
       return factory.createCallExpression(
         getUnscopedHelperName("__exportStar"),
         /*typeArguments*/ undefined,
-        [moduleExpression, exportsExpression]
+        [moduleExpression, exportsExpression],
       );
     }
 
@@ -522,7 +518,7 @@ namespace ts {
       receiver: Expression,
       state: Identifier,
       kind: PrivateIdentifierKind,
-      f: Identifier | undefined
+      f: Identifier | undefined,
     ) {
       context.requestEmitHelper(classPrivateFieldGetHelper);
       let args;
@@ -534,7 +530,7 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__classPrivateFieldGet"),
         /*typeArguments*/ undefined,
-        args
+        args,
       );
     }
 
@@ -543,7 +539,7 @@ namespace ts {
       state: Identifier,
       value: Expression,
       kind: PrivateIdentifierKind,
-      f: Identifier | undefined
+      f: Identifier | undefined,
     ) {
       context.requestEmitHelper(classPrivateFieldSetHelper);
       let args;
@@ -555,19 +551,19 @@ namespace ts {
       return factory.createCallExpression(
         getUnscopedHelperName("__classPrivateFieldSet"),
         /*typeArguments*/ undefined,
-        args
+        args,
       );
     }
 
     function createClassPrivateFieldInHelper(
       state: Identifier,
-      receiver: Expression
+      receiver: Expression,
     ) {
       context.requestEmitHelper(classPrivateFieldInHelper);
       return factory.createCallExpression(
         getUnscopedHelperName("__classPrivateFieldIn"),
         /* typeArguments*/ undefined,
-        [state, receiver]
+        [state, receiver],
       );
     }
   }
@@ -1169,8 +1165,8 @@ namespace ts {
 
   export function getAllUnscopedEmitHelpers() {
     return (
-      allUnscopedEmitHelpers ||
-      (allUnscopedEmitHelpers = arrayToMap(
+      allUnscopedEmitHelpers
+      || (allUnscopedEmitHelpers = arrayToMap(
         [
           decorateHelper,
           metadataHelper,
@@ -1197,7 +1193,7 @@ namespace ts {
           createBindingHelper,
           setModuleDefaultHelper,
         ],
-        (helper) => helper.name
+        (helper) => helper.name,
       ))
     );
   }
@@ -1221,13 +1217,13 @@ namespace ts {
 
   export function isCallToHelper(
     firstSegment: Expression,
-    helperName: __String
+    helperName: __String,
   ): boolean {
     return (
-      isCallExpression(firstSegment) &&
-      isIdentifier(firstSegment.expression) &&
-      (getEmitFlags(firstSegment.expression) & EmitFlags.HelperName) !== 0 &&
-      firstSegment.expression.escapedText === helperName
+      isCallExpression(firstSegment)
+      && isIdentifier(firstSegment.expression)
+      && (getEmitFlags(firstSegment.expression) & EmitFlags.HelperName) !== 0
+      && firstSegment.expression.escapedText === helperName
     );
   }
 }

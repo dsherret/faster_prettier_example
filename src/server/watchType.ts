@@ -11,12 +11,9 @@ namespace ts {
     NodeModulesForModuleSpecifierCache: "node_modules for module specifier cache invalidation";
   }
   WatchType.ClosedScriptInfo = "Closed Script info";
-  WatchType.ConfigFileForInferredRoot =
-    "Config file for the inferred project root";
-  WatchType.NodeModules =
-    "node_modules for closed script infos and package.jsons affecting module specifier cache";
+  WatchType.ConfigFileForInferredRoot = "Config file for the inferred project root";
+  WatchType.NodeModules = "node_modules for closed script infos and package.jsons affecting module specifier cache";
   WatchType.MissingSourceMapFile = "Missing source map file";
-  WatchType.NoopConfigFileForInferredRoot =
-    "Noop Config file for the inferred project root";
+  WatchType.NoopConfigFileForInferredRoot = "Noop Config file for the inferred project root";
   WatchType.MissingGeneratedFile = "Missing generated file";
 }

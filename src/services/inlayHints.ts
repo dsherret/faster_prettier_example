@@ -8,13 +8,13 @@ namespace ts.InlayHints {
 
   function shouldShowParameterNameHints(preferences: UserPreferences) {
     return (
-      preferences.includeInlayParameterNameHints === "literals" ||
-      preferences.includeInlayParameterNameHints === "all"
+      preferences.includeInlayParameterNameHints === "literals"
+      || preferences.includeInlayParameterNameHints === "all"
     );
   }
 
   function shouldShowLiteralParameterNameHintsOnly(
-    preferences: UserPreferences
+    preferences: UserPreferences,
   ) {
     return preferences.includeInlayParameterNameHints === "literals";
   }
@@ -56,36 +56,36 @@ namespace ts.InlayHints {
       }
 
       if (
-        preferences.includeInlayVariableTypeHints &&
-        isVariableDeclaration(node)
+        preferences.includeInlayVariableTypeHints
+        && isVariableDeclaration(node)
       ) {
         visitVariableLikeDeclaration(node);
       } else if (
-        preferences.includeInlayPropertyDeclarationTypeHints &&
-        isPropertyDeclaration(node)
+        preferences.includeInlayPropertyDeclarationTypeHints
+        && isPropertyDeclaration(node)
       ) {
         visitVariableLikeDeclaration(node);
       } else if (
-        preferences.includeInlayEnumMemberValueHints &&
-        isEnumMember(node)
+        preferences.includeInlayEnumMemberValueHints
+        && isEnumMember(node)
       ) {
         visitEnumMember(node);
       } else if (
-        shouldShowParameterNameHints(preferences) &&
-        (isCallExpression(node) || isNewExpression(node))
+        shouldShowParameterNameHints(preferences)
+        && (isCallExpression(node) || isNewExpression(node))
       ) {
         visitCallOrNewExpression(node);
       } else {
         if (
-          preferences.includeInlayFunctionParameterTypeHints &&
-          isFunctionLikeDeclaration(node) &&
-          hasContextSensitiveParameters(node)
+          preferences.includeInlayFunctionParameterTypeHints
+          && isFunctionLikeDeclaration(node)
+          && hasContextSensitiveParameters(node)
         ) {
           visitFunctionLikeForParameterType(node);
         }
         if (
-          preferences.includeInlayFunctionLikeReturnTypeHints &&
-          isSignatureSupportingReturnAnnotation(node)
+          preferences.includeInlayFunctionLikeReturnTypeHints
+          && isSignatureSupportingReturnAnnotation(node)
         ) {
           visitFunctionDeclarationLikeForReturnType(node);
         }
@@ -94,32 +94,35 @@ namespace ts.InlayHints {
     }
 
     function isSignatureSupportingReturnAnnotation(
-      node: Node
+      node: Node,
     ): node is
       | FunctionDeclaration
       | ArrowFunction
       | FunctionExpression
       | MethodDeclaration
-      | GetAccessorDeclaration {
+      | GetAccessorDeclaration
+    {
       return (
-        isArrowFunction(node) ||
-        isFunctionExpression(node) ||
-        isFunctionDeclaration(node) ||
-        isMethodDeclaration(node) ||
-        isGetAccessorDeclaration(node)
+        isArrowFunction(node)
+        || isFunctionExpression(node)
+        || isFunctionDeclaration(node)
+        || isMethodDeclaration(node)
+        || isGetAccessorDeclaration(node)
       );
     }
 
     function addParameterHints(
       text: string,
       position: number,
-      isFirstVariadicArgument: boolean
+      isFirstVariadicArgument: boolean,
     ) {
       result.push({
-        text: `${isFirstVariadicArgument ? "..." : ""}${truncation(
-          text,
-          maxHintsLength
-        )}:`,
+        text: `${isFirstVariadicArgument ? "..." : ""}${
+          truncation(
+            text,
+            maxHintsLength,
+          )
+        }:`,
         position,
         kind: InlayHintKind.Parameter,
         whitespaceAfter: true,
@@ -160,7 +163,7 @@ namespace ts.InlayHints {
     }
 
     function visitVariableLikeDeclaration(
-      decl: VariableDeclaration | PropertyDeclaration
+      decl: VariableDeclaration | PropertyDeclaration,
     ) {
       if (!decl.initializer || isBindingPattern(decl.name)) {
         return;
@@ -191,7 +194,7 @@ namespace ts.InlayHints {
       const candidates: Signature[] = [];
       const signature = checker.getResolvedSignatureForSignatureHelp(
         expr,
-        candidates
+        candidates,
       );
       if (!signature || !candidates.length) {
         return;
@@ -201,23 +204,22 @@ namespace ts.InlayHints {
         const originalArg = args[i];
         const arg = skipParentheses(originalArg);
         if (
-          shouldShowLiteralParameterNameHintsOnly(preferences) &&
-          !isHintableLiteral(arg)
+          shouldShowLiteralParameterNameHintsOnly(preferences)
+          && !isHintableLiteral(arg)
         ) {
           continue;
         }
 
         const identifierNameInfo = checker.getParameterIdentifierNameAtPosition(
           signature,
-          i
+          i,
         );
         if (identifierNameInfo) {
           const [parameterName, isFirstVariadicArgument] = identifierNameInfo;
-          const isParameterNameNotSameAsArgument =
-            preferences.includeInlayParameterNameHintsWhenArgumentMatchesName ||
-            !identifierOrAccessExpressionPostfixMatchesParameterName(
+          const isParameterNameNotSameAsArgument = preferences.includeInlayParameterNameHintsWhenArgumentMatchesName
+            || !identifierOrAccessExpressionPostfixMatchesParameterName(
               arg,
-              parameterName
+              parameterName,
             );
           if (!isParameterNameNotSameAsArgument && !isFirstVariadicArgument) {
             continue;
@@ -231,7 +233,7 @@ namespace ts.InlayHints {
           addParameterHints(
             name,
             originalArg.getStart(),
-            isFirstVariadicArgument
+            isFirstVariadicArgument,
           );
         }
       }
@@ -239,7 +241,7 @@ namespace ts.InlayHints {
 
     function identifierOrAccessExpressionPostfixMatchesParameterName(
       expr: Expression,
-      parameterName: __String
+      parameterName: __String,
     ) {
       if (isIdentifier(expr)) {
         return expr.text === parameterName;
@@ -255,7 +257,7 @@ namespace ts.InlayHints {
         !isIdentifierText(
           name,
           compilerOptions.target,
-          getLanguageVariant(file.scriptKind)
+          getLanguageVariant(file.scriptKind),
         )
       ) {
         return false;
@@ -267,9 +269,7 @@ namespace ts.InlayHints {
       }
 
       const regex = leadingParameterNameCommentRegexFactory(name);
-      return some(ranges, (range) =>
-        regex.test(sourceFileText.substring(range.pos, range.end))
-      );
+      return some(ranges, (range) => regex.test(sourceFileText.substring(range.pos, range.end)));
     }
 
     function isHintableLiteral(node: Node) {
@@ -277,9 +277,9 @@ namespace ts.InlayHints {
         case SyntaxKind.PrefixUnaryExpression: {
           const operand = (node as PrefixUnaryExpression).operand;
           return (
-            isLiteralExpression(operand) ||
-            (isIdentifier(operand) &&
-              isInfinityOrNaNString(operand.escapedText))
+            isLiteralExpression(operand)
+            || (isIdentifier(operand)
+              && isInfinityOrNaNString(operand.escapedText))
           );
         }
         case SyntaxKind.TrueKeyword:
@@ -302,7 +302,7 @@ namespace ts.InlayHints {
         | ArrowFunction
         | FunctionExpression
         | MethodDeclaration
-        | GetAccessorDeclaration
+        | GetAccessorDeclaration,
     ) {
       if (isArrowFunction(decl)) {
         if (!findChildOfKind(decl, SyntaxKind.OpenParenToken, file)) {
@@ -339,12 +339,12 @@ namespace ts.InlayHints {
         | ArrowFunction
         | FunctionExpression
         | MethodDeclaration
-        | GetAccessorDeclaration
+        | GetAccessorDeclaration,
     ) {
       const closeParenToken = findChildOfKind(
         decl,
         SyntaxKind.CloseParenToken,
-        file
+        file,
       );
       if (closeParenToken) {
         return closeParenToken.end;
@@ -371,7 +371,7 @@ namespace ts.InlayHints {
         }
 
         const typeDisplayString = getParameterDeclarationTypeDisplayString(
-          signature.parameters[i]
+          signature.parameters[i],
         );
         if (!typeDisplayString) {
           continue;
@@ -379,7 +379,7 @@ namespace ts.InlayHints {
 
         addTypeHints(
           typeDisplayString,
-          param.questionToken ? param.questionToken.end : param.name.end
+          param.questionToken ? param.questionToken.end : param.name.end,
         );
       }
     }
@@ -392,7 +392,7 @@ namespace ts.InlayHints {
 
       const signatureParamType = checker.getTypeOfSymbolAtLocation(
         symbol,
-        valueDeclaration
+        valueDeclaration,
       );
       if (isModuleReferenceType(signatureParamType)) {
         return undefined;
@@ -409,10 +409,9 @@ namespace ts.InlayHints {
     }
 
     function printTypeInSingleLine(type: Type) {
-      const flags =
-        NodeBuilderFlags.IgnoreErrors |
-        TypeFormatFlags.AllowUniqueESSymbolType |
-        TypeFormatFlags.UseAliasDefinedOutsideCurrentScope;
+      const flags = NodeBuilderFlags.IgnoreErrors
+        | TypeFormatFlags.AllowUniqueESSymbolType
+        | TypeFormatFlags.UseAliasDefinedOutsideCurrentScope;
       const options: PrinterOptions = { removeComments: true };
       const printer = createPrinter(options);
 
@@ -421,14 +420,14 @@ namespace ts.InlayHints {
           type,
           /*enclosingDeclaration*/ undefined,
           flags,
-          writer
+          writer,
         );
         Debug.assertIsDefined(typeNode, "should always get typenode");
         printer.writeNode(
           EmitHint.Unspecified,
           typeNode,
           /*sourceFile*/ file,
-          writer
+          writer,
         );
       });
     }

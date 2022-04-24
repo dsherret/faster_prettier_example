@@ -25,7 +25,7 @@ namespace ts.tscWatch {
           ],
           {
             currentDirectory: `${TestFSWithWatch.tsbuildProjectsLocation}/reexport`,
-          }
+          },
         ),
       changes: [
         {
@@ -35,7 +35,7 @@ namespace ts.tscWatch {
               sys,
               `${TestFSWithWatch.tsbuildProjectsLocation}/reexport/src/pure/session.ts`,
               "// ",
-              ""
+              "",
             ),
           timeouts: build,
         },
@@ -46,7 +46,7 @@ namespace ts.tscWatch {
               sys,
               `${TestFSWithWatch.tsbuildProjectsLocation}/reexport/src/pure/session.ts`,
               "bar: ",
-              "// bar: "
+              "// bar: ",
             ),
           timeouts: build,
         },

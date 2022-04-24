@@ -15,7 +15,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         rootFiles: ["/.src/main.ts"],
         main: "/.src/main.ts",
       },
-      { module: ts.ModuleKind.CommonJS }
+      { module: ts.ModuleKind.CommonJS },
     );
     assert.equal(result.a, 2);
     assert.equal(result.b, 2);
@@ -33,7 +33,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         rootFiles: ["/.src/main.ts"],
         main: "/.src/main.ts",
       },
-      { module: ts.ModuleKind.System }
+      { module: ts.ModuleKind.System },
     );
     assert.equal(result.a, 2);
     assert.equal(result.b, 2);
@@ -52,7 +52,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         main: "/.src/main.ts",
       },
       { module: ts.ModuleKind.CommonJS },
-      { BigInt }
+      { BigInt },
     );
     assert.equal(result.a, BigInt(2));
     assert.equal(result.b, BigInt(2));
@@ -71,7 +71,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         main: "/.src/main.ts",
       },
       { module: ts.ModuleKind.System },
-      { BigInt }
+      { BigInt },
     );
     assert.equal(result.a, BigInt(2));
     assert.equal(result.b, BigInt(2));
@@ -89,7 +89,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         rootFiles: ["/.src/main.ts"],
         main: "/.src/main.ts",
       },
-      { module: ts.ModuleKind.CommonJS }
+      { module: ts.ModuleKind.CommonJS },
     );
     assert.equal(result.a, 2);
     assert.equal(result.b, 1);
@@ -107,7 +107,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         rootFiles: ["/.src/main.ts"],
         main: "/.src/main.ts",
       },
-      { module: ts.ModuleKind.System }
+      { module: ts.ModuleKind.System },
     );
     assert.equal(result.a, 2);
     assert.equal(result.b, 1);
@@ -126,7 +126,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         main: "/.src/main.ts",
       },
       { module: ts.ModuleKind.CommonJS },
-      { BigInt }
+      { BigInt },
     );
     assert.equal(result.a, BigInt(2));
     assert.equal(result.b, BigInt(1));
@@ -145,7 +145,7 @@ describe("unittests:: evaluation:: updateExpressionInModule", () => {
         main: "/.src/main.ts",
       },
       { module: ts.ModuleKind.System },
-      { BigInt }
+      { BigInt },
     );
     assert.equal(result.a, BigInt(2));
     assert.equal(result.b, BigInt(1));

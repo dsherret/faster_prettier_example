@@ -12,14 +12,12 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToConvertToMappedTypeObject(
-      context
+      context,
     ) {
       const { sourceFile, span } = context;
       const info = getInfo(sourceFile, span.start);
       if (!info) return undefined;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, info)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, info));
       const name = idText(info.container.name);
       return [
         createCodeFixAction(
@@ -27,7 +25,7 @@ namespace ts.codefix {
           changes,
           [Diagnostics.Convert_0_to_mapped_object_type, name],
           fixId,
-          [Diagnostics.Convert_0_to_mapped_object_type, name]
+          [Diagnostics.Convert_0_to_mapped_object_type, name],
         ),
       ];
     },
@@ -47,7 +45,7 @@ namespace ts.codefix {
     const token = getTokenAtPosition(sourceFile, pos);
     const indexSignature = tryCast(
       token.parent.parent,
-      isIndexSignatureDeclaration
+      isIndexSignatureDeclaration,
     );
     if (!indexSignature) return undefined;
 
@@ -61,33 +59,33 @@ namespace ts.codefix {
 
   function createTypeAliasFromInterface(
     declaration: FixableDeclaration,
-    type: TypeNode
+    type: TypeNode,
   ): TypeAliasDeclaration {
     return factory.createTypeAliasDeclaration(
       declaration.decorators,
       declaration.modifiers,
       declaration.name,
       declaration.typeParameters,
-      type
+      type,
     );
   }
 
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    { indexSignature, container }: Info
+    { indexSignature, container }: Info,
   ): void {
     const members = isInterfaceDeclaration(container)
       ? container.members
       : (container.type as TypeLiteralNode).members;
     const otherMembers = members.filter(
-      (member) => !isIndexSignatureDeclaration(member)
+      (member) => !isIndexSignatureDeclaration(member),
     );
     const parameter = first(indexSignature.parameters);
     const mappedTypeParameter = factory.createTypeParameterDeclaration(
       /*modifiers*/ undefined,
       cast(parameter.name, isIdentifier),
-      parameter.type
+      parameter.type,
     );
     const mappedIntersectionType = factory.createMappedTypeNode(
       hasEffectiveReadonlyModifier(indexSignature)
@@ -97,7 +95,7 @@ namespace ts.codefix {
       /*nameType*/ undefined,
       indexSignature.questionToken,
       indexSignature.type,
-      /*members*/ undefined
+      /*members*/ undefined,
     );
     const intersectionType = factory.createIntersectionTypeNode([
       ...getAllSuperTypeNodes(container),
@@ -109,7 +107,7 @@ namespace ts.codefix {
     changes.replaceNode(
       sourceFile,
       container,
-      createTypeAliasFromInterface(container, intersectionType)
+      createTypeAliasFromInterface(container, intersectionType),
     );
   }
 }

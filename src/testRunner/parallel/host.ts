@@ -15,7 +15,7 @@ namespace Harness.Parallel.Host {
 
     // NOTE: paths for module and types for FailedTestReporter _do not_ line up due to our use of --outFile for run.js
     const FailedTestReporter = require(Utils.findUpFile(
-      "scripts/failed-tests.js"
+      "scripts/failed-tests.js",
     )) as typeof import("../../../scripts/failed-tests");
 
     const perfdataFileNameFragment = ".parallelperf";
@@ -118,19 +118,18 @@ namespace Harness.Parallel.Host {
         percentComplete: number,
         color: string,
         title: string | undefined,
-        titleColor?: string
+        titleColor?: string,
       ) {
         percentComplete = minMax(percentComplete, 0, 1);
 
-        const progressBar =
-          this._progressBars[index] || (this._progressBars[index] = {});
+        const progressBar = this._progressBars[index] || (this._progressBars[index] = {});
         const width = this._options.width;
         const n = Math.floor(width * percentComplete);
         const i = width - n;
         if (
-          n === progressBar.lastN &&
-          title === progressBar.title &&
-          color === progressBar.progressColor
+          n === progressBar.lastN
+          && title === progressBar.title
+          && color === progressBar.progressColor
         ) {
           return;
         }
@@ -163,7 +162,7 @@ namespace Harness.Parallel.Host {
         readline.moveCursor(
           process.stdout,
           -process.stdout.columns,
-          -this._lineCount
+          -this._lineCount,
         );
         let lineCount = 0;
         const numProgressBars = this._progressBars.length;
@@ -191,7 +190,7 @@ namespace Harness.Parallel.Host {
     }
 
     function readSavedPerfData(
-      target?: string
+      target?: string,
     ): { [testHash: string]: number } | undefined {
       const perfDataContents = IO.readFile(perfdataFileName(target));
       if (perfDataContents) {
@@ -206,11 +205,11 @@ namespace Harness.Parallel.Host {
 
     function startDelayed(
       perfData: { [testHash: string]: number } | undefined,
-      totalCost: number
+      totalCost: number,
     ) {
       console.log(
-        `Discovered ${tasks.length} unittest suites` +
-          (newTasks.length ? ` and ${newTasks.length} new suites.` : ".")
+        `Discovered ${tasks.length} unittest suites`
+          + (newTasks.length ? ` and ${newTasks.length} new suites.` : "."),
       );
       console.log("Discovering runner-based tests...");
       const discoverStart = +new Date();
@@ -227,7 +226,7 @@ namespace Harness.Parallel.Host {
                 size = IO.listFiles(
                   path.join(runner.workingDirectory, file),
                   /.*/g,
-                  { recursive: true }
+                  { recursive: true },
                 ).reduce((acc, elem) => acc + statSync(elem).size, 0);
               } catch {
                 // Unknown test kind, just return 0 and let the historical analysis take over after one run
@@ -255,9 +254,7 @@ namespace Harness.Parallel.Host {
       const chunkSize = 1000; // ~1KB or 1s for sending batches near the end of a test
       const batchSize = (totalCost / workerCount) * packfraction; // Keep spare tests for unittest thread in reserve
       console.log(
-        `Discovered ${tasks.length} test files in ${
-          +new Date() - discoverStart
-        }ms.`
+        `Discovered ${tasks.length} test files in ${+new Date() - discoverStart}ms.`,
       );
       console.log(`Starting to run tests using ${workerCount} threads...`);
 
@@ -288,7 +285,7 @@ namespace Harness.Parallel.Host {
         }; // eslint-disable-line @typescript-eslint/no-unnecessary-qualifier
         const configPath = ts.combinePaths(
           taskConfigsFolder,
-          `task-config${i}.json`
+          `task-config${i}.json`,
         );
         IO.writeFile(configPath, JSON.stringify(config));
         const worker: Worker = {
@@ -312,7 +309,7 @@ namespace Harness.Parallel.Host {
               worker.currentTasks && worker.currentTasks.length
                 ? `while running test '${worker.currentTasks[0].file}'.`
                 : `during test setup.`
-            }`
+            }`,
           );
           return process.exit(2);
         };
@@ -352,7 +349,7 @@ namespace Harness.Parallel.Host {
                 worker.timer = setTimeout(
                   killChild,
                   data.payload.duration,
-                  data.payload
+                  data.payload,
                 );
               }
               break;
@@ -385,7 +382,7 @@ namespace Harness.Parallel.Host {
                   errorResults.length
                     ? `${errorResults.length} failing`
                     : `${totalPassing} passing`,
-                  errorResults.length ? "fail" : undefined
+                  errorResults.length ? "fail" : undefined,
                 );
               }
 
@@ -402,8 +399,8 @@ namespace Harness.Parallel.Host {
                 // Send tasks in blocks if the tasks are small
                 const taskList = [tasks.pop()!];
                 while (
-                  tasks.length &&
-                  taskList.reduce((p, c) => p + c.size, 0) < chunkSize
+                  tasks.length
+                  && taskList.reduce((p, c) => p + c.size, 0) < chunkSize
                 ) {
                   taskList.push(tasks.pop()!);
                 }
@@ -436,12 +433,13 @@ namespace Harness.Parallel.Host {
         }[][] = new Array(batchCount);
         const doneBatching = new Array(batchCount);
         let scheduledTotal = 0;
-        batcher: while (true) {
+        batcher:
+        while (true) {
           for (let i = 0; i < batchCount; i++) {
             if (tasks.length <= workerCount) {
               // Keep a small reserve even in the suboptimally packed case
               console.log(
-                `Suboptimal packing detected: no tests remain to be stolen. Reduce packing fraction from ${packfraction} to fix.`
+                `Suboptimal packing detected: no tests remain to be stolen. Reduce packing fraction from ${packfraction} to fix.`,
               );
               break batcher;
             }
@@ -470,17 +468,17 @@ namespace Harness.Parallel.Host {
         const prefix = `Batched into ${batchCount} groups`;
         if (unknownValue) {
           console.log(
-            `${prefix}. Unprofiled tests including ${unknownValue} will be run first.`
+            `${prefix}. Unprofiled tests including ${unknownValue} will be run first.`,
           );
         } else {
           console.log(
-            `${prefix} with approximate total ${
-              perfData ? "time" : "file sizes"
-            } of ${
+            `${prefix} with approximate total ${perfData ? "time" : "file sizes"} of ${
               perfData ? ms(batchSize) : `${Math.floor(batchSize)} bytes`
-            } in each group. (${((scheduledTotal / totalCost) * 100).toFixed(
-              1
-            )}% of total tests batched)`
+            } in each group. (${
+              ((scheduledTotal / totalCost) * 100).toFixed(
+                1,
+              )
+            }% of total tests batched)`,
           );
         }
         for (const worker of workers) {
@@ -516,18 +514,16 @@ namespace Harness.Parallel.Host {
           ? Base.symbols.err
           : Base.symbols.ok;
 
-        const summaryTests =
-          (isPartitionFail
-            ? totalPassing + "/" + (errorResults.length + totalPassing)
-            : totalPassing) + " passing";
+        const summaryTests = (isPartitionFail
+          ? totalPassing + "/" + (errorResults.length + totalPassing)
+          : totalPassing) + " passing";
         const summaryDuration = "(" + ms(duration) + ")";
         const savedUseColors = Base.useColors;
         Base.useColors = !noColors;
 
-        const summary =
-          color(summaryColor, summarySymbol + " " + summaryTests) +
-          " " +
-          color("light", summaryDuration);
+        const summary = color(summaryColor, summarySymbol + " " + summaryTests)
+          + " "
+          + color("light", summaryDuration);
         Base.useColors = savedUseColors;
 
         updateProgress(1, summary);
@@ -536,7 +532,7 @@ namespace Harness.Parallel.Host {
       function updateProgress(
         percentComplete: number,
         title?: string,
-        titleColor?: string
+        titleColor?: string,
       ) {
         let progressColor = "pending";
         if (failingFiles) {
@@ -548,7 +544,7 @@ namespace Harness.Parallel.Host {
           percentComplete,
           progressColor,
           title,
-          titleColor
+          titleColor,
         );
       }
 
@@ -590,22 +586,24 @@ namespace Harness.Parallel.Host {
 
         function rebuildSuite(failures: ErrorInfo[], passes: TestInfo[]) {
           const root = new RemoteSuite("");
-          for (const result of [...failures, ...passes] as (
-            | ErrorInfo
-            | TestInfo
-          )[]) {
+          for (
+            const result of [...failures, ...passes] as (
+              | ErrorInfo
+              | TestInfo
+            )[]
+          ) {
             getSuite(root, result.name.slice(0, -1)).addTest(
-              new RemoteTest(result)
+              new RemoteTest(result),
             );
           }
           return root;
           function getSuite(
             parent: RemoteSuite,
-            titlePath: string[]
+            titlePath: string[],
           ): Mocha.Suite {
             const title = titlePath[0];
             let suite = parent.suiteMap.get(title);
-            if (!suite) parent.addSuite((suite = new RemoteSuite(title)));
+            if (!suite) parent.addSuite(suite = new RemoteSuite(title));
             return titlePath.length === 1
               ? suite
               : getSuite(suite, titlePath.slice(1));
@@ -637,7 +635,7 @@ namespace Harness.Parallel.Host {
               test,
               "error" in test.info
                 ? rebuildError(test.info)
-                : new Error("Unknown error")
+                : new Error("Unknown error"),
             ); // eslint-disable-line no-in-operator
           } else {
             runner.emit("pass", test);
@@ -694,17 +692,13 @@ namespace Harness.Parallel.Host {
         // eslint-disable-next-line no-null/no-null
         IO.writeFile(
           perfdataFileName(configOption),
-          JSON.stringify(newPerfData, null, 4)
+          JSON.stringify(newPerfData, null, 4),
         );
 
         if (xunitReporter) {
-          xunitReporter.done(errorResults.length, (failures) =>
-            process.exit(failures)
-          );
+          xunitReporter.done(errorResults.length, (failures) => process.exit(failures));
         } else if (failedTestReporter) {
-          failedTestReporter.done(errorResults.length, (failures) =>
-            process.exit(failures)
-          );
+          failedTestReporter.done(errorResults.length, (failures) => process.exit(failures));
         } else {
           process.exit(errorResults.length);
         }

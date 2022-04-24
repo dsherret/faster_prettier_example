@@ -8,7 +8,7 @@ interface Date {
    */
   toLocaleString(
     locales?: Intl.LocalesArgument,
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 
   /**
@@ -18,7 +18,7 @@ interface Date {
    */
   toLocaleDateString(
     locales?: Intl.LocalesArgument,
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 
   /**
@@ -28,6 +28,6 @@ interface Date {
    */
   toLocaleTimeString(
     locales?: Intl.LocalesArgument,
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 }

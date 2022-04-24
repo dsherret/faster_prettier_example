@@ -10,10 +10,11 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToAddMissingDeclareOnProperty(
-      context
+      context,
     ) {
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        makeChange(t, context.sourceFile, context.span.start)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => makeChange(t, context.sourceFile, context.span.start),
       );
       if (changes.length > 0) {
         return [
@@ -22,7 +23,7 @@ namespace ts.codefix {
             changes,
             Diagnostics.Prefix_with_declare,
             fixId,
-            Diagnostics.Prefix_all_incorrect_property_declarations_with_declare
+            Diagnostics.Prefix_all_incorrect_property_declarations_with_declare,
           ),
         ];
       }
@@ -30,9 +31,7 @@ namespace ts.codefix {
     fixIds: [fixId],
     getAllCodeActions: (context) => {
       const fixedNodes = new Set<Node>();
-      return codeFixAll(context, errorCodes, (changes, diag) =>
-        makeChange(changes, diag.file, diag.start, fixedNodes)
-      );
+      return codeFixAll(context, errorCodes, (changes, diag) => makeChange(changes, diag.file, diag.start, fixedNodes));
     },
   });
 
@@ -40,7 +39,7 @@ namespace ts.codefix {
     changeTracker: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     pos: number,
-    fixedNodes?: Set<Node>
+    fixedNodes?: Set<Node>,
   ) {
     const token = getTokenAtPosition(sourceFile, pos);
     if (!isIdentifier(token)) {
@@ -48,13 +47,13 @@ namespace ts.codefix {
     }
     const declaration = token.parent;
     if (
-      declaration.kind === SyntaxKind.PropertyDeclaration &&
-      (!fixedNodes || tryAddToSet(fixedNodes, declaration))
+      declaration.kind === SyntaxKind.PropertyDeclaration
+      && (!fixedNodes || tryAddToSet(fixedNodes, declaration))
     ) {
       changeTracker.insertModifierBefore(
         sourceFile,
         SyntaxKind.DeclareKeyword,
-        declaration
+        declaration,
       );
     }
   }

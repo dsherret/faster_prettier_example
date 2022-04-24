@@ -3,7 +3,7 @@ namespace ts {
     let projFs: vfs.FileSystem;
     before(() => {
       projFs = loadProjectFromDisk(
-        "tests/projects/resolveJsonModuleAndComposite"
+        "tests/projects/resolveJsonModuleAndComposite",
       );
     });
 
@@ -37,8 +37,7 @@ namespace ts {
 
     verifyTsc({
       scenario: "resolveJsonModule",
-      subScenario:
-        "include of json along with other include and file name matches ts file",
+      subScenario: "include of json along with other include and file name matches ts file",
       fs: () => projFs,
       commandLineArgs: [
         "--b",
@@ -50,13 +49,13 @@ namespace ts {
         fs.rimrafSync("/src/src/hello.json");
         fs.writeFileSync(
           "/src/src/index.json",
-          JSON.stringify({ hello: "world" })
+          JSON.stringify({ hello: "world" }),
         );
         fs.writeFileSync(
           "/src/src/index.ts",
           `import hello from "./index.json"
 
-export default hello.hello`
+export default hello.hello`,
         );
       },
     });
@@ -100,7 +99,7 @@ export default hello.hello`
           fs,
           "src/tsconfig_withFiles.json",
           `"composite": true,`,
-          `"composite": true, "sourceMap": true,`
+          `"composite": true, "sourceMap": true,`,
         ),
       incrementalScenarios: noChangeOnlyRuns,
     });
@@ -110,8 +109,7 @@ export default hello.hello`
       subScenario: "without outDir",
       fs: () => projFs,
       commandLineArgs: ["--b", "src/tsconfig_withFiles.json", "--verbose"],
-      modifyFs: (fs) =>
-        replaceText(fs, "src/tsconfig_withFiles.json", `"outDir": "dist",`, ""),
+      modifyFs: (fs) => replaceText(fs, "src/tsconfig_withFiles.json", `"outDir": "dist",`, ""),
       incrementalScenarios: noChangeOnlyRuns,
     });
   });
@@ -120,8 +118,7 @@ export default hello.hello`
     verifyTscSerializedIncrementalEdits({
       scenario: "resolveJsonModule",
       subScenario: "importing json module from project reference",
-      fs: () =>
-        loadProjectFromDisk("tests/projects/importJsonFromProjectReference"),
+      fs: () => loadProjectFromDisk("tests/projects/importJsonFromProjectReference"),
       commandLineArgs: [
         "--b",
         "src/tsconfig.json",

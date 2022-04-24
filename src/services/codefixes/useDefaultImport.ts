@@ -13,8 +13,9 @@ namespace ts.codefix {
       } = context;
       const info = getInfo(sourceFile, start);
       if (!info) return undefined;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, info, context.preferences)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChange(t, sourceFile, info, context.preferences),
       );
       return [
         createCodeFixAction(
@@ -22,7 +23,7 @@ namespace ts.codefix {
           changes,
           Diagnostics.Convert_to_default_import,
           fixId,
-          Diagnostics.Convert_all_to_default_imports
+          Diagnostics.Convert_all_to_default_imports,
         ),
       ];
     },
@@ -44,8 +45,8 @@ namespace ts.codefix {
     if (!isIdentifier(name)) return undefined; // bad input
     const { parent } = name;
     if (
-      isImportEqualsDeclaration(parent) &&
-      isExternalModuleReference(parent.moduleReference)
+      isImportEqualsDeclaration(parent)
+      && isExternalModuleReference(parent.moduleReference)
     ) {
       return {
         importNode: parent,
@@ -62,7 +63,7 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     info: Info,
-    preferences: UserPreferences
+    preferences: UserPreferences,
   ): void {
     changes.replaceNode(
       sourceFile,
@@ -71,8 +72,8 @@ namespace ts.codefix {
         info.name,
         /*namedImports*/ undefined,
         info.moduleSpecifier,
-        getQuotePreference(sourceFile, preferences)
-      )
+        getQuotePreference(sourceFile, preferences),
+      ),
     );
   }
 }

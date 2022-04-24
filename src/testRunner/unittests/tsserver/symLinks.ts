@@ -59,7 +59,7 @@ namespace ts.projectSystem {
           { file: aFc, projectRootPath: folderA },
           { file: bFc, projectRootPath: folderB },
         ],
-        session
+        session,
       );
       executeSessionRequest<protocol.RenameRequest, protocol.RenameResponse>(
         session,
@@ -67,12 +67,12 @@ namespace ts.projectSystem {
         {
           file: aFc,
           ...protocolLocationFromSubstring(cFile.content, "C"),
-        }
+        },
       );
       baselineTsserverLogs(
         "symLinks",
         "rename in common file renames all project",
-        session
+        session,
       );
     });
 
@@ -170,7 +170,7 @@ new C();`,
               host.ensureFileOrFolder(nodeModulesRecorgnizersText);
               host.writeFile(
                 recongnizerTextDistTypingFile.path,
-                recongnizerTextDistTypingFile.content
+                recongnizerTextDistTypingFile.content,
               );
               host.runQueuedTimeoutCallbacks(); // Scheduled invalidation of resolutions
               host.runQueuedTimeoutCallbacks(); // Actual update
@@ -182,10 +182,8 @@ new C();`,
               });
               baselineTsserverLogs(
                 "symLinks",
-                `module resolution${
-                  withPathMapping ? " with path mapping" : ""
-                } when project compiles from sources`,
-                session
+                `module resolution${withPathMapping ? " with path mapping" : ""} when project compiles from sources`,
+                session,
               );
             });
 
@@ -203,7 +201,7 @@ new C();`,
 
               host.writeFile(
                 recongnizerTextDistTypingFile.path,
-                recongnizerTextDistTypingFile.content
+                recongnizerTextDistTypingFile.content,
               );
               host.runQueuedTimeoutCallbacks(); // Scheduled invalidation of resolutions
               host.runQueuedTimeoutCallbacks(); // Actual update
@@ -218,7 +216,7 @@ new C();`,
                 `module resolution${
                   withPathMapping ? " with path mapping" : ""
                 } when project has node_modules setup but doesnt have modules in typings folder and then recompiles`,
-                session
+                session,
               );
             });
 
@@ -260,10 +258,10 @@ new C();`,
                 `module resolution${
                   withPathMapping ? " with path mapping" : ""
                 } when project recompiles after deleting generated folders`,
-                session
+                session,
               );
             });
-          }
+          },
         );
       }
 

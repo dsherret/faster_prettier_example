@@ -11,7 +11,7 @@ namespace Utils {
   export function evalFile(
     fileContents: string,
     fileName: string,
-    nodeContext?: any
+    nodeContext?: any,
   ) {
     const vm = require("vm");
     if (nodeContext) {
@@ -55,11 +55,11 @@ namespace Utils {
 
   export function memoize<T extends ts.AnyFunction>(
     f: T,
-    memoKey: (...anything: any[]) => string
+    memoKey: (...anything: any[]) => string,
   ): T {
     const cache = new ts.Map<string, any>();
 
-    return function (this: any, ...args: any[]) {
+    return function(this: any, ...args: any[]) {
       const key = memoKey(...args);
       if (cache.has(key)) {
         return cache.get(key);
@@ -72,12 +72,12 @@ namespace Utils {
   }
 
   export const canonicalizeForHarness = ts.createGetCanonicalFileName(
-    /*caseSensitive*/ false
+    /*caseSensitive*/ false,
   ); // This is done so tests work on windows _and_ linux
 
   export function assertInvariants(
     node: ts.Node | undefined,
-    parent: ts.Node | undefined
+    parent: ts.Node | undefined,
   ) {
     const queue: [ts.Node | undefined, ts.Node | undefined][] = [
       [node, parent],
@@ -88,7 +88,7 @@ namespace Utils {
 
     function assertInvariantsWorker(
       node: ts.Node | undefined,
-      parent: ts.Node | undefined
+      parent: ts.Node | undefined,
     ): void {
       if (node) {
         assert.isFalse(node.pos < 0, "node.pos < 0");
@@ -122,13 +122,13 @@ namespace Utils {
             for (const item of array) {
               assert.isFalse(
                 item.pos < currentPos,
-                "array[i].pos < currentPos"
+                "array[i].pos < currentPos",
               );
               currentPos = item.end;
             }
 
             currentPos = array.end;
-          }
+          },
         );
 
         const childNodesAndArrays: any[] = [];
@@ -139,19 +139,19 @@ namespace Utils {
           },
           (array) => {
             childNodesAndArrays.push(array);
-          }
+          },
         );
 
         for (const childName in node) {
           if (
-            childName === "parent" ||
-            childName === "nextContainer" ||
-            childName === "modifiers" ||
-            childName === "externalModuleIndicator" ||
+            childName === "parent"
+            || childName === "nextContainer"
+            || childName === "modifiers"
+            || childName === "externalModuleIndicator"
             // for now ignore jsdoc comments
-            childName === "jsDocComment" ||
-            childName === "checkJsDirective" ||
-            childName === "commonJsModuleIndicator"
+            || childName === "jsDocComment"
+            || childName === "checkJsDirective"
+            || childName === "commonJsModuleIndicator"
           ) {
             continue;
           }
@@ -159,10 +159,10 @@ namespace Utils {
           if (isNodeOrArray(child)) {
             assert.isFalse(
               childNodesAndArrays.indexOf(child) < 0,
-              "Missing child when forEach'ing over node: " +
-                (ts as any).SyntaxKind[node.kind] +
-                "-" +
-                childName
+              "Missing child when forEach'ing over node: "
+                + (ts as any).SyntaxKind[node.kind]
+                + "-"
+                + childName,
             );
           }
         }
@@ -184,7 +184,7 @@ namespace Utils {
       length: diagnostic.length,
       messageText: ts.flattenDiagnosticMessageText(
         diagnostic.messageText,
-        Harness.IO.newLine()
+        Harness.IO.newLine(),
       ),
       category: ts.diagnosticCategoryName(diagnostic, /*lowerCase*/ false),
       code: diagnostic.code,
@@ -195,7 +195,7 @@ namespace Utils {
     return JSON.stringify(
       file,
       (_, v) => (isNodeOrArray(v) ? serializeNode(v) : v),
-      "    "
+      "    ",
     );
 
     function getKindName(k: number | string): string {
@@ -206,10 +206,10 @@ namespace Utils {
       // For some markers in SyntaxKind, we should print its original syntax name instead of
       // the marker name in tests.
       if (
-        k === (ts as any).SyntaxKind.FirstJSDocNode ||
-        k === (ts as any).SyntaxKind.LastJSDocNode ||
-        k === (ts as any).SyntaxKind.FirstJSDocTagNode ||
-        k === (ts as any).SyntaxKind.LastJSDocTagNode
+        k === (ts as any).SyntaxKind.FirstJSDocNode
+        || k === (ts as any).SyntaxKind.LastJSDocNode
+        || k === (ts as any).SyntaxKind.FirstJSDocTagNode
+        || k === (ts as any).SyntaxKind.LastJSDocTagNode
       ) {
         for (const kindName in (ts as any).SyntaxKind) {
           if ((ts as any).SyntaxKind[kindName] === k) {
@@ -255,10 +255,12 @@ namespace Utils {
         o.containsParseError = true;
       }
 
-      for (const propertyName of Object.getOwnPropertyNames(n) as readonly (
-        | keyof ts.SourceFile
-        | keyof ts.Identifier
-      )[]) {
+      for (
+        const propertyName of Object.getOwnPropertyNames(n) as readonly (
+          | keyof ts.SourceFile
+          | keyof ts.Identifier
+        )[]
+      ) {
         switch (propertyName) {
           case "parent":
           case "symbol":
@@ -281,11 +283,10 @@ namespace Utils {
             // Clear the flags that are produced by aggregating child values. That is ephemeral
             // data we don't care about in the dump. We only care what the parser set directly
             // on the AST.
-            const flags =
-              n.flags &
-              ~(
-                ts.NodeFlags.JavaScriptFile |
-                ts.NodeFlags.HasAggregatedChildData
+            const flags = n.flags
+              & ~(
+                ts.NodeFlags.JavaScriptFile
+                | ts.NodeFlags.HasAggregatedChildData
               );
             if (flags) {
               o[propertyName] = getNodeFlagName(flags);
@@ -324,7 +325,7 @@ namespace Utils {
 
   export function assertDiagnosticsEquals(
     array1: readonly ts.Diagnostic[],
-    array2: readonly ts.Diagnostic[]
+    array2: readonly ts.Diagnostic[],
   ) {
     if (array1 === array2) {
       return;
@@ -336,7 +337,7 @@ namespace Utils {
     assert.equal(
       array1.length,
       array2.length,
-      "array1.length !== array2.length"
+      "array1.length !== array2.length",
     );
 
     for (let i = 0; i < array1.length; i++) {
@@ -348,7 +349,7 @@ namespace Utils {
       assert.equal(
         ts.flattenDiagnosticMessageText(d1.messageText, Harness.IO.newLine()),
         ts.flattenDiagnosticMessageText(d2.messageText, Harness.IO.newLine()),
-        "d1.messageText !== d2.messageText"
+        "d1.messageText !== d2.messageText",
       );
       assert.equal(d1.category, d2.category, "d1.category !== d2.category");
       assert.equal(d1.code, d2.code, "d1.code !== d2.code");
@@ -372,7 +373,7 @@ namespace Utils {
     assert.equal(
       node1.flags & ~ts.NodeFlags.ReachabilityAndEmitFlags,
       node2.flags & ~ts.NodeFlags.ReachabilityAndEmitFlags,
-      "node1.flags !== node2.flags"
+      "node1.flags !== node2.flags",
     );
 
     ts.forEachChild(
@@ -388,13 +389,13 @@ namespace Utils {
         const array2: ts.NodeArray<ts.Node> = (node2 as any)[childName];
 
         assertArrayStructuralEquals(array1, array2);
-      }
+      },
     );
   }
 
   function assertArrayStructuralEquals(
     array1: ts.NodeArray<ts.Node>,
-    array2: ts.NodeArray<ts.Node>
+    array2: ts.NodeArray<ts.Node>,
   ) {
     if (array1 === array2) {
       return;
@@ -407,7 +408,7 @@ namespace Utils {
     assert.equal(
       array1.length,
       array2.length,
-      "array1.length !== array2.length"
+      "array1.length !== array2.length",
     );
 
     for (let i = 0; i < array1.length; i++) {
@@ -450,7 +451,7 @@ namespace Utils {
 
           line = line.replace(
             /\bfile:\/\/\/(.*?)(?=(:\d+)*($|\)))/,
-            (_, path) => ts.sys.resolvePath(path)
+            (_, path) => ts.sys.resolvePath(path),
           );
           frameCount++;
         }
@@ -470,7 +471,7 @@ namespace Utils {
 
   function isMocha(line: string) {
     return /[\\/](node_modules|components)[\\/]mocha(js)?[\\/]|[\\/]mocha\.js/.test(
-      line
+      line,
     );
   }
 

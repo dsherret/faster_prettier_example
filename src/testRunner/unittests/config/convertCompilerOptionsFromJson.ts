@@ -3,7 +3,7 @@ namespace ts {
     const formatDiagnosticHost: FormatDiagnosticsHost = {
       getCurrentDirectory: () => "/apath/",
       getCanonicalFileName: createGetCanonicalFileName(
-        /*useCaseSensitiveFileNames*/ true
+        /*useCaseSensitiveFileNames*/ true,
       ),
       getNewLine: () => "\n",
     };
@@ -23,7 +23,7 @@ namespace ts {
       | ExpectedResultWithParsingFailure;
 
     function isExpectedResultWithParsingFailure(
-      expectedResult: ExpectedResult
+      expectedResult: ExpectedResult,
     ): expectedResult is ExpectedResultWithParsingFailure {
       return !!(expectedResult as ExpectedResultWithParsingFailure)
         .hasParseErrors;
@@ -32,7 +32,7 @@ namespace ts {
     function assertCompilerOptions(
       json: any,
       configFileName: string,
-      expectedResult: ExpectedResultWithParsingSuccess
+      expectedResult: ExpectedResultWithParsingSuccess,
     ) {
       assertCompilerOptionsWithJson(json, configFileName, expectedResult);
       assertCompilerOptionsWithJsonNode(json, configFileName, expectedResult);
@@ -41,14 +41,13 @@ namespace ts {
     function assertCompilerOptionsWithJson(
       json: any,
       configFileName: string,
-      expectedResult: ExpectedResultWithParsingSuccess
+      expectedResult: ExpectedResultWithParsingSuccess,
     ) {
-      const { options: actualCompilerOptions, errors: actualErrors } =
-        convertCompilerOptionsFromJson(
-          json.compilerOptions,
-          "/apath/",
-          configFileName
-        );
+      const { options: actualCompilerOptions, errors: actualErrors } = convertCompilerOptionsFromJson(
+        json.compilerOptions,
+        "/apath/",
+        configFileName,
+      );
 
       const parsedCompilerOptions = JSON.stringify(actualCompilerOptions);
       const expectedCompilerOptions = JSON.stringify({
@@ -60,49 +59,48 @@ namespace ts {
       verifyErrors(
         actualErrors,
         expectedResult.errors,
-        /*ignoreLocation*/ true
+        /*ignoreLocation*/ true,
       );
     }
 
     function assertCompilerOptionsWithJsonNode(
       json: any,
       configFileName: string,
-      expectedResult: ExpectedResultWithParsingSuccess
+      expectedResult: ExpectedResultWithParsingSuccess,
     ) {
       assertCompilerOptionsWithJsonText(
         JSON.stringify(json),
         configFileName,
-        expectedResult
+        expectedResult,
       );
     }
 
     function assertCompilerOptionsWithJsonText(
       fileText: string,
       configFileName: string,
-      expectedResult: ExpectedResult
+      expectedResult: ExpectedResult,
     ) {
       const result = parseJsonText(configFileName, fileText);
       assert(!!result.endOfFileToken);
       assert.equal(
         !!result.parseDiagnostics.length,
-        isExpectedResultWithParsingFailure(expectedResult)
+        isExpectedResultWithParsingFailure(expectedResult),
       );
       const host: ParseConfigHost = new fakes.ParseConfigHost(
-        new vfs.FileSystem(/*ignoreCase*/ false, { cwd: "/apath/" })
+        new vfs.FileSystem(/*ignoreCase*/ false, { cwd: "/apath/" }),
       );
-      const { options: actualCompilerOptions, errors: actualParseErrors } =
-        parseJsonSourceFileConfigFileContent(
-          result,
-          host,
-          "/apath/",
-          /*existingOptions*/ undefined,
-          configFileName
-        );
+      const { options: actualCompilerOptions, errors: actualParseErrors } = parseJsonSourceFileConfigFileContent(
+        result,
+        host,
+        "/apath/",
+        /*existingOptions*/ undefined,
+        configFileName,
+      );
       expectedResult.compilerOptions.configFilePath = configFileName;
 
       const parsedCompilerOptions = JSON.stringify(actualCompilerOptions);
       const expectedCompilerOptions = JSON.stringify(
-        expectedResult.compilerOptions
+        expectedResult.compilerOptions,
       );
       assert.equal(parsedCompilerOptions, expectedCompilerOptions);
       assert.equal(actualCompilerOptions.configFile, result);
@@ -111,12 +109,12 @@ namespace ts {
         verifyErrors(
           actualParseErrors.filter(
             (error) =>
-              error.code !==
-              Diagnostics
-                .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2
-                .code
+              error.code
+                !== Diagnostics
+                  .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2
+                  .code,
           ),
-          expectedResult.errors
+          expectedResult.errors,
         );
       }
     }
@@ -124,19 +122,23 @@ namespace ts {
     function verifyErrors(
       actualErrors: Diagnostic[],
       expectedErrors: readonly Diagnostic[],
-      ignoreLocation?: boolean
+      ignoreLocation?: boolean,
     ) {
       assert.isTrue(
         expectedErrors.length === actualErrors.length,
-        `Expected error: ${JSON.stringify(
-          expectedErrors.map(getDiagnosticString),
-          undefined,
-          " "
-        )}. Actual error: ${JSON.stringify(
-          actualErrors.map(getDiagnosticString),
-          undefined,
-          " "
-        )}.`
+        `Expected error: ${
+          JSON.stringify(
+            expectedErrors.map(getDiagnosticString),
+            undefined,
+            " ",
+          )
+        }. Actual error: ${
+          JSON.stringify(
+            actualErrors.map(getDiagnosticString),
+            undefined,
+            " ",
+          )
+        }.`,
       );
       for (let i = 0; i < actualErrors.length; i++) {
         const actualError = actualErrors[i];
@@ -145,16 +147,20 @@ namespace ts {
         assert.equal(
           actualError.code,
           expectedError.code,
-          `Expected error-code: ${JSON.stringify(
-            expectedError.code
-          )}. Actual error-code: ${JSON.stringify(actualError.code)}.`
+          `Expected error-code: ${
+            JSON.stringify(
+              expectedError.code,
+            )
+          }. Actual error-code: ${JSON.stringify(actualError.code)}.`,
         );
         assert.equal(
           actualError.category,
           expectedError.category,
-          `Expected error-category: ${JSON.stringify(
-            expectedError.category
-          )}. Actual error-category: ${JSON.stringify(actualError.category)}.`
+          `Expected error-category: ${
+            JSON.stringify(
+              expectedError.category,
+            )
+          }. Actual error-category: ${JSON.stringify(actualError.category)}.`,
         );
         if (!ignoreLocation) {
           assert(actualError.file);
@@ -198,7 +204,7 @@ namespace ts {
             ],
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -229,7 +235,7 @@ namespace ts {
             ],
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -257,14 +263,12 @@ namespace ts {
               file: undefined,
               start: 0,
               length: 0,
-              messageText:
-                "Argument for '--jsx' option must be: 'preserve', 'react-native', 'react'.",
+              messageText: "Argument for '--jsx' option must be: 'preserve', 'react-native', 'react'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -293,11 +297,10 @@ namespace ts {
               messageText:
                 "Argument for '--module' option must be: 'none', 'commonjs', 'amd', 'system', 'umd', 'es6', 'es2015', 'es2020', 'es2022', 'esnext'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -323,14 +326,12 @@ namespace ts {
               file: undefined,
               start: 0,
               length: 0,
-              messageText:
-                "Argument for '--newLine' option must be: 'crlf', 'lf'.",
+              messageText: "Argument for '--newLine' option must be: 'crlf', 'lf'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -357,11 +358,10 @@ namespace ts {
               messageText:
                 "Argument for '--target' option must be: 'es3', 'es5', 'es6', 'es2015', 'es2016', 'es2017', 'es2018', 'es2019', 'esnext'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -385,14 +385,12 @@ namespace ts {
               file: undefined,
               start: 0,
               length: 0,
-              messageText:
-                "Argument for '--moduleResolution' option must be: 'node', 'classic'.",
+              messageText: "Argument for '--moduleResolution' option must be: 'node', 'classic'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -424,11 +422,10 @@ namespace ts {
               messageText:
                 "Argument for '--lib' option must be: 'es5', 'es6', 'es2015', 'es7', 'es2016', 'es2017', 'es2018', 'esnext', 'dom', 'dom.iterable', 'webworker', 'webworker.importscripts', 'scripthost', 'es2015.core', 'es2015.collection', 'es2015.generator', 'es2015.iterable', 'es2015.promise', 'es2015.proxy', 'es2015.reflect', 'es2015.symbol', 'es2015.symbol.wellknown', 'es2016.array.include', 'es2017.object', 'es2017.sharedmemory', 'es2017.string', 'es2017.intl', 'es2017.typedarrays', 'es2018.asynciterable', 'es2018.intl', 'es2018.promise', 'es2018.regexp', 'esnext.array', 'esnext.symbol', 'esnext.intl', 'esnext.bigint', 'esnext.bigint', 'esnext.string', 'esnext.promise'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -460,11 +457,10 @@ namespace ts {
               messageText:
                 "Argument for '--lib' option must be: 'es5', 'es6', 'es2015', 'es7', 'es2016', 'es2017', 'es2018', 'esnext', 'dom', 'dom.iterable', 'webworker', 'webworker.importscripts', 'scripthost', 'es2015.core', 'es2015.collection', 'es2015.generator', 'es2015.iterable', 'es2015.promise', 'es2015.proxy', 'es2015.reflect', 'es2015.symbol', 'es2015.symbol.wellknown', 'es2016.array.include', 'es2017.object', 'es2017.sharedmemory', 'es2017.string', 'es2017.intl', 'es2017.typedarrays', 'es2018.asynciterable', 'es2018.intl', 'es2018.promise', 'es2018.regexp', 'esnext.array', 'esnext.symbol', 'esnext.intl', 'esnext.bigint', 'esnext.string', 'esnext.promise'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -496,11 +492,10 @@ namespace ts {
               messageText:
                 "Argument for '--lib' option must be: 'es5', 'es6', 'es2015', 'es7', 'es2016', 'es2017', 'es2018', 'esnext', 'dom', 'dom.iterable', 'webworker', 'webworker.importscripts', 'scripthost', 'es2015.core', 'es2015.collection', 'es2015.generator', 'es2015.iterable', 'es2015.promise', 'es2015.proxy', 'es2015.reflect', 'es2015.symbol', 'es2015.symbol.wellknown', 'es2016.array.include', 'es2017.object', 'es2017.sharedmemory', 'es2017.string', 'es2017.intl', 'es2017.typedarrays', 'es2018.asynciterable', 'es2018.intl', 'es2018.promise', 'es2018.regexp', 'esnext.array', 'esnext.symbol', 'esnext.intl', 'esnext.bigint', 'esnext.string', 'esnext.promise'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -532,11 +527,10 @@ namespace ts {
               messageText:
                 "Argument for '--lib' option must be: 'es5', 'es6', 'es2015', 'es7', 'es2016', 'es2017', 'es2018', 'esnext', 'dom', 'dom.iterable', 'webworker', 'webworker.importscripts', 'scripthost', 'es2015.core', 'es2015.collection', 'es2015.generator', 'es2015.iterable', 'es2015.promise', 'es2015.proxy', 'es2015.reflect', 'es2015.symbol', 'es2015.symbol.wellknown', 'es2016.array.include', 'es2017.object', 'es2017.sharedmemory', 'es2017.string', 'es2017.intl', 'es2017.typedarrays', 'es2018.asynciterable', 'es2018.intl', 'es2018.promise', 'es2018.regexp', 'esnext.array', 'esnext.symbol', 'esnext.intl', 'esnext.bigint', 'esnext.string', 'esnext.promise'.",
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -561,7 +555,7 @@ namespace ts {
             lib: [],
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -585,7 +579,7 @@ namespace ts {
               category: Diagnostics.Unknown_compiler_option_0.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -611,7 +605,7 @@ namespace ts {
             maxNodeModuleJsDepth: -1,
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -646,7 +640,7 @@ namespace ts {
             ],
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -681,7 +675,7 @@ namespace ts {
             ],
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -711,7 +705,7 @@ namespace ts {
               category: Diagnostics.Unknown_compiler_option_0.category,
             },
           ],
-        }
+        },
       );
     });
 
@@ -758,7 +752,7 @@ namespace ts {
             experimentalDecorators: true,
           },
           hasParseErrors: true,
-        }
+        },
       );
     });
 
@@ -778,14 +772,13 @@ namespace ts {
           errors: [
             {
               ...Diagnostics.The_root_value_of_a_0_file_must_be_an_object,
-              messageText:
-                "The root value of a 'tsconfig.json' file must be an object.",
+              messageText: "The root value of a 'tsconfig.json' file must be an object.",
               file: undefined,
               start: 0,
               length: 0,
             },
           ],
-        }
+        },
       );
     });
 
@@ -805,14 +798,13 @@ namespace ts {
           errors: [
             {
               ...Diagnostics.The_root_value_of_a_0_file_must_be_an_object,
-              messageText:
-                "The root value of a 'tsconfig.json' file must be an object.",
+              messageText: "The root value of a 'tsconfig.json' file must be an object.",
               file: undefined,
               start: 0,
               length: 0,
             },
           ],
-        }
+        },
       );
     });
 
@@ -831,14 +823,13 @@ namespace ts {
           errors: [
             {
               ...Diagnostics.The_root_value_of_a_0_file_must_be_an_object,
-              messageText:
-                "The root value of a 'tsconfig.json' file must be an object.",
+              messageText: "The root value of a 'tsconfig.json' file must be an object.",
               file: undefined,
               start: 0,
               length: 0,
             },
           ],
-        }
+        },
       );
     });
 
@@ -853,14 +844,13 @@ namespace ts {
           errors: [
             {
               ...Diagnostics._0_should_be_set_inside_the_compilerOptions_object_of_the_config_json_file,
-              messageText:
-                "'module' should be set inside the 'compilerOptions' object of the config json file.",
+              messageText: "'module' should be set inside the 'compilerOptions' object of the config json file.",
               file: undefined,
               start: 0,
               length: 0,
             },
           ],
-        }
+        },
       );
     });
 
@@ -878,7 +868,7 @@ namespace ts {
             module: ModuleKind.ESNext,
           },
           errors: [],
-        }
+        },
       );
     });
 
@@ -888,8 +878,7 @@ namespace ts {
         errors: [
           {
             ...Diagnostics.The_root_value_of_a_0_file_must_be_an_object,
-            messageText:
-              "The root value of a 'tsconfig.json' file must be an object.",
+            messageText: "The root value of a 'tsconfig.json' file must be an object.",
             file: undefined,
             start: 0,
             length: 0,

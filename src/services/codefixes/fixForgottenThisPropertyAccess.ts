@@ -1,8 +1,7 @@
 /* @internal */
 namespace ts.codefix {
   const fixId = "forgottenThisPropertyAccess";
-  const didYouMeanStaticMemberCode =
-    Diagnostics.Cannot_find_name_0_Did_you_mean_the_static_member_1_0.code;
+  const didYouMeanStaticMemberCode = Diagnostics.Cannot_find_name_0_Did_you_mean_the_static_member_1_0.code;
   const errorCodes = [
     Diagnostics.Cannot_find_name_0_Did_you_mean_the_instance_member_this_0.code,
     Diagnostics
@@ -18,16 +17,14 @@ namespace ts.codefix {
       if (!info) {
         return undefined;
       }
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, info)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, info));
       return [
         createCodeFixAction(
           fixId,
           changes,
           [Diagnostics.Add_0_to_unresolved_variable, info.className || "this"],
           fixId,
-          Diagnostics.Add_qualifier_to_all_unresolved_variables_matching_a_member_name
+          Diagnostics.Add_qualifier_to_all_unresolved_variables_matching_a_member_name,
         ),
       ];
     },
@@ -47,16 +44,15 @@ namespace ts.codefix {
   function getInfo(
     sourceFile: SourceFile,
     pos: number,
-    diagCode: number
+    diagCode: number,
   ): Info | undefined {
     const node = getTokenAtPosition(sourceFile, pos);
     if (isIdentifier(node) || isPrivateIdentifier(node)) {
       return {
         node,
-        className:
-          diagCode === didYouMeanStaticMemberCode
-            ? getContainingClass(node)!.name!.text
-            : undefined,
+        className: diagCode === didYouMeanStaticMemberCode
+          ? getContainingClass(node)!.name!.text
+          : undefined,
       };
     }
   }
@@ -64,7 +60,7 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    { node, className }: Info
+    { node, className }: Info,
   ): void {
     // TODO (https://github.com/Microsoft/TypeScript/issues/21246): use shared helper
     suppressLeadingAndTrailingTrivia(node);
@@ -73,8 +69,8 @@ namespace ts.codefix {
       node,
       factory.createPropertyAccessExpression(
         className ? factory.createIdentifier(className) : factory.createThis(),
-        node
-      )
+        node,
+      ),
     );
   }
 }

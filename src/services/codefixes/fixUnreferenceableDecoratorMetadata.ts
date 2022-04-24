@@ -12,29 +12,28 @@ namespace ts.codefix {
       const importDeclaration = getImportDeclaration(
         context.sourceFile,
         context.program,
-        context.span.start
+        context.span.start,
       );
       if (!importDeclaration) return;
 
       const namespaceChanges = textChanges.ChangeTracker.with(
         context,
         (t) =>
-          importDeclaration.kind === SyntaxKind.ImportSpecifier &&
-          doNamespaceImportChange(
+          importDeclaration.kind === SyntaxKind.ImportSpecifier
+          && doNamespaceImportChange(
             t,
             context.sourceFile,
             importDeclaration,
-            context.program
-          )
+            context.program,
+          ),
       );
       const typeOnlyChanges = textChanges.ChangeTracker.with(context, (t) =>
         doTypeOnlyImportChange(
           t,
           context.sourceFile,
           importDeclaration,
-          context.program
-        )
-      );
+          context.program,
+        ));
       let actions: CodeFixAction[] | undefined;
       if (namespaceChanges.length) {
         actions = append(
@@ -42,8 +41,8 @@ namespace ts.codefix {
           createCodeFixActionWithoutFixAll(
             fixId,
             namespaceChanges,
-            Diagnostics.Convert_named_imports_to_namespace_import
-          )
+            Diagnostics.Convert_named_imports_to_namespace_import,
+          ),
         );
       }
       if (typeOnlyChanges.length) {
@@ -52,8 +51,8 @@ namespace ts.codefix {
           createCodeFixActionWithoutFixAll(
             fixId,
             typeOnlyChanges,
-            Diagnostics.Convert_to_type_only_import
-          )
+            Diagnostics.Convert_to_type_only_import,
+          ),
         );
       }
       return actions;
@@ -64,22 +63,23 @@ namespace ts.codefix {
   function getImportDeclaration(
     sourceFile: SourceFile,
     program: Program,
-    start: number
+    start: number,
   ): ImportClause | ImportSpecifier | ImportEqualsDeclaration | undefined {
     const identifier = tryCast(
       getTokenAtPosition(sourceFile, start),
-      isIdentifier
+      isIdentifier,
     );
-    if (!identifier || identifier.parent.kind !== SyntaxKind.TypeReference)
+    if (!identifier || identifier.parent.kind !== SyntaxKind.TypeReference) {
       return;
+    }
 
     const checker = program.getTypeChecker();
     const symbol = checker.getSymbolAtLocation(identifier);
     return find(
       symbol?.declarations || emptyArray,
       or(isImportClause, isImportSpecifier, isImportEqualsDeclaration) as (
-        n: Node
-      ) => n is ImportClause | ImportSpecifier | ImportEqualsDeclaration
+        n: Node,
+      ) => n is ImportClause | ImportSpecifier | ImportEqualsDeclaration,
     );
   }
 
@@ -92,21 +92,20 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     importDeclaration: ImportClause | ImportSpecifier | ImportEqualsDeclaration,
-    program: Program
+    program: Program,
   ) {
     if (importDeclaration.kind === SyntaxKind.ImportEqualsDeclaration) {
       changes.insertModifierBefore(
         sourceFile,
         SyntaxKind.TypeKeyword,
-        importDeclaration.name
+        importDeclaration.name,
       );
       return;
     }
 
-    const importClause =
-      importDeclaration.kind === SyntaxKind.ImportClause
-        ? importDeclaration
-        : importDeclaration.parent.parent;
+    const importClause = importDeclaration.kind === SyntaxKind.ImportClause
+      ? importDeclaration
+      : importDeclaration.parent.parent;
     if (importClause.name && importClause.namedBindings) {
       // Cannot convert an import with a default import and named bindings to type-only
       // (it's a grammar error).
@@ -117,9 +116,10 @@ namespace ts.codefix {
     const importsValue = !!forEachImportClauseDeclaration(
       importClause,
       (decl) => {
-        if (skipAlias(decl.symbol, checker).flags & SymbolFlags.Value)
+        if (skipAlias(decl.symbol, checker).flags & SymbolFlags.Value) {
           return true;
-      }
+        }
+      },
     );
 
     if (importsValue) {
@@ -132,7 +132,7 @@ namespace ts.codefix {
     changes.insertModifierBefore(
       sourceFile,
       SyntaxKind.TypeKeyword,
-      importClause
+      importClause,
     );
   }
 
@@ -140,13 +140,13 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     importDeclaration: ImportSpecifier,
-    program: Program
+    program: Program,
   ) {
     refactor.doChangeNamedToNamespaceOrDefault(
       sourceFile,
       program,
       changes,
-      importDeclaration.parent
+      importDeclaration.parent,
     );
   }
 }

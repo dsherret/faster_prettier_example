@@ -54,7 +54,7 @@ export function Component(x: Config): any;`,
       const languageService = createLanguageService();
       const definitions = languageService.getDefinitionAtPosition(
         "foo.ts",
-        160
+        160,
       ); // 160 is the latter `vueTemplateHtml` position
       expect(definitions).to.exist; // eslint-disable-line @typescript-eslint/no-unused-expressions
     });
@@ -68,14 +68,14 @@ export function Component(x: Config): any;`,
           diagnostics: emptyArray,
           outputFiles: emptyArray,
           exportedModulesFromDeclarationEmit: undefined,
-        }
+        },
       );
 
       assert.deepEqual(
         languageService.getEmitOutput(
           "foo.ts",
           /*emitOnlyDtsFiles*/ true,
-          /*forceDtsEmit*/ true
+          /*forceDtsEmit*/ true,
         ),
         {
           emitSkipped: false,
@@ -88,7 +88,7 @@ export function Component(x: Config): any;`,
             },
           ],
           exportedModulesFromDeclarationEmit: undefined,
-        }
+        },
       );
     });
 
@@ -154,7 +154,7 @@ export function Component(x: Config): any;`,
         function verifyProgramFiles(program: Program) {
           assert.deepEqual(
             program.getSourceFiles().map((f) => f.fileName),
-            ["/lib/lib.d.ts", "/project/other.ts", "/project/root.ts"]
+            ["/lib/lib.d.ts", "/project/other.ts", "/project/root.ts"],
           );
         }
       }
@@ -168,7 +168,7 @@ export function Component(x: Config): any;`,
 
     describe("detects program upto date when new file is added to the referenced project", () => {
       function setup(
-        useSourceOfProjectReferenceRedirect: (() => boolean) | undefined
+        useSourceOfProjectReferenceRedirect: (() => boolean) | undefined,
       ) {
         const config1: TestFSWithWatch.File = {
           path: `${tscWatch.projectRoot}/projects/project1/tsconfig.json`,
@@ -221,7 +221,7 @@ export function Component(x: Config): any;`,
             readDirectory: (path, extensions, excludes, includes, depth) =>
               system.readDirectory(path, extensions, excludes, includes, depth),
             onUnRecoverableConfigFileDiagnostic: noop,
-          }
+          },
         )!;
         const host: LanguageServiceHost = {
           useCaseSensitiveFileNames: returnTrue,
@@ -254,7 +254,7 @@ export function Component(x: Config): any;`,
             .getProgram()!
             .getSourceFiles()
             .map((f) => f.fileName),
-          [projectSystem.libFile.path, class1.path, class2.path]
+          [projectSystem.libFile.path, class1.path, class2.path],
         );
         // Add new file to referenced project
         const class3 = `${tscWatch.projectRoot}/projects/project1/class3.ts`;
@@ -262,7 +262,7 @@ export function Component(x: Config): any;`,
         const program = ls.getProgram()!;
         assert.deepEqual(
           program.getSourceFiles().map((f) => f.fileName),
-          [projectSystem.libFile.path, class1.path, class3, class2.path]
+          [projectSystem.libFile.path, class1.path, class3, class2.path],
         );
         // Add excluded file to referenced project
         system.ensureFileOrFolder({
@@ -273,19 +273,19 @@ export function Component(x: Config): any;`,
         // Add output from new class to referenced project
         system.writeFile(
           `${tscWatch.projectRoot}/projects/project1/class3.d.ts`,
-          `declare class class3 {}`
+          `declare class class3 {}`,
         );
         assert.strictEqual(ls.getProgram(), program);
       });
 
       it("detects program upto date when new file is added to the referenced project without useSourceOfProjectReferenceRedirect", () => {
         const { ls, system, class1Dts, class2 } = setup(
-          /*useSourceOfProjectReferenceRedirect*/ undefined
+          /*useSourceOfProjectReferenceRedirect*/ undefined,
         );
         const program1 = ls.getProgram()!;
         assert.deepEqual(
           program1.getSourceFiles().map((f) => f.fileName),
-          [projectSystem.libFile.path, class1Dts.path, class2.path]
+          [projectSystem.libFile.path, class1Dts.path, class2.path],
         );
         // Add new file to referenced project
         const class3 = `${tscWatch.projectRoot}/projects/project1/class3.ts`;
@@ -296,7 +296,7 @@ export function Component(x: Config): any;`,
             .getProgram()!
             .getSourceFiles()
             .map((f) => f.fileName),
-          [projectSystem.libFile.path, class1Dts.path, class2.path]
+          [projectSystem.libFile.path, class1Dts.path, class2.path],
         );
         // Add class3 output
         const class3Dts = `${tscWatch.projectRoot}/projects/project1/class3.d.ts`;
@@ -304,7 +304,7 @@ export function Component(x: Config): any;`,
         const program2 = ls.getProgram()!;
         assert.deepEqual(
           program2.getSourceFiles().map((f) => f.fileName),
-          [projectSystem.libFile.path, class1Dts.path, class3Dts, class2.path]
+          [projectSystem.libFile.path, class1Dts.path, class3Dts, class2.path],
         );
         // Add excluded file to referenced project
         system.ensureFileOrFolder({
@@ -319,7 +319,7 @@ export function Component(x: Config): any;`,
             .getProgram()!
             .getSourceFiles()
             .map((f) => f.fileName),
-          [projectSystem.libFile.path, class1Dts.path, class2.path]
+          [projectSystem.libFile.path, class1Dts.path, class2.path],
         );
         // Write output again
         system.writeFile(class3Dts, `declare class class3 {}`);
@@ -328,7 +328,7 @@ export function Component(x: Config): any;`,
             .getProgram()!
             .getSourceFiles()
             .map((f) => f.fileName),
-          [projectSystem.libFile.path, class1Dts.path, class3Dts, class2.path]
+          [projectSystem.libFile.path, class1Dts.path, class3Dts, class2.path],
         );
       });
     });

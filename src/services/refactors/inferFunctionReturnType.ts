@@ -15,12 +15,13 @@ namespace ts.refactor.inferFunctionReturnType {
   });
 
   function getRefactorEditsToInferReturnType(
-    context: RefactorContext
+    context: RefactorContext,
   ): RefactorEditInfo | undefined {
     const info = getInfo(context);
     if (info && !isRefactorErrorInfo(info)) {
-      const edits = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(context.file, t, info.declaration, info.returnTypeNode)
+      const edits = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChange(context.file, t, info.declaration, info.returnTypeNode),
       );
       return { renameFilename: undefined, renameLocation: undefined, edits };
     }
@@ -28,7 +29,7 @@ namespace ts.refactor.inferFunctionReturnType {
   }
 
   function getRefactorActionsToInferReturnType(
-    context: RefactorContext
+    context: RefactorContext,
   ): readonly ApplicableRefactorInfo[] {
     const info = getInfo(context);
     if (!info) return emptyArray;
@@ -70,12 +71,12 @@ namespace ts.refactor.inferFunctionReturnType {
     sourceFile: SourceFile,
     changes: textChanges.ChangeTracker,
     declaration: ConvertibleDeclaration,
-    typeNode: TypeNode
+    typeNode: TypeNode,
   ) {
     const closeParen = findChildOfKind(
       declaration,
       SyntaxKind.CloseParenToken,
-      sourceFile
+      sourceFile,
     );
     const needParens = isArrowFunction(declaration) && closeParen === undefined;
     const endNode = needParens ? first(declaration.parameters) : closeParen;
@@ -84,12 +85,12 @@ namespace ts.refactor.inferFunctionReturnType {
         changes.insertNodeBefore(
           sourceFile,
           endNode,
-          factory.createToken(SyntaxKind.OpenParenToken)
+          factory.createToken(SyntaxKind.OpenParenToken),
         );
         changes.insertNodeAfter(
           sourceFile,
           endNode,
-          factory.createToken(SyntaxKind.CloseParenToken)
+          factory.createToken(SyntaxKind.CloseParenToken),
         );
       }
       changes.insertNodeAt(sourceFile, endNode.end, typeNode, { prefix: ": " });
@@ -97,27 +98,27 @@ namespace ts.refactor.inferFunctionReturnType {
   }
 
   function getInfo(
-    context: RefactorContext
+    context: RefactorContext,
   ): FunctionInfo | RefactorErrorInfo | undefined {
     if (
-      isInJSFile(context.file) ||
-      !refactorKindBeginsWith(inferReturnTypeAction.kind, context.kind)
-    )
+      isInJSFile(context.file)
+      || !refactorKindBeginsWith(inferReturnTypeAction.kind, context.kind)
+    ) {
       return;
+    }
 
     const token = getTokenAtPosition(context.file, context.startPosition);
     const declaration = findAncestor(token, (n) =>
-      isBlock(n) ||
-      (n.parent &&
-        isArrowFunction(n.parent) &&
-        (n.kind === SyntaxKind.EqualsGreaterThanToken || n.parent.body === n))
+      isBlock(n)
+        || (n.parent
+          && isArrowFunction(n.parent)
+          && (n.kind === SyntaxKind.EqualsGreaterThanToken || n.parent.body === n))
         ? "quit"
-        : isConvertibleDeclaration(n)
-    ) as ConvertibleDeclaration | undefined;
+        : isConvertibleDeclaration(n)) as ConvertibleDeclaration | undefined;
     if (!declaration || !declaration.body || declaration.type) {
       return {
         error: getLocaleSpecificMessage(
-          Diagnostics.Return_type_must_be_inferred_from_a_function
+          Diagnostics.Return_type_must_be_inferred_from_a_function,
         ),
       };
     }
@@ -127,7 +128,7 @@ namespace ts.refactor.inferFunctionReturnType {
     if (!returnType) {
       return {
         error: getLocaleSpecificMessage(
-          Diagnostics.Could_not_determine_function_return_type
+          Diagnostics.Could_not_determine_function_return_type,
         ),
       };
     }
@@ -135,7 +136,7 @@ namespace ts.refactor.inferFunctionReturnType {
     const returnTypeNode = typeChecker.typeToTypeNode(
       returnType,
       declaration,
-      NodeBuilderFlags.NoTruncation
+      NodeBuilderFlags.NoTruncation,
     );
     if (returnTypeNode) {
       return { declaration, returnTypeNode };
@@ -143,7 +144,7 @@ namespace ts.refactor.inferFunctionReturnType {
   }
 
   function isConvertibleDeclaration(
-    node: Node
+    node: Node,
   ): node is ConvertibleDeclaration {
     switch (node.kind) {
       case SyntaxKind.FunctionDeclaration:
@@ -158,7 +159,7 @@ namespace ts.refactor.inferFunctionReturnType {
 
   function tryGetReturnType(
     typeChecker: TypeChecker,
-    node: ConvertibleDeclaration
+    node: ConvertibleDeclaration,
   ): Type | undefined {
     if (typeChecker.isImplementationOfOverload(node)) {
       const signatures = typeChecker
@@ -166,7 +167,7 @@ namespace ts.refactor.inferFunctionReturnType {
         .getCallSignatures();
       if (signatures.length > 1) {
         return typeChecker.getUnionType(
-          mapDefined(signatures, (s) => s.getReturnType())
+          mapDefined(signatures, (s) => s.getReturnType()),
         );
       }
     }

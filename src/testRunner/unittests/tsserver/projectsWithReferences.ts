@@ -3,35 +3,35 @@ namespace ts.projectSystem {
     it("on sample project", () => {
       const coreConfig = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "core/tsconfig.json"
+        "core/tsconfig.json",
       );
       const coreIndex = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "core/index.ts"
+        "core/index.ts",
       );
       const coreAnotherModule = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "core/anotherModule.ts"
+        "core/anotherModule.ts",
       );
       const coreSomeDecl = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "core/some_decl.d.ts"
+        "core/some_decl.d.ts",
       );
       const logicConfig = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "logic/tsconfig.json"
+        "logic/tsconfig.json",
       );
       const logicIndex = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "logic/index.ts"
+        "logic/index.ts",
       );
       const testsConfig = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "tests/tsconfig.json"
+        "tests/tsconfig.json",
       );
       const testsIndex = TestFSWithWatch.getTsBuildProjectFile(
         "sample1",
-        "tests/index.ts"
+        "tests/index.ts",
       );
       const host = createServerHost([
         libFile,
@@ -58,7 +58,7 @@ namespace ts.projectSystem {
           testsConfig,
           libFile,
         ].map((f) => f.path.toLowerCase()),
-        1
+        1,
       );
       checkWatchedDirectoriesDetailed(host, emptyArray, 1, /*recursive*/ false);
       checkWatchedDirectoriesDetailed(
@@ -67,11 +67,11 @@ namespace ts.projectSystem {
           TestFSWithWatch.getTsBuildProjectFilePath("sample1", "core"),
           TestFSWithWatch.getTsBuildProjectFilePath("sample1", "logic"),
           ...getTypeRootsFromLocation(
-            TestFSWithWatch.getTsBuildProjectFilePath("sample1", "tests")
+            TestFSWithWatch.getTsBuildProjectFilePath("sample1", "tests"),
           ),
         ],
         1,
-        /*recursive*/ true
+        /*recursive*/ true,
       );
 
       // local edit in ts file
@@ -87,7 +87,7 @@ namespace ts.projectSystem {
           logicIndex.path,
           testsIndex.path,
           testsConfig.path,
-        ]
+        ],
       );
 
       // non local edit in ts file
@@ -103,7 +103,7 @@ namespace ts.projectSystem {
           logicIndex.path,
           testsIndex.path,
           testsConfig.path,
-        ]
+        ],
       );
 
       // change in project reference config file
@@ -116,7 +116,7 @@ namespace ts.projectSystem {
             declarationDir: "decls",
           },
           references: [{ path: "../core" }],
-        })
+        }),
       );
       host.checkTimeoutQueueLengthAndRun(2);
       checkNumberOfProjects(service, { configuredProjects: 1 });
@@ -129,7 +129,7 @@ namespace ts.projectSystem {
           logicIndex.path,
           testsIndex.path,
           testsConfig.path,
-        ]
+        ],
       );
     });
 
@@ -243,7 +243,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -251,7 +251,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -262,7 +262,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
 
@@ -289,7 +289,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -297,7 +297,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -308,7 +308,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
       });
@@ -355,7 +355,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -363,7 +363,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -374,7 +374,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [refsTs.path]);
@@ -402,7 +402,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -410,7 +410,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -421,7 +421,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [nRefsTs.path]);
@@ -469,7 +469,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -477,7 +477,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -488,7 +488,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [aTs.path]);
@@ -516,7 +516,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -524,7 +524,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -535,7 +535,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [nRefsTs.path]);
@@ -573,7 +573,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -581,7 +581,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -591,7 +591,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [aTs.path]);
@@ -618,7 +618,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -626,7 +626,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -637,7 +637,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
       });
@@ -676,7 +676,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -684,7 +684,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -695,7 +695,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
 
@@ -721,7 +721,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -729,7 +729,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -740,7 +740,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
       });
@@ -851,7 +851,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -859,7 +859,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         const expectedWatchedDirectoriesDetailed = arrayToMap(
           [
@@ -868,14 +868,14 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           identity,
-          () => 1
+          () => 1,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/a`, 2); // Failed to package json and wild card directory
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/b`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
 
@@ -902,7 +902,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -910,12 +910,12 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
       });
@@ -962,7 +962,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -970,7 +970,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         const expectedWatchedDirectoriesDetailed = arrayToMap(
           [
@@ -979,14 +979,14 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           identity,
-          () => 1
+          () => 1,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/a`, 2); // Failed to package json and wild card directory
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/b`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [refsTs.path]);
@@ -1014,7 +1014,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1022,19 +1022,19 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         expectedWatchedDirectoriesDetailed.delete(
-          `${tscWatch.projectRoot}/nrefs`
+          `${tscWatch.projectRoot}/nrefs`,
         );
         expectedWatchedDirectoriesDetailed.set(
           `${tscWatch.projectRoot}/refs`,
-          1
+          1,
         ); // Failed lookup since refs/a.ts does not exist
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [nRefsTs.path]);
@@ -1082,7 +1082,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1090,7 +1090,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         const expectedWatchedDirectoriesDetailed = arrayToMap(
           [
@@ -1101,13 +1101,13 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           identity,
-          () => 1
+          () => 1,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/b`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [aTs.path]);
@@ -1135,7 +1135,7 @@ export class A {}`,
             cConfig.path,
             nRefsTs.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1143,16 +1143,16 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         expectedWatchedDirectoriesDetailed.delete(
-          `${tscWatch.projectRoot}/nrefs`
+          `${tscWatch.projectRoot}/nrefs`,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/a`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [nRefsTs.path]);
@@ -1190,7 +1190,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1198,7 +1198,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1209,7 +1209,7 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           1,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         // Script infos arent deleted till next file open
         checkOrphanScriptInfos(service, [aTs.path]);
@@ -1236,7 +1236,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1244,7 +1244,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         const expectedWatchedDirectoriesDetailed = arrayToMap(
           [
@@ -1253,14 +1253,14 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           identity,
-          () => 1
+          () => 1,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/a`, 2); // Failed to package json and wild card directory
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/b`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
       });
@@ -1299,7 +1299,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1307,7 +1307,7 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         const expectedWatchedDirectoriesDetailed = arrayToMap(
           [
@@ -1317,13 +1317,13 @@ export class A {}`,
             ...getTypeRootsFromLocation(`${tscWatch.projectRoot}/c`),
           ],
           identity,
-          () => 1
+          () => 1,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/b`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
 
@@ -1349,7 +1349,7 @@ export class A {}`,
             bConfig.path,
             cConfig.path,
           ],
-          1
+          1,
         );
         checkWatchedDirectoriesDetailed(
           host,
@@ -1357,13 +1357,13 @@ export class A {}`,
             tscWatch.projectRoot, // watches for directories created for resolution of b
           ],
           1,
-          /*recursive*/ false
+          /*recursive*/ false,
         );
         expectedWatchedDirectoriesDetailed.set(`${tscWatch.projectRoot}/a`, 2); // Failed to package json and wild card directory
         checkWatchedDirectoriesDetailed(
           host,
           expectedWatchedDirectoriesDetailed,
-          /*recursive*/ true
+          /*recursive*/ true,
         );
         checkOrphanScriptInfos(service, emptyArray);
       });

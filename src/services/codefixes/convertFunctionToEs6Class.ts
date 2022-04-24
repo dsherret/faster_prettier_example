@@ -15,16 +15,15 @@ namespace ts.codefix {
           context.span.start,
           context.program.getTypeChecker(),
           context.preferences,
-          context.program.getCompilerOptions()
-        )
-      );
+          context.program.getCompilerOptions(),
+        ));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Convert_function_to_an_ES2015_class,
           fixId,
-          Diagnostics.Convert_all_constructor_functions_to_classes
+          Diagnostics.Convert_all_constructor_functions_to_classes,
         ),
       ];
     },
@@ -37,9 +36,8 @@ namespace ts.codefix {
           err.start,
           context.program.getTypeChecker(),
           context.preferences,
-          context.program.getCompilerOptions()
-        )
-      ),
+          context.program.getCompilerOptions(),
+        )),
   });
 
   function doChange(
@@ -48,15 +46,15 @@ namespace ts.codefix {
     position: number,
     checker: TypeChecker,
     preferences: UserPreferences,
-    compilerOptions: CompilerOptions
+    compilerOptions: CompilerOptions,
   ): void {
     const ctorSymbol = checker.getSymbolAtLocation(
-      getTokenAtPosition(sourceFile, position)
+      getTokenAtPosition(sourceFile, position),
     )!;
     if (
-      !ctorSymbol ||
-      !ctorSymbol.valueDeclaration ||
-      !(ctorSymbol.flags & (SymbolFlags.Function | SymbolFlags.Variable))
+      !ctorSymbol
+      || !ctorSymbol.valueDeclaration
+      || !(ctorSymbol.flags & (SymbolFlags.Function | SymbolFlags.Variable))
     ) {
       // Bad input
       return undefined;
@@ -67,19 +65,18 @@ namespace ts.codefix {
       changes.replaceNode(
         sourceFile,
         ctorDeclaration,
-        createClassFromFunctionDeclaration(ctorDeclaration)
+        createClassFromFunctionDeclaration(ctorDeclaration),
       );
     } else if (isVariableDeclaration(ctorDeclaration)) {
-      const classDeclaration =
-        createClassFromVariableDeclaration(ctorDeclaration);
+      const classDeclaration = createClassFromVariableDeclaration(ctorDeclaration);
       if (!classDeclaration) {
         return undefined;
       }
 
       const ancestor = ctorDeclaration.parent.parent;
       if (
-        isVariableDeclarationList(ctorDeclaration.parent) &&
-        ctorDeclaration.parent.declarations.length > 1
+        isVariableDeclarationList(ctorDeclaration.parent)
+        && ctorDeclaration.parent.declarations.length > 1
       ) {
         changes.delete(sourceFile, ctorDeclaration);
         changes.insertNodeAfter(sourceFile, ancestor, classDeclaration);
@@ -97,25 +94,25 @@ namespace ts.codefix {
             const firstDeclaration = member.declarations[0];
             // only one "x.prototype = { ... }" will pass
             if (
-              member.declarations.length === 1 &&
-              isPropertyAccessExpression(firstDeclaration) &&
-              isBinaryExpression(firstDeclaration.parent) &&
-              firstDeclaration.parent.operatorToken.kind ===
-                SyntaxKind.EqualsToken &&
-              isObjectLiteralExpression(firstDeclaration.parent.right)
+              member.declarations.length === 1
+              && isPropertyAccessExpression(firstDeclaration)
+              && isBinaryExpression(firstDeclaration.parent)
+              && firstDeclaration.parent.operatorToken.kind
+                === SyntaxKind.EqualsToken
+              && isObjectLiteralExpression(firstDeclaration.parent.right)
             ) {
               const prototypes = firstDeclaration.parent.right;
               createClassElement(
                 prototypes.symbol,
                 /** modifiers */ undefined,
-                memberElements
+                memberElements,
               );
             }
           } else {
             createClassElement(
               member,
               [factory.createToken(SyntaxKind.StaticKeyword)],
-              memberElements
+              memberElements,
             );
           }
         });
@@ -126,15 +123,15 @@ namespace ts.codefix {
         symbol.members.forEach((member, key) => {
           if (key === "constructor" && member.valueDeclaration) {
             const prototypeAssignment = symbol.exports?.get(
-              "prototype" as __String
+              "prototype" as __String,
             )?.declarations?.[0]?.parent;
             if (
-              prototypeAssignment &&
-              isBinaryExpression(prototypeAssignment) &&
-              isObjectLiteralExpression(prototypeAssignment.right) &&
-              some(
+              prototypeAssignment
+              && isBinaryExpression(prototypeAssignment)
+              && isObjectLiteralExpression(prototypeAssignment.right)
+              && some(
                 prototypeAssignment.right.properties,
-                isConstructorAssignment
+                isConstructorAssignment,
               )
             ) {
               // fn.prototype = { constructor: fn }
@@ -153,33 +150,36 @@ namespace ts.codefix {
 
       function shouldConvertDeclaration(
         _target: AccessExpression | ObjectLiteralExpression,
-        source: Expression
+        source: Expression,
       ) {
         // Right now the only thing we can convert are function expressions, get/set accessors and methods
         // other values like normal value fields ({a: 1}) shouldn't get transformed.
         // We can update this once ES public class properties are available.
         if (isAccessExpression(_target)) {
           if (
-            isPropertyAccessExpression(_target) &&
-            isConstructorAssignment(_target)
-          )
+            isPropertyAccessExpression(_target)
+            && isConstructorAssignment(_target)
+          ) {
             return true;
+          }
           return isFunctionLike(source);
         } else {
           return every(_target.properties, (property) => {
             // a() {}
             if (
-              isMethodDeclaration(property) ||
-              isGetOrSetAccessorDeclaration(property)
-            )
+              isMethodDeclaration(property)
+              || isGetOrSetAccessorDeclaration(property)
+            ) {
               return true;
+            }
             // a: function() {}
             if (
-              isPropertyAssignment(property) &&
-              isFunctionExpression(property.initializer) &&
-              !!property.name
-            )
+              isPropertyAssignment(property)
+              && isFunctionExpression(property.initializer)
+              && !!property.name
+            ) {
               return true;
+            }
             // x.prototype.constructor = fn
             if (isConstructorAssignment(property)) return true;
             return false;
@@ -190,13 +190,13 @@ namespace ts.codefix {
       function createClassElement(
         symbol: Symbol,
         modifiers: Modifier[] | undefined,
-        members: ClassElement[]
+        members: ClassElement[],
       ): void {
         // Right now the only thing we can convert are function expressions, which are marked as methods
         // or { x: y } type prototype assignments, which are marked as ObjectLiteral
         if (
-          !(symbol.flags & SymbolFlags.Method) &&
-          !(symbol.flags & SymbolFlags.ObjectLiteral)
+          !(symbol.flags & SymbolFlags.Method)
+          && !(symbol.flags & SymbolFlags.ObjectLiteral)
         ) {
           return;
         }
@@ -204,8 +204,7 @@ namespace ts.codefix {
         const memberDeclaration = symbol.valueDeclaration as
           | AccessExpression
           | ObjectLiteralExpression;
-        const assignmentBinaryExpression =
-          memberDeclaration.parent as BinaryExpression;
+        const assignmentBinaryExpression = memberDeclaration.parent as BinaryExpression;
         const assignmentExpr = assignmentBinaryExpression.right;
         if (!shouldConvertDeclaration(memberDeclaration, assignmentExpr)) {
           return;
@@ -215,9 +214,9 @@ namespace ts.codefix {
           some(members, (m) => {
             const name = getNameOfDeclaration(m);
             if (
-              name &&
-              isIdentifier(name) &&
-              idText(name) === symbolName(symbol)
+              name
+              && isIdentifier(name)
+              && idText(name) === symbolName(symbol)
             ) {
               return true; // class member already made for this name
             }
@@ -228,12 +227,11 @@ namespace ts.codefix {
         }
 
         // delete the entire statement if this expression is the sole expression to take care of the semicolon at the end
-        const nodeToDelete =
-          assignmentBinaryExpression.parent &&
-          assignmentBinaryExpression.parent.kind ===
-            SyntaxKind.ExpressionStatement
-            ? assignmentBinaryExpression.parent
-            : assignmentBinaryExpression;
+        const nodeToDelete = assignmentBinaryExpression.parent
+            && assignmentBinaryExpression.parent.kind
+              === SyntaxKind.ExpressionStatement
+          ? assignmentBinaryExpression.parent
+          : assignmentBinaryExpression;
         changes.delete(sourceFile, nodeToDelete);
 
         if (!assignmentExpr) {
@@ -244,47 +242,46 @@ namespace ts.codefix {
               symbol.name,
               /*questionToken*/ undefined,
               /*type*/ undefined,
-              /*initializer*/ undefined
-            )
+              /*initializer*/ undefined,
+            ),
           );
           return;
         }
 
         // f.x = expr
         if (
-          isAccessExpression(memberDeclaration) &&
-          (isFunctionExpression(assignmentExpr) ||
-            isArrowFunction(assignmentExpr))
+          isAccessExpression(memberDeclaration)
+          && (isFunctionExpression(assignmentExpr)
+            || isArrowFunction(assignmentExpr))
         ) {
           const quotePreference = getQuotePreference(sourceFile, preferences);
           const name = tryGetPropertyName(
             memberDeclaration,
             compilerOptions,
-            quotePreference
+            quotePreference,
           );
           if (name) {
             createFunctionLikeExpressionMember(members, assignmentExpr, name);
           }
           return;
-        }
-        // f.prototype = { ... }
+        } // f.prototype = { ... }
         else if (isObjectLiteralExpression(assignmentExpr)) {
           forEach(assignmentExpr.properties, (property) => {
             if (
-              isMethodDeclaration(property) ||
-              isGetOrSetAccessorDeclaration(property)
+              isMethodDeclaration(property)
+              || isGetOrSetAccessorDeclaration(property)
             ) {
               // MethodDeclaration and AccessorDeclaration can appear in a class directly
               members.push(property);
             }
             if (
-              isPropertyAssignment(property) &&
-              isFunctionExpression(property.initializer)
+              isPropertyAssignment(property)
+              && isFunctionExpression(property.initializer)
             ) {
               createFunctionLikeExpressionMember(
                 members,
                 property.initializer,
-                property.name
+                property.name,
               );
             }
             // Drop constructor assignments
@@ -302,12 +299,12 @@ namespace ts.codefix {
             memberDeclaration.name,
             /*questionToken*/ undefined,
             /*type*/ undefined,
-            assignmentExpr
+            assignmentExpr,
           );
           copyLeadingComments(
             assignmentBinaryExpression.parent,
             prop,
-            sourceFile
+            sourceFile,
           );
           members.push(prop);
           return;
@@ -316,29 +313,30 @@ namespace ts.codefix {
         function createFunctionLikeExpressionMember(
           members: ClassElement[],
           expression: FunctionExpression | ArrowFunction,
-          name: PropertyName
+          name: PropertyName,
         ) {
-          if (isFunctionExpression(expression))
+          if (isFunctionExpression(expression)) {
             return createFunctionExpressionMember(members, expression, name);
-          else
+          } else {
             return createArrowFunctionExpressionMember(
               members,
               expression,
-              name
+              name,
             );
+          }
         }
 
         function createFunctionExpressionMember(
           members: ClassElement[],
           functionExpression: FunctionExpression,
-          name: PropertyName
+          name: PropertyName,
         ) {
           const fullModifiers = concatenate(
             modifiers,
             getModifierKindFromSource(
               functionExpression,
-              SyntaxKind.AsyncKeyword
-            )
+              SyntaxKind.AsyncKeyword,
+            ),
           );
           const method = factory.createMethodDeclaration(
             /*decorators*/ undefined,
@@ -349,7 +347,7 @@ namespace ts.codefix {
             /*typeParameters*/ undefined,
             functionExpression.parameters,
             /*type*/ undefined,
-            functionExpression.body
+            functionExpression.body,
           );
           copyLeadingComments(assignmentBinaryExpression, method, sourceFile);
           members.push(method);
@@ -359,7 +357,7 @@ namespace ts.codefix {
         function createArrowFunctionExpressionMember(
           members: ClassElement[],
           arrowFunction: ArrowFunction,
-          name: PropertyName
+          name: PropertyName,
         ) {
           const arrowFunctionBody = arrowFunction.body;
           let bodyBlock: Block;
@@ -367,8 +365,7 @@ namespace ts.codefix {
           // case 1: () => { return [1,2,3] }
           if (arrowFunctionBody.kind === SyntaxKind.Block) {
             bodyBlock = arrowFunctionBody as Block;
-          }
-          // case 2: () => [1,2,3]
+          } // case 2: () => [1,2,3]
           else {
             bodyBlock = factory.createBlock([
               factory.createReturnStatement(arrowFunctionBody),
@@ -376,7 +373,7 @@ namespace ts.codefix {
           }
           const fullModifiers = concatenate(
             modifiers,
-            getModifierKindFromSource(arrowFunction, SyntaxKind.AsyncKeyword)
+            getModifierKindFromSource(arrowFunction, SyntaxKind.AsyncKeyword),
           );
           const method = factory.createMethodDeclaration(
             /*decorators*/ undefined,
@@ -387,7 +384,7 @@ namespace ts.codefix {
             /*typeParameters*/ undefined,
             arrowFunction.parameters,
             /*type*/ undefined,
-            bodyBlock
+            bodyBlock,
           );
           copyLeadingComments(assignmentBinaryExpression, method, sourceFile);
           members.push(method);
@@ -396,13 +393,13 @@ namespace ts.codefix {
     }
 
     function createClassFromVariableDeclaration(
-      node: VariableDeclaration
+      node: VariableDeclaration,
     ): ClassDeclaration | undefined {
       const initializer = node.initializer;
       if (
-        !initializer ||
-        !isFunctionExpression(initializer) ||
-        !isIdentifier(node.name)
+        !initializer
+        || !isFunctionExpression(initializer)
+        || !isIdentifier(node.name)
       ) {
         return undefined;
       }
@@ -414,14 +411,14 @@ namespace ts.codefix {
             /*decorators*/ undefined,
             /*modifiers*/ undefined,
             initializer.parameters,
-            initializer.body
-          )
+            initializer.body,
+          ),
         );
       }
 
       const modifiers = getModifierKindFromSource(
         node.parent.parent,
-        SyntaxKind.ExportKeyword
+        SyntaxKind.ExportKeyword,
       );
       const cls = factory.createClassDeclaration(
         /*decorators*/ undefined,
@@ -429,14 +426,14 @@ namespace ts.codefix {
         node.name,
         /*typeParameters*/ undefined,
         /*heritageClauses*/ undefined,
-        memberElements
+        memberElements,
       );
       // Don't call copyComments here because we'll already leave them in place
       return cls;
     }
 
     function createClassFromFunctionDeclaration(
-      node: FunctionDeclaration
+      node: FunctionDeclaration,
     ): ClassDeclaration {
       const memberElements = createClassElementsFromSymbol(ctorSymbol);
       if (node.body) {
@@ -445,14 +442,14 @@ namespace ts.codefix {
             /*decorators*/ undefined,
             /*modifiers*/ undefined,
             node.parameters,
-            node.body
-          )
+            node.body,
+          ),
         );
       }
 
       const modifiers = getModifierKindFromSource(
         node,
-        SyntaxKind.ExportKeyword
+        SyntaxKind.ExportKeyword,
       );
       const cls = factory.createClassDeclaration(
         /*decorators*/ undefined,
@@ -460,7 +457,7 @@ namespace ts.codefix {
         node.name,
         /*typeParameters*/ undefined,
         /*heritageClauses*/ undefined,
-        memberElements
+        memberElements,
       );
       // Don't call copyComments here because we'll already leave them in place
       return cls;
@@ -469,13 +466,13 @@ namespace ts.codefix {
 
   function getModifierKindFromSource(
     source: Node,
-    kind: SyntaxKind
+    kind: SyntaxKind,
   ): readonly Modifier[] | undefined {
     return filter(source.modifiers, (modifier) => modifier.kind === kind);
   }
 
   function isConstructorAssignment(
-    x: ObjectLiteralElementLike | PropertyAccessExpression
+    x: ObjectLiteralElementLike | PropertyAccessExpression,
   ) {
     if (!x.name) return false;
     if (isIdentifier(x.name) && x.name.text === "constructor") return true;
@@ -485,7 +482,7 @@ namespace ts.codefix {
   function tryGetPropertyName(
     node: AccessExpression,
     compilerOptions: CompilerOptions,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): PropertyName | undefined {
     if (isPropertyAccessExpression(node)) {
       return node.name;
@@ -498,15 +495,15 @@ namespace ts.codefix {
 
     if (isStringLiteralLike(propName)) {
       return isIdentifierText(
-        propName.text,
-        getEmitScriptTarget(compilerOptions)
-      )
+          propName.text,
+          getEmitScriptTarget(compilerOptions),
+        )
         ? factory.createIdentifier(propName.text)
         : isNoSubstitutionTemplateLiteral(propName)
         ? factory.createStringLiteral(
-            propName.text,
-            quotePreference === QuotePreference.Single
-          )
+          propName.text,
+          quotePreference === QuotePreference.Single,
+        )
         : propName;
     }
 

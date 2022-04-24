@@ -46,7 +46,7 @@ namespace ts.tscWatch {
           change: (sys) =>
             sys.writeFile(
               anotherFile.path,
-              anotherFile.content.replace("./logger", "./Logger")
+              anotherFile.content.replace("./logger", "./Logger"),
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -58,8 +58,7 @@ namespace ts.tscWatch {
       changes: [
         {
           caption: "Change name of file from logger to Logger",
-          change: (sys) =>
-            sys.renameFile(loggerFile.path, `${projectRoot}/Logger.ts`),
+          change: (sys) => sys.renameFile(loggerFile.path, `${projectRoot}/Logger.ts`),
           timeouts: runQueuedTimeoutCallbacks,
         },
       ],
@@ -90,7 +89,7 @@ namespace ts.tscWatch {
         };
         return createWatchedSystem(
           [moduleA, moduleB, moduleC, libFile, tsconfig],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         );
       },
       changes: [
@@ -100,7 +99,7 @@ namespace ts.tscWatch {
             sys.prependFile(
               `${projectRoot}/moduleA.ts`,
               `// some comment
-                    `
+                    `,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -153,7 +152,7 @@ export const Fragment: unique symbol;
               }),
             },
           ],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         ),
       changes: emptyArray,
     });
@@ -161,7 +160,7 @@ export const Fragment: unique symbol;
     function verifyWindowsStyleRoot(
       subScenario: string,
       windowsStyleRoot: string,
-      projectRootRelative: string
+      projectRootRelative: string,
     ) {
       verifyTscWatch({
         scenario: "forceConsistentCasingInFileNames",
@@ -207,7 +206,7 @@ a;b;
               sys.prependFile(
                 `${windowsStyleRoot}/${projectRootRelative}/a.ts`,
                 `// some comment
-                        `
+                        `,
               ),
             timeouts: runQueuedTimeoutCallbacks,
           },
@@ -218,19 +217,19 @@ a;b;
     verifyWindowsStyleRoot(
       "when Windows-style drive root is lowercase",
       "c:/",
-      "project"
+      "project",
     );
     verifyWindowsStyleRoot(
       "when Windows-style drive root is uppercase",
       "C:/",
-      "project"
+      "project",
     );
 
     function verifyFileSymlink(
       subScenario: string,
       diskPath: string,
       targetPath: string,
-      importedPath: string
+      importedPath: string,
     ) {
       verifyTscWatch({
         scenario: "forceConsistentCasingInFileNames",
@@ -267,7 +266,7 @@ a;b;
             [moduleA, symlinkA, moduleB, libFile, tsconfig],
             {
               currentDirectory: projectRoot,
-            }
+            },
           );
         },
         changes: [
@@ -277,7 +276,7 @@ a;b;
               sys.prependFile(
                 diskPath,
                 `// some comment
-                        `
+                        `,
               ),
             timeouts: runQueuedTimeoutCallbacks,
           },
@@ -289,38 +288,38 @@ a;b;
       "when both file symlink target and import match disk",
       `${projectRoot}/XY.ts`,
       `${projectRoot}/XY.ts`,
-      `./XY`
+      `./XY`,
     );
     verifyFileSymlink(
       "when file symlink target matches disk but import does not",
       `${projectRoot}/XY.ts`,
       `${projectRoot}/Xy.ts`,
-      `./XY`
+      `./XY`,
     );
     verifyFileSymlink(
       "when import matches disk but file symlink target does not",
       `${projectRoot}/XY.ts`,
       `${projectRoot}/XY.ts`,
-      `./Xy`
+      `./Xy`,
     );
     verifyFileSymlink(
       "when import and file symlink target agree but do not match disk",
       `${projectRoot}/XY.ts`,
       `${projectRoot}/Xy.ts`,
-      `./Xy`
+      `./Xy`,
     );
     verifyFileSymlink(
       "when import, file symlink target, and disk are all different",
       `${projectRoot}/XY.ts`,
       `${projectRoot}/Xy.ts`,
-      `./yX`
+      `./yX`,
     );
 
     function verifyDirSymlink(
       subScenario: string,
       diskPath: string,
       targetPath: string,
-      importedPath: string
+      importedPath: string,
     ) {
       verifyTscWatch({
         scenario: "forceConsistentCasingInFileNames",
@@ -362,7 +361,7 @@ a;b;
             [moduleA, symlinkA, moduleB, libFile, tsconfig],
             {
               currentDirectory: projectRoot,
-            }
+            },
           );
         },
         changes: [
@@ -372,7 +371,7 @@ a;b;
               sys.prependFile(
                 `${diskPath}/a.ts`,
                 `// some comment
-                        `
+                        `,
               ),
             timeouts: runQueuedTimeoutCallbacks,
           },
@@ -384,31 +383,31 @@ a;b;
       "when both directory symlink target and import match disk",
       `${projectRoot}/XY`,
       `${projectRoot}/XY`,
-      `./XY`
+      `./XY`,
     );
     verifyDirSymlink(
       "when directory symlink target matches disk but import does not",
       `${projectRoot}/XY`,
       `${projectRoot}/Xy`,
-      `./XY`
+      `./XY`,
     );
     verifyDirSymlink(
       "when import matches disk but directory symlink target does not",
       `${projectRoot}/XY`,
       `${projectRoot}/XY`,
-      `./Xy`
+      `./Xy`,
     );
     verifyDirSymlink(
       "when import and directory symlink target agree but do not match disk",
       `${projectRoot}/XY`,
       `${projectRoot}/Xy`,
-      `./Xy`
+      `./Xy`,
     );
     verifyDirSymlink(
       "when import, directory symlink target, and disk are all different",
       `${projectRoot}/XY`,
       `${projectRoot}/Xy`,
-      `./yX`
+      `./yX`,
     );
   });
 }

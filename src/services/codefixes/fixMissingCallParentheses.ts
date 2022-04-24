@@ -15,16 +15,14 @@ namespace ts.codefix {
       const callName = getCallName(sourceFile, span.start);
       if (!callName) return;
 
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, context.sourceFile, callName)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, context.sourceFile, callName));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Add_missing_call_parentheses,
           fixId,
-          Diagnostics.Add_all_missing_call_parentheses
+          Diagnostics.Add_all_missing_call_parentheses,
         ),
       ];
     },
@@ -38,14 +36,14 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    name: Identifier | PrivateIdentifier
+    name: Identifier | PrivateIdentifier,
   ): void {
     changes.replaceNodeWithText(sourceFile, name, `${name.text}()`);
   }
 
   function getCallName(
     sourceFile: SourceFile,
-    start: number
+    start: number,
   ): Identifier | PrivateIdentifier | undefined {
     const token = getTokenAtPosition(sourceFile, start);
     if (isPropertyAccessExpression(token.parent)) {

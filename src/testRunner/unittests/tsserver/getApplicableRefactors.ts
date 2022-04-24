@@ -14,7 +14,7 @@ namespace ts.projectSystem {
       });
       assert.deepEqual<readonly protocol.ApplicableRefactorInfo[] | undefined>(
         response,
-        []
+        [],
       );
     });
   });

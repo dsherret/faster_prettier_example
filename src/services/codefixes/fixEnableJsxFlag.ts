@@ -12,14 +12,12 @@ namespace ts.codefix {
         return undefined;
       }
 
-      const changes = textChanges.ChangeTracker.with(context, (changeTracker) =>
-        doChange(changeTracker, configFile)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (changeTracker) => doChange(changeTracker, configFile));
       return [
         createCodeFixActionWithoutFixAll(
           fixID,
           changes,
-          Diagnostics.Enable_the_jsx_flag_in_your_configuration_file
+          Diagnostics.Enable_the_jsx_flag_in_your_configuration_file,
         ),
       ];
     },
@@ -37,13 +35,13 @@ namespace ts.codefix {
 
   function doChange(
     changeTracker: textChanges.ChangeTracker,
-    configFile: TsConfigSourceFile
+    configFile: TsConfigSourceFile,
   ) {
     setJsonCompilerOptionValue(
       changeTracker,
       configFile,
       "jsx",
-      factory.createStringLiteral("react")
+      factory.createStringLiteral("react"),
     );
   }
 }

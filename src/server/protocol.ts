@@ -155,7 +155,6 @@ namespace ts.server.protocol {
     ProvideCallHierarchyIncomingCalls = "provideCallHierarchyIncomingCalls",
     ProvideCallHierarchyOutgoingCalls = "provideCallHierarchyOutgoingCalls",
     ProvideInlayHints = "provideInlayHints",
-
     // NOTE: If updating this, be sure to also update `allCommandNames` in `testRunner/unittests/tsserver/session.ts`.
   }
 
@@ -349,8 +348,7 @@ namespace ts.server.protocol {
     arguments: SpanOfEnclosingCommentRequestArgs;
   }
 
-  export interface SpanOfEnclosingCommentRequestArgs
-    extends FileLocationRequestArgs {
+  export interface SpanOfEnclosingCommentRequestArgs extends FileLocationRequestArgs {
     /**
      * Requires that the enclosing span be a multi-line comment, or else the request returns undefined.
      */
@@ -569,11 +567,10 @@ namespace ts.server.protocol {
     command: CommandTypes.GetApplicableRefactors;
     arguments: GetApplicableRefactorsRequestArgs;
   }
-  export type GetApplicableRefactorsRequestArgs =
-    FileLocationOrRangeRequestArgs & {
-      triggerReason?: RefactorTriggerReason;
-      kind?: string;
-    };
+  export type GetApplicableRefactorsRequestArgs = FileLocationOrRangeRequestArgs & {
+    triggerReason?: RefactorTriggerReason;
+    kind?: string;
+  };
 
   export type RefactorTriggerReason = "implicit" | "invoked";
 
@@ -648,13 +645,12 @@ namespace ts.server.protocol {
    * Request the edits that a particular refactoring action produces.
    * Callers must specify the name of the refactor and the name of the action.
    */
-  export type GetEditsForRefactorRequestArgs =
-    FileLocationOrRangeRequestArgs & {
-      /* The 'name' property from the refactoring that offered this action */
-      refactor: string;
-      /* The 'name' property from the refactoring action */
-      action: string;
-    };
+  export type GetEditsForRefactorRequestArgs = FileLocationOrRangeRequestArgs & {
+    /* The 'name' property from the refactoring that offered this action */
+    refactor: string;
+    /* The 'name' property from the refactoring action */
+    action: string;
+  };
 
   export interface GetEditsForRefactorResponse extends Response {
     body?: RefactorEditInfo;
@@ -835,8 +831,7 @@ namespace ts.server.protocol {
    * Arguments for EncodedSyntacticClassificationsRequest request.
    */
   /** @internal */
-  export interface EncodedSyntacticClassificationsRequestArgs
-    extends FileRequestArgs {
+  export interface EncodedSyntacticClassificationsRequestArgs extends FileRequestArgs {
     /**
      * Start position of the span.
      */
@@ -857,8 +852,7 @@ namespace ts.server.protocol {
   /**
    * Arguments for EncodedSemanticClassificationsRequest request.
    */
-  export interface EncodedSemanticClassificationsRequestArgs
-    extends FileRequestArgs {
+  export interface EncodedSemanticClassificationsRequestArgs extends FileRequestArgs {
     /**
      * Start position of the span.
      */
@@ -890,8 +884,7 @@ namespace ts.server.protocol {
    * Arguments in document highlight request; include: filesToSearch, file,
    * line, offset.
    */
-  export interface DocumentHighlightsRequestArgs
-    extends FileLocationRequestArgs {
+  export interface DocumentHighlightsRequestArgs extends FileLocationRequestArgs {
     /**
      * List of files to search for document highlights.
      */
@@ -1029,8 +1022,7 @@ namespace ts.server.protocol {
   }
 
   /** @deprecated Use `DefinitionInfoAndBoundSpanResponse` instead. */
-  export type DefinitionInfoAndBoundSpanReponse =
-    DefinitionInfoAndBoundSpanResponse;
+  export type DefinitionInfoAndBoundSpanReponse = DefinitionInfoAndBoundSpanResponse;
 
   /**
    * Definition response message.  Gives text range for definition.
@@ -1402,9 +1394,10 @@ namespace ts.server.protocol {
    * For external projects, some of the project settings are sent together with
    * compiler settings.
    */
-  export type ExternalProjectCompilerOptions = CompilerOptions &
-    CompileOnSaveMixin &
-    WatchOptions;
+  export type ExternalProjectCompilerOptions =
+    & CompilerOptions
+    & CompileOnSaveMixin
+    & WatchOptions;
 
   /**
    * Contains information about current project version
@@ -1834,8 +1827,9 @@ namespace ts.server.protocol {
   /**
    * External projects have a typeAcquisition option so they need to be added separately to compiler options for inferred projects.
    */
-  export type InferredProjectCompilerOptions = ExternalProjectCompilerOptions &
-    TypeAcquisition;
+  export type InferredProjectCompilerOptions =
+    & ExternalProjectCompilerOptions
+    & TypeAcquisition;
 
   /**
    * Request to set compiler options for inferred projects.
@@ -1846,8 +1840,7 @@ namespace ts.server.protocol {
    * or configured project and will contain only open file and transitive closure of referenced files if 'useOneInferredProject' is false,
    * or all open loose files and its transitive closure of referenced files if 'useOneInferredProject' is true.
    */
-  export interface SetCompilerOptionsForInferredProjectsRequest
-    extends Request {
+  export interface SetCompilerOptionsForInferredProjectsRequest extends Request {
     command: CommandTypes.CompilerOptionsForInferredProjects;
     arguments: SetCompilerOptionsForInferredProjectsArgs;
   }
@@ -1873,8 +1866,7 @@ namespace ts.server.protocol {
    * Response to SetCompilerOptionsForInferredProjectsResponse request. This is just an acknowledgement, so
    * no body field is required.
    */
-  export interface SetCompilerOptionsForInferredProjectsResponse
-    extends Response {}
+  export interface SetCompilerOptionsForInferredProjectsResponse extends Response {}
 
   /**
    *  Exit request; value of command field is "exit".  Ask the server process
@@ -2150,7 +2142,7 @@ namespace ts.server.protocol {
 
   export type CompletionsTriggerCharacter =
     | "."
-    | '"'
+    | "\""
     | "'"
     | "`"
     | "/"
@@ -2208,8 +2200,7 @@ namespace ts.server.protocol {
   /**
    * Arguments for completion details request.
    */
-  export interface CompletionDetailsRequestArgs
-    extends FileLocationRequestArgs {
+  export interface CompletionDetailsRequestArgs extends FileLocationRequestArgs {
     /**
      * Names of one or more entries for which to obtain details.
      */
@@ -2629,10 +2620,8 @@ namespace ts.server.protocol {
     arguments: SuggestionDiagnosticsSyncRequestArgs;
   }
 
-  export type SuggestionDiagnosticsSyncRequestArgs =
-    SemanticDiagnosticsSyncRequestArgs;
-  export type SuggestionDiagnosticsSyncResponse =
-    SemanticDiagnosticsSyncResponse;
+  export type SuggestionDiagnosticsSyncRequestArgs = SemanticDiagnosticsSyncRequestArgs;
+  export type SuggestionDiagnosticsSyncResponse = SemanticDiagnosticsSyncResponse;
 
   /**
    * Synchronous request for syntactic diagnostics of one file.
@@ -2850,8 +2839,7 @@ namespace ts.server.protocol {
     event: "configFileDiag";
   }
 
-  export type ProjectLanguageServiceStateEventName =
-    "projectLanguageServiceState";
+  export type ProjectLanguageServiceStateEventName = "projectLanguageServiceState";
   export interface ProjectLanguageServiceStateEvent extends Event {
     event: ProjectLanguageServiceStateEventName;
     body?: ProjectLanguageServiceStateEventBody;
@@ -2872,8 +2860,7 @@ namespace ts.server.protocol {
     languageServiceEnabled: boolean;
   }
 
-  export type ProjectsUpdatedInBackgroundEventName =
-    "projectsUpdatedInBackground";
+  export type ProjectsUpdatedInBackgroundEventName = "projectsUpdatedInBackground";
   export interface ProjectsUpdatedInBackgroundEvent extends Event {
     event: ProjectsUpdatedInBackgroundEventName;
     body: ProjectsUpdatedInBackgroundEventBody;
@@ -3200,8 +3187,7 @@ namespace ts.server.protocol {
     payload: any;
   }
 
-  export type TypesInstallerInitializationFailedEventName =
-    "typesInstallerInitializationFailed";
+  export type TypesInstallerInitializationFailedEventName = "typesInstallerInitializationFailed";
 
   export interface TypesInstallerInitializationFailedEvent extends Event {
     event: TypesInstallerInitializationFailedEventName;
@@ -3214,8 +3200,7 @@ namespace ts.server.protocol {
 
   export type TypingsInstalledTelemetryEventName = "typingsInstalled";
 
-  export interface TypingsInstalledTelemetryEventBody
-    extends TelemetryEventBody {
+  export interface TypingsInstalledTelemetryEventBody extends TelemetryEventBody {
     telemetryEventName: TypingsInstalledTelemetryEventName;
     payload: TypingsInstalledTelemetryEventPayload;
   }
@@ -3332,8 +3317,7 @@ namespace ts.server.protocol {
     readonly body: CallHierarchyItem | CallHierarchyItem[];
   }
 
-  export interface ProvideCallHierarchyIncomingCallsRequest
-    extends FileLocationRequest {
+  export interface ProvideCallHierarchyIncomingCallsRequest extends FileLocationRequest {
     command: CommandTypes.ProvideCallHierarchyIncomingCalls;
   }
 
@@ -3341,8 +3325,7 @@ namespace ts.server.protocol {
     readonly body: CallHierarchyIncomingCall[];
   }
 
-  export interface ProvideCallHierarchyOutgoingCallsRequest
-    extends FileLocationRequest {
+  export interface ProvideCallHierarchyOutgoingCallsRequest extends FileLocationRequest {
     command: CommandTypes.ProvideCallHierarchyOutgoingCalls;
   }
 

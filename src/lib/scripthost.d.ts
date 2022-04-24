@@ -3,7 +3,7 @@
 /////////////////////////////
 
 interface ActiveXObject {
-  new (s: string): any;
+  new(s: string): any;
 }
 declare var ActiveXObject: ActiveXObject;
 
@@ -240,9 +240,9 @@ interface Enumerator<T = any> {
 }
 
 interface EnumeratorConstructor {
-  new <T = any>(safearray: SafeArray<T>): Enumerator<T>;
-  new <T = any>(collection: { Item(index: any): T }): Enumerator<T>;
-  new <T = any>(collection: any): Enumerator<T>;
+  new<T = any>(safearray: SafeArray<T>): Enumerator<T>;
+  new<T = any>(collection: { Item(index: any): T }): Enumerator<T>;
+  new<T = any>(collection: any): Enumerator<T>;
 }
 
 declare var Enumerator: EnumeratorConstructor;
@@ -282,7 +282,7 @@ interface VBArray<T = any> {
 }
 
 interface VBArrayConstructor {
-  new <T = any>(safeArray: SafeArray<T>): VBArray<T>;
+  new<T = any>(safeArray: SafeArray<T>): VBArray<T>;
 }
 
 declare var VBArray: VBArrayConstructor;
@@ -296,7 +296,7 @@ declare class VarDate {
 }
 
 interface DateConstructor {
-  new (vd: VarDate): Date;
+  new(vd: VarDate): Date;
 }
 
 interface Date {

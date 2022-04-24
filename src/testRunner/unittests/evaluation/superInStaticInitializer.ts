@@ -15,7 +15,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Base, Derived] = result.main();
     assert.strictEqual(Base.x, 1);
@@ -37,7 +37,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Base, Derived] = result.main();
     assert.strictEqual(Base.x, 1);
@@ -66,7 +66,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Base, Derived, thisInBase] = result.main();
     assert.strictEqual(Base._x, 1);
@@ -101,7 +101,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Base, Derived, thisInBaseGet, thisInBaseSet] = result.main();
     assert.strictEqual(Base._x, 1);
@@ -130,7 +130,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Derived, thisInBase] = result.main();
     assert.strictEqual(Derived.y, 1);
@@ -156,7 +156,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES5 }
+      { target: ts.ScriptTarget.ES5 },
     );
     const [Derived, thisInBase] = result.main();
     assert.strictEqual(Derived.y, 1);
@@ -182,7 +182,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Derived] = result.main();
     assert.strictEqual(Derived.y, 2);
@@ -207,7 +207,7 @@ describe("unittests:: evaluation:: superInStaticInitializer", () => {
                 ];
             }
         `,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     const [Derived] = result.main();
     assert.strictEqual(Derived.y, 2);

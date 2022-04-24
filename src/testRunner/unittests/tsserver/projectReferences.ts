@@ -1,7 +1,7 @@
 namespace ts.projectSystem {
   export function createHostWithSolutionBuild(
     files: readonly TestFSWithWatch.FileOrFolderOrSymLink[],
-    rootNames: readonly string[]
+    rootNames: readonly string[],
   ) {
     const host = createServerHost(files);
     // ts build should succeed
@@ -24,7 +24,7 @@ namespace ts.projectSystem {
       const containerCompositeExec = getProjectFiles("container/compositeExec");
       const containerConfig = TestFSWithWatch.getTsBuildProjectFile(
         project,
-        "tsconfig.json"
+        "tsconfig.json",
       );
       const files = [
         libFile,
@@ -46,7 +46,7 @@ namespace ts.projectSystem {
           {
             projectFileName: TestFSWithWatch.getTsBuildProjectFilePath(
               project,
-              project
+              project,
             ),
             rootFiles: files.map((f) => ({ fileName: f.path })),
             options: {},
@@ -69,7 +69,7 @@ namespace ts.projectSystem {
           });
         });
         const containerProject = service.configuredProjects.get(
-          containerConfig.path
+          containerConfig.path,
         )!;
         session.executeCommandSeq<protocol.CompilerOptionsDiagnosticsRequest>({
           command: protocol.CommandTypes.CompilerOptionsDiagnosticsFull,
@@ -78,7 +78,7 @@ namespace ts.projectSystem {
         baselineTsserverLogs(
           "projectReferences",
           `does not error on container only project`,
-          session
+          session,
         );
       });
 
@@ -90,7 +90,7 @@ namespace ts.projectSystem {
         openFilesForSession([containerCompositeExec[1]], session);
         const myConstStart = protocolLocationFromSubstring(
           containerCompositeExec[1].content,
-          "myConst"
+          "myConst",
         );
         session.executeCommandSeq<protocol.RenameRequest>({
           command: protocol.CommandTypes.Rename,
@@ -100,7 +100,7 @@ namespace ts.projectSystem {
         baselineTsserverLogs(
           "projectReferences",
           `can successfully find references with out option`,
-          session
+          session,
         );
       });
 
@@ -124,7 +124,7 @@ namespace ts.projectSystem {
         // Ref projects are loaded after as part of this command
         const locationOfMyConst = protocolLocationFromSubstring(
           containerCompositeExec[1].content,
-          "myConst"
+          "myConst",
         );
         session.executeCommandSeq<protocol.RenameRequest>({
           command: protocol.CommandTypes.Rename,
@@ -145,7 +145,7 @@ namespace ts.projectSystem {
         baselineTsserverLogs(
           "projectReferences",
           `ancestor and project ref management`,
-          session
+          session,
         );
       });
     });
@@ -214,7 +214,7 @@ function foo() {
             terminalTs,
             libFile,
           ],
-          [srcConfig.path]
+          [srcConfig.path],
         );
         const session = createSession(host, {
           logger: createLoggerWithInMemoryLogs(),
@@ -270,7 +270,7 @@ function foo() {
           symbolName: searchStr,
           symbolStartOffset: protocolLocationFromSubstring(
             keyboardTs.content,
-            searchStr
+            searchStr,
           ).offset,
           symbolDisplayString: "function evaluateKeyboardEvent(): void",
         });
@@ -281,7 +281,7 @@ function foo() {
               ? " and using declaration maps"
               : ""
           }`,
-          session
+          session,
         );
       }
 
@@ -398,7 +398,7 @@ function foo() {
       }
       function verifySymlinkScenario(
         scenario: string,
-        packages: () => Packages
+        packages: () => Packages,
       ) {
         describe(`${scenario}: when solution is not built`, () => {
           it("with preserveSymlinks turned off", () => {
@@ -429,7 +429,7 @@ function foo() {
         scenario: string,
         { bPackageJson, aTest, bFoo, bBar, bSymlink }: Packages,
         alreadyBuilt: boolean,
-        extraOptions: CompilerOptions
+        extraOptions: CompilerOptions,
       ) {
         const aConfig = config("A", extraOptions, ["../B"]);
         const bConfig = config("B", extraOptions);
@@ -474,17 +474,17 @@ function foo() {
         verifyGetErrRequest({ session, host, files: [aTest] });
         baselineTsserverLogs(
           "projectReferences",
-          `monorepo like with symlinks ${scenario} and solution is ${
-            alreadyBuilt ? "built" : "not built"
-          }${extraOptions.preserveSymlinks ? " with preserveSymlinks" : ""}`,
-          session
+          `monorepo like with symlinks ${scenario} and solution is ${alreadyBuilt ? "built" : "not built"}${
+            extraOptions.preserveSymlinks ? " with preserveSymlinks" : ""
+          }`,
+          session,
         );
       }
 
       function config(
         packageName: string,
         extraOptions: CompilerOptions,
-        references?: string[]
+        references?: string[],
       ): File {
         return {
           path: `${tscWatch.projectRoot}/packages/${packageName}/tsconfig.json`,
@@ -506,7 +506,7 @@ function foo() {
       function file(
         packageName: string,
         fileName: string,
-        content: string
+        content: string,
       ): File {
         return {
           path: `${tscWatch.projectRoot}/packages/${packageName}/src/${fileName}`,
@@ -516,9 +516,7 @@ function foo() {
 
       function verifyMonoRepoLike(scope = "") {
         verifySymlinkScenario(
-          `when packageJson has types field and has index.ts${
-            scope ? " with scoped package" : ""
-          }`,
+          `when packageJson has types field and has index.ts${scope ? " with scoped package" : ""}`,
           () => ({
             bPackageJson: {
               path: `${tscWatch.projectRoot}/packages/B/package.json`,
@@ -534,7 +532,7 @@ function foo() {
 import { bar } from '${scope}b/lib/bar';
 foo();
 bar();
-`
+`,
             ),
             bFoo: file("B", "index.ts", `export function foo() { }`),
             bBar: file("B", "bar.ts", `export function bar() { }`),
@@ -542,13 +540,11 @@ bar();
               path: `${tscWatch.projectRoot}/node_modules/${scope}b`,
               symLink: `${tscWatch.projectRoot}/packages/B`,
             },
-          })
+          }),
         );
 
         verifySymlinkScenario(
-          `when referencing file from subFolder${
-            scope ? " with scoped package" : ""
-          }`,
+          `when referencing file from subFolder${scope ? " with scoped package" : ""}`,
           () => ({
             bPackageJson: {
               path: `${tscWatch.projectRoot}/packages/B/package.json`,
@@ -561,7 +557,7 @@ bar();
 import { bar } from '${scope}b/lib/bar/foo';
 foo();
 bar();
-`
+`,
             ),
             bFoo: file("B", "foo.ts", `export function foo() { }`),
             bBar: file("B", "bar/foo.ts", `export function bar() { }`),
@@ -569,7 +565,7 @@ bar();
               path: `${tscWatch.projectRoot}/node_modules/${scope}b`,
               symLink: `${tscWatch.projectRoot}/packages/B`,
             },
-          })
+          }),
         );
       }
 
@@ -650,7 +646,7 @@ testCompositeFunction('why hello there', 42);`,
           consumerIndex,
           symlink,
         ],
-        { useCaseSensitiveFileNames: true }
+        { useCaseSensitiveFileNames: true },
       );
       const session = createSession(host, {
         canUseEvents: true,
@@ -661,7 +657,7 @@ testCompositeFunction('why hello there', 42);`,
       baselineTsserverLogs(
         "projectReferences",
         `when the referenced projects have allowJs and emitDeclarationOnly`,
-        session
+        session,
       );
     });
 
@@ -745,7 +741,7 @@ testCompositeFunction('why hello there', 42);`,
         arguments: protocolFileLocationFromSubstring(
           programFile,
           "getSourceFile",
-          { index: 1 }
+          { index: 1 },
         ),
       });
 
@@ -755,13 +751,13 @@ testCompositeFunction('why hello there', 42);`,
         command: protocol.CommandTypes.References,
         arguments: protocolFileLocationFromSubstring(
           programFile,
-          "getSourceFiles"
+          "getSourceFiles",
         ),
       });
       baselineTsserverLogs(
         "projectReferences",
         `finding local reference doesnt load ancestor/sibling projects`,
-        session
+        session,
       );
     });
 
@@ -770,7 +766,7 @@ testCompositeFunction('why hello there', 42);`,
         scenario: string,
         definition: string,
         usage: string,
-        referenceTerm: string
+        referenceTerm: string,
       ) {
         it(scenario, () => {
           const solutionLocation = "/user/username/projects/solution";
@@ -842,14 +838,14 @@ ${usage}`,
             command: protocol.CommandTypes.References,
             arguments: protocolFileLocationFromSubstring(
               apiFile,
-              referenceTerm
+              referenceTerm,
             ),
           });
 
           baselineTsserverLogs(
             "projectReferences",
             `special handling of localness ${scenario}`,
-            session
+            session,
           );
         });
       }
@@ -858,21 +854,21 @@ ${usage}`,
         "when using arrow function assignment",
         `export const dog = () => { };`,
         `shared.dog();`,
-        "dog"
+        "dog",
       );
 
       verify(
         "when using arrow function as object literal property types",
         `export const foo = { bar: () => { } };`,
         `shared.foo.bar();`,
-        "bar"
+        "bar",
       );
 
       verify(
         "when using object literal property",
         `export const foo = {  baz: "BAZ" };`,
         `shared.foo.baz;`,
-        "baz"
+        "baz",
       );
 
       verify(
@@ -880,7 +876,7 @@ ${usage}`,
         `export const foo = class { fly() {} };`,
         `const instance = new shared.foo();
 instance.fly();`,
-        "fly"
+        "fly",
       );
 
       verify(
@@ -889,7 +885,7 @@ instance.fly();`,
         `const local = { bar: () => { } };
 export const foo = local;`,
         `shared.foo.bar();`,
-        "bar"
+        "bar",
       );
     });
 
@@ -973,13 +969,13 @@ export const foo = local;`,
         command: protocol.CommandTypes.References,
         arguments: protocolFileLocationFromSubstring(
           programFile,
-          "getSourceFiles"
+          "getSourceFiles",
         ),
       });
       baselineTsserverLogs(
         "projectReferences",
         `with disableSolutionSearching solution and siblings are not loaded`,
-        session
+        session,
       );
     });
 
@@ -1008,7 +1004,8 @@ export { foo };
       };
       const mainDtsMap: File = {
         path: `${tscWatch.projectRoot}/target/src/main.d.ts.map`,
-        content: `{"version":3,"file":"main.d.ts","sourceRoot":"","sources":["../../src/main.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,GAAG,EAAE,MAAM,mBAAmB,CAAC;AAExC,OAAO,EAAC,GAAG,EAAC,CAAC"}`,
+        content:
+          `{"version":3,"file":"main.d.ts","sourceRoot":"","sources":["../../src/main.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,GAAG,EAAE,MAAM,mBAAmB,CAAC;AAExC,OAAO,EAAC,GAAG,EAAC,CAAC"}`,
       };
       const helperDts: File = {
         path: `${tscWatch.projectRoot}/target/src/helpers/functions.d.ts`,
@@ -1017,7 +1014,8 @@ export { foo };
       };
       const helperDtsMap: File = {
         path: `${tscWatch.projectRoot}/target/src/helpers/functions.d.ts.map`,
-        content: `{"version":3,"file":"functions.d.ts","sourceRoot":"","sources":["../../../src/helpers/functions.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,GAAG,IAAI,CAAC"}`,
+        content:
+          `{"version":3,"file":"functions.d.ts","sourceRoot":"","sources":["../../../src/helpers/functions.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,GAAG,IAAI,CAAC"}`,
       };
       const tsconfigIndirect3: File = {
         path: `${tscWatch.projectRoot}/indirect3/tsconfig.json`,
@@ -1095,14 +1093,10 @@ export function bar() {}`,
         const info = service.getScriptInfoForPath(main.path as Path)!;
         session.logger.logs.push("");
         session.logger.logs.push(
-          `getDefaultProject for ${main.path}: ${
-            info.getDefaultProject().projectName
-          }`
+          `getDefaultProject for ${main.path}: ${info.getDefaultProject().projectName}`,
         );
         session.logger.logs.push(
-          `findDefaultConfiguredProject for ${main.path}: ${
-            service.findDefaultConfiguredProject(info)!.projectName
-          }`
+          `findDefaultConfiguredProject for ${main.path}: ${service.findDefaultConfiguredProject(info)!.projectName}`,
         );
         session.logger.logs.push("");
 
@@ -1142,7 +1136,7 @@ export function bar() {}`,
           command: protocol.CommandTypes.References,
           arguments: protocolFileLocationFromSubstring(
             fileResolvingToMainDts,
-            "foo"
+            "foo",
           ),
         }).response as protocol.ReferencesResponseBody;
         baselineTsserverLogs("projectReferences", input.scenario, session);
@@ -1150,7 +1144,7 @@ export function bar() {}`,
 
       function getIndirectProject(
         postfix: string,
-        optionsToExtend?: CompilerOptions
+        optionsToExtend?: CompilerOptions,
       ) {
         const tsconfigIndirect: File = {
           path: `${tscWatch.projectRoot}/tsconfig-indirect${postfix}.json`,
@@ -1178,14 +1172,10 @@ export function bar() {}`,
         const info = service.getScriptInfoForPath(main.path as Path)!;
         session.logger.logs.push("");
         session.logger.logs.push(
-          `getDefaultProject for ${main.path}: ${
-            info.getDefaultProject().projectName
-          }`
+          `getDefaultProject for ${main.path}: ${info.getDefaultProject().projectName}`,
         );
         session.logger.logs.push(
-          `findDefaultConfiguredProject for ${main.path}: ${
-            service.findDefaultConfiguredProject(info)?.projectName
-          }`
+          `findDefaultConfiguredProject for ${main.path}: ${service.findDefaultConfiguredProject(info)?.projectName}`,
         );
         session.logger.logs.push("");
 
@@ -1213,8 +1203,7 @@ export function bar() {}`,
 
       it("when project is indirectly referenced by solution", () => {
         const { tsconfigIndirect, indirect } = getIndirectProject("1");
-        const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } =
-          getIndirectProject("2");
+        const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } = getIndirectProject("2");
         verifySolutionScenario({
           scenario: "project is indirectly referenced by solution",
           configRefs: [
@@ -1232,8 +1221,7 @@ export function bar() {}`,
 
       it("disables looking into the child project if disableReferencedProjectLoad is set", () => {
         verifyDisableReferencedProjectLoad({
-          scenario:
-            "disables looking into the child project if disableReferencedProjectLoad is set",
+          scenario: "disables looking into the child project if disableReferencedProjectLoad is set",
           solutionOptions: { disableReferencedProjectLoad: true },
           configRefs: ["./tsconfig-src.json"],
           additionalFiles: emptyArray,
@@ -1256,8 +1244,7 @@ export function bar() {}`,
         const { tsconfigIndirect, indirect } = getIndirectProject("1", {
           disableReferencedProjectLoad: true,
         });
-        const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } =
-          getIndirectProject("2");
+        const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } = getIndirectProject("2");
         verifyDisableReferencedProjectLoad({
           scenario:
             "disables looking into the child project if disableReferencedProjectLoad is set in first indirect project but not in another one",
@@ -1300,11 +1287,9 @@ export function bar() {}`,
 bar;`,
           };
           const { tsconfigIndirect, indirect } = getIndirectProject("1");
-          const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } =
-            getIndirectProject("2");
+          const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } = getIndirectProject("2");
           verifySolutionScenario({
-            scenario:
-              "solution with its own files and project is indirectly referenced by solution",
+            scenario: "solution with its own files and project is indirectly referenced by solution",
             solutionFiles: [`./own/main.ts`],
             solutionOptions: {
               outDir: "./target/",
@@ -1374,8 +1359,7 @@ bar;`,
           const { tsconfigIndirect, indirect } = getIndirectProject("1", {
             disableReferencedProjectLoad: true,
           });
-          const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } =
-            getIndirectProject("2");
+          const { tsconfigIndirect: tsconfigIndirect2, indirect: indirect2 } = getIndirectProject("2");
           verifyDisableReferencedProjectLoad({
             scenario:
               "solution with its own files and disables looking into the child project if disableReferencedProjectLoad is set in first indirect project but not in another one",
@@ -1472,7 +1456,7 @@ bar;`,
         baselineTsserverLogs(
           "projectReferences",
           `new file is added to the referenced project when referenced project is not open`,
-          session
+          session,
         );
       });
 
@@ -1497,7 +1481,7 @@ bar;`,
         baselineTsserverLogs(
           "projectReferences",
           `new file is added to the referenced project when referenced project is open`,
-          session
+          session,
         );
       });
 
@@ -1529,7 +1513,7 @@ bar;`,
         baselineTsserverLogs(
           "projectReferences",
           `new file is added to the referenced project when referenced project is not open with disableSourceOfProjectReferenceRedirect`,
-          session
+          session,
         );
       });
 
@@ -1562,7 +1546,7 @@ bar;`,
         baselineTsserverLogs(
           "projectReferences",
           `new file is added to the referenced project when referenced project is open with disableSourceOfProjectReferenceRedirect`,
-          session
+          session,
         );
       });
     });
@@ -1570,7 +1554,7 @@ bar;`,
     describe("auto import with referenced project", () => {
       function verifyAutoImport(
         built: boolean,
-        disableSourceOfProjectReferenceRedirect?: boolean
+        disableSourceOfProjectReferenceRedirect?: boolean,
       ) {
         const solnConfig: File = {
           path: `${tscWatch.projectRoot}/tsconfig.json`,
@@ -1643,7 +1627,7 @@ bar;`,
           const solutionBuilder = tscWatch.createSolutionBuilder(
             host,
             [solnConfig.path],
-            {}
+            {},
           );
           solutionBuilder.build();
           host.clearOutput();
@@ -1670,7 +1654,7 @@ bar;`,
               ? " with disableSourceOfProjectReferenceRedirect"
               : ""
           }`,
-          session
+          session,
         );
       }
 
@@ -1683,7 +1667,7 @@ bar;`,
       it("when disableSourceOfProjectReferenceRedirect is true", () => {
         verifyAutoImport(
           /*built*/ true,
-          /*disableSourceOfProjectReferenceRedirect*/ true
+          /*disableSourceOfProjectReferenceRedirect*/ true,
         );
       });
     });
@@ -1692,7 +1676,7 @@ bar;`,
       function getPackageAndFile(
         packageName: string,
         references?: string[],
-        optionsToExtend?: CompilerOptions
+        optionsToExtend?: CompilerOptions,
       ): [file: File, config: File] {
         const file: File = {
           path: `${tscWatch.projectRoot}/${packageName}/src/file1.ts`,
@@ -1717,36 +1701,39 @@ bar;`,
         "indirectNoCoreRef",
       ]);
       const [coreFile, coreConfig] = getPackageAndFile("core");
-      const [noCoreRef1File, noCoreRef1Config] =
-        getPackageAndFile("noCoreRef1");
+      const [noCoreRef1File, noCoreRef1Config] = getPackageAndFile("noCoreRef1");
       const [indirectFile, indirectConfig] = getPackageAndFile("indirect", [
         "coreRef1",
       ]);
       const [coreRef1File, coreRef1Config] = getPackageAndFile("coreRef1", [
         "core",
       ]);
-      const [indirectDisabledChildLoad1File, indirectDisabledChildLoad1Config] =
-        getPackageAndFile("indirectDisabledChildLoad1", ["coreRef2"], {
+      const [indirectDisabledChildLoad1File, indirectDisabledChildLoad1Config] = getPackageAndFile(
+        "indirectDisabledChildLoad1",
+        ["coreRef2"],
+        {
           disableReferencedProjectLoad: true,
-        });
+        },
+      );
       const [coreRef2File, coreRef2Config] = getPackageAndFile("coreRef2", [
         "core",
       ]);
-      const [indirectDisabledChildLoad2File, indirectDisabledChildLoad2Config] =
-        getPackageAndFile("indirectDisabledChildLoad2", ["coreRef3"], {
+      const [indirectDisabledChildLoad2File, indirectDisabledChildLoad2Config] = getPackageAndFile(
+        "indirectDisabledChildLoad2",
+        ["coreRef3"],
+        {
           disableReferencedProjectLoad: true,
-        });
+        },
+      );
       const [coreRef3File, coreRef3Config] = getPackageAndFile("coreRef3", [
         "core",
       ]);
       const [refToCoreRef3File, refToCoreRef3Config] = getPackageAndFile(
         "refToCoreRef3",
-        ["coreRef3"]
+        ["coreRef3"],
       );
-      const [indirectNoCoreRefFile, indirectNoCoreRefConfig] =
-        getPackageAndFile("indirectNoCoreRef", ["noCoreRef2"]);
-      const [noCoreRef2File, noCoreRef2Config] =
-        getPackageAndFile("noCoreRef2");
+      const [indirectNoCoreRefFile, indirectNoCoreRefConfig] = getPackageAndFile("indirectNoCoreRef", ["noCoreRef2"]);
+      const [noCoreRef2File, noCoreRef2Config] = getPackageAndFile("noCoreRef2");
 
       const host = createServerHost(
         [
@@ -1776,7 +1763,7 @@ bar;`,
           noCoreRef2File,
           noCoreRef2Config,
         ],
-        { useCaseSensitiveFileNames: true }
+        { useCaseSensitiveFileNames: true },
       );
       const session = createSession(host, {
         logger: createLoggerWithInMemoryLogs(),
@@ -1791,7 +1778,7 @@ bar;`,
       baselineTsserverLogs(
         "projectReferences",
         `when files from two projects are open and one project references`,
-        session
+        session,
       );
     });
 
@@ -1838,25 +1825,21 @@ const b: B = new B();`,
 
       const dtsMapB: File = {
         path: `${tscWatch.projectRoot}/b/lib/index.d.ts.map`,
-        content: `{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../index.ts"],"names":[],"mappings":"AAAA,qBAAa,CAAC;IACV,CAAC;CACJ"}`,
+        content:
+          `{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../index.ts"],"names":[],"mappings":"AAAA,qBAAa,CAAC;IACV,CAAC;CACJ"}`,
       };
 
       function baselineDisableReferencedProjectLoad(
         projectAlreadyLoaded: boolean,
         disableReferencedProjectLoad: boolean,
         disableSourceOfProjectReferenceRedirect: boolean,
-        dtsMapPresent: boolean
+        dtsMapPresent: boolean,
       ) {
         // Mangled to stay under windows path length limit
-        const subScenario =
-          `when proj ${projectAlreadyLoaded ? "is" : "is not"} loaded` +
-          ` and refd proj loading is ${
-            disableReferencedProjectLoad ? "disabled" : "enabled"
-          }` +
-          ` and proj ref redirects are ${
-            disableSourceOfProjectReferenceRedirect ? "disabled" : "enabled"
-          }` +
-          ` and a decl map is ${dtsMapPresent ? "present" : "missing"}`;
+        const subScenario = `when proj ${projectAlreadyLoaded ? "is" : "is not"} loaded`
+          + ` and refd proj loading is ${disableReferencedProjectLoad ? "disabled" : "enabled"}`
+          + ` and proj ref redirects are ${disableSourceOfProjectReferenceRedirect ? "disabled" : "enabled"}`
+          + ` and a decl map is ${dtsMapPresent ? "present" : "missing"}`;
         const compilerOptions: CompilerOptions = {
           disableReferencedProjectLoad,
           disableSourceOfProjectReferenceRedirect,
@@ -1886,7 +1869,7 @@ const b: B = new B();`,
           });
           openFilesForSession(
             [indexA, ...(projectAlreadyLoaded ? [helperB] : [])],
-            session
+            session,
           );
 
           session.executeCommandSeq<protocol.ReferencesRequest>({
@@ -1898,7 +1881,7 @@ const b: B = new B();`,
           baselineTsserverLogs(
             "projectReferences",
             `find refs to decl in other proj ${subScenario}`,
-            session
+            session,
           );
         });
       }

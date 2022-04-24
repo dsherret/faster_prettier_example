@@ -21,16 +21,16 @@ namespace ts.server {
     const lines = message.split(/\r?\n/);
     Debug.assert(
       lines.length >= 2,
-      "Malformed response: Expected 3 lines in the response."
+      "Malformed response: Expected 3 lines in the response.",
     );
 
     const contentLengthText = lines[0];
     Debug.assert(
       contentLengthText.indexOf(contentLengthPrefix) === 0,
-      "Malformed response: Response text did not contain content-length header."
+      "Malformed response: Response text did not contain content-length header.",
     );
     const contentLength = parseInt(
-      contentLengthText.substring(contentLengthPrefix.length)
+      contentLengthText.substring(contentLengthPrefix.length),
     );
 
     // Read the body
@@ -39,7 +39,7 @@ namespace ts.server {
     // Verify content length
     Debug.assert(
       responseBody.length + 1 === contentLength,
-      "Malformed response: Content length did not match the response's body length."
+      "Malformed response: Content length did not match the response's body length.",
     );
     return responseBody;
   }
@@ -64,7 +64,7 @@ namespace ts.server {
       let lineMap = this.lineMaps.get(fileName);
       if (!lineMap) {
         lineMap = computeLineStarts(
-          getSnapshotText(this.host.getScriptSnapshot(fileName)!)
+          getSnapshotText(this.host.getScriptSnapshot(fileName)!),
         );
         this.lineMaps.set(fileName, lineMap);
       }
@@ -74,23 +74,23 @@ namespace ts.server {
     private lineOffsetToPosition(
       fileName: string,
       lineOffset: protocol.Location,
-      lineMap?: number[]
+      lineMap?: number[],
     ): number {
       lineMap = lineMap || this.getLineMap(fileName);
       return computePositionOfLineAndCharacter(
         lineMap,
         lineOffset.line - 1,
-        lineOffset.offset - 1
+        lineOffset.offset - 1,
       );
     }
 
     private positionToOneBasedLineOffset(
       fileName: string,
-      position: number
+      position: number,
     ): protocol.Location {
       const lineOffset = computeLineAndCharacterOfPosition(
         this.getLineMap(fileName),
-        position
+        position,
       );
       return {
         line: lineOffset.line + 1,
@@ -100,7 +100,7 @@ namespace ts.server {
 
     private convertCodeEditsToTextChange(
       fileName: string,
-      codeEdit: protocol.CodeEdit
+      codeEdit: protocol.CodeEdit,
     ): TextChange {
       return {
         span: this.decodeSpan(codeEdit, fileName),
@@ -110,7 +110,7 @@ namespace ts.server {
 
     private processRequest<T extends protocol.Request>(
       command: string,
-      args: T["arguments"]
+      args: T["arguments"],
     ): T {
       const request: protocol.Request = {
         seq: this.sequence,
@@ -127,7 +127,7 @@ namespace ts.server {
 
     private processResponse<T extends protocol.Response>(
       request: protocol.Request,
-      expectEmptyBody = false
+      expectEmptyBody = false,
     ): T {
       let foundResponseMessage = false;
       let response!: T;
@@ -144,10 +144,10 @@ namespace ts.server {
           }
         } catch (e) {
           throw new Error(
-            "Malformed response: Failed to parse server response: " +
-              lastMessage +
-              ". \r\n  Error details: " +
-              e.message
+            "Malformed response: Failed to parse server response: "
+              + lastMessage
+              + ". \r\n  Error details: "
+              + e.message,
           );
         }
       }
@@ -159,15 +159,15 @@ namespace ts.server {
 
       Debug.assert(
         response.request_seq === request.seq,
-        "Malformed response: response sequence number did not match request sequence number."
+        "Malformed response: response sequence number did not match request sequence number.",
       );
       Debug.assert(
         expectEmptyBody || !!response.body,
-        "Malformed response: Unexpected empty response body."
+        "Malformed response: Unexpected empty response body.",
       );
       Debug.assert(
         !expectEmptyBody || !response.body,
-        "Malformed response: Unexpected non-empty response body."
+        "Malformed response: Unexpected non-empty response body.",
       );
 
       return response;
@@ -194,7 +194,7 @@ namespace ts.server {
       };
       const request = this.processRequest(
         CommandNames.CompilerOptionsForInferredProjects,
-        args
+        args,
       );
       this.processResponse(request, /*expectEmptyBody*/ false);
     }
@@ -202,7 +202,7 @@ namespace ts.server {
     openFile(
       file: string,
       fileContent?: string,
-      scriptKindName?: "TS" | "JS" | "TSX" | "JSX"
+      scriptKindName?: "TS" | "JS" | "TSX" | "JSX",
     ): void {
       const args: protocol.OpenRequestArgs = {
         file,
@@ -221,13 +221,13 @@ namespace ts.server {
       fileName: string,
       start: number,
       end: number,
-      insertString: string
+      insertString: string,
     ): protocol.ChangeRequestArgs {
       return {
         ...this.createFileLocationRequestArgsWithEndLineAndOffset(
           fileName,
           start,
-          end
+          end,
         ),
         insertString,
       };
@@ -242,7 +242,7 @@ namespace ts.server {
     toLineColumnOffset(fileName: string, position: number) {
       const { line, offset } = this.positionToOneBasedLineOffset(
         fileName,
-        position
+        position,
       );
       return { line, character: offset };
     }
@@ -252,10 +252,9 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.QuickInfoRequest>(
         CommandNames.Quickinfo,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.QuickInfoResponse>(request);
+      const response = this.processResponse<protocol.QuickInfoResponse>(request);
       const body = response.body!; // TODO: GH#18217
 
       return {
@@ -263,26 +262,24 @@ namespace ts.server {
         kindModifiers: body.kindModifiers,
         textSpan: this.decodeSpan(body, fileName),
         displayParts: [{ kind: "text", text: body.displayString }],
-        documentation:
-          typeof body.documentation === "string"
-            ? [{ kind: "text", text: body.documentation }]
-            : body.documentation,
+        documentation: typeof body.documentation === "string"
+          ? [{ kind: "text", text: body.documentation }]
+          : body.documentation,
         tags: this.decodeLinkDisplayParts(body.tags),
       };
     }
 
     getProjectInfo(
       file: string,
-      needFileNameList: boolean
+      needFileNameList: boolean,
     ): protocol.ProjectInfo {
       const args: protocol.ProjectInfoRequestArgs = { file, needFileNameList };
 
       const request = this.processRequest<protocol.ProjectInfoRequest>(
         CommandNames.ProjectInfo,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.ProjectInfoResponse>(request);
+      const response = this.processResponse<protocol.ProjectInfoResponse>(request);
 
       return {
         configFileName: response.body!.configFileName, // TODO: GH#18217
@@ -293,18 +290,16 @@ namespace ts.server {
     getCompletionsAtPosition(
       fileName: string,
       position: number,
-      _preferences: UserPreferences | undefined
+      _preferences: UserPreferences | undefined,
     ): CompletionInfo {
       // Not passing along 'preferences' because server should already have those from the 'configure' command
-      const args: protocol.CompletionsRequestArgs =
-        this.createFileLocationRequestArgs(fileName, position);
+      const args: protocol.CompletionsRequestArgs = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.CompletionsRequest>(
         CommandNames.CompletionInfo,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.CompletionInfoResponse>(request);
+      const response = this.processResponse<protocol.CompletionInfoResponse>(request);
 
       return {
         isGlobalCompletion: response.body!.isGlobalCompletion,
@@ -338,7 +333,7 @@ namespace ts.server {
       _options: FormatCodeOptions | FormatCodeSettings | undefined,
       source: string | undefined,
       _preferences: UserPreferences | undefined,
-      data: unknown
+      data: unknown,
     ): CompletionEntryDetails {
       const args: protocol.CompletionDetailsRequestArgs = {
         ...this.createFileLocationRequestArgs(fileName, position),
@@ -347,12 +342,12 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.CompletionDetailsRequest>(
         CommandNames.CompletionDetailsFull,
-        args
+        args,
       );
       const response = this.processResponse<protocol.Response>(request);
       Debug.assert(
         response.body.length === 1,
-        "Unexpected length of completion details response body."
+        "Unexpected length of completion details response body.",
       );
       return response.body[0];
     }
@@ -360,7 +355,7 @@ namespace ts.server {
     getCompletionEntrySymbol(
       _fileName: string,
       _position: number,
-      _entryName: string
+      _entryName: string,
     ): Symbol {
       return notImplemented();
     }
@@ -373,7 +368,7 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.NavtoRequest>(
         CommandNames.Navto,
-        args
+        args,
       );
       const response = this.processResponse<protocol.NavtoResponse>(request);
 
@@ -395,36 +390,33 @@ namespace ts.server {
       file: string,
       start: number,
       end: number,
-      _options: FormatCodeOptions
+      _options: FormatCodeOptions,
     ): TextChange[] {
-      const args: protocol.FormatRequestArgs =
-        this.createFileLocationRequestArgsWithEndLineAndOffset(
-          file,
-          start,
-          end
-        );
+      const args: protocol.FormatRequestArgs = this.createFileLocationRequestArgsWithEndLineAndOffset(
+        file,
+        start,
+        end,
+      );
 
       // TODO: handle FormatCodeOptions
       const request = this.processRequest<protocol.FormatRequest>(
         CommandNames.Format,
-        args
+        args,
       );
       const response = this.processResponse<protocol.FormatResponse>(request);
 
-      return response.body!.map((entry) =>
-        this.convertCodeEditsToTextChange(file, entry)
-      ); // TODO: GH#18217
+      return response.body!.map((entry) => this.convertCodeEditsToTextChange(file, entry)); // TODO: GH#18217
     }
 
     getFormattingEditsForDocument(
       fileName: string,
-      options: FormatCodeOptions
+      options: FormatCodeOptions,
     ): TextChange[] {
       return this.getFormattingEditsForRange(
         fileName,
         0,
         this.host.getScriptSnapshot(fileName)!.getLength(),
-        options
+        options,
       );
     }
 
@@ -432,7 +424,7 @@ namespace ts.server {
       fileName: string,
       position: number,
       key: string,
-      _options: FormatCodeOptions
+      _options: FormatCodeOptions,
     ): TextChange[] {
       const args: protocol.FormatOnKeyRequestArgs = {
         ...this.createFileLocationRequestArgs(fileName, position),
@@ -442,28 +434,24 @@ namespace ts.server {
       // TODO: handle FormatCodeOptions
       const request = this.processRequest<protocol.FormatOnKeyRequest>(
         CommandNames.Formatonkey,
-        args
+        args,
       );
       const response = this.processResponse<protocol.FormatResponse>(request);
 
-      return response.body!.map((entry) =>
-        this.convertCodeEditsToTextChange(fileName, entry)
-      ); // TODO: GH#18217
+      return response.body!.map((entry) => this.convertCodeEditsToTextChange(fileName, entry)); // TODO: GH#18217
     }
 
     getDefinitionAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): DefinitionInfo[] {
-      const args: protocol.FileLocationRequestArgs =
-        this.createFileLocationRequestArgs(fileName, position);
+      const args: protocol.FileLocationRequestArgs = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.DefinitionRequest>(
         CommandNames.Definition,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.DefinitionResponse>(request);
+      const response = this.processResponse<protocol.DefinitionResponse>(request);
 
       return response.body!.map((entry) => ({
         // TODO: GH#18217
@@ -478,19 +466,17 @@ namespace ts.server {
 
     getDefinitionAndBoundSpan(
       fileName: string,
-      position: number
+      position: number,
     ): DefinitionInfoAndBoundSpan {
-      const args: protocol.FileLocationRequestArgs =
-        this.createFileLocationRequestArgs(fileName, position);
+      const args: protocol.FileLocationRequestArgs = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.DefinitionRequest>(
         CommandNames.DefinitionAndBoundSpan,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.DefinitionInfoAndBoundSpanResponse>(
-          request
-        );
+      const response = this.processResponse<protocol.DefinitionInfoAndBoundSpanResponse>(
+        request,
+      );
       const body = Debug.checkDefined(response.body); // TODO: GH#18217
 
       return {
@@ -509,17 +495,15 @@ namespace ts.server {
 
     getTypeDefinitionAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): DefinitionInfo[] {
-      const args: protocol.FileLocationRequestArgs =
-        this.createFileLocationRequestArgs(fileName, position);
+      const args: protocol.FileLocationRequestArgs = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.TypeDefinitionRequest>(
         CommandNames.TypeDefinition,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.TypeDefinitionResponse>(request);
+      const response = this.processResponse<protocol.TypeDefinitionResponse>(request);
 
       return response.body!.map((entry) => ({
         // TODO: GH#18217
@@ -534,16 +518,15 @@ namespace ts.server {
 
     getImplementationAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): ImplementationLocation[] {
       const args = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.ImplementationRequest>(
         CommandNames.Implementation,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.ImplementationResponse>(request);
+      const response = this.processResponse<protocol.ImplementationResponse>(request);
 
       return response.body!.map((entry) => ({
         // TODO: GH#18217
@@ -558,7 +541,7 @@ namespace ts.server {
       const args = this.createFileLocationRequestArgs(fileName, position);
       const request = this.processRequest<protocol.ReferencesRequest>(
         CommandNames.ReferencesFull,
-        args
+        args,
       );
       const response = this.processResponse(request);
       return response.body;
@@ -566,16 +549,15 @@ namespace ts.server {
 
     getReferencesAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): ReferenceEntry[] {
       const args = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.ReferencesRequest>(
         CommandNames.References,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.ReferencesResponse>(request);
+      const response = this.processResponse<protocol.ReferencesResponse>(request);
 
       return response.body!.refs.map((entry) => ({
         // TODO: GH#18217
@@ -591,10 +573,9 @@ namespace ts.server {
         CommandNames.FileReferences,
         {
           file: fileName,
-        }
+        },
       );
-      const response =
-        this.processResponse<protocol.FileReferencesResponse>(request);
+      const response = this.processResponse<protocol.FileReferencesResponse>(request);
 
       return response.body!.refs.map((entry) => ({
         // TODO: GH#18217
@@ -608,10 +589,9 @@ namespace ts.server {
     getEmitOutput(file: string): EmitOutput {
       const request = this.processRequest<protocol.EmitOutputRequest>(
         protocol.CommandTypes.EmitOutput,
-        { file }
+        { file },
       );
-      const response =
-        this.processResponse<protocol.EmitOutputResponse>(request);
+      const response = this.processResponse<protocol.EmitOutputResponse>(request);
       return response.body as EmitOutput;
     }
 
@@ -627,7 +607,7 @@ namespace ts.server {
 
     private getDiagnostics(
       file: string,
-      command: CommandNames
+      command: CommandNames,
     ): DiagnosticWithLocation[] {
       const request = this.processRequest<
         | protocol.SyntacticDiagnosticsSyncRequest
@@ -644,10 +624,12 @@ namespace ts.server {
 
       return (response.body as protocol.DiagnosticWithLinePosition[]).map(
         (entry): DiagnosticWithLocation => {
-          const category = firstDefined(Object.keys(DiagnosticCategory), (id) =>
-            isString(id) && entry.category === id.toLowerCase()
-              ? (DiagnosticCategory as any)[id]
-              : undefined
+          const category = firstDefined(
+            Object.keys(DiagnosticCategory),
+            (id) =>
+              isString(id) && entry.category === id.toLowerCase()
+                ? (DiagnosticCategory as any)[id]
+                : undefined,
           );
           return {
             file: fakeSourceFile,
@@ -656,13 +638,13 @@ namespace ts.server {
             messageText: entry.message,
             category: Debug.checkDefined(
               category,
-              "convertDiagnostic: category should not be undefined"
+              "convertDiagnostic: category should not be undefined",
             ),
             code: entry.code,
             reportsUnnecessary: entry.reportsUnnecessary,
             reportsDeprecated: entry.reportsDeprecated,
           };
-        }
+        },
       );
     }
 
@@ -675,7 +657,7 @@ namespace ts.server {
       position: number,
       _options?: RenameInfoOptions,
       findInStrings?: boolean,
-      findInComments?: boolean
+      findInComments?: boolean,
     ): RenameInfo {
       // Not passing along 'options' because server should already have those from the 'configure' command
       const args: protocol.RenameRequestArgs = {
@@ -686,30 +668,32 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.RenameRequest>(
         CommandNames.Rename,
-        args
+        args,
       );
       const response = this.processResponse<protocol.RenameResponse>(request);
       const body = response.body!; // TODO: GH#18217
       const locations: RenameLocation[] = [];
       for (const entry of body.locs) {
         const fileName = entry.file;
-        for (const {
-          start,
-          end,
-          contextStart,
-          contextEnd,
-          ...prefixSuffixText
-        } of entry.locs) {
+        for (
+          const {
+            start,
+            end,
+            contextStart,
+            contextEnd,
+            ...prefixSuffixText
+          } of entry.locs
+        ) {
           locations.push({
             textSpan: this.decodeSpan({ start, end }, fileName),
             fileName,
             ...(contextStart !== undefined
               ? {
-                  contextSpan: this.decodeSpan(
-                    { start: contextStart, end: contextEnd! },
-                    fileName
-                  ),
-                }
+                contextSpan: this.decodeSpan(
+                  { start: contextStart, end: contextEnd! },
+                  fileName,
+                ),
+              }
               : undefined),
             ...prefixSuffixText,
           });
@@ -718,18 +702,18 @@ namespace ts.server {
 
       const renameInfo = body.info.canRename
         ? identity<RenameInfoSuccess>({
-            canRename: body.info.canRename,
-            fileToRename: body.info.fileToRename,
-            displayName: body.info.displayName,
-            fullDisplayName: body.info.fullDisplayName,
-            kind: body.info.kind,
-            kindModifiers: body.info.kindModifiers,
-            triggerSpan: createTextSpanFromBounds(position, position),
-          })
+          canRename: body.info.canRename,
+          fileToRename: body.info.fileToRename,
+          displayName: body.info.displayName,
+          fullDisplayName: body.info.fullDisplayName,
+          kind: body.info.kind,
+          kindModifiers: body.info.kindModifiers,
+          triggerSpan: createTextSpanFromBounds(position, position),
+        })
         : identity<RenameInfoFailure>({
-            canRename: false,
-            localizedErrorMessage: body.info.localizedErrorMessage,
-          });
+          canRename: false,
+          localizedErrorMessage: body.info.localizedErrorMessage,
+        });
       this.lastRenameEntry = {
         renameInfo,
         inputs: {
@@ -751,21 +735,21 @@ namespace ts.server {
       fileName: string,
       position: number,
       findInStrings: boolean,
-      findInComments: boolean
+      findInComments: boolean,
     ): RenameLocation[] {
       if (
-        !this.lastRenameEntry ||
-        this.lastRenameEntry.inputs.fileName !== fileName ||
-        this.lastRenameEntry.inputs.position !== position ||
-        this.lastRenameEntry.inputs.findInStrings !== findInStrings ||
-        this.lastRenameEntry.inputs.findInComments !== findInComments
+        !this.lastRenameEntry
+        || this.lastRenameEntry.inputs.fileName !== fileName
+        || this.lastRenameEntry.inputs.position !== position
+        || this.lastRenameEntry.inputs.findInStrings !== findInStrings
+        || this.lastRenameEntry.inputs.findInComments !== findInComments
       ) {
         this.getRenameInfo(
           fileName,
           position,
           { allowRenameOfImportPath: true },
           findInStrings,
-          findInComments
+          findInComments,
         );
       }
 
@@ -775,7 +759,7 @@ namespace ts.server {
     private decodeNavigationBarItems(
       items: protocol.NavigationBarItem[] | undefined,
       fileName: string,
-      lineMap: number[]
+      lineMap: number[],
     ): NavigationBarItem[] {
       if (!items) {
         return [];
@@ -785,13 +769,11 @@ namespace ts.server {
         text: item.text,
         kind: item.kind,
         kindModifiers: item.kindModifiers || "",
-        spans: item.spans.map((span) =>
-          this.decodeSpan(span, fileName, lineMap)
-        ),
+        spans: item.spans.map((span) => this.decodeSpan(span, fileName, lineMap)),
         childItems: this.decodeNavigationBarItems(
           item.childItems,
           fileName,
-          lineMap
+          lineMap,
         ),
         indent: item.indent,
         bolded: false,
@@ -802,7 +784,7 @@ namespace ts.server {
     getNavigationBarItems(file: string): NavigationBarItem[] {
       const request = this.processRequest<protocol.NavBarRequest>(
         CommandNames.NavBar,
-        { file }
+        { file },
       );
       const response = this.processResponse<protocol.NavBarResponse>(request);
 
@@ -813,27 +795,22 @@ namespace ts.server {
     private decodeNavigationTree(
       tree: protocol.NavigationTree,
       fileName: string,
-      lineMap: number[]
+      lineMap: number[],
     ): NavigationTree {
       return {
         text: tree.text,
         kind: tree.kind,
         kindModifiers: tree.kindModifiers,
-        spans: tree.spans.map((span) =>
-          this.decodeSpan(span, fileName, lineMap)
-        ),
-        nameSpan:
-          tree.nameSpan && this.decodeSpan(tree.nameSpan, fileName, lineMap),
-        childItems: map(tree.childItems, (item) =>
-          this.decodeNavigationTree(item, fileName, lineMap)
-        ),
+        spans: tree.spans.map((span) => this.decodeSpan(span, fileName, lineMap)),
+        nameSpan: tree.nameSpan && this.decodeSpan(tree.nameSpan, fileName, lineMap),
+        childItems: map(tree.childItems, (item) => this.decodeNavigationTree(item, fileName, lineMap)),
       };
     }
 
     getNavigationTree(file: string): NavigationTree {
       const request = this.processRequest<protocol.NavTreeRequest>(
         CommandNames.NavTree,
-        { file }
+        { file },
       );
       const response = this.processResponse<protocol.NavTreeResponse>(request);
 
@@ -845,18 +822,18 @@ namespace ts.server {
     private decodeSpan(
       span: protocol.TextSpan,
       fileName: string,
-      lineMap?: number[]
+      lineMap?: number[],
     ): TextSpan;
     private decodeSpan(
       span: protocol.TextSpan & { file: string },
       fileName?: string,
-      lineMap?: number[]
+      lineMap?: number[],
     ): TextSpan {
       if (
-        span.start.line === 1 &&
-        span.start.offset === 1 &&
-        span.end.line === 1 &&
-        span.end.offset === 1
+        span.start.line === 1
+        && span.start.offset === 1
+        && span.end.line === 1
+        && span.end.offset === 1
       ) {
         return { start: 0, length: 0 };
       }
@@ -864,19 +841,19 @@ namespace ts.server {
       lineMap = lineMap || this.getLineMap(fileName);
       return createTextSpanFromBounds(
         this.lineOffsetToPosition(fileName, span.start, lineMap),
-        this.lineOffsetToPosition(fileName, span.end, lineMap)
+        this.lineOffsetToPosition(fileName, span.end, lineMap),
       );
     }
 
     private decodeLinkDisplayParts(
-      tags: (protocol.JSDocTagInfo | JSDocTagInfo)[]
+      tags: (protocol.JSDocTagInfo | JSDocTagInfo)[],
     ): JSDocTagInfo[] {
       return tags.map((tag) =>
         typeof tag.text === "string"
           ? {
-              ...tag,
-              text: [textPart(tag.text)],
-            }
+            ...tag,
+            text: [textPart(tag.text)],
+          }
           : (tag as JSDocTagInfo)
       );
     }
@@ -884,31 +861,29 @@ namespace ts.server {
     getNameOrDottedNameSpan(
       _fileName: string,
       _startPos: number,
-      _endPos: number
+      _endPos: number,
     ): TextSpan {
       return notImplemented();
     }
 
     getBreakpointStatementAtPosition(
       _fileName: string,
-      _position: number
+      _position: number,
     ): TextSpan {
       return notImplemented();
     }
 
     getSignatureHelpItems(
       fileName: string,
-      position: number
+      position: number,
     ): SignatureHelpItems | undefined {
-      const args: protocol.SignatureHelpRequestArgs =
-        this.createFileLocationRequestArgs(fileName, position);
+      const args: protocol.SignatureHelpRequestArgs = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.SignatureHelpRequest>(
         CommandNames.SignatureHelp,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.SignatureHelpResponse>(request);
+      const response = this.processResponse<protocol.SignatureHelpResponse>(request);
 
       if (!response.body) {
         return undefined;
@@ -941,16 +916,15 @@ namespace ts.server {
 
     getOccurrencesAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): ReferenceEntry[] {
       const args = this.createFileLocationRequestArgs(fileName, position);
 
       const request = this.processRequest<protocol.OccurrencesRequest>(
         CommandNames.Occurrences,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.OccurrencesResponse>(request);
+      const response = this.processResponse<protocol.OccurrencesResponse>(request);
 
       return response.body!.map((entry) => ({
         // TODO: GH#18217
@@ -964,7 +938,7 @@ namespace ts.server {
     getDocumentHighlights(
       fileName: string,
       position: number,
-      filesToSearch: string[]
+      filesToSearch: string[],
     ): DocumentHighlights[] {
       const args: protocol.DocumentHighlightsRequestArgs = {
         ...this.createFileLocationRequestArgs(fileName, position),
@@ -973,10 +947,9 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.DocumentHighlightsRequest>(
         CommandNames.DocumentHighlights,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.DocumentHighlightsResponse>(request);
+      const response = this.processResponse<protocol.DocumentHighlightsResponse>(request);
 
       return response.body!.map((item) => ({
         // TODO: GH#18217
@@ -991,10 +964,9 @@ namespace ts.server {
     getOutliningSpans(file: string): OutliningSpan[] {
       const request = this.processRequest<protocol.OutliningSpansRequest>(
         CommandNames.GetOutliningSpans,
-        { file }
+        { file },
       );
-      const response =
-        this.processResponse<protocol.OutliningSpansResponse>(request);
+      const response = this.processResponse<protocol.OutliningSpansResponse>(request);
 
       return response.body!.map<OutliningSpan>((item) => ({
         textSpan: this.decodeSpan(item.textSpan, file),
@@ -1007,7 +979,7 @@ namespace ts.server {
 
     getTodoComments(
       _fileName: string,
-      _descriptors: TodoCommentDescriptor[]
+      _descriptors: TodoCommentDescriptor[],
     ): TodoComment[] {
       return notImplemented();
     }
@@ -1015,7 +987,7 @@ namespace ts.server {
     getDocCommentTemplateAtPosition(
       _fileName: string,
       _position: number,
-      _options?: DocCommentTemplateOptions
+      _options?: DocCommentTemplateOptions,
     ): TextInsertion {
       return notImplemented();
     }
@@ -1023,7 +995,7 @@ namespace ts.server {
     isValidBraceCompletionAtPosition(
       _fileName: string,
       _position: number,
-      _openingBrace: number
+      _openingBrace: number,
     ): boolean {
       return notImplemented();
     }
@@ -1035,7 +1007,7 @@ namespace ts.server {
     getSpanOfEnclosingComment(
       _fileName: string,
       _position: number,
-      _onlyMultiLine: boolean
+      _onlyMultiLine: boolean,
     ): TextSpan {
       return notImplemented();
     }
@@ -1044,7 +1016,7 @@ namespace ts.server {
       file: string,
       start: number,
       end: number,
-      errorCodes: readonly number[]
+      errorCodes: readonly number[],
     ): readonly CodeFixAction[] {
       const args: protocol.CodeFixRequestArgs = {
         ...this.createFileRangeRequestArgs(file, start, end),
@@ -1053,13 +1025,13 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.CodeFixRequest>(
         CommandNames.GetCodeFixes,
-        args
+        args,
       );
       const response = this.processResponse<protocol.CodeFixResponse>(request);
 
       return response.body!.map<CodeFixAction>(
         (
-          { fixName, description, changes, commands, fixId, fixAllDescription } // TODO: GH#18217
+          { fixName, description, changes, commands, fixId, fixAllDescription }, // TODO: GH#18217
         ) => ({
           fixName,
           description,
@@ -1067,7 +1039,7 @@ namespace ts.server {
           commands: commands as CodeActionCommand[],
           fixId,
           fixAllDescription,
-        })
+        }),
       );
     }
 
@@ -1081,10 +1053,9 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.InlayHintsRequest>(
         CommandNames.ProvideInlayHints,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.InlayHintsResponse>(request);
+      const response = this.processResponse<protocol.InlayHintsResponse>(request);
 
       return response.body!.map((item) => ({
         // TODO: GH#18217
@@ -1096,24 +1067,24 @@ namespace ts.server {
 
     private createFileLocationOrRangeRequestArgs(
       positionOrRange: number | TextRange,
-      fileName: string
+      fileName: string,
     ): protocol.FileLocationOrRangeRequestArgs {
       return typeof positionOrRange === "number"
         ? this.createFileLocationRequestArgs(fileName, positionOrRange)
         : this.createFileRangeRequestArgs(
-            fileName,
-            positionOrRange.pos,
-            positionOrRange.end
-          );
+          fileName,
+          positionOrRange.pos,
+          positionOrRange.end,
+        );
     }
 
     private createFileLocationRequestArgs(
       file: string,
-      position: number
+      position: number,
     ): protocol.FileLocationRequestArgs {
       const { line, offset } = this.positionToOneBasedLineOffset(
         file,
-        position
+        position,
       );
       return { file, line, offset };
     }
@@ -1121,45 +1092,40 @@ namespace ts.server {
     private createFileRangeRequestArgs(
       file: string,
       start: number,
-      end: number
+      end: number,
     ): protocol.FileRangeRequestArgs {
-      const { line: startLine, offset: startOffset } =
-        this.positionToOneBasedLineOffset(file, start);
-      const { line: endLine, offset: endOffset } =
-        this.positionToOneBasedLineOffset(file, end);
+      const { line: startLine, offset: startOffset } = this.positionToOneBasedLineOffset(file, start);
+      const { line: endLine, offset: endOffset } = this.positionToOneBasedLineOffset(file, end);
       return { file, startLine, startOffset, endLine, endOffset };
     }
 
     private createFileLocationRequestArgsWithEndLineAndOffset(
       file: string,
       start: number,
-      end: number
+      end: number,
     ): protocol.FileLocationRequestArgs & {
       endLine: number;
       endOffset: number;
     } {
       const { line, offset } = this.positionToOneBasedLineOffset(file, start);
-      const { line: endLine, offset: endOffset } =
-        this.positionToOneBasedLineOffset(file, end);
+      const { line: endLine, offset: endOffset } = this.positionToOneBasedLineOffset(file, end);
       return { file, line, offset, endLine, endOffset };
     }
 
     getApplicableRefactors(
       fileName: string,
-      positionOrRange: number | TextRange
+      positionOrRange: number | TextRange,
     ): ApplicableRefactorInfo[] {
       const args = this.createFileLocationOrRangeRequestArgs(
         positionOrRange,
-        fileName
+        fileName,
       );
 
-      const request =
-        this.processRequest<protocol.GetApplicableRefactorsRequest>(
-          CommandNames.GetApplicableRefactors,
-          args
-        );
-      const response =
-        this.processResponse<protocol.GetApplicableRefactorsResponse>(request);
+      const request = this.processRequest<protocol.GetApplicableRefactorsRequest>(
+        CommandNames.GetApplicableRefactors,
+        args,
+      );
+      const response = this.processResponse<protocol.GetApplicableRefactorsResponse>(request);
       return response.body!; // TODO: GH#18217
     }
 
@@ -1168,21 +1134,20 @@ namespace ts.server {
       _formatOptions: FormatCodeSettings,
       positionOrRange: number | TextRange,
       refactorName: string,
-      actionName: string
+      actionName: string,
     ): RefactorEditInfo {
       const args = this.createFileLocationOrRangeRequestArgs(
         positionOrRange,
-        fileName
+        fileName,
       ) as protocol.GetEditsForRefactorRequestArgs;
       args.refactor = refactorName;
       args.action = actionName;
 
       const request = this.processRequest<protocol.GetEditsForRefactorRequest>(
         CommandNames.GetEditsForRefactor,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.GetEditsForRefactorResponse>(request);
+      const response = this.processResponse<protocol.GetEditsForRefactorResponse>(request);
 
       if (!response.body) {
         return {
@@ -1193,7 +1158,7 @@ namespace ts.server {
       }
 
       const edits: FileTextChanges[] = this.convertCodeEditsToTextChanges(
-        response.body.edits
+        response.body.edits,
       );
 
       const renameFilename: string | undefined = response.body.renameFilename;
@@ -1201,7 +1166,7 @@ namespace ts.server {
       if (renameFilename !== undefined) {
         renameLocation = this.lineOffsetToPosition(
           renameFilename,
-          response.body.renameLocation!
+          response.body.renameLocation!,
         ); // TODO: GH#18217
       }
 
@@ -1214,7 +1179,7 @@ namespace ts.server {
 
     organizeImports(
       _args: OrganizeImportsArgs,
-      _formatOptions: FormatCodeSettings
+      _formatOptions: FormatCodeSettings,
     ): readonly FileTextChanges[] {
       return notImplemented();
     }
@@ -1224,34 +1189,30 @@ namespace ts.server {
     }
 
     private convertCodeEditsToTextChanges(
-      edits: protocol.FileCodeEdits[]
+      edits: protocol.FileCodeEdits[],
     ): FileTextChanges[] {
       return edits.map((edit) => {
         const fileName = edit.fileName;
         return {
           fileName,
-          textChanges: edit.textChanges.map((t) =>
-            this.convertTextChangeToCodeEdit(t, fileName)
-          ),
+          textChanges: edit.textChanges.map((t) => this.convertTextChangeToCodeEdit(t, fileName)),
         };
       });
     }
 
     private convertChanges(
       changes: protocol.FileCodeEdits[],
-      fileName: string
+      fileName: string,
     ): FileTextChanges[] {
       return changes.map((change) => ({
         fileName: change.fileName,
-        textChanges: change.textChanges.map((textChange) =>
-          this.convertTextChangeToCodeEdit(textChange, fileName)
-        ),
+        textChanges: change.textChanges.map((textChange) => this.convertTextChangeToCodeEdit(textChange, fileName)),
       }));
     }
 
     convertTextChangeToCodeEdit(
       change: protocol.CodeEdit,
-      fileName: string
+      fileName: string,
     ): TextChange {
       return {
         span: this.decodeSpan(change, fileName),
@@ -1264,7 +1225,7 @@ namespace ts.server {
 
       const request = this.processRequest<protocol.BraceRequest>(
         CommandNames.Brace,
-        args
+        args,
       );
       const response = this.processResponse<protocol.BraceResponse>(request);
 
@@ -1277,39 +1238,39 @@ namespace ts.server {
         {
           pluginName,
           configuration,
-        }
+        },
       );
       this.processResponse<protocol.ConfigurePluginResponse>(
         request,
-        /*expectEmptyBody*/ true
+        /*expectEmptyBody*/ true,
       );
     }
 
     getIndentationAtPosition(
       _fileName: string,
       _position: number,
-      _options: EditorOptions
+      _options: EditorOptions,
     ): number {
       return notImplemented();
     }
 
     getSyntacticClassifications(
       _fileName: string,
-      _span: TextSpan
+      _span: TextSpan,
     ): ClassifiedSpan[] {
       return notImplemented();
     }
 
     getSemanticClassifications(
       _fileName: string,
-      _span: TextSpan
+      _span: TextSpan,
     ): ClassifiedSpan[] {
       return notImplemented();
     }
 
     getEncodedSyntacticClassifications(
       _fileName: string,
-      _span: TextSpan
+      _span: TextSpan,
     ): Classifications {
       return notImplemented();
     }
@@ -1317,22 +1278,20 @@ namespace ts.server {
     getEncodedSemanticClassifications(
       file: string,
       span: TextSpan,
-      format?: SemanticClassificationFormat
+      format?: SemanticClassificationFormat,
     ): Classifications {
-      const request =
-        this.processRequest<protocol.EncodedSemanticClassificationsRequest>(
-          protocol.CommandTypes.EncodedSemanticClassificationsFull,
-          { file, start: span.start, length: span.length, format }
-        );
-      const r =
-        this.processResponse<protocol.EncodedSemanticClassificationsResponse>(
-          request
-        );
+      const request = this.processRequest<protocol.EncodedSemanticClassificationsRequest>(
+        protocol.CommandTypes.EncodedSemanticClassificationsFull,
+        { file, start: span.start, length: span.length, format },
+      );
+      const r = this.processResponse<protocol.EncodedSemanticClassificationsResponse>(
+        request,
+      );
       return r.body!;
     }
 
     private convertCallHierarchyItem(
-      item: protocol.CallHierarchyItem
+      item: protocol.CallHierarchyItem,
     ): CallHierarchyItem {
       return {
         file: item.file,
@@ -1347,53 +1306,44 @@ namespace ts.server {
 
     prepareCallHierarchy(
       fileName: string,
-      position: number
+      position: number,
     ): CallHierarchyItem | CallHierarchyItem[] | undefined {
       const args = this.createFileLocationRequestArgs(fileName, position);
       const request = this.processRequest<protocol.PrepareCallHierarchyRequest>(
         CommandNames.PrepareCallHierarchy,
-        args
+        args,
       );
-      const response =
-        this.processResponse<protocol.PrepareCallHierarchyResponse>(request);
+      const response = this.processResponse<protocol.PrepareCallHierarchyResponse>(request);
       return (
-        response.body &&
-        mapOneOrMany(response.body, (item) =>
-          this.convertCallHierarchyItem(item)
-        )
+        response.body
+        && mapOneOrMany(response.body, (item) => this.convertCallHierarchyItem(item))
       );
     }
 
     private convertCallHierarchyIncomingCall(
-      item: protocol.CallHierarchyIncomingCall
+      item: protocol.CallHierarchyIncomingCall,
     ): CallHierarchyIncomingCall {
       return {
         from: this.convertCallHierarchyItem(item.from),
-        fromSpans: item.fromSpans.map((span) =>
-          this.decodeSpan(span, item.from.file)
-        ),
+        fromSpans: item.fromSpans.map((span) => this.decodeSpan(span, item.from.file)),
       };
     }
 
     provideCallHierarchyIncomingCalls(fileName: string, position: number) {
       const args = this.createFileLocationRequestArgs(fileName, position);
-      const request =
-        this.processRequest<protocol.ProvideCallHierarchyIncomingCallsRequest>(
-          CommandNames.ProvideCallHierarchyIncomingCalls,
-          args
-        );
-      const response =
-        this.processResponse<protocol.ProvideCallHierarchyIncomingCallsResponse>(
-          request
-        );
-      return response.body.map((item) =>
-        this.convertCallHierarchyIncomingCall(item)
+      const request = this.processRequest<protocol.ProvideCallHierarchyIncomingCallsRequest>(
+        CommandNames.ProvideCallHierarchyIncomingCalls,
+        args,
       );
+      const response = this.processResponse<protocol.ProvideCallHierarchyIncomingCallsResponse>(
+        request,
+      );
+      return response.body.map((item) => this.convertCallHierarchyIncomingCall(item));
     }
 
     private convertCallHierarchyOutgoingCall(
       file: string,
-      item: protocol.CallHierarchyOutgoingCall
+      item: protocol.CallHierarchyOutgoingCall,
     ): CallHierarchyOutgoingCall {
       return {
         to: this.convertCallHierarchyItem(item.to),
@@ -1403,47 +1353,43 @@ namespace ts.server {
 
     provideCallHierarchyOutgoingCalls(fileName: string, position: number) {
       const args = this.createFileLocationRequestArgs(fileName, position);
-      const request =
-        this.processRequest<protocol.ProvideCallHierarchyOutgoingCallsRequest>(
-          CommandNames.ProvideCallHierarchyOutgoingCalls,
-          args
-        );
-      const response =
-        this.processResponse<protocol.ProvideCallHierarchyOutgoingCallsResponse>(
-          request
-        );
-      return response.body.map((item) =>
-        this.convertCallHierarchyOutgoingCall(fileName, item)
+      const request = this.processRequest<protocol.ProvideCallHierarchyOutgoingCallsRequest>(
+        CommandNames.ProvideCallHierarchyOutgoingCalls,
+        args,
       );
+      const response = this.processResponse<protocol.ProvideCallHierarchyOutgoingCallsResponse>(
+        request,
+      );
+      return response.body.map((item) => this.convertCallHierarchyOutgoingCall(fileName, item));
     }
 
     getProgram(): Program {
       throw new Error(
-        "Program objects are not serializable through the server protocol."
+        "Program objects are not serializable through the server protocol.",
       );
     }
 
     getAutoImportProvider(): Program | undefined {
       throw new Error(
-        "Program objects are not serializable through the server protocol."
+        "Program objects are not serializable through the server protocol.",
       );
     }
 
     getNonBoundSourceFile(_fileName: string): SourceFile {
       throw new Error(
-        "SourceFile objects are not serializable through the server protocol."
+        "SourceFile objects are not serializable through the server protocol.",
       );
     }
 
     getSourceFile(_fileName: string): SourceFile {
       throw new Error(
-        "SourceFile objects are not serializable through the server protocol."
+        "SourceFile objects are not serializable through the server protocol.",
       );
     }
 
     cleanupSemanticCache(): void {
       throw new Error(
-        "cleanupSemanticCache is not available through the server layer."
+        "cleanupSemanticCache is not available through the server layer.",
       );
     }
 

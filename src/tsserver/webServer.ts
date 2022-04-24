@@ -78,7 +78,7 @@ namespace ts.server {
     const sys = server.createWebSystem(
       webHost,
       args,
-      () => findArgument("--executingFilePath") || location + ""
+      () => findArgument("--executingFilePath") || location + "",
     );
     setSys(sys);
     const localeStr = findArgument("--locale");
@@ -105,7 +105,7 @@ namespace ts.server {
   function startWebSession(
     options: StartSessionOptions,
     logger: Logger,
-    cancellationToken: ServerCancellationToken
+    cancellationToken: ServerCancellationToken,
   ) {
     class WorkerSession extends server.WorkerSession {
       constructor() {
@@ -115,7 +115,7 @@ namespace ts.server {
           options,
           logger,
           cancellationToken,
-          hrtime
+          hrtime,
         );
       }
 

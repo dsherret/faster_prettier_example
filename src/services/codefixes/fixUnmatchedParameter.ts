@@ -23,7 +23,7 @@ namespace ts.codefix {
       return undefined;
     },
     getAllCodeActions: function getAllCodeActionsToFixUnmatchedParameter(
-      context
+      context,
     ) {
       const tagsToSignature = new Map<SignatureDeclaration, JSDocTag[]>();
       return createCombinedCodeActions(
@@ -35,8 +35,8 @@ namespace ts.codefix {
                 info.signature,
                 append(
                   tagsToSignature.get(info.signature),
-                  info.jsDocParameterTag
-                )
+                  info.jsDocParameterTag,
+                ),
               );
             }
           });
@@ -47,38 +47,37 @@ namespace ts.codefix {
               changes.filterJSDocTags(
                 signature.getSourceFile(),
                 signature,
-                (t) => !tagsSet.has(t)
+                (t) => !tagsSet.has(t),
               );
             }
           });
-        })
+        }),
       );
     },
   });
 
   function getDeleteAction(
     context: CodeFixContext,
-    { name, signature, jsDocParameterTag }: Info
+    { name, signature, jsDocParameterTag }: Info,
   ) {
     const changes = textChanges.ChangeTracker.with(context, (changeTracker) =>
       changeTracker.filterJSDocTags(
         context.sourceFile,
         signature,
-        (t) => t !== jsDocParameterTag
-      )
-    );
+        (t) => t !== jsDocParameterTag,
+      ));
     return createCodeFixAction(
       deleteUnmatchedParameter,
       changes,
       [Diagnostics.Delete_unused_param_tag_0, name.getText(context.sourceFile)],
       deleteUnmatchedParameter,
-      Diagnostics.Delete_all_unused_param_tags
+      Diagnostics.Delete_all_unused_param_tags,
     );
   }
 
   function getRenameAction(
     context: CodeFixContext,
-    { name, signature, jsDocParameterTag }: Info
+    { name, signature, jsDocParameterTag }: Info,
   ) {
     if (!length(signature.parameters)) return undefined;
 
@@ -92,10 +91,12 @@ namespace ts.codefix {
     }
     // @todo - match to all available names instead to the first parameter name
     // @see /codeFixRenameUnmatchedParameter3.ts
-    const parameterName = firstDefined(signature.parameters, (p) =>
-      isIdentifier(p.name) && !names.has(p.name.escapedText)
-        ? p.name.getText(sourceFile)
-        : undefined
+    const parameterName = firstDefined(
+      signature.parameters,
+      (p) =>
+        isIdentifier(p.name) && !names.has(p.name.escapedText)
+          ? p.name.getText(sourceFile)
+          : undefined,
     );
     if (parameterName === undefined) return undefined;
 
@@ -106,15 +107,14 @@ namespace ts.codefix {
       jsDocParameterTag.isBracketed,
       jsDocParameterTag.typeExpression,
       jsDocParameterTag.isNameFirst,
-      jsDocParameterTag.comment
+      jsDocParameterTag.comment,
     );
     const changes = textChanges.ChangeTracker.with(context, (changeTracker) =>
       changeTracker.replaceJSDocComment(
         sourceFile,
         signature,
-        map(tags, (t) => (t === jsDocParameterTag ? newJSDocParameterTag : t))
-      )
-    );
+        map(tags, (t) => (t === jsDocParameterTag ? newJSDocParameterTag : t)),
+      ));
     return createCodeFixActionWithoutFixAll(renameUnmatchedParameter, changes, [
       Diagnostics.Rename_param_tag_name_0_to_1,
       name.getText(sourceFile),
@@ -131,9 +131,9 @@ namespace ts.codefix {
   function getInfo(sourceFile: SourceFile, pos: number): Info | undefined {
     const token = getTokenAtPosition(sourceFile, pos);
     if (
-      token.parent &&
-      isJSDocParameterTag(token.parent) &&
-      isIdentifier(token.parent.name)
+      token.parent
+      && isJSDocParameterTag(token.parent)
+      && isIdentifier(token.parent.name)
     ) {
       const jsDocParameterTag = token.parent;
       const signature = getHostSignatureFromJSDoc(jsDocParameterTag);

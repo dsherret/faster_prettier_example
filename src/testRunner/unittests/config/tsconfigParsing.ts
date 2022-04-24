@@ -2,15 +2,15 @@ namespace ts {
   describe("unittests:: config:: tsconfigParsing:: parseConfigFileTextToJson", () => {
     function assertParseResult(
       jsonText: string,
-      expectedConfigObject: { config?: any; error?: Diagnostic[] }
+      expectedConfigObject: { config?: any; error?: Diagnostic[] },
     ) {
       const parsed = parseConfigFileTextToJson(
         "/apath/tsconfig.json",
-        jsonText
+        jsonText,
       );
       assert.equal(
         JSON.stringify(parsed),
-        JSON.stringify(expectedConfigObject)
+        JSON.stringify(expectedConfigObject),
       );
     }
 
@@ -18,18 +18,18 @@ namespace ts {
       {
         const parsed = parseConfigFileTextToJson(
           "/apath/tsconfig.json",
-          jsonText
+          jsonText,
         );
         const parsedCommand = parseJsonConfigFileContent(
           parsed.config,
           sys,
-          "tests/cases/unittests"
+          "tests/cases/unittests",
         );
         assert.isTrue(
-          parsedCommand.errors &&
-            parsedCommand.errors.length === 1 &&
-            parsedCommand.errors[0].code ===
-              Diagnostics.Unknown_option_excludes_Did_you_mean_exclude.code
+          parsedCommand.errors
+            && parsedCommand.errors.length === 1
+            && parsedCommand.errors[0].code
+              === Diagnostics.Unknown_option_excludes_Did_you_mean_exclude.code,
         );
       }
       {
@@ -37,13 +37,13 @@ namespace ts {
         const parsedCommand = parseJsonSourceFileConfigFileContent(
           parsed,
           sys,
-          "tests/cases/unittests"
+          "tests/cases/unittests",
         );
         assert.isTrue(
-          parsedCommand.errors &&
-            parsedCommand.errors.length === 1 &&
-            parsedCommand.errors[0].code ===
-              Diagnostics.Unknown_option_excludes_Did_you_mean_exclude.code
+          parsedCommand.errors
+            && parsedCommand.errors.length === 1
+            && parsedCommand.errors[0].code
+              === Diagnostics.Unknown_option_excludes_Did_you_mean_exclude.code,
         );
       }
     }
@@ -52,25 +52,25 @@ namespace ts {
       jsonText: string,
       configFileName: string,
       basePath: string,
-      allFileList: string[]
+      allFileList: string[],
     ) {
       const parsed = parseConfigFileTextToJson(configFileName, jsonText);
       const files = allFileList.reduce(
         (files, value) => ((files[value] = ""), files),
-        {} as vfs.FileSet
+        {} as vfs.FileSet,
       );
       const host: ParseConfigHost = new fakes.ParseConfigHost(
         new vfs.FileSystem(/*ignoreCase*/ false, {
           cwd: basePath,
           files: { "/": {}, ...files },
-        })
+        }),
       );
       return parseJsonConfigFileContent(
         parsed.config,
         host,
         basePath,
         /*existingOptions*/ undefined,
-        configFileName
+        configFileName,
       );
     }
 
@@ -78,25 +78,25 @@ namespace ts {
       jsonText: string,
       configFileName: string,
       basePath: string,
-      allFileList: string[]
+      allFileList: string[],
     ) {
       const parsed = parseJsonText(configFileName, jsonText);
       const files = allFileList.reduce(
         (files, value) => ((files[value] = ""), files),
-        {} as vfs.FileSet
+        {} as vfs.FileSet,
       );
       const host: ParseConfigHost = new fakes.ParseConfigHost(
         new vfs.FileSystem(/*ignoreCase*/ false, {
           cwd: basePath,
           files: { "/": {}, ...files },
-        })
+        }),
       );
       return parseJsonSourceFileConfigFileContent(
         parsed,
         host,
         basePath,
         /*existingOptions*/ undefined,
-        configFileName
+        configFileName,
       );
     }
 
@@ -105,17 +105,17 @@ namespace ts {
       configFileName: string,
       basePath: string,
       allFileList: string[],
-      expectedFileList: string[]
+      expectedFileList: string[],
     ) {
       {
         const parsed = getParsedCommandJson(
           jsonText,
           configFileName,
           basePath,
-          allFileList
+          allFileList,
         );
         assert.isTrue(
-          arrayIsEqualTo(parsed.fileNames.sort(), expectedFileList.sort())
+          arrayIsEqualTo(parsed.fileNames.sort(), expectedFileList.sort()),
         );
       }
       {
@@ -123,10 +123,10 @@ namespace ts {
           jsonText,
           configFileName,
           basePath,
-          allFileList
+          allFileList,
         );
         assert.isTrue(
-          arrayIsEqualTo(parsed.fileNames.sort(), expectedFileList.sort())
+          arrayIsEqualTo(parsed.fileNames.sort(), expectedFileList.sort()),
         );
       }
     }
@@ -137,22 +137,24 @@ namespace ts {
       basePath: string,
       allFileList: string[],
       expectedDiagnosticCode: number,
-      noLocation?: boolean
+      noLocation?: boolean,
     ) {
       {
         const parsed = getParsedCommandJson(
           jsonText,
           configFileName,
           basePath,
-          allFileList
+          allFileList,
         );
         assert.isTrue(parsed.errors.length >= 0);
         assert.isTrue(
           parsed.errors.filter((e) => e.code === expectedDiagnosticCode)
             .length > 0,
-          `Expected error code ${expectedDiagnosticCode} to be in ${JSON.stringify(
-            parsed.errors
-          )}`
+          `Expected error code ${expectedDiagnosticCode} to be in ${
+            JSON.stringify(
+              parsed.errors,
+            )
+          }`,
         );
       }
       {
@@ -160,28 +162,32 @@ namespace ts {
           jsonText,
           configFileName,
           basePath,
-          allFileList
+          allFileList,
         );
         assert.isTrue(parsed.errors.length >= 0);
         assert.isTrue(
           parsed.errors.filter((e) => e.code === expectedDiagnosticCode)
             .length > 0,
-          `Expected error code ${expectedDiagnosticCode} to be in ${JSON.stringify(
-            parsed.errors
-          )}`
+          `Expected error code ${expectedDiagnosticCode} to be in ${
+            JSON.stringify(
+              parsed.errors,
+            )
+          }`,
         );
         if (!noLocation) {
           assert.isTrue(
             parsed.errors.filter(
               (e) =>
-                e.code === expectedDiagnosticCode &&
-                e.file &&
-                e.start &&
-                e.length
+                e.code === expectedDiagnosticCode
+                && e.file
+                && e.start
+                && e.length,
             ).length > 0,
-            `Expected error code ${expectedDiagnosticCode} to be in ${JSON.stringify(
-              parsed.errors
-            )} with location information`
+            `Expected error code ${expectedDiagnosticCode} to be in ${
+              JSON.stringify(
+                parsed.errors,
+              )
+            } with location information`,
           );
         }
       }
@@ -192,23 +198,25 @@ namespace ts {
       configFileName: string,
       basePath: string,
       allFileList: string[],
-      expectedExcludedDiagnosticCode: number
+      expectedExcludedDiagnosticCode: number,
     ) {
       {
         const parsed = getParsedCommandJson(
           jsonText,
           configFileName,
           basePath,
-          allFileList
+          allFileList,
         );
         assert.isTrue(parsed.errors.length >= 0);
         assert.isTrue(
           parsed.errors.findIndex(
-            (e) => e.code === expectedExcludedDiagnosticCode
+            (e) => e.code === expectedExcludedDiagnosticCode,
           ) === -1,
-          `Expected error code ${expectedExcludedDiagnosticCode} to not be in ${JSON.stringify(
-            parsed.errors
-          )}`
+          `Expected error code ${expectedExcludedDiagnosticCode} to not be in ${
+            JSON.stringify(
+              parsed.errors,
+            )
+          }`,
         );
       }
       {
@@ -216,16 +224,18 @@ namespace ts {
           jsonText,
           configFileName,
           basePath,
-          allFileList
+          allFileList,
         );
         assert.isTrue(parsed.errors.length >= 0);
         assert.isTrue(
           parsed.errors.findIndex(
-            (e) => e.code === expectedExcludedDiagnosticCode
+            (e) => e.code === expectedExcludedDiagnosticCode,
           ) === -1,
-          `Expected error code ${expectedExcludedDiagnosticCode} to not be in ${JSON.stringify(
-            parsed.errors
-          )}`
+          `Expected error code ${expectedExcludedDiagnosticCode} to not be in ${
+            JSON.stringify(
+              parsed.errors,
+            )
+          }`,
         );
       }
     }
@@ -252,7 +262,7 @@ namespace ts {
                         "file.d.ts"
                     ]
                 }`,
-        { config: { exclude: ["file.d.ts"] } }
+        { config: { exclude: ["file.d.ts"] } },
       );
 
       assertParseResult(
@@ -264,7 +274,7 @@ namespace ts {
                         /* multiline comments can be in the middle of a line */"file.d.ts"
                     ]
                 }`,
-        { config: { exclude: ["file.d.ts"] } }
+        { config: { exclude: ["file.d.ts"] } },
       );
     });
 
@@ -275,7 +285,7 @@ namespace ts {
                         "xx//file.d.ts"
                     ]
                 }`,
-        { config: { exclude: ["xx//file.d.ts"] } }
+        { config: { exclude: ["xx//file.d.ts"] } },
       );
       assertParseResult(
         `{
@@ -283,7 +293,7 @@ namespace ts {
                         "xx/*file.d.ts*/"
                     ]
                 }`,
-        { config: { exclude: ["xx/*file.d.ts*/"] } }
+        { config: { exclude: ["xx/*file.d.ts*/"] } },
       );
     });
 
@@ -294,7 +304,7 @@ namespace ts {
                         "xx\\"//files"
                     ]
                 }`,
-        { config: { exclude: ['xx"//files'] } }
+        { config: { exclude: ["xx\"//files"] } },
       );
 
       assertParseResult(
@@ -303,14 +313,14 @@ namespace ts {
                         "xx\\\\" // end of line comment
                     ]
                 }`,
-        { config: { exclude: ["xx\\"] } }
+        { config: { exclude: ["xx\\"] } },
       );
     });
 
     it("returns object with error when json is invalid", () => {
       const parsed = parseConfigFileTextToJson(
         "/apath/tsconfig.json",
-        "invalid"
+        "invalid",
       );
       assert.deepEqual(parsed.config, {});
       const expected = createCompilerDiagnostic(Diagnostics._0_expected, "{");
@@ -331,7 +341,7 @@ namespace ts {
                 }`,
         {
           config: { compilerOptions: { lib: ["es5"] } },
-        }
+        },
       );
 
       assertParseResult(
@@ -342,7 +352,7 @@ namespace ts {
                 }`,
         {
           config: { compilerOptions: { lib: ["es5", "es6"] } },
-        }
+        },
       );
     });
 
@@ -355,7 +365,7 @@ namespace ts {
                     "excludes": [
                         "foge.ts"
                     ]
-                }`
+                }`,
       );
     });
 
@@ -365,7 +375,7 @@ namespace ts {
         "tsconfig.json",
         "/apath",
         ["/apath/test.ts", "/apath/.git/a.ts", "/apath/.b.ts", "/apath/..c.ts"],
-        ["/apath/test.ts"]
+        ["/apath/test.ts"],
       );
     });
 
@@ -377,7 +387,7 @@ namespace ts {
         "tsconfig.json",
         "/apath",
         ["/apath/test.ts", "/apath/.git/a.ts", "/apath/.b.ts", "/apath/..c.ts"],
-        ["/apath/.git/a.ts", "/apath/.b.ts", "/apath/..c.ts"]
+        ["/apath/.git/a.ts", "/apath/.b.ts", "/apath/..c.ts"],
       );
     });
 
@@ -401,14 +411,14 @@ namespace ts {
         "tsconfig.json",
         rootDir,
         allFiles,
-        expectedFiles
+        expectedFiles,
       );
       assertParseFileList(
         tsconfigWithExclude,
         "tsconfig.json",
         rootDir,
         allFiles,
-        allFiles
+        allFiles,
       );
     });
 
@@ -434,14 +444,14 @@ namespace ts {
         "tsconfig.json",
         rootDir,
         allFiles,
-        expectedFiles
+        expectedFiles,
       );
       assertParseFileList(
         tsconfigWithExclude,
         "tsconfig.json",
         rootDir,
         allFiles,
-        allFiles
+        allFiles,
       );
     });
 
@@ -457,7 +467,7 @@ namespace ts {
           "/d.ts",
           "/folder/e.ts",
         ],
-        ["/d.ts", "/folder/e.ts"]
+        ["/d.ts", "/folder/e.ts"],
       );
     });
 
@@ -483,7 +493,7 @@ namespace ts {
       assert.isTrue(diagnostics.length === 2);
       assert.equal(
         JSON.stringify(configJsonObject),
-        JSON.stringify(expectedResult)
+        JSON.stringify(expectedResult),
       );
     });
 
@@ -496,7 +506,7 @@ namespace ts {
         "/apath/tsconfig.json",
         "tests/cases/unittests",
         ["/apath/a.ts"],
-        Diagnostics.The_files_list_in_config_file_0_is_empty.code
+        Diagnostics.The_files_list_in_config_file_0_is_empty.code,
       );
     });
 
@@ -510,7 +520,7 @@ namespace ts {
         "/apath/tsconfig.json",
         "tests/cases/unittests",
         ["/apath/a.ts"],
-        Diagnostics.The_files_list_in_config_file_0_is_empty.code
+        Diagnostics.The_files_list_in_config_file_0_is_empty.code,
       );
     });
 
@@ -524,7 +534,7 @@ namespace ts {
         "/apath/tsconfig.json",
         "tests/cases/unittests",
         ["/apath/a.ts"],
-        Diagnostics.The_files_list_in_config_file_0_is_empty.code
+        Diagnostics.The_files_list_in_config_file_0_is_empty.code,
       );
     });
 
@@ -539,7 +549,7 @@ namespace ts {
         Diagnostics
           .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2
           .code,
-        /*noLocation*/ true
+        /*noLocation*/ true,
       );
     });
 
@@ -557,7 +567,7 @@ namespace ts {
         Diagnostics
           .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2
           .code,
-        /*noLocation*/ true
+        /*noLocation*/ true,
       );
     });
 
@@ -573,7 +583,7 @@ namespace ts {
         Diagnostics
           .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2
           .code,
-        /*noLocation*/ true
+        /*noLocation*/ true,
       );
     });
 
@@ -592,7 +602,7 @@ namespace ts {
         Diagnostics
           .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2
           .code,
-        /*noLocation*/ true
+        /*noLocation*/ true,
       );
     });
 
@@ -608,7 +618,7 @@ namespace ts {
         jsonText,
         "/apath/tsconfig.json",
         "tests/cases/unittests",
-        ["/apath/a.ts"]
+        ["/apath/a.ts"],
       );
       assert.isTrue(parsed.errors.length >= 0);
     });
@@ -629,7 +639,7 @@ namespace ts {
         "tests/cases/unittests",
         ["/apath/a.ts"],
         Diagnostics.Compiler_option_0_requires_a_value_of_type_1.code,
-        /*noLocation*/ true
+        /*noLocation*/ true,
       );
     });
 
@@ -642,7 +652,7 @@ namespace ts {
         "tests/cases/unittests",
         ["/apath/a.ts"],
         Diagnostics.Compiler_option_0_requires_a_value_of_type_1.code,
-        /*noLocation*/ true
+        /*noLocation*/ true,
       );
     });
 
@@ -651,13 +661,13 @@ namespace ts {
         "/foo.bar/tsconfig.json",
         JSON.stringify({
           include: ["src"],
-        })
+        }),
       );
 
       const parsedCommand = parseJsonConfigFileContent(
         parsed.config,
         sys,
-        "/foo.bar"
+        "/foo.bar",
       );
       assert.deepEqual(parsedCommand.wildcardDirectories, {
         "/foo.bar/src": WatchDirectoryFlags.Recursive,

@@ -7,16 +7,14 @@ namespace ts {
   //
   // NOTE: We differ here in that we allow X and X.Y, with missing parts having the default
   // value of `0`.
-  const versionRegExp =
-    /^(0|[1-9]\d*)(?:\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*)(?:\-([a-z0-9-.]+))?(?:\+([a-z0-9-.]+))?)?)?$/i;
+  const versionRegExp = /^(0|[1-9]\d*)(?:\.(0|[1-9]\d*)(?:\.(0|[1-9]\d*)(?:\-([a-z0-9-.]+))?(?:\+([a-z0-9-.]+))?)?)?$/i;
 
   // https://semver.org/#spec-item-9
   // > A pre-release version MAY be denoted by appending a hyphen and a series of dot separated
   // > identifiers immediately following the patch version. Identifiers MUST comprise only ASCII
   // > alphanumerics and hyphen [0-9A-Za-z-]. Identifiers MUST NOT be empty. Numeric identifiers
   // > MUST NOT include leading zeroes.
-  const prereleaseRegExp =
-    /^(?:0|[1-9]\d*|[a-z-][a-z0-9-]*)(?:\.(?:0|[1-9]\d*|[a-z-][a-z0-9-]*))*$/i;
+  const prereleaseRegExp = /^(?:0|[1-9]\d*|[a-z-][a-z0-9-]*)(?:\.(?:0|[1-9]\d*|[a-z-][a-z0-9-]*))*$/i;
 
   // https://semver.org/#spec-item-10
   // > Build metadata MAY be denoted by appending a plus sign and a series of dot separated
@@ -46,19 +44,19 @@ namespace ts {
       minor?: number,
       patch?: number,
       prerelease?: string,
-      build?: string
+      build?: string,
     );
     constructor(
       major: number | string,
       minor = 0,
       patch = 0,
       prerelease = "",
-      build = ""
+      build = "",
     ) {
       if (typeof major === "string") {
         const result = Debug.checkDefined(
           tryParseComponents(major),
-          "Invalid version"
+          "Invalid version",
         );
         ({ major, minor, patch, prerelease, build } = result);
       }
@@ -68,11 +66,11 @@ namespace ts {
       Debug.assert(patch >= 0, "Invalid argument: patch");
       Debug.assert(
         !prerelease || prereleaseRegExp.test(prerelease),
-        "Invalid argument: prerelease"
+        "Invalid argument: prerelease",
       );
       Debug.assert(
         !build || buildRegExp.test(build),
-        "Invalid argument: build"
+        "Invalid argument: build",
       );
       this.major = major;
       this.minor = minor;
@@ -105,10 +103,10 @@ namespace ts {
       if (this === other) return Comparison.EqualTo;
       if (other === undefined) return Comparison.GreaterThan;
       return (
-        compareValues(this.major, other.major) ||
-        compareValues(this.minor, other.minor) ||
-        compareValues(this.patch, other.patch) ||
-        comparePrereleaseIdentifiers(this.prerelease, other.prerelease)
+        compareValues(this.major, other.major)
+        || compareValues(this.minor, other.minor)
+        || compareValues(this.patch, other.patch)
+        || comparePrereleaseIdentifiers(this.prerelease, other.prerelease)
       );
     }
 
@@ -137,8 +135,7 @@ namespace ts {
     const match = versionRegExp.exec(text);
     if (!match) return undefined;
 
-    const [, major, minor = "0", patch = "0", prerelease = "", build = ""] =
-      match;
+    const [, major, minor = "0", patch = "0", prerelease = "", build = ""] = match;
     if (prerelease && !prereleaseRegExp.test(prerelease)) return undefined;
     if (build && !buildRegExp.test(build)) return undefined;
     return {
@@ -152,14 +149,15 @@ namespace ts {
 
   function comparePrereleaseIdentifiers(
     left: readonly string[],
-    right: readonly string[]
+    right: readonly string[],
   ) {
     // https://semver.org/#spec-item-11
     // > When major, minor, and patch are equal, a pre-release version has lower precedence
     // > than a normal version.
     if (left === right) return Comparison.EqualTo;
-    if (left.length === 0)
+    if (left.length === 0) {
       return right.length === 0 ? Comparison.EqualTo : Comparison.GreaterThan;
+    }
     if (right.length === 0) return Comparison.LessThan;
 
     // https://semver.org/#spec-item-11
@@ -177,8 +175,9 @@ namespace ts {
       if (leftIsNumeric || rightIsNumeric) {
         // https://semver.org/#spec-item-11
         // > Numeric identifiers always have lower precedence than non-numeric identifiers.
-        if (leftIsNumeric !== rightIsNumeric)
+        if (leftIsNumeric !== rightIsNumeric) {
           return leftIsNumeric ? Comparison.LessThan : Comparison.GreaterThan;
+        }
 
         // https://semver.org/#spec-item-11
         // > identifiers consisting of only digits are compared numerically
@@ -189,7 +188,7 @@ namespace ts {
         // > identifiers with letters or hyphens are compared lexically in ASCII sort order.
         const result = compareStringsCaseSensitive(
           leftIdentifier,
-          rightIdentifier
+          rightIdentifier,
         );
         if (result) return result;
       }
@@ -284,8 +283,9 @@ namespace ts {
       } else {
         for (const simple of range.split(whitespaceRegExp)) {
           const match = rangeRegExp.exec(trimString(simple));
-          if (!match || !parseComparator(match[1], match[2], comparators))
+          if (!match || !parseComparator(match[1], match[2], comparators)) {
             return undefined;
+          }
         }
       }
       alternatives.push(comparators);
@@ -305,7 +305,7 @@ namespace ts {
         ? 0
         : parseInt(patch, 10),
       prerelease,
-      build
+      build,
     );
 
     return { version, major, minor, patch };
@@ -328,7 +328,7 @@ namespace ts {
           ? createComparator("<", rightResult.version.increment("major"))
           : isWildcard(rightResult.patch)
           ? createComparator("<", rightResult.version.increment("minor"))
-          : createComparator("<=", rightResult.version)
+          : createComparator("<=", rightResult.version),
       );
     }
 
@@ -338,7 +338,7 @@ namespace ts {
   function parseComparator(
     operator: string,
     text: string,
-    comparators: Comparator[]
+    comparators: Comparator[],
   ) {
     const result = parsePartial(text);
     if (!result) return false;
@@ -351,8 +351,8 @@ namespace ts {
           comparators.push(
             createComparator(
               "<",
-              version.increment(isWildcard(minor) ? "major" : "minor")
-            )
+              version.increment(isWildcard(minor) ? "major" : "minor"),
+            ),
           );
           break;
         case "^":
@@ -365,9 +365,9 @@ namespace ts {
                   ? "major"
                   : version.minor > 0 || isWildcard(patch)
                   ? "minor"
-                  : "patch"
-              )
-            )
+                  : "patch",
+              ),
+            ),
           );
           break;
         case "<":
@@ -379,15 +379,15 @@ namespace ts {
           comparators.push(
             isWildcard(minor)
               ? createComparator(
-                  operator === "<=" ? "<" : ">=",
-                  version.increment("major")
-                )
+                operator === "<=" ? "<" : ">=",
+                version.increment("major"),
+              )
               : isWildcard(patch)
               ? createComparator(
-                  operator === "<=" ? "<" : ">=",
-                  version.increment("minor")
-                )
-              : createComparator(operator, version)
+                operator === "<=" ? "<" : ">=",
+                version.increment("minor"),
+              )
+              : createComparator(operator, version),
           );
           break;
         case "=":
@@ -397,8 +397,8 @@ namespace ts {
             comparators.push(
               createComparator(
                 "<",
-                version.increment(isWildcard(minor) ? "major" : "minor")
-              )
+                version.increment(isWildcard(minor) ? "major" : "minor"),
+              ),
             );
           } else {
             comparators.push(createComparator("=", version));
@@ -421,14 +421,14 @@ namespace ts {
 
   function createComparator(
     operator: Comparator["operator"],
-    operand: Version
+    operand: Version,
   ) {
     return { operator, operand };
   }
 
   function testDisjunction(
     version: Version,
-    alternatives: readonly (readonly Comparator[])[]
+    alternatives: readonly (readonly Comparator[])[],
   ) {
     // an empty disjunction is treated as "*" (all versions)
     if (alternatives.length === 0) return true;
@@ -440,11 +440,12 @@ namespace ts {
 
   function testAlternative(
     version: Version,
-    comparators: readonly Comparator[]
+    comparators: readonly Comparator[],
   ) {
     for (const comparator of comparators) {
-      if (!testComparator(version, comparator.operator, comparator.operand))
+      if (!testComparator(version, comparator.operator, comparator.operand)) {
         return false;
+      }
     }
     return true;
   }
@@ -452,7 +453,7 @@ namespace ts {
   function testComparator(
     version: Version,
     operator: Comparator["operator"],
-    operand: Version
+    operand: Version,
   ) {
     const cmp = version.compareTo(operand);
     switch (operator) {

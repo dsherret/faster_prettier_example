@@ -12,18 +12,18 @@ namespace ts.refactor.generateGetAccessorAndSetAccessor {
     kinds: [generateGetSetAction.kind],
     getEditsForAction: function getRefactorActionsToGenerateGetAndSetAccessors(
       context,
-      actionName
+      actionName,
     ) {
       if (!context.endPosition) return undefined;
       const info = codefix.getAccessorConvertiblePropertyAtPosition(
         context.file,
         context.program,
         context.startPosition,
-        context.endPosition
+        context.endPosition,
       );
       Debug.assert(
         info && !isRefactorErrorInfo(info),
-        "Expected applicable refactor info"
+        "Expected applicable refactor info",
       );
       const edits = codefix.generateAccessorFromProperty(
         context.file,
@@ -31,7 +31,7 @@ namespace ts.refactor.generateGetAccessorAndSetAccessor {
         context.startPosition,
         context.endPosition,
         context,
-        actionName
+        actionName,
       );
       if (!edits) return undefined;
 
@@ -40,19 +40,18 @@ namespace ts.refactor.generateGetAccessorAndSetAccessor {
         ? info.accessorName
         : info.fieldName;
       const renameLocationOffset = isIdentifier(nameNeedRename) ? 0 : -1;
-      const renameLocation =
-        renameLocationOffset +
-        getRenameLocation(
+      const renameLocation = renameLocationOffset
+        + getRenameLocation(
           edits,
           renameFilename,
           nameNeedRename.text,
-          /*preferLastLocation*/ isParameter(info.declaration)
+          /*preferLastLocation*/ isParameter(info.declaration),
         );
 
       return { renameFilename, renameLocation, edits };
     },
     getAvailableActions(
-      context: RefactorContext
+      context: RefactorContext,
     ): readonly ApplicableRefactorInfo[] {
       if (!context.endPosition) return emptyArray;
       const info = codefix.getAccessorConvertiblePropertyAtPosition(
@@ -60,7 +59,7 @@ namespace ts.refactor.generateGetAccessorAndSetAccessor {
         context.program,
         context.startPosition,
         context.endPosition,
-        context.triggerReason === "invoked"
+        context.triggerReason === "invoked",
       );
       if (!info) return emptyArray;
 

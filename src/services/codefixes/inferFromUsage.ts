@@ -97,26 +97,25 @@ namespace ts.codefix {
           cancellationToken,
           /*markSeen*/ returnTrue,
           host,
-          preferences
+          preferences,
         );
       });
       const name = declaration && getNameOfDeclaration(declaration);
       return !name || changes.length === 0
         ? undefined
         : [
-            createCodeFixAction(
-              fixId,
-              changes,
-              [getDiagnostic(errorCode, token), getTextOfNode(name)],
-              fixId,
-              Diagnostics.Infer_all_types_from_usage
-            ),
-          ];
+          createCodeFixAction(
+            fixId,
+            changes,
+            [getDiagnostic(errorCode, token), getTextOfNode(name)],
+            fixId,
+            Diagnostics.Infer_all_types_from_usage,
+          ),
+        ];
     },
     fixIds: [fixId],
     getAllCodeActions(context) {
-      const { sourceFile, program, cancellationToken, host, preferences } =
-        context;
+      const { sourceFile, program, cancellationToken, host, preferences } = context;
       const markSeen = nodeSeenTracker();
       return codeFixAll(context, errorCodes, (changes, err) => {
         doChange(
@@ -128,7 +127,7 @@ namespace ts.codefix {
           cancellationToken,
           markSeen,
           host,
-          preferences
+          preferences,
         );
       });
     },
@@ -213,13 +212,13 @@ namespace ts.codefix {
     cancellationToken: CancellationToken,
     markSeen: NodeSeenTracker,
     host: LanguageServiceHost,
-    preferences: UserPreferences
+    preferences: UserPreferences,
   ): Declaration | undefined {
     if (
-      !isParameterPropertyModifier(token.kind) &&
-      token.kind !== SyntaxKind.Identifier &&
-      token.kind !== SyntaxKind.DotDotDotToken &&
-      token.kind !== SyntaxKind.ThisKeyword
+      !isParameterPropertyModifier(token.kind)
+      && token.kind !== SyntaxKind.Identifier
+      && token.kind !== SyntaxKind.DotDotDotToken
+      && token.kind !== SyntaxKind.ThisKeyword
     ) {
       return undefined;
     }
@@ -229,7 +228,7 @@ namespace ts.codefix {
       sourceFile,
       program,
       preferences,
-      host
+      host,
     );
     errorCode = mapSuggestionDiagnostic(errorCode);
     switch (errorCode) {
@@ -239,9 +238,9 @@ namespace ts.codefix {
         .Variable_0_implicitly_has_type_1_in_some_locations_where_its_type_cannot_be_determined
         .code:
         if (
-          (isVariableDeclaration(parent) && markSeen(parent)) ||
-          isPropertyDeclaration(parent) ||
-          isPropertySignature(parent)
+          (isVariableDeclaration(parent) && markSeen(parent))
+          || isPropertyDeclaration(parent)
+          || isPropertySignature(parent)
         ) {
           // handle bad location
           annotateVariableDeclaration(
@@ -251,7 +250,7 @@ namespace ts.codefix {
             parent,
             program,
             host,
-            cancellationToken
+            cancellationToken,
           );
           importAdder.writeFixes(changes);
           return parent;
@@ -260,7 +259,7 @@ namespace ts.codefix {
           const type = inferTypeForVariableFromUsage(
             parent.name,
             program,
-            cancellationToken
+            cancellationToken,
           );
           const typeNode = getTypeNodeIfAccessible(type, parent, program, host);
           if (typeNode) {
@@ -268,12 +267,12 @@ namespace ts.codefix {
             const typeTag = factory.createJSDocTypeTag(
               /*tagName*/ undefined,
               factory.createJSDocTypeExpression(typeNode),
-              /*comment*/ undefined
+              /*comment*/ undefined,
             );
             changes.addJSDocTags(
               sourceFile,
               cast(parent.parent.parent, isExpressionStatement),
-              [typeTag]
+              [typeTag],
             );
           }
           importAdder.writeFixes(changes);
@@ -284,10 +283,10 @@ namespace ts.codefix {
       case Diagnostics.Variable_0_implicitly_has_an_1_type.code: {
         const symbol = program.getTypeChecker().getSymbolAtLocation(token);
         if (
-          symbol &&
-          symbol.valueDeclaration &&
-          isVariableDeclaration(symbol.valueDeclaration) &&
-          markSeen(symbol.valueDeclaration)
+          symbol
+          && symbol.valueDeclaration
+          && isVariableDeclaration(symbol.valueDeclaration)
+          && markSeen(symbol.valueDeclaration)
         ) {
           annotateVariableDeclaration(
             changes,
@@ -296,7 +295,7 @@ namespace ts.codefix {
             symbol.valueDeclaration,
             program,
             host,
-            cancellationToken
+            cancellationToken,
           );
           importAdder.writeFixes(changes);
           return symbol.valueDeclaration;
@@ -322,7 +321,7 @@ namespace ts.codefix {
             containingFunction,
             program,
             host,
-            cancellationToken
+            cancellationToken,
           );
           declaration = containingFunction;
           break;
@@ -339,13 +338,14 @@ namespace ts.codefix {
             containingFunction,
             program,
             host,
-            cancellationToken
+            cancellationToken,
           );
           declaration = param;
         }
         break;
 
       // Get Accessor declarations
+
       case Diagnostics
         .Property_0_implicitly_has_type_any_because_its_get_accessor_lacks_a_return_type_annotation
         .code:
@@ -353,8 +353,8 @@ namespace ts.codefix {
         ._0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type
         .code:
         if (
-          isGetAccessorDeclaration(containingFunction) &&
-          isIdentifier(containingFunction.name)
+          isGetAccessorDeclaration(containingFunction)
+          && isIdentifier(containingFunction.name)
         ) {
           annotate(
             changes,
@@ -364,16 +364,17 @@ namespace ts.codefix {
             inferTypeForVariableFromUsage(
               containingFunction.name,
               program,
-              cancellationToken
+              cancellationToken,
             ),
             program,
-            host
+            host,
           );
           declaration = containingFunction;
         }
         break;
 
       // Set Accessor declarations
+
       case Diagnostics
         .Property_0_implicitly_has_type_any_because_its_set_accessor_lacks_a_parameter_type_annotation
         .code:
@@ -385,19 +386,20 @@ namespace ts.codefix {
             containingFunction,
             program,
             host,
-            cancellationToken
+            cancellationToken,
           );
           declaration = containingFunction;
         }
         break;
 
       // Function 'this'
+
       case Diagnostics
         .this_implicitly_has_type_any_because_it_does_not_have_a_type_annotation
         .code:
         if (
-          textChanges.isThisTypeAnnotatable(containingFunction) &&
-          markSeen(containingFunction)
+          textChanges.isThisTypeAnnotatable(containingFunction)
+          && markSeen(containingFunction)
         ) {
           annotateThis(
             changes,
@@ -405,7 +407,7 @@ namespace ts.codefix {
             containingFunction,
             program,
             host,
-            cancellationToken
+            cancellationToken,
           );
           declaration = containingFunction;
         }
@@ -426,7 +428,7 @@ namespace ts.codefix {
     declaration: VariableDeclaration | PropertyDeclaration | PropertySignature,
     program: Program,
     host: LanguageServiceHost,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): void {
     if (isIdentifier(declaration.name)) {
       annotate(
@@ -437,10 +439,10 @@ namespace ts.codefix {
         inferTypeForVariableFromUsage(
           declaration.name,
           program,
-          cancellationToken
+          cancellationToken,
         ),
         program,
-        host
+        host,
       );
     }
   }
@@ -453,7 +455,7 @@ namespace ts.codefix {
     containingFunction: SignatureDeclaration,
     program: Program,
     host: LanguageServiceHost,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): void {
     if (!isIdentifier(parameterDeclaration.name)) {
       return;
@@ -463,11 +465,11 @@ namespace ts.codefix {
       containingFunction,
       sourceFile,
       program,
-      cancellationToken
+      cancellationToken,
     );
     Debug.assert(
       containingFunction.parameters.length === parameterInferences.length,
-      "Parameter count and inference count should match"
+      "Parameter count and inference count should match",
     );
 
     if (isInJSFile(containingFunction)) {
@@ -476,22 +478,22 @@ namespace ts.codefix {
         sourceFile,
         parameterInferences,
         program,
-        host
+        host,
       );
     } else {
-      const needParens =
-        isArrowFunction(containingFunction) &&
-        !findChildOfKind(
+      const needParens = isArrowFunction(containingFunction)
+        && !findChildOfKind(
           containingFunction,
           SyntaxKind.OpenParenToken,
-          sourceFile
+          sourceFile,
         );
-      if (needParens)
+      if (needParens) {
         changes.insertNodeBefore(
           sourceFile,
           first(containingFunction.parameters),
-          factory.createToken(SyntaxKind.OpenParenToken)
+          factory.createToken(SyntaxKind.OpenParenToken),
         );
+      }
       for (const { declaration, type } of parameterInferences) {
         if (declaration && !declaration.type && !declaration.initializer) {
           annotate(
@@ -501,16 +503,17 @@ namespace ts.codefix {
             declaration,
             type,
             program,
-            host
+            host,
           );
         }
       }
-      if (needParens)
+      if (needParens) {
         changes.insertNodeAfter(
           sourceFile,
           last(containingFunction.parameters),
-          factory.createToken(SyntaxKind.CloseParenToken)
+          factory.createToken(SyntaxKind.CloseParenToken),
         );
+      }
     }
   }
 
@@ -520,13 +523,13 @@ namespace ts.codefix {
     containingFunction: textChanges.ThisTypeAnnotatable,
     program: Program,
     host: LanguageServiceHost,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ) {
     const references = getFunctionReferences(
       containingFunction,
       sourceFile,
       program,
-      cancellationToken
+      cancellationToken,
     );
     if (!references || !references.length) {
       return;
@@ -534,13 +537,13 @@ namespace ts.codefix {
     const thisInference = inferTypeFromReferences(
       program,
       references,
-      cancellationToken
+      cancellationToken,
     ).thisParameter();
     const typeNode = getTypeNodeIfAccessible(
       thisInference,
       containingFunction,
       program,
-      host
+      host,
     );
     if (!typeNode) {
       return;
@@ -552,7 +555,7 @@ namespace ts.codefix {
       changes.tryInsertThisTypeAnnotation(
         sourceFile,
         containingFunction,
-        typeNode
+        typeNode,
       );
     }
   }
@@ -561,12 +564,12 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     containingFunction: SignatureDeclaration,
-    typeNode: TypeNode
+    typeNode: TypeNode,
   ) {
     changes.addJSDocTags(sourceFile, containingFunction, [
       factory.createJSDocThisTag(
         /*tagName*/ undefined,
-        factory.createJSDocTypeExpression(typeNode)
+        factory.createJSDocTypeExpression(typeNode),
       ),
     ]);
   }
@@ -578,24 +581,24 @@ namespace ts.codefix {
     setAccessorDeclaration: SetAccessorDeclaration,
     program: Program,
     host: LanguageServiceHost,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): void {
     const param = firstOrUndefined(setAccessorDeclaration.parameters);
     if (
-      param &&
-      isIdentifier(setAccessorDeclaration.name) &&
-      isIdentifier(param.name)
+      param
+      && isIdentifier(setAccessorDeclaration.name)
+      && isIdentifier(param.name)
     ) {
       let type = inferTypeForVariableFromUsage(
         setAccessorDeclaration.name,
         program,
-        cancellationToken
+        cancellationToken,
       );
       if (type === program.getTypeChecker().getAnyType()) {
         type = inferTypeForVariableFromUsage(
           param.name,
           program,
-          cancellationToken
+          cancellationToken,
         );
       }
       if (isInJSFile(setAccessorDeclaration)) {
@@ -604,7 +607,7 @@ namespace ts.codefix {
           sourceFile,
           [{ declaration: param, type }],
           program,
-          host
+          host,
         );
       } else {
         annotate(changes, importAdder, sourceFile, param, type, program, host);
@@ -619,13 +622,13 @@ namespace ts.codefix {
     declaration: textChanges.TypeAnnotatable,
     type: Type,
     program: Program,
-    host: LanguageServiceHost
+    host: LanguageServiceHost,
   ): void {
     const typeNode = getTypeNodeIfAccessible(type, declaration, program, host);
     if (typeNode) {
       if (
-        isInJSFile(sourceFile) &&
-        declaration.kind !== SyntaxKind.PropertySignature
+        isInJSFile(sourceFile)
+        && declaration.kind !== SyntaxKind.PropertySignature
       ) {
         const parent = isVariableDeclaration(declaration)
           ? tryCast(declaration.parent.parent, isVariableStatement)
@@ -636,15 +639,15 @@ namespace ts.codefix {
         const typeExpression = factory.createJSDocTypeExpression(typeNode);
         const typeTag = isGetAccessorDeclaration(declaration)
           ? factory.createJSDocReturnTag(
-              /*tagName*/ undefined,
-              typeExpression,
-              /*comment*/ undefined
-            )
+            /*tagName*/ undefined,
+            typeExpression,
+            /*comment*/ undefined,
+          )
           : factory.createJSDocTypeTag(
-              /*tagName*/ undefined,
-              typeExpression,
-              /*comment*/ undefined
-            );
+            /*tagName*/ undefined,
+            typeExpression,
+            /*comment*/ undefined,
+          );
         changes.addJSDocTags(sourceFile, parent, [typeTag]);
       } else if (
         !tryReplaceImportTypeNodeWithAutoImport(
@@ -653,7 +656,7 @@ namespace ts.codefix {
           sourceFile,
           changes,
           importAdder,
-          getEmitScriptTarget(program.getCompilerOptions())
+          getEmitScriptTarget(program.getCompilerOptions()),
         )
       ) {
         changes.tryInsertTypeAnnotation(sourceFile, declaration, typeNode);
@@ -667,23 +670,21 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     changes: textChanges.ChangeTracker,
     importAdder: ImportAdder,
-    scriptTarget: ScriptTarget
+    scriptTarget: ScriptTarget,
   ): boolean {
     const importableReference = tryGetAutoImportableReferenceFromTypeNode(
       typeNode,
-      scriptTarget
+      scriptTarget,
     );
     if (
-      importableReference &&
-      changes.tryInsertTypeAnnotation(
+      importableReference
+      && changes.tryInsertTypeAnnotation(
         sourceFile,
         declaration,
-        importableReference.typeNode
+        importableReference.typeNode,
       )
     ) {
-      forEach(importableReference.symbols, (s) =>
-        importAdder.addImportFromExportedSymbol(s, /*usageIsTypeOnly*/ true)
-      );
+      forEach(importableReference.symbols, (s) => importAdder.addImportFromExportedSymbol(s, /*usageIsTypeOnly*/ true));
       return true;
     }
     return false;
@@ -694,10 +695,9 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     parameterInferences: readonly ParameterInference[],
     program: Program,
-    host: LanguageServiceHost
+    host: LanguageServiceHost,
   ): void {
-    const signature =
-      parameterInferences.length && parameterInferences[0].declaration.parent;
+    const signature = parameterInferences.length && parameterInferences[0].declaration.parent;
     if (!signature) {
       return;
     }
@@ -706,15 +706,14 @@ namespace ts.codefix {
       const param = inference.declaration;
       // only infer parameters that have (1) no type and (2) an accessible inferred type
       if (
-        param.initializer ||
-        getJSDocType(param) ||
-        !isIdentifier(param.name)
+        param.initializer
+        || getJSDocType(param)
+        || !isIdentifier(param.name)
       ) {
         return;
       }
-      const typeNode =
-        inference.type &&
-        getTypeNodeIfAccessible(inference.type, param, program, host);
+      const typeNode = inference.type
+        && getTypeNodeIfAccessible(inference.type, param, program, host);
       if (typeNode) {
         const name = factory.cloneNode(param.name);
         setEmitFlags(name, EmitFlags.NoComments | EmitFlags.NoNestedComments);
@@ -732,21 +731,20 @@ namespace ts.codefix {
     }
 
     if (isArrowFunction(signature) || isFunctionExpression(signature)) {
-      const needParens =
-        isArrowFunction(signature) &&
-        !findChildOfKind(signature, SyntaxKind.OpenParenToken, sourceFile);
+      const needParens = isArrowFunction(signature)
+        && !findChildOfKind(signature, SyntaxKind.OpenParenToken, sourceFile);
       if (needParens) {
         changes.insertNodeBefore(
           sourceFile,
           first(signature.parameters),
-          factory.createToken(SyntaxKind.OpenParenToken)
+          factory.createToken(SyntaxKind.OpenParenToken),
         );
       }
 
       forEach(inferences, ({ typeNode, param }) => {
         const typeTag = factory.createJSDocTypeTag(
           /*tagName*/ undefined,
-          factory.createJSDocTypeExpression(typeNode)
+          factory.createJSDocTypeExpression(typeNode),
         );
         const jsDoc = factory.createJSDocComment(/*comment*/ undefined, [
           typeTag,
@@ -760,7 +758,7 @@ namespace ts.codefix {
         changes.insertNodeAfter(
           sourceFile,
           last(signature.parameters),
-          factory.createToken(SyntaxKind.CloseParenToken)
+          factory.createToken(SyntaxKind.CloseParenToken),
         );
       }
     } else {
@@ -771,9 +769,8 @@ namespace ts.codefix {
           /*isBracketed*/ !!isOptional,
           factory.createJSDocTypeExpression(typeNode),
           /* isNameFirst */ false,
-          /*comment*/ undefined
-        )
-      );
+          /*comment*/ undefined,
+        ));
       changes.addJSDocTags(sourceFile, signature, paramTags);
     }
   }
@@ -781,7 +778,7 @@ namespace ts.codefix {
   function getReferences(
     token: PropertyName | Token<SyntaxKind.ConstructorKeyword>,
     program: Program,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): readonly Identifier[] {
     // Position shouldn't matter since token is not a SourceFile.
     return mapDefined(
@@ -790,25 +787,25 @@ namespace ts.codefix {
         token,
         program,
         program.getSourceFiles(),
-        cancellationToken
+        cancellationToken,
       ),
       (entry) =>
         entry.kind !== FindAllReferences.EntryKind.Span
           ? tryCast(entry.node, isIdentifier)
-          : undefined
+          : undefined,
     );
   }
 
   function inferTypeForVariableFromUsage(
     token: Identifier | PrivateIdentifier,
     program: Program,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): Type {
     const references = getReferences(token, program, cancellationToken);
     return inferTypeFromReferences(
       program,
       references,
-      cancellationToken
+      cancellationToken,
     ).single();
   }
 
@@ -816,22 +813,22 @@ namespace ts.codefix {
     func: SignatureDeclaration,
     sourceFile: SourceFile,
     program: Program,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ) {
     const references = getFunctionReferences(
       func,
       sourceFile,
       program,
-      cancellationToken
+      cancellationToken,
     );
     return (
-      (references &&
-        inferTypeFromReferences(
+      (references
+        && inferTypeFromReferences(
           program,
           references,
-          cancellationToken
-        ).parameters(func)) ||
-      func.parameters.map<ParameterInference>((p) => ({
+          cancellationToken,
+        ).parameters(func))
+      || func.parameters.map<ParameterInference>((p) => ({
         declaration: p,
         type: isIdentifier(p.name)
           ? inferTypeForVariableFromUsage(p.name, program, cancellationToken)
@@ -844,7 +841,7 @@ namespace ts.codefix {
     containingFunction: SignatureDeclaration,
     sourceFile: SourceFile,
     program: Program,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): readonly Identifier[] | undefined {
     let searchToken;
     switch (containingFunction.kind) {
@@ -852,17 +849,16 @@ namespace ts.codefix {
         searchToken = findChildOfKind<Token<SyntaxKind.ConstructorKeyword>>(
           containingFunction,
           SyntaxKind.ConstructorKeyword,
-          sourceFile
+          sourceFile,
         );
         break;
       case SyntaxKind.ArrowFunction:
       case SyntaxKind.FunctionExpression:
         const parent = containingFunction.parent;
-        searchToken =
-          (isVariableDeclaration(parent) || isPropertyDeclaration(parent)) &&
-          isIdentifier(parent.name)
-            ? parent.name
-            : containingFunction.name;
+        searchToken = (isVariableDeclaration(parent) || isPropertyDeclaration(parent))
+            && isIdentifier(parent.name)
+          ? parent.name
+          : containingFunction.name;
         break;
       case SyntaxKind.FunctionDeclaration:
       case SyntaxKind.MethodDeclaration:
@@ -887,7 +883,7 @@ namespace ts.codefix {
   function inferTypeFromReferences(
     program: Program,
     references: readonly Identifier[],
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ) {
     const checker = program.getTypeChecker();
     const builtinConstructors: { [s: string]: (t: Type) => Type } = {
@@ -974,7 +970,7 @@ namespace ts.codefix {
         stringIndex: forEach(usages, (u) => u.stringIndex),
         candidateThisTypes: flatMap(
           usages,
-          (u) => u.candidateThisTypes
+          (u) => u.candidateThisTypes,
         ) as Type[],
         inferredTypes: undefined, // clear type cache
       };
@@ -985,7 +981,7 @@ namespace ts.codefix {
     }
 
     function parameters(
-      declaration: SignatureDeclaration
+      declaration: SignatureDeclaration,
     ): ParameterInference[] | undefined {
       if (references.length === 0 || !declaration.parameters) {
         return undefined;
@@ -1009,25 +1005,25 @@ namespace ts.codefix {
             } else if (isRest) {
               for (let i = parameterIndex; i < call.argumentTypes.length; i++) {
                 types.push(
-                  checker.getBaseTypeOfLiteralType(call.argumentTypes[i])
+                  checker.getBaseTypeOfLiteralType(call.argumentTypes[i]),
                 );
               }
             } else {
               types.push(
                 checker.getBaseTypeOfLiteralType(
-                  call.argumentTypes[parameterIndex]
-                )
+                  call.argumentTypes[parameterIndex],
+                ),
               );
             }
           }
           if (isIdentifier(parameter.name)) {
             const inferred = inferTypesFromReferencesSingle(
-              getReferences(parameter.name, program, cancellationToken)
+              getReferences(parameter.name, program, cancellationToken),
             );
             types.push(
               ...(isRest
                 ? mapDefined(inferred, checker.getElementTypeOfArrayType)
-                : inferred)
+                : inferred),
             );
           }
           const type = combineTypes(types);
@@ -1036,7 +1032,7 @@ namespace ts.codefix {
             isOptional: isOptional && !isRest,
             declaration: parameter,
           };
-        }
+        },
       );
     }
 
@@ -1051,7 +1047,7 @@ namespace ts.codefix {
     }
 
     function inferTypesFromReferencesSingle(
-      references: readonly Identifier[]
+      references: readonly Identifier[],
     ): Type[] {
       const usage: Usage = createEmptyUsage();
       for (const reference of references) {
@@ -1076,21 +1072,21 @@ namespace ts.codefix {
         case SyntaxKind.PrefixUnaryExpression:
           inferTypeFromPrefixUnaryExpression(
             node.parent as PrefixUnaryExpression,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.BinaryExpression:
           inferTypeFromBinaryExpression(
             node,
             node.parent as BinaryExpression,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.CaseClause:
         case SyntaxKind.DefaultClause:
           inferTypeFromSwitchStatementLabel(
             node.parent as CaseOrDefaultClause,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.CallExpression:
@@ -1100,7 +1096,7 @@ namespace ts.codefix {
           ) {
             inferTypeFromCallExpression(
               node.parent as CallExpression | NewExpression,
-              usage
+              usage,
             );
           } else {
             inferTypeFromContextualType(node, usage);
@@ -1109,27 +1105,27 @@ namespace ts.codefix {
         case SyntaxKind.PropertyAccessExpression:
           inferTypeFromPropertyAccessExpression(
             node.parent as PropertyAccessExpression,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.ElementAccessExpression:
           inferTypeFromPropertyElementExpression(
             node.parent as ElementAccessExpression,
             node,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.PropertyAssignment:
         case SyntaxKind.ShorthandPropertyAssignment:
           inferTypeFromPropertyAssignment(
             node.parent as PropertyAssignment | ShorthandPropertyAssignment,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.PropertyDeclaration:
           inferTypeFromPropertyDeclaration(
             node.parent as PropertyDeclaration,
-            usage
+            usage,
           );
           break;
         case SyntaxKind.VariableDeclaration: {
@@ -1156,17 +1152,17 @@ namespace ts.codefix {
 
     function inferTypeFromExpressionStatement(
       node: Expression,
-      usage: Usage
+      usage: Usage,
     ): void {
       addCandidateType(
         usage,
-        isCallExpression(node) ? checker.getVoidType() : checker.getAnyType()
+        isCallExpression(node) ? checker.getVoidType() : checker.getAnyType(),
       );
     }
 
     function inferTypeFromPrefixUnaryExpression(
       node: PrefixUnaryExpression,
-      usage: Usage
+      usage: Usage,
     ): void {
       switch (node.operator) {
         case SyntaxKind.PlusPlusToken:
@@ -1180,15 +1176,15 @@ namespace ts.codefix {
           usage.isNumberOrString = true;
           break;
 
-        // case SyntaxKind.ExclamationToken:
-        // no inferences here;
+          // case SyntaxKind.ExclamationToken:
+          // no inferences here;
       }
     }
 
     function inferTypeFromBinaryExpression(
       node: Expression,
       parent: BinaryExpression,
-      usage: Usage
+      usage: Usage,
     ): void {
       switch (parent.operatorToken.kind) {
         // ExponentiationOperator
@@ -1237,7 +1233,7 @@ namespace ts.codefix {
         case SyntaxKind.GreaterThanToken:
         case SyntaxKind.GreaterThanEqualsToken:
           const operandType = checker.getTypeAtLocation(
-            parent.left === node ? parent.right : parent.left
+            parent.left === node ? parent.right : parent.left,
           );
           if (operandType.flags & TypeFlags.EnumLike) {
             addCandidateType(usage, operandType);
@@ -1249,7 +1245,7 @@ namespace ts.codefix {
         case SyntaxKind.PlusEqualsToken:
         case SyntaxKind.PlusToken:
           const otherOperandType = checker.getTypeAtLocation(
-            parent.left === node ? parent.right : parent.left
+            parent.left === node ? parent.right : parent.left,
           );
           if (otherOperandType.flags & TypeFlags.EnumLike) {
             addCandidateType(usage, otherOperandType);
@@ -1265,6 +1261,7 @@ namespace ts.codefix {
           break;
 
         //  AssignmentOperators
+
         case SyntaxKind.EqualsToken:
         case SyntaxKind.EqualsEqualsToken:
         case SyntaxKind.EqualsEqualsEqualsToken:
@@ -1273,8 +1270,8 @@ namespace ts.codefix {
           addCandidateType(
             usage,
             checker.getTypeAtLocation(
-              parent.left === node ? parent.right : parent.left
-            )
+              parent.left === node ? parent.right : parent.left,
+            ),
           );
           break;
 
@@ -1285,14 +1282,15 @@ namespace ts.codefix {
           break;
 
         // LogicalOperator Or NullishCoalescing
+
         case SyntaxKind.BarBarToken:
         case SyntaxKind.QuestionQuestionToken:
           if (
-            node === parent.left &&
-            (node.parent.parent.kind === SyntaxKind.VariableDeclaration ||
-              isAssignmentExpression(
+            node === parent.left
+            && (node.parent.parent.kind === SyntaxKind.VariableDeclaration
+              || isAssignmentExpression(
                 node.parent.parent,
-                /*excludeCompoundAssignment*/ true
+                /*excludeCompoundAssignment*/ true,
               ))
           ) {
             // var x = x || {};
@@ -1311,17 +1309,17 @@ namespace ts.codefix {
 
     function inferTypeFromSwitchStatementLabel(
       parent: CaseOrDefaultClause,
-      usage: Usage
+      usage: Usage,
     ): void {
       addCandidateType(
         usage,
-        checker.getTypeAtLocation(parent.parent.parent.expression)
+        checker.getTypeAtLocation(parent.parent.parent.expression),
       );
     }
 
     function inferTypeFromCallExpression(
       parent: CallExpression | NewExpression,
-      usage: Usage
+      usage: Usage,
     ): void {
       const call: CallUsage = {
         argumentTypes: [],
@@ -1344,7 +1342,7 @@ namespace ts.codefix {
 
     function inferTypeFromPropertyAccessExpression(
       parent: PropertyAccessExpression,
-      usage: Usage
+      usage: Usage,
     ): void {
       const name = escapeLeadingUnderscores(parent.name.text);
       if (!usage.properties) {
@@ -1358,7 +1356,7 @@ namespace ts.codefix {
     function inferTypeFromPropertyElementExpression(
       parent: ElementAccessExpression,
       node: Expression,
-      usage: Usage
+      usage: Usage,
     ): void {
       if (node === parent.argumentExpression) {
         usage.isNumberOrString = true;
@@ -1377,7 +1375,7 @@ namespace ts.codefix {
 
     function inferTypeFromPropertyAssignment(
       assignment: PropertyAssignment | ShorthandPropertyAssignment,
-      usage: Usage
+      usage: Usage,
     ) {
       const nodeWithRealType = isVariableDeclaration(assignment.parent.parent)
         ? assignment.parent.parent
@@ -1387,11 +1385,11 @@ namespace ts.codefix {
 
     function inferTypeFromPropertyDeclaration(
       declaration: PropertyDeclaration,
-      usage: Usage
+      usage: Usage,
     ) {
       addCandidateThisType(
         usage,
-        checker.getTypeAtLocation(declaration.parent)
+        checker.getTypeAtLocation(declaration.parent),
       );
     }
 
@@ -1402,7 +1400,7 @@ namespace ts.codefix {
 
     function removeLowPriorityInferences(
       inferences: readonly Type[],
-      priorities: Priority[]
+      priorities: Priority[],
     ): Type[] {
       const toRemove: ((t: Type) => boolean)[] = [];
       for (const i of inferences) {
@@ -1432,8 +1430,7 @@ namespace ts.codefix {
       ]);
       const priorities: Priority[] = [
         {
-          high: (t) =>
-            t === checker.getStringType() || t === checker.getNumberType(),
+          high: (t) => t === checker.getStringType() || t === checker.getNumberType(),
           low: (t) => t === stringNumber,
         },
         {
@@ -1443,15 +1440,15 @@ namespace ts.codefix {
         {
           high: (t) =>
             !(
-              t.flags &
-              (TypeFlags.Nullable | TypeFlags.Any | TypeFlags.Void)
+              t.flags
+              & (TypeFlags.Nullable | TypeFlags.Any | TypeFlags.Void)
             ) && !(getObjectFlags(t) & ObjectFlags.Anonymous),
           low: (t) => !!(getObjectFlags(t) & ObjectFlags.Anonymous),
         },
       ];
       let good = removeLowPriorityInferences(inferences, priorities);
       const anons = good.filter(
-        (i) => getObjectFlags(i) & ObjectFlags.Anonymous
+        (i) => getObjectFlags(i) & ObjectFlags.Anonymous,
       ) as AnonymousType[];
       if (anons.length) {
         good = good.filter((i) => !(getObjectFlags(i) & ObjectFlags.Anonymous));
@@ -1460,8 +1457,8 @@ namespace ts.codefix {
       return checker.getWidenedType(
         checker.getUnionType(
           good.map(checker.getBaseTypeOfLiteralType),
-          UnionReduction.Subtype
-        )
+          UnionReduction.Subtype,
+        ),
       );
     }
 
@@ -1482,65 +1479,64 @@ namespace ts.codefix {
             p.name,
             p.valueDeclaration
               ? checker.getTypeOfSymbolAtLocation(p, p.valueDeclaration)
-              : checker.getAnyType()
+              : checker.getAnyType(),
           );
         }
         calls.push(...checker.getSignaturesOfType(anon, SignatureKind.Call));
         constructs.push(
-          ...checker.getSignaturesOfType(anon, SignatureKind.Construct)
+          ...checker.getSignaturesOfType(anon, SignatureKind.Construct),
         );
         const stringIndexInfo = checker.getIndexInfoOfType(
           anon,
-          IndexKind.String
+          IndexKind.String,
         );
         if (stringIndexInfo) {
           stringIndices.push(stringIndexInfo.type);
-          stringIndexReadonly =
-            stringIndexReadonly || stringIndexInfo.isReadonly;
+          stringIndexReadonly = stringIndexReadonly || stringIndexInfo.isReadonly;
         }
         const numberIndexInfo = checker.getIndexInfoOfType(
           anon,
-          IndexKind.Number
+          IndexKind.Number,
         );
         if (numberIndexInfo) {
           numberIndices.push(numberIndexInfo.type);
-          numberIndexReadonly =
-            numberIndexReadonly || numberIndexInfo.isReadonly;
+          numberIndexReadonly = numberIndexReadonly || numberIndexInfo.isReadonly;
         }
       }
       const members = mapEntries(props, (name, types) => {
-        const isOptional =
-          types.length < anons.length ? SymbolFlags.Optional : 0;
+        const isOptional = types.length < anons.length ? SymbolFlags.Optional : 0;
         const s = checker.createSymbol(
           SymbolFlags.Property | isOptional,
-          name as __String
+          name as __String,
         );
         s.type = checker.getUnionType(types);
         return [name, s];
       });
       const indexInfos = [];
-      if (stringIndices.length)
+      if (stringIndices.length) {
         indexInfos.push(
           checker.createIndexInfo(
             checker.getStringType(),
             checker.getUnionType(stringIndices),
-            stringIndexReadonly
-          )
+            stringIndexReadonly,
+          ),
         );
-      if (numberIndices.length)
+      }
+      if (numberIndices.length) {
         indexInfos.push(
           checker.createIndexInfo(
             checker.getNumberType(),
             checker.getUnionType(numberIndices),
-            numberIndexReadonly
-          )
+            numberIndexReadonly,
+          ),
         );
+      }
       return checker.createAnonymousType(
         anons[0].symbol,
         members as UnderscoreEscapedMap<TransientSymbol>,
         calls,
         constructs,
-        indexInfos
+        indexInfos,
       );
     }
 
@@ -1558,25 +1554,23 @@ namespace ts.codefix {
           checker.getUnionType([
             checker.getStringType(),
             checker.getNumberType(),
-          ])
+          ]),
         );
       }
       if (usage.numberIndex) {
         types.push(
-          checker.createArrayType(combineFromUsage(usage.numberIndex))
+          checker.createArrayType(combineFromUsage(usage.numberIndex)),
         );
       }
       if (
-        usage.properties?.size ||
-        usage.constructs?.length ||
-        usage.stringIndex
+        usage.properties?.size
+        || usage.constructs?.length
+        || usage.stringIndex
       ) {
         types.push(inferStructuralType(usage));
       }
 
-      const candidateTypes = (usage.candidateTypes || []).map((t) =>
-        checker.getBaseTypeOfLiteralType(t)
-      );
+      const candidateTypes = (usage.candidateTypes || []).map((t) => checker.getBaseTypeOfLiteralType(t));
       const callsType = usage.calls?.length
         ? inferStructuralType(usage)
         : undefined;
@@ -1584,8 +1578,8 @@ namespace ts.codefix {
         types.push(
           checker.getUnionType(
             [callsType, ...candidateTypes],
-            UnionReduction.Subtype
-          )
+            UnionReduction.Subtype,
+          ),
         );
       } else {
         if (callsType) {
@@ -1617,27 +1611,25 @@ namespace ts.codefix {
         : [];
       const indexInfos = usage.stringIndex
         ? [
-            checker.createIndexInfo(
-              checker.getStringType(),
-              combineFromUsage(usage.stringIndex),
-              /*isReadonly*/ false
-            ),
-          ]
+          checker.createIndexInfo(
+            checker.getStringType(),
+            combineFromUsage(usage.stringIndex),
+            /*isReadonly*/ false,
+          ),
+        ]
         : [];
       return checker.createAnonymousType(
         /*symbol*/ undefined,
         members,
         callSignatures,
         constructSignatures,
-        indexInfos
+        indexInfos,
       );
     }
 
     function inferNamedTypesFromProperties(usage: Usage): Type[] {
       if (!usage.properties || !usage.properties.size) return [];
-      const types = builtins.filter((t) =>
-        allPropertiesAreAssignableToUsage(t, usage)
-      );
+      const types = builtins.filter((t) => allPropertiesAreAssignableToUsage(t, usage));
       if (0 < types.length && types.length < 3) {
         return types.map((t) => inferInstantiationFromUsage(t, usage));
       }
@@ -1654,16 +1646,16 @@ namespace ts.codefix {
         if (propUsage.calls) {
           const sigs = checker.getSignaturesOfType(source, SignatureKind.Call);
           return (
-            !sigs.length ||
-            !checker.isTypeAssignableTo(
+            !sigs.length
+            || !checker.isTypeAssignableTo(
               source,
-              getFunctionFromCalls(propUsage.calls)
+              getFunctionFromCalls(propUsage.calls),
             )
           );
         } else {
           return !checker.isTypeAssignableTo(
             source,
-            combineFromUsage(propUsage)
+            combineFromUsage(propUsage),
           );
         }
       });
@@ -1676,8 +1668,8 @@ namespace ts.codefix {
      */
     function inferInstantiationFromUsage(type: Type, usage: Usage) {
       if (
-        !(getObjectFlags(type) & ObjectFlags.Reference) ||
-        !usage.properties
+        !(getObjectFlags(type) & ObjectFlags.Reference)
+        || !usage.properties
       ) {
         return type;
       }
@@ -1689,43 +1681,44 @@ namespace ts.codefix {
       usage.properties.forEach((propUsage, name) => {
         const genericPropertyType = checker.getTypeOfPropertyOfType(
           generic,
-          name as string
+          name as string,
         );
         Debug.assert(
           !!genericPropertyType,
-          "generic should have all the properties of its reference."
+          "generic should have all the properties of its reference.",
         );
         types.push(
           ...inferTypeParameters(
             genericPropertyType,
             combineFromUsage(propUsage),
-            singleTypeParameter
-          )
+            singleTypeParameter,
+          ),
         );
       });
       return builtinConstructors[type.symbol.escapedName as string](
-        combineTypes(types)
+        combineTypes(types),
       );
     }
 
     function inferTypeParameters(
       genericType: Type,
       usageType: Type,
-      typeParameter: Type
+      typeParameter: Type,
     ): readonly Type[] {
       if (genericType === typeParameter) {
         return [usageType];
       } else if (genericType.flags & TypeFlags.UnionOrIntersection) {
-        return flatMap((genericType as UnionOrIntersectionType).types, (t) =>
-          inferTypeParameters(t, usageType, typeParameter)
+        return flatMap(
+          (genericType as UnionOrIntersectionType).types,
+          (t) => inferTypeParameters(t, usageType, typeParameter),
         );
       } else if (
-        getObjectFlags(genericType) & ObjectFlags.Reference &&
-        getObjectFlags(usageType) & ObjectFlags.Reference
+        getObjectFlags(genericType) & ObjectFlags.Reference
+        && getObjectFlags(usageType) & ObjectFlags.Reference
       ) {
         // this is wrong because we need a reference to the targetType to, so we can check that it's also a reference
         const genericArgs = checker.getTypeArguments(
-          genericType as TypeReference
+          genericType as TypeReference,
         );
         const usageArgs = checker.getTypeArguments(usageType as TypeReference);
         const types = [];
@@ -1736,8 +1729,8 @@ namespace ts.codefix {
                 ...inferTypeParameters(
                   genericArgs[i],
                   usageArgs[i],
-                  typeParameter
-                )
+                  typeParameter,
+                ),
               );
             }
           }
@@ -1746,11 +1739,11 @@ namespace ts.codefix {
       }
       const genericSigs = checker.getSignaturesOfType(
         genericType,
-        SignatureKind.Call
+        SignatureKind.Call,
       );
       const usageSigs = checker.getSignaturesOfType(
         usageType,
-        SignatureKind.Call
+        SignatureKind.Call,
       );
       if (genericSigs.length === 1 && usageSigs.length === 1) {
         return inferFromSignatures(genericSigs[0], usageSigs[0], typeParameter);
@@ -1761,45 +1754,42 @@ namespace ts.codefix {
     function inferFromSignatures(
       genericSig: Signature,
       usageSig: Signature,
-      typeParameter: Type
+      typeParameter: Type,
     ) {
       const types = [];
       for (let i = 0; i < genericSig.parameters.length; i++) {
         const genericParam = genericSig.parameters[i];
         const usageParam = usageSig.parameters[i];
-        const isRest =
-          genericSig.declaration &&
-          isRestParameter(genericSig.declaration.parameters[i]);
+        const isRest = genericSig.declaration
+          && isRestParameter(genericSig.declaration.parameters[i]);
         if (!usageParam) {
           break;
         }
         let genericParamType = genericParam.valueDeclaration
           ? checker.getTypeOfSymbolAtLocation(
-              genericParam,
-              genericParam.valueDeclaration
-            )
+            genericParam,
+            genericParam.valueDeclaration,
+          )
           : checker.getAnyType();
-        const elementType =
-          isRest && checker.getElementTypeOfArrayType(genericParamType);
+        const elementType = isRest && checker.getElementTypeOfArrayType(genericParamType);
         if (elementType) {
           genericParamType = elementType;
         }
-        const targetType =
-          (usageParam as SymbolLinks).type ||
-          (usageParam.valueDeclaration
+        const targetType = (usageParam as SymbolLinks).type
+          || (usageParam.valueDeclaration
             ? checker.getTypeOfSymbolAtLocation(
-                usageParam,
-                usageParam.valueDeclaration
-              )
+              usageParam,
+              usageParam.valueDeclaration,
+            )
             : checker.getAnyType());
         types.push(
-          ...inferTypeParameters(genericParamType, targetType, typeParameter)
+          ...inferTypeParameters(genericParamType, targetType, typeParameter),
         );
       }
       const genericReturn = checker.getReturnTypeOfSignature(genericSig);
       const usageReturn = checker.getReturnTypeOfSignature(usageSig);
       types.push(
-        ...inferTypeParameters(genericReturn, usageReturn, typeParameter)
+        ...inferTypeParameters(genericReturn, usageReturn, typeParameter),
       );
       return types;
     }
@@ -1810,7 +1800,7 @@ namespace ts.codefix {
         createSymbolTable(),
         [getSignatureFromCalls(calls)],
         emptyArray,
-        emptyArray
+        emptyArray,
       );
     }
 
@@ -1820,12 +1810,12 @@ namespace ts.codefix {
       for (let i = 0; i < length; i++) {
         const symbol = checker.createSymbol(
           SymbolFlags.FunctionScopedVariable,
-          escapeLeadingUnderscores(`arg${i}`)
+          escapeLeadingUnderscores(`arg${i}`),
         );
         symbol.type = combineTypes(
           calls.map(
-            (call) => call.argumentTypes[i] || checker.getUndefinedType()
-          )
+            (call) => call.argumentTypes[i] || checker.getUndefinedType(),
+          ),
         );
         if (calls.some((call) => call.argumentTypes[i] === undefined)) {
           symbol.flags |= SymbolFlags.Optional;
@@ -1833,7 +1823,7 @@ namespace ts.codefix {
         parameters.push(symbol);
       }
       const returnType = combineFromUsage(
-        combineUsages(calls.map((call) => call.return_))
+        combineUsages(calls.map((call) => call.return_)),
       );
       return checker.createSignature(
         /*declaration*/ undefined,
@@ -1843,15 +1833,15 @@ namespace ts.codefix {
         returnType,
         /*typePredicate*/ undefined,
         length,
-        SignatureFlags.None
+        SignatureFlags.None,
       );
     }
 
     function addCandidateType(usage: Usage, type: Type | undefined) {
       if (
-        type &&
-        !(type.flags & TypeFlags.Any) &&
-        !(type.flags & TypeFlags.Never)
+        type
+        && !(type.flags & TypeFlags.Any)
+        && !(type.flags & TypeFlags.Never)
       ) {
         (usage.candidateTypes || (usage.candidateTypes = [])).push(type);
       }
@@ -1859,12 +1849,12 @@ namespace ts.codefix {
 
     function addCandidateThisType(usage: Usage, type: Type | undefined) {
       if (
-        type &&
-        !(type.flags & TypeFlags.Any) &&
-        !(type.flags & TypeFlags.Never)
+        type
+        && !(type.flags & TypeFlags.Any)
+        && !(type.flags & TypeFlags.Never)
       ) {
         (usage.candidateThisTypes || (usage.candidateThisTypes = [])).push(
-          type
+          type,
         );
       }
     }

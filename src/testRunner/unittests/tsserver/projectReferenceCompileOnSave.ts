@@ -41,7 +41,7 @@ exports.fn3 = fn3;`;
 
     function expectedAffectedFiles(
       config: File,
-      fileNames: readonly File[]
+      fileNames: readonly File[],
     ): protocol.CompileOnSaveAffectedFileListSingleProject {
       return {
         projectFileName: config.path,
@@ -59,9 +59,7 @@ exports.fn3 = fn3;`;
         {
           path: `${usageLocation}/usage.js`,
           content: `"use strict";
-exports.__esModule = true;${
-            appendJsText === changeJs ? "\nexports.fn3 = void 0;" : ""
-          }
+exports.__esModule = true;${appendJsText === changeJs ? "\nexports.fn3 = void 0;" : ""}
 var fns_1 = require("../decls/fns");
 (0, fns_1.fn1)();
 (0, fns_1.fn2)();
@@ -92,7 +90,7 @@ ${appendJs}`,
 
     function expectedDependencyEmitFiles(
       appendJsText?: string,
-      appendDtsText?: string
+      appendDtsText?: string,
     ): readonly File[] {
       const appendJs = appendJsText
         ? `${appendJsText}
@@ -107,9 +105,7 @@ ${appendJs}`,
           path: `${dependecyLocation}/fns.js`,
           content: `"use strict";
 exports.__esModule = true;
-${
-  appendJsText === changeJs ? "exports.fn3 = " : ""
-}exports.fn2 = exports.fn1 = void 0;
+${appendJsText === changeJs ? "exports.fn3 = " : ""}exports.fn2 = exports.fn1 = void 0;
 function fn1() { }
 exports.fn1 = fn1;
 function fn2() { }
@@ -135,31 +131,29 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -167,11 +161,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -186,7 +180,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with initial file open, with specifying project file", () => {
@@ -197,37 +191,35 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -235,11 +227,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -257,7 +249,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to dependency, without specifying project file", () => {
@@ -268,7 +260,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -277,34 +269,32 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(
             dependencyTs.path,
-            `${dependencyTs.content}${localChange}`
+            `${dependencyTs.content}${localChange}`,
           );
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -312,11 +302,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -331,7 +321,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to dependency, with specifying project file", () => {
@@ -342,7 +332,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -351,40 +341,38 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(
             dependencyTs.path,
-            `${dependencyTs.content}${localChange}`
+            `${dependencyTs.content}${localChange}`,
           );
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -392,11 +380,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -414,7 +402,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to usage, without specifying project file", () => {
@@ -425,7 +413,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -434,7 +422,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -451,25 +439,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(localChange);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -477,11 +463,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -496,7 +482,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to usage, with specifying project file", () => {
@@ -507,7 +493,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -516,7 +502,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -533,31 +519,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(localChange);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -565,11 +549,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -587,7 +571,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to dependency, without specifying project file", () => {
@@ -598,7 +582,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -607,31 +591,29 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(dependencyTs.path, `${dependencyTs.content}${change}`);
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -639,11 +621,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -658,7 +640,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to dependency, with specifying project file", () => {
@@ -669,7 +651,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -678,37 +660,35 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(dependencyTs.path, `${dependencyTs.content}${change}`);
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -716,11 +696,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -738,7 +718,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to usage, without specifying project file", () => {
@@ -749,7 +729,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -758,7 +738,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -775,25 +755,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(changeJs);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -801,11 +779,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -820,7 +798,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to usage, with specifying project file", () => {
@@ -831,7 +809,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -840,7 +818,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -857,31 +835,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(changeJs);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -889,11 +865,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -911,7 +887,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
       });
@@ -925,31 +901,29 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -971,37 +945,35 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1026,7 +998,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1035,34 +1007,32 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(
             dependencyTs.path,
-            `${dependencyTs.content}${localChange}`
+            `${dependencyTs.content}${localChange}`,
           );
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1084,7 +1054,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1093,40 +1063,38 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(
             dependencyTs.path,
-            `${dependencyTs.content}${localChange}`
+            `${dependencyTs.content}${localChange}`,
           );
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, emptyArray)],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1151,7 +1119,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1160,7 +1128,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -1177,25 +1145,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1217,7 +1183,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1226,7 +1192,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -1243,31 +1209,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, emptyArray)],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1292,7 +1256,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1301,31 +1265,29 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(dependencyTs.path, `${dependencyTs.content}${change}`);
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1347,7 +1309,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1356,37 +1318,35 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           host.writeFile(dependencyTs.path, `${dependencyTs.content}${change}`);
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1411,7 +1371,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1420,7 +1380,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -1437,25 +1397,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1477,7 +1435,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs], session);
@@ -1486,7 +1444,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -1503,31 +1461,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, emptyArray)],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -1557,31 +1513,29 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -1589,11 +1543,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -1608,7 +1562,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with initial file open, with specifying project file", () => {
@@ -1619,37 +1573,35 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -1657,11 +1609,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -1679,7 +1631,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to dependency, without specifying project file", () => {
@@ -1690,7 +1642,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -1699,7 +1651,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -1716,25 +1668,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -1742,11 +1692,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -1761,7 +1711,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to dependency, with specifying project file", () => {
@@ -1772,7 +1722,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -1781,7 +1731,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -1798,31 +1748,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -1830,11 +1778,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -1852,7 +1800,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to usage, without specifying project file", () => {
@@ -1863,7 +1811,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -1872,7 +1820,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -1889,25 +1837,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(localChange);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -1915,11 +1861,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -1934,7 +1880,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to usage, with specifying project file", () => {
@@ -1945,7 +1891,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -1954,7 +1900,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -1971,31 +1917,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(localChange);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2003,11 +1947,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2025,7 +1969,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to dependency, without specifying project file", () => {
@@ -2036,7 +1980,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2045,7 +1989,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -2062,25 +2006,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2088,11 +2030,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2107,7 +2049,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to dependency, with specifying project file", () => {
@@ -2118,7 +2060,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2127,7 +2069,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -2144,31 +2086,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2176,11 +2116,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2198,7 +2138,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to usage, without specifying project file", () => {
@@ -2209,7 +2149,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2218,7 +2158,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -2235,25 +2175,23 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: usageTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: usageTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: usageTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: usageTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(changeJs);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2261,11 +2199,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2280,7 +2218,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to usage, with specifying project file", () => {
@@ -2291,7 +2229,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2300,7 +2238,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -2317,31 +2255,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: usageTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: usageTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: usageTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedUsageEmitFiles(changeJs);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2349,11 +2285,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2371,7 +2307,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
       });
@@ -2385,37 +2321,35 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -2440,7 +2374,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2449,7 +2383,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -2466,31 +2400,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, emptyArray)],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -2515,7 +2447,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2524,7 +2456,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -2541,31 +2473,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, emptyArray)],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -2590,7 +2520,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2599,7 +2529,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -2616,31 +2546,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, [usageTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, [usageTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -2665,7 +2593,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2674,7 +2602,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -2691,31 +2619,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: usageConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(usageConfig, emptyArray)],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: usageConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(usageConfig, emptyArray)],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: usageConfig.path,
+            },
+          }).response;
           assert.isFalse(actualEmit, "Emit files");
           assert.equal(host.writtenFiles.size, 0);
 
@@ -2743,34 +2669,32 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [
               expectedAffectedFiles(usageConfig, [usageTs]),
               expectedAffectedFiles(dependencyConfig, [dependencyTs]),
             ],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2778,11 +2702,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2797,7 +2721,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with initial file open, with specifying project file", () => {
@@ -2808,37 +2732,35 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: dependencyConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: dependencyConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: dependencyConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2846,11 +2768,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2868,7 +2790,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to dependency, without specifying project file", () => {
@@ -2879,7 +2801,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2888,7 +2810,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -2905,28 +2827,26 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [
               expectedAffectedFiles(usageConfig, emptyArray),
               expectedAffectedFiles(dependencyConfig, [dependencyTs]),
             ],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles(localChange);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -2934,11 +2854,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -2953,7 +2873,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to dependency, with specifying project file", () => {
@@ -2964,7 +2884,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -2973,7 +2893,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -2990,31 +2910,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: dependencyConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: dependencyConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: dependencyConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles(localChange);
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -3022,11 +2940,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3044,7 +2962,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to usage, without specifying project file", () => {
@@ -3055,7 +2973,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -3064,7 +2982,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -3081,28 +2999,26 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [
               expectedAffectedFiles(usageConfig, emptyArray),
               expectedAffectedFiles(dependencyConfig, [dependencyTs]),
             ],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -3110,11 +3026,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3129,7 +3045,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with local change to usage, with specifying project file", () => {
@@ -3140,7 +3056,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -3149,7 +3065,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -3166,31 +3082,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: dependencyConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: dependencyConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: dependencyConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -3198,11 +3112,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3220,7 +3134,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to dependency, without specifying project file", () => {
@@ -3231,7 +3145,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -3240,7 +3154,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -3257,43 +3171,41 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [
               expectedAffectedFiles(usageConfig, [usageTs]),
               expectedAffectedFiles(dependencyConfig, [dependencyTs]),
             ],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles(
             changeJs,
-            changeDts
+            changeDts,
           );
           assert.equal(host.writtenFiles.size, expectedFiles.length);
           for (const file of expectedFiles) {
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3308,7 +3220,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to dependency, with specifying project file", () => {
@@ -3319,7 +3231,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -3328,7 +3240,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(dependencyTs.content);
           const location = toLocation(dependencyTs.content.length);
@@ -3345,46 +3257,44 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: dependencyConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: dependencyConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: dependencyConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles(
             changeJs,
-            changeDts
+            changeDts,
           );
           assert.equal(host.writtenFiles.size, expectedFiles.length);
           for (const file of expectedFiles) {
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3402,7 +3312,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to usage, without specifying project file", () => {
@@ -3413,7 +3323,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -3422,7 +3332,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -3439,28 +3349,26 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: dependencyTs.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: dependencyTs.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(
             actualAffectedFiles,
             [
               expectedAffectedFiles(usageConfig, emptyArray),
               expectedAffectedFiles(dependencyConfig, [dependencyTs]),
             ],
-            "Affected files"
+            "Affected files",
           );
 
           // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: dependencyTs.path },
-            }).response;
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: dependencyTs.path },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -3468,11 +3376,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3487,7 +3395,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
         it("with change to usage, with specifying project file", () => {
@@ -3498,7 +3406,7 @@ ${appendDts}`,
               usageTs,
               usageConfig,
               libFile,
-            ])
+            ]),
           );
           const session = createSession(host);
           openFilesForSession([usageTs, dependencyTs], session);
@@ -3507,7 +3415,7 @@ ${appendDts}`,
             {
               command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: { file: dependencyTs.path },
-            }
+            },
           );
           const toLocation = protocolToLocation(usageTs.content);
           const location = toLocation(usageTs.content.length);
@@ -3524,31 +3432,29 @@ ${appendDts}`,
           host.writtenFiles.clear();
 
           // Verify CompileOnSaveAffectedFileList
-          const actualAffectedFiles =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: {
-                  file: dependencyTs.path,
-                  projectFileName: dependencyConfig.path,
-                },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
-          assert.deepEqual(
-            actualAffectedFiles,
-            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
-            "Affected files"
-          );
-
-          // Verify CompileOnSaveEmit
-          const actualEmit =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          const actualAffectedFiles = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
               arguments: {
                 file: dependencyTs.path,
                 projectFileName: dependencyConfig.path,
               },
-            }).response;
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          assert.deepEqual(
+            actualAffectedFiles,
+            [expectedAffectedFiles(dependencyConfig, [dependencyTs])],
+            "Affected files",
+          );
+
+          // Verify CompileOnSaveEmit
+          const actualEmit = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: {
+              file: dependencyTs.path,
+              projectFileName: dependencyConfig.path,
+            },
+          }).response;
           assert.isTrue(actualEmit, "Emit files");
           const expectedFiles = expectedDependencyEmitFiles();
           assert.equal(host.writtenFiles.size, expectedFiles.length);
@@ -3556,11 +3462,11 @@ ${appendDts}`,
             assert.equal(
               host.readFile(file.path),
               file.content,
-              `Expected to write ${file.path}`
+              `Expected to write ${file.path}`,
             );
             assert.isTrue(
               host.writtenFiles.has(file.path as Path),
-              `${file.path} is newly written`
+              `${file.path} is newly written`,
             );
           }
 
@@ -3578,7 +3484,7 @@ ${appendDts}`,
           assert.deepEqual(
             actualEmitOutput,
             expectedEmitOutput(expectedFiles),
-            "Emit output"
+            "Emit output",
           );
         });
       });
@@ -3654,7 +3560,7 @@ ${appendDts}`,
         ],
         {
           useCaseSensitiveFileNames: true,
-        }
+        },
       );
 
       // ts build should succeed

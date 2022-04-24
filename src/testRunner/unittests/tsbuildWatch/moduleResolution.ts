@@ -2,8 +2,7 @@ namespace ts.tscWatch {
   describe("unittests:: tsbuildWatch:: watchMode:: module resolution different in referenced project", () => {
     verifyTscWatch({
       scenario: "moduleResolutionCache",
-      subScenario:
-        "handles the cache correctly when two projects use different module resolution settings",
+      subScenario: "handles the cache correctly when two projects use different module resolution settings",
       sys: () =>
         createWatchedSystem(
           [
@@ -58,7 +57,7 @@ namespace ts.tscWatch {
             },
             libFile,
           ],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         ),
       commandLineArgs: ["--b", "-w", "-v"],
       changes: [
@@ -67,7 +66,7 @@ namespace ts.tscWatch {
           change: (sys) =>
             sys.appendFile(
               `${projectRoot}/project1/index.ts`,
-              "const bar = 10;"
+              "const bar = 10;",
             ),
           timeouts: (sys) => {
             sys.checkTimeoutQueueLengthAndRun(1); // build project1

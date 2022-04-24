@@ -13,7 +13,7 @@ namespace ts.codefix {
           program.getTypeChecker(),
           changes,
           getEmitScriptTarget(program.getCompilerOptions()),
-          getQuotePreference(sourceFile, preferences)
+          getQuotePreference(sourceFile, preferences),
         );
         if (moduleExportsChangedToDefault) {
           for (const importingFile of program.getSourceFiles()) {
@@ -21,7 +21,7 @@ namespace ts.codefix {
               importingFile,
               sourceFile,
               changes,
-              getQuotePreference(importingFile, preferences)
+              getQuotePreference(importingFile, preferences),
             );
           }
         }
@@ -31,7 +31,7 @@ namespace ts.codefix {
         createCodeFixActionWithoutFixAll(
           "convertToEsModule",
           changes,
-          Diagnostics.Convert_to_ES_module
+          Diagnostics.Convert_to_ES_module,
         ),
       ];
     },
@@ -41,13 +41,13 @@ namespace ts.codefix {
     importingFile: SourceFile,
     exportingFile: SourceFile,
     changes: textChanges.ChangeTracker,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ) {
     for (const moduleSpecifier of importingFile.imports) {
       const imported = getResolvedModule(
         importingFile,
         moduleSpecifier.text,
-        getModeForUsageLocation(importingFile, moduleSpecifier)
+        getModeForUsageLocation(importingFile, moduleSpecifier),
       );
       if (!imported || imported.resolvedFileName !== exportingFile.fileName) {
         continue;
@@ -63,15 +63,15 @@ namespace ts.codefix {
               importNode.name,
               /*namedImports*/ undefined,
               moduleSpecifier,
-              quotePreference
-            )
+              quotePreference,
+            ),
           );
           break;
         case SyntaxKind.CallExpression:
           if (
             isRequireCall(
               importNode,
-              /*checkArgumentIsStringLiteralLike*/ false
+              /*checkArgumentIsStringLiteralLike*/ false,
             )
           ) {
             changes.replaceNode(
@@ -79,8 +79,8 @@ namespace ts.codefix {
               importNode,
               factory.createPropertyAccessExpression(
                 getSynthesizedDeepClone(importNode),
-                "default"
-              )
+                "default",
+              ),
             );
           }
           break;
@@ -94,7 +94,7 @@ namespace ts.codefix {
     checker: TypeChecker,
     changes: textChanges.ChangeTracker,
     target: ScriptTarget,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ModuleExportsChanged {
     const identifiers: Identifiers = {
       original: collectFreeIdentifiers(sourceFile),
@@ -105,10 +105,12 @@ namespace ts.codefix {
     let moduleExportsChangedToDefault = false;
     let useSitesToUnqualify: ESMap<Node, Node> | undefined;
     // Process variable statements first to collect use sites that need to be updated inside other transformations
-    for (const statement of filter(
-      sourceFile.statements,
-      isVariableStatement
-    )) {
+    for (
+      const statement of filter(
+        sourceFile.statements,
+        isVariableStatement,
+      )
+    ) {
       const newUseSites = convertVariableStatement(
         sourceFile,
         statement,
@@ -116,17 +118,19 @@ namespace ts.codefix {
         checker,
         identifiers,
         target,
-        quotePreference
+        quotePreference,
       );
       if (newUseSites) {
-        copyEntries(newUseSites, (useSitesToUnqualify ??= new Map()));
+        copyEntries(newUseSites, useSitesToUnqualify ??= new Map());
       }
     }
     // `convertStatement` will delete entries from `useSitesToUnqualify` when containing statements are replaced
-    for (const statement of filter(
-      sourceFile.statements,
-      (s) => !isVariableStatement(s)
-    )) {
+    for (
+      const statement of filter(
+        sourceFile.statements,
+        (s) => !isVariableStatement(s),
+      )
+    ) {
       const moduleExportsChanged = convertStatement(
         sourceFile,
         statement,
@@ -136,10 +140,9 @@ namespace ts.codefix {
         target,
         exports,
         useSitesToUnqualify,
-        quotePreference
+        quotePreference,
       );
-      moduleExportsChangedToDefault =
-        moduleExportsChangedToDefault || moduleExportsChanged;
+      moduleExportsChangedToDefault = moduleExportsChangedToDefault || moduleExportsChanged;
     }
     // Remaining use sites can be changed directly
     useSitesToUnqualify?.forEach((replacement, original) => {
@@ -163,20 +166,20 @@ namespace ts.codefix {
   function collectExportRenames(
     sourceFile: SourceFile,
     checker: TypeChecker,
-    identifiers: Identifiers
+    identifiers: Identifiers,
   ): ExportRenames {
     const res = new Map<string, string>();
     forEachExportReference(sourceFile, (node) => {
       const { text, originalKeywordKind } = node.name;
       if (
-        !res.has(text) &&
-        ((originalKeywordKind !== undefined &&
-          isNonContextualKeyword(originalKeywordKind)) ||
-          checker.resolveName(
+        !res.has(text)
+        && ((originalKeywordKind !== undefined
+          && isNonContextualKeyword(originalKeywordKind))
+          || checker.resolveName(
             text,
             node,
             SymbolFlags.Value,
-            /*excludeGlobals*/ true
+            /*excludeGlobals*/ true,
           ))
       ) {
         // Unconditionally add an underscore in case `text` is a keyword.
@@ -189,7 +192,7 @@ namespace ts.codefix {
   function convertExportsAccesses(
     sourceFile: SourceFile,
     exports: ExportRenames,
-    changes: textChanges.ChangeTracker
+    changes: textChanges.ChangeTracker,
   ): void {
     forEachExportReference(sourceFile, (node, isAssignmentLhs) => {
       if (isAssignmentLhs) {
@@ -199,7 +202,7 @@ namespace ts.codefix {
       changes.replaceNode(
         sourceFile,
         node,
-        factory.createIdentifier(exports.get(text) || text)
+        factory.createIdentifier(exports.get(text) || text),
       );
     });
   }
@@ -208,21 +211,21 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     cb: (
       node: PropertyAccessExpression & { name: Identifier },
-      isAssignmentLhs: boolean
-    ) => void
+      isAssignmentLhs: boolean,
+    ) => void,
   ): void {
     sourceFile.forEachChild(function recur(node) {
       if (
-        isPropertyAccessExpression(node) &&
-        isExportsOrModuleExportsOrAlias(sourceFile, node.expression) &&
-        isIdentifier(node.name)
+        isPropertyAccessExpression(node)
+        && isExportsOrModuleExportsOrAlias(sourceFile, node.expression)
+        && isIdentifier(node.name)
       ) {
         const { parent } = node;
         cb(
           node as typeof node & { name: Identifier },
-          isBinaryExpression(parent) &&
-            parent.left === node &&
-            parent.operatorToken.kind === SyntaxKind.EqualsToken
+          isBinaryExpression(parent)
+            && parent.left === node
+            && parent.operatorToken.kind === SyntaxKind.EqualsToken,
         );
       }
       node.forEachChild(recur);
@@ -241,7 +244,7 @@ namespace ts.codefix {
     target: ScriptTarget,
     exports: ExportRenames,
     useSitesToUnqualify: ESMap<Node, Node> | undefined,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ModuleExportsChanged {
     switch (statement.kind) {
       case SyntaxKind.VariableStatement:
@@ -252,7 +255,7 @@ namespace ts.codefix {
           checker,
           identifiers,
           target,
-          quotePreference
+          quotePreference,
         );
         return false;
       case SyntaxKind.ExpressionStatement: {
@@ -262,7 +265,7 @@ namespace ts.codefix {
             if (
               isRequireCall(
                 expression,
-                /*checkArgumentIsStringLiteralLike*/ true
+                /*checkArgumentIsStringLiteralLike*/ true,
               )
             ) {
               // For side-effecting require() call, just make a side-effecting import.
@@ -273,8 +276,8 @@ namespace ts.codefix {
                   /*name*/ undefined,
                   /*namedImports*/ undefined,
                   expression.arguments[0],
-                  quotePreference
-                )
+                  quotePreference,
+                ),
               );
             }
             return false;
@@ -282,14 +285,14 @@ namespace ts.codefix {
           case SyntaxKind.BinaryExpression: {
             const { operatorToken } = expression as BinaryExpression;
             return (
-              operatorToken.kind === SyntaxKind.EqualsToken &&
-              convertAssignment(
+              operatorToken.kind === SyntaxKind.EqualsToken
+              && convertAssignment(
                 sourceFile,
                 checker,
                 expression as BinaryExpression,
                 changes,
                 exports,
-                useSitesToUnqualify
+                useSitesToUnqualify,
               )
             );
           }
@@ -308,7 +311,7 @@ namespace ts.codefix {
     checker: TypeChecker,
     identifiers: Identifiers,
     target: ScriptTarget,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ESMap<Node, Node> | undefined {
     const { declarationList } = statement;
     let foundImport = false;
@@ -329,13 +332,13 @@ namespace ts.codefix {
             checker,
             identifiers,
             target,
-            quotePreference
+            quotePreference,
           );
         } else if (
-          isPropertyAccessExpression(initializer) &&
-          isRequireCall(
+          isPropertyAccessExpression(initializer)
+          && isRequireCall(
             initializer.expression,
-            /*checkArgumentIsStringLiteralLike*/ true
+            /*checkArgumentIsStringLiteralLike*/ true,
           )
         ) {
           foundImport = true;
@@ -344,7 +347,7 @@ namespace ts.codefix {
             initializer.name.text,
             initializer.expression.arguments[0],
             identifiers,
-            quotePreference
+            quotePreference,
           );
         }
       }
@@ -352,7 +355,7 @@ namespace ts.codefix {
       return convertedImports([
         factory.createVariableStatement(
           /*modifiers*/ undefined,
-          factory.createVariableDeclarationList([decl], declarationList.flags)
+          factory.createVariableDeclarationList([decl], declarationList.flags),
         ),
       ]);
     });
@@ -361,12 +364,12 @@ namespace ts.codefix {
       changes.replaceNodeWithNodes(
         sourceFile,
         statement,
-        flatMap(converted, (c) => c.newImports)
+        flatMap(converted, (c) => c.newImports),
       );
       let combinedUseSites: ESMap<Node, Node> | undefined;
       forEach(converted, (c) => {
         if (c.useSitesToUnqualify) {
-          copyEntries(c.useSitesToUnqualify, (combinedUseSites ??= new Map()));
+          copyEntries(c.useSitesToUnqualify, combinedUseSites ??= new Map());
         }
       });
 
@@ -380,7 +383,7 @@ namespace ts.codefix {
     propertyName: string,
     moduleSpecifier: StringLiteralLike,
     identifiers: Identifiers,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ConvertedImports {
     switch (name.kind) {
       case SyntaxKind.ObjectBindingPattern:
@@ -392,7 +395,7 @@ namespace ts.codefix {
           makeConst(
             /*modifiers*/ undefined,
             name,
-            factory.createIdentifier(tmp)
+            factory.createIdentifier(tmp),
           ),
         ]);
       }
@@ -403,15 +406,13 @@ namespace ts.codefix {
             name.text,
             propertyName,
             moduleSpecifier,
-            quotePreference
+            quotePreference,
           ),
         ]);
       default:
         return Debug.assertNever(
           name,
-          `Convert to ES module got invalid syntax form ${
-            (name as BindingName).kind
-          }`
+          `Convert to ES module got invalid syntax form ${(name as BindingName).kind}`,
         );
     }
   }
@@ -422,7 +423,7 @@ namespace ts.codefix {
     assignment: BinaryExpression,
     changes: textChanges.ChangeTracker,
     exports: ExportRenames,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): ModuleExportsChanged {
     const { left, right } = assignment;
     if (!isPropertyAccessExpression(left)) {
@@ -443,14 +444,14 @@ namespace ts.codefix {
           changes.replaceNodeWithNodes(
             sourceFile,
             assignment.parent,
-            replacement[0]
+            replacement[0],
           );
           return replacement[1];
         } else {
           changes.replaceRangeWithText(
             sourceFile,
             createRange(left.getStart(sourceFile), right.pos),
-            "export default"
+            "export default",
           );
           return true;
         }
@@ -460,7 +461,7 @@ namespace ts.codefix {
         sourceFile,
         assignment as BinaryExpression & { left: PropertyAccessExpression },
         changes,
-        exports
+        exports,
       );
     }
 
@@ -473,7 +474,7 @@ namespace ts.codefix {
    */
   function tryChangeModuleExportsObject(
     object: ObjectLiteralExpression,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): [readonly Statement[], ModuleExportsChanged] | undefined {
     const statements = mapAllOrFail(object.properties, (prop) => {
       switch (prop.kind) {
@@ -488,25 +489,23 @@ namespace ts.codefix {
           return !isIdentifier(prop.name)
             ? undefined
             : convertExportsDotXEquals_replaceNode(
-                prop.name.text,
-                prop.initializer,
-                useSitesToUnqualify
-              );
+              prop.name.text,
+              prop.initializer,
+              useSitesToUnqualify,
+            );
         case SyntaxKind.MethodDeclaration:
           return !isIdentifier(prop.name)
             ? undefined
             : functionExpressionToDeclaration(
-                prop.name.text,
-                [factory.createToken(SyntaxKind.ExportKeyword)],
-                prop,
-                useSitesToUnqualify
-              );
+              prop.name.text,
+              [factory.createToken(SyntaxKind.ExportKeyword)],
+              prop,
+              useSitesToUnqualify,
+            );
         default:
           Debug.assertNever(
             prop,
-            `Convert to ES6 got invalid prop kind ${
-              (prop as ObjectLiteralElementLike).kind
-            }`
+            `Convert to ES6 got invalid prop kind ${(prop as ObjectLiteralElementLike).kind}`,
           );
       }
     });
@@ -517,7 +516,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     assignment: BinaryExpression & { left: PropertyAccessExpression },
     changes: textChanges.ChangeTracker,
-    exports: ExportRenames
+    exports: ExportRenames,
   ): void {
     // If "originalKeywordKind" was set, this is e.g. `exports.
     const { text } = assignment.left.name;
@@ -541,7 +540,7 @@ namespace ts.codefix {
 
   function convertReExportAll(
     reExported: StringLiteralLike,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): [readonly Statement[], ModuleExportsChanged] {
     // `module.exports = require("x");` ==> `export * from "x"; export { default } from "x";`
     const moduleSpecifier = reExported.text;
@@ -554,12 +553,12 @@ namespace ts.codefix {
       : !exports.has(InternalSymbolName.Default)
       ? [[reExportStar(moduleSpecifier)], false]
       : // If there's some non-default export, must include both `export *` and `export default`.
-      exports.size > 1
-      ? [
+        exports.size > 1
+        ? [
           [reExportStar(moduleSpecifier), reExportDefault(moduleSpecifier)],
           true,
         ]
-      : [[reExportDefault(moduleSpecifier)], true];
+        : [[reExportDefault(moduleSpecifier)], true];
   }
   function reExportStar(moduleSpecifier: string): ExportDeclaration {
     return makeExportDeclaration(/*exportClause*/ undefined, moduleSpecifier);
@@ -570,10 +569,10 @@ namespace ts.codefix {
         factory.createExportSpecifier(
           /*isTypeOnly*/ false,
           /*propertyName*/ undefined,
-          "default"
+          "default",
         ),
       ],
-      moduleSpecifier
+      moduleSpecifier,
     );
   }
 
@@ -584,21 +583,21 @@ namespace ts.codefix {
       parent,
     }: BinaryExpression & { left: PropertyAccessExpression },
     sourceFile: SourceFile,
-    changes: textChanges.ChangeTracker
+    changes: textChanges.ChangeTracker,
   ): void {
     const name = left.name.text;
     if (
-      (isFunctionExpression(right) ||
-        isArrowFunction(right) ||
-        isClassExpression(right)) &&
-      (!right.name || right.name.text === name)
+      (isFunctionExpression(right)
+        || isArrowFunction(right)
+        || isClassExpression(right))
+      && (!right.name || right.name.text === name)
     ) {
       // `exports.f = function() {}` -> `export function f() {}` -- Replace `exports.f = ` with `export `, and insert the name after `function`.
       changes.replaceRange(
         sourceFile,
         { pos: left.getStart(sourceFile), end: right.getStart(sourceFile) },
         factory.createToken(SyntaxKind.ExportKeyword),
-        { suffix: " " }
+        { suffix: " " },
       );
 
       if (!right.name) changes.insertName(sourceFile, right, name);
@@ -606,7 +605,7 @@ namespace ts.codefix {
       const semi = findChildOfKind(
         parent,
         SyntaxKind.SemicolonToken,
-        sourceFile
+        sourceFile,
       );
       if (semi) changes.delete(sourceFile, semi);
     } else {
@@ -619,7 +618,7 @@ namespace ts.codefix {
           factory.createToken(SyntaxKind.ExportKeyword),
           factory.createToken(SyntaxKind.ConstKeyword),
         ],
-        { joiner: " ", suffix: " " }
+        { joiner: " ", suffix: " " },
       );
     }
   }
@@ -628,7 +627,7 @@ namespace ts.codefix {
   function convertExportsDotXEquals_replaceNode(
     name: string | undefined,
     exported: Expression,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): Statement {
     const modifiers = [factory.createToken(SyntaxKind.ExportKeyword)];
     switch (exported.kind) {
@@ -641,13 +640,14 @@ namespace ts.codefix {
       }
 
       // falls through
+
       case SyntaxKind.ArrowFunction:
         // `exports.f = function() {}` --> `export function f() {}`
         return functionExpressionToDeclaration(
           name,
           modifiers,
           exported as FunctionExpression | ArrowFunction,
-          useSitesToUnqualify
+          useSitesToUnqualify,
         );
       case SyntaxKind.ClassExpression:
         // `exports.C = class {}` --> `export class C {}`
@@ -655,7 +655,7 @@ namespace ts.codefix {
           name,
           modifiers,
           exported as ClassExpression,
-          useSitesToUnqualify
+          useSitesToUnqualify,
         );
       default:
         return exportConst();
@@ -666,43 +666,41 @@ namespace ts.codefix {
       return makeConst(
         modifiers,
         factory.createIdentifier(name!),
-        replaceImportUseSites(exported, useSitesToUnqualify)
+        replaceImportUseSites(exported, useSitesToUnqualify),
       ); // TODO: GH#18217
     }
   }
 
   function replaceImportUseSites<T extends Node>(
     node: T,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): T;
   function replaceImportUseSites<T extends Node>(
     nodes: NodeArray<T>,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): NodeArray<T>;
   function replaceImportUseSites<T extends Node>(
     nodeOrNodes: T | NodeArray<T>,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ) {
     if (
-      !useSitesToUnqualify ||
-      !some(arrayFrom(useSitesToUnqualify.keys()), (original) =>
-        rangeContainsRange(nodeOrNodes, original)
-      )
+      !useSitesToUnqualify
+      || !some(arrayFrom(useSitesToUnqualify.keys()), (original) => rangeContainsRange(nodeOrNodes, original))
     ) {
       return nodeOrNodes;
     }
 
     return isArray(nodeOrNodes)
       ? getSynthesizedDeepClonesWithReplacements(
-          nodeOrNodes,
-          /*includeTrivia*/ true,
-          replaceNode
-        )
+        nodeOrNodes,
+        /*includeTrivia*/ true,
+        replaceNode,
+      )
       : getSynthesizedDeepCloneWithReplacements(
-          nodeOrNodes,
-          /*includeTrivia*/ true,
-          replaceNode
-        );
+        nodeOrNodes,
+        /*includeTrivia*/ true,
+        replaceNode,
+      );
 
     function replaceNode(original: Node) {
       // We are replacing `mod.SomeExport` wih `SomeExport`, so we only need to look at PropertyAccessExpressions
@@ -726,28 +724,27 @@ namespace ts.codefix {
     checker: TypeChecker,
     identifiers: Identifiers,
     target: ScriptTarget,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ConvertedImports {
     switch (name.kind) {
       case SyntaxKind.ObjectBindingPattern: {
         const importSpecifiers = mapAllOrFail(name.elements, (e) =>
-          e.dotDotDotToken ||
-          e.initializer ||
-          (e.propertyName && !isIdentifier(e.propertyName)) ||
-          !isIdentifier(e.name)
+          e.dotDotDotToken
+            || e.initializer
+            || (e.propertyName && !isIdentifier(e.propertyName))
+            || !isIdentifier(e.name)
             ? undefined
             : makeImportSpecifier(
-                e.propertyName && e.propertyName.text,
-                e.name.text
-              )
-        );
+              e.propertyName && e.propertyName.text,
+              e.name.text,
+            ));
         if (importSpecifiers) {
           return convertedImports([
             makeImport(
               /*name*/ undefined,
               importSpecifiers,
               moduleSpecifier,
-              quotePreference
+              quotePreference,
             ),
           ]);
         }
@@ -760,19 +757,19 @@ namespace ts.codefix {
                 */
         const tmp = makeUniqueName(
           moduleSpecifierToValidIdentifier(moduleSpecifier.text, target),
-          identifiers
+          identifiers,
         );
         return convertedImports([
           makeImport(
             factory.createIdentifier(tmp),
             /*namedImports*/ undefined,
             moduleSpecifier,
-            quotePreference
+            quotePreference,
           ),
           makeConst(
             /*modifiers*/ undefined,
             getSynthesizedDeepClone(name),
-            factory.createIdentifier(tmp)
+            factory.createIdentifier(tmp),
           ),
         ]);
       }
@@ -782,14 +779,12 @@ namespace ts.codefix {
           moduleSpecifier,
           checker,
           identifiers,
-          quotePreference
+          quotePreference,
         );
       default:
         return Debug.assertNever(
           name,
-          `Convert to ES module got invalid name kind ${
-            (name as BindingName).kind
-          }`
+          `Convert to ES module got invalid name kind ${(name as BindingName).kind}`,
         );
     }
   }
@@ -805,7 +800,7 @@ namespace ts.codefix {
     moduleSpecifier: StringLiteralLike,
     checker: TypeChecker,
     identifiers: Identifiers,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ConvertedImports {
     const nameSymbol = checker.getSymbolAtLocation(name);
     // Maps from module property name to name actually used. (The same if there isn't shadowing.)
@@ -831,12 +826,12 @@ namespace ts.codefix {
           const importDefaultName = use.getText();
           (useSitesToUnqualify ??= new Map()).set(
             parent,
-            factory.createIdentifier(importDefaultName)
+            factory.createIdentifier(importDefaultName),
           );
         } else {
           Debug.assert(
             parent.expression === use,
-            "Didn't expect expression === use"
+            "Didn't expect expression === use",
           ); // Else shouldn't have been in `collectIdentifiers`
           let idName = namedBindingsNames.get(propertyName);
           if (idName === undefined) {
@@ -846,7 +841,7 @@ namespace ts.codefix {
 
           (useSitesToUnqualify ??= new Map()).set(
             parent,
-            factory.createIdentifier(idName)
+            factory.createIdentifier(idName),
           );
         }
       } else {
@@ -854,22 +849,21 @@ namespace ts.codefix {
       }
     }
 
-    const namedBindings =
-      namedBindingsNames.size === 0
-        ? undefined
-        : arrayFrom(
-            mapIterator(
-              namedBindingsNames.entries(),
-              ([propertyName, idName]) =>
-                factory.createImportSpecifier(
-                  /*isTypeOnly*/ false,
-                  propertyName === idName
-                    ? undefined
-                    : factory.createIdentifier(propertyName),
-                  factory.createIdentifier(idName)
-                )
-            )
-          );
+    const namedBindings = namedBindingsNames.size === 0
+      ? undefined
+      : arrayFrom(
+        mapIterator(
+          namedBindingsNames.entries(),
+          ([propertyName, idName]) =>
+            factory.createImportSpecifier(
+              /*isTypeOnly*/ false,
+              propertyName === idName
+                ? undefined
+                : factory.createIdentifier(propertyName),
+              factory.createIdentifier(idName),
+            ),
+        ),
+      );
     if (!namedBindings) {
       // If it was unused, ensure that we at least import *something*.
       needDefaultImport = true;
@@ -880,10 +874,10 @@ namespace ts.codefix {
           needDefaultImport ? getSynthesizedDeepClone(name) : undefined,
           namedBindings,
           moduleSpecifier,
-          quotePreference
+          quotePreference,
         ),
       ],
-      useSitesToUnqualify
+      useSitesToUnqualify,
     );
   }
 
@@ -921,7 +915,7 @@ namespace ts.codefix {
    */
   function forEachFreeIdentifier(
     node: Node,
-    cb: (id: Identifier) => void
+    cb: (id: Identifier) => void,
   ): void {
     if (isIdentifier(node) && isFreeIdentifier(node)) cb(node);
     node.forEachChild((child) => forEachFreeIdentifier(child, cb));
@@ -947,7 +941,7 @@ namespace ts.codefix {
     name: string | undefined,
     additionalModifiers: readonly Modifier[],
     fn: FunctionExpression | ArrowFunction | MethodDeclaration,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): FunctionDeclaration {
     return factory.createFunctionDeclaration(
       getSynthesizedDeepClones(fn.decorators), // TODO: GH#19915 Don't think this is even legal.
@@ -958,8 +952,8 @@ namespace ts.codefix {
       getSynthesizedDeepClones(fn.parameters),
       getSynthesizedDeepClone(fn.type),
       factory.converters.convertToFunctionBlock(
-        replaceImportUseSites(fn.body!, useSitesToUnqualify)
-      )
+        replaceImportUseSites(fn.body!, useSitesToUnqualify),
+      ),
     );
   }
 
@@ -967,7 +961,7 @@ namespace ts.codefix {
     name: string | undefined,
     additionalModifiers: readonly Modifier[],
     cls: ClassExpression,
-    useSitesToUnqualify: ESMap<Node, Node> | undefined
+    useSitesToUnqualify: ESMap<Node, Node> | undefined,
   ): ClassDeclaration {
     return factory.createClassDeclaration(
       getSynthesizedDeepClones(cls.decorators), // TODO: GH#19915 Don't think this is even legal.
@@ -975,7 +969,7 @@ namespace ts.codefix {
       name,
       getSynthesizedDeepClones(cls.typeParameters),
       getSynthesizedDeepClones(cls.heritageClauses),
-      replaceImportUseSites(cls.members, useSitesToUnqualify)
+      replaceImportUseSites(cls.members, useSitesToUnqualify),
     );
   }
 
@@ -983,40 +977,40 @@ namespace ts.codefix {
     localName: string,
     propertyName: string,
     moduleSpecifier: StringLiteralLike,
-    quotePreference: QuotePreference
+    quotePreference: QuotePreference,
   ): ImportDeclaration {
     return propertyName === "default"
       ? makeImport(
-          factory.createIdentifier(localName),
-          /*namedImports*/ undefined,
-          moduleSpecifier,
-          quotePreference
-        )
+        factory.createIdentifier(localName),
+        /*namedImports*/ undefined,
+        moduleSpecifier,
+        quotePreference,
+      )
       : makeImport(
-          /*name*/ undefined,
-          [makeImportSpecifier(propertyName, localName)],
-          moduleSpecifier,
-          quotePreference
-        );
+        /*name*/ undefined,
+        [makeImportSpecifier(propertyName, localName)],
+        moduleSpecifier,
+        quotePreference,
+      );
   }
 
   function makeImportSpecifier(
     propertyName: string | undefined,
-    name: string
+    name: string,
   ): ImportSpecifier {
     return factory.createImportSpecifier(
       /*isTypeOnly*/ false,
       propertyName !== undefined && propertyName !== name
         ? factory.createIdentifier(propertyName)
         : undefined,
-      factory.createIdentifier(name)
+      factory.createIdentifier(name),
     );
   }
 
   function makeConst(
     modifiers: readonly Modifier[] | undefined,
     name: string | BindingName,
-    init: Expression
+    init: Expression,
   ): VariableStatement {
     return factory.createVariableStatement(
       modifiers,
@@ -1026,17 +1020,17 @@ namespace ts.codefix {
             name,
             /*exclamationToken*/ undefined,
             /*type*/ undefined,
-            init
+            init,
           ),
         ],
-        NodeFlags.Const
-      )
+        NodeFlags.Const,
+      ),
     );
   }
 
   function makeExportDeclaration(
     exportSpecifiers: ExportSpecifier[] | undefined,
-    moduleSpecifier?: string
+    moduleSpecifier?: string,
   ): ExportDeclaration {
     return factory.createExportDeclaration(
       /*decorators*/ undefined,
@@ -1045,7 +1039,7 @@ namespace ts.codefix {
       exportSpecifiers && factory.createNamedExports(exportSpecifiers),
       moduleSpecifier === undefined
         ? undefined
-        : factory.createStringLiteral(moduleSpecifier)
+        : factory.createStringLiteral(moduleSpecifier),
     );
   }
 
@@ -1056,7 +1050,7 @@ namespace ts.codefix {
 
   function convertedImports(
     newImports: readonly Node[],
-    useSitesToUnqualify?: ESMap<Node, Node>
+    useSitesToUnqualify?: ESMap<Node, Node>,
   ): ConvertedImports {
     return {
       newImports,

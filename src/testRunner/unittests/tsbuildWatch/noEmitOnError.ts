@@ -6,7 +6,7 @@ namespace ts.tscWatch {
         change: (sys) =>
           sys.writeFile(
             `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`,
-            content
+            content,
           ),
         // build project
         timeouts: checkSingleTimeoutQueueLengthAndRunAndVerifyNoTimeout,
@@ -19,8 +19,8 @@ namespace ts.tscWatch {
         sys.writeFile(
           `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`,
           sys.readFile(
-            `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`
-          )!
+            `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`,
+          )!,
         ),
       // build project
       timeouts: checkSingleTimeoutQueueLengthAndRunAndVerifyNoTimeout,
@@ -37,14 +37,12 @@ namespace ts.tscWatch {
               "shared/types/db.ts",
               "src/main.ts",
               "src/other.ts",
-            ].map((f) =>
-              TestFSWithWatch.getTsBuildProjectFile("noEmitOnError", f)
-            ),
+            ].map((f) => TestFSWithWatch.getTsBuildProjectFile("noEmitOnError", f)),
             { path: libFile.path, content: libContent },
           ],
           {
             currentDirectory: `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError`,
-          }
+          },
         ),
       changes: [
         noChange,
@@ -53,18 +51,18 @@ namespace ts.tscWatch {
           `import { A } from "../shared/types/db";
 const a = {
     lastName: 'sdsd'
-};`
+};`,
         ),
         change(
           "Semantic Error",
           `import { A } from "../shared/types/db";
-const a: string = 10;`
+const a: string = 10;`,
         ),
         noChange,
         change(
           "Fix Semantic Error",
           `import { A } from "../shared/types/db";
-const a: string = "hello";`
+const a: string = "hello";`,
         ),
         noChange,
       ],

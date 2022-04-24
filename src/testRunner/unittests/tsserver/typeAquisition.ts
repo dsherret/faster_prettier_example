@@ -24,11 +24,10 @@ namespace ts.projectSystem {
         options: {},
       });
       projectService.checkNumberOfProjects({ externalProjects: 1 });
-      const typeAcquisition =
-        projectService.externalProjects[0].getTypeAcquisition();
+      const typeAcquisition = projectService.externalProjects[0].getTypeAcquisition();
       assert.isTrue(
         typeAcquisition.enable,
-        "Typine acquisition should be enabled"
+        "Typine acquisition should be enabled",
       );
     });
   });
@@ -60,7 +59,7 @@ namespace ts.projectSystem {
         typingsInstaller: new TestTypingsInstaller(
           typingsCacheLocation,
           /*throttleLimit*/ 5,
-          host
+          host,
         ),
       });
 

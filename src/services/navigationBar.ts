@@ -54,14 +54,14 @@ namespace ts.NavigationBar {
 
   export function getNavigationBarItems(
     sourceFile: SourceFile,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): NavigationBarItem[] {
     curCancellationToken = cancellationToken;
     curSourceFile = sourceFile;
     try {
       return map(
         primaryNavBarMenuItems(rootNavigationBarNode(sourceFile)),
-        convertToPrimaryNavBarMenuItem
+        convertToPrimaryNavBarMenuItem,
       );
     } finally {
       reset();
@@ -70,7 +70,7 @@ namespace ts.NavigationBar {
 
   export function getNavigationTree(
     sourceFile: SourceFile,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): NavigationTree {
     curCancellationToken = cancellationToken;
     curSourceFile = sourceFile;
@@ -99,7 +99,7 @@ namespace ts.NavigationBar {
 
   function pushChild(
     parent: NavigationBarNode,
-    child: NavigationBarNode
+    child: NavigationBarNode,
   ): void {
     if (parent.children) {
       parent.children.push(child);
@@ -133,13 +133,12 @@ namespace ts.NavigationBar {
 
   function emptyNavigationBarNode(
     node: Node,
-    name?: DeclarationName
+    name?: DeclarationName,
   ): NavigationBarNode {
     return {
       node,
-      name:
-        name ||
-        (isDeclaration(node) || isExpression(node)
+      name: name
+        || (isDeclaration(node) || isExpression(node)
           ? getNameOfDeclaration(node)
           : undefined),
       additionalNodes: undefined,
@@ -160,7 +159,7 @@ namespace ts.NavigationBar {
   }
   function startNestedNodes(
     targetNode: Node,
-    entityName: BindableStaticNameExpression
+    entityName: BindableStaticNameExpression,
   ) {
     const names: PropertyNameLiteral[] = [];
     while (!isPropertyNameLiteral(entityName)) {
@@ -206,7 +205,7 @@ namespace ts.NavigationBar {
   function addNodeWithRecursiveChild(
     node: Node,
     child: Node | undefined,
-    name?: DeclarationName
+    name?: DeclarationName,
   ): void {
     startNode(node, name);
     addChildrenRecursively(child);
@@ -218,7 +217,7 @@ namespace ts.NavigationBar {
       | VariableDeclaration
       | PropertyAssignment
       | BindingElement
-      | PropertyDeclaration
+      | PropertyDeclaration,
   ): void {
     if (node.initializer && isFunctionOrClassExpression(node.initializer)) {
       startNode(node);
@@ -236,11 +235,11 @@ namespace ts.NavigationBar {
    */
   function hasNavigationBarName(node: Declaration) {
     return (
-      !hasDynamicName(node) ||
-      (node.kind !== SyntaxKind.BinaryExpression &&
-        isPropertyAccessExpression(node.name.expression) &&
-        isIdentifier(node.name.expression.expression) &&
-        idText(node.name.expression.expression) === "Symbol")
+      !hasDynamicName(node)
+      || (node.kind !== SyntaxKind.BinaryExpression
+        && isPropertyAccessExpression(node.name.expression)
+        && isIdentifier(node.name.expression.expression)
+        && idText(node.name.expression.expression) === "Symbol")
     );
   }
 
@@ -273,7 +272,7 @@ namespace ts.NavigationBar {
         if (hasNavigationBarName(node as ClassElement | TypeElement)) {
           addNodeWithRecursiveChild(
             node,
-            (node as FunctionLikeDeclaration).body
+            (node as FunctionLikeDeclaration).body,
           );
         }
         break;
@@ -315,7 +314,7 @@ namespace ts.NavigationBar {
       case SyntaxKind.ShorthandPropertyAssignment:
         addNodeWithRecursiveChild(
           node,
-          (node as ShorthandPropertyAssignment).name
+          (node as ShorthandPropertyAssignment).name,
         );
         break;
       case SyntaxKind.SpreadAssignment:
@@ -375,18 +374,17 @@ namespace ts.NavigationBar {
       case SyntaxKind.ModuleDeclaration:
         addNodeWithRecursiveChild(
           node,
-          getInteriorModule(node as ModuleDeclaration).body
+          getInteriorModule(node as ModuleDeclaration).body,
         );
         break;
 
       case SyntaxKind.ExportAssignment: {
         const expression = (node as ExportAssignment).expression;
-        const child =
-          isObjectLiteralExpression(expression) || isCallExpression(expression)
-            ? expression
-            : isArrowFunction(expression) || isFunctionExpression(expression)
-            ? expression.body
-            : undefined;
+        const child = isObjectLiteralExpression(expression) || isCallExpression(expression)
+          ? expression
+          : isArrowFunction(expression) || isFunctionExpression(expression)
+          ? expression.body
+          : undefined;
         if (child) {
           startNode(node);
           addChildrenRecursively(child);
@@ -416,13 +414,11 @@ namespace ts.NavigationBar {
           case AssignmentDeclarationKind.Prototype:
           case AssignmentDeclarationKind.PrototypeProperty: {
             const binaryExpression = node as BinaryExpression;
-            const assignmentTarget =
-              binaryExpression.left as PropertyAccessExpression;
+            const assignmentTarget = binaryExpression.left as PropertyAccessExpression;
 
-            const prototypeAccess =
-              special === AssignmentDeclarationKind.PrototypeProperty
-                ? (assignmentTarget.expression as PropertyAccessExpression)
-                : assignmentTarget;
+            const prototypeAccess = special === AssignmentDeclarationKind.PrototypeProperty
+              ? (assignmentTarget.expression as PropertyAccessExpression)
+              : assignmentTarget;
 
             let depth = 0;
             let className: PropertyNameLiteral;
@@ -434,7 +430,7 @@ namespace ts.NavigationBar {
             } else {
               [depth, className] = startNestedNodes(
                 binaryExpression,
-                prototypeAccess.expression as EntityNameExpression
+                prototypeAccess.expression as EntityNameExpression,
               );
             }
             if (special === AssignmentDeclarationKind.Prototype) {
@@ -446,20 +442,20 @@ namespace ts.NavigationBar {
                 }
               }
             } else if (
-              isFunctionExpression(binaryExpression.right) ||
-              isArrowFunction(binaryExpression.right)
+              isFunctionExpression(binaryExpression.right)
+              || isArrowFunction(binaryExpression.right)
             ) {
               addNodeWithRecursiveChild(
                 node,
                 binaryExpression.right,
-                className
+                className,
               );
             } else {
               startNode(binaryExpression, className);
               addNodeWithRecursiveChild(
                 node,
                 binaryExpression.right,
-                assignmentTarget.name
+                assignmentTarget.name,
               );
               endNode();
             }
@@ -469,24 +465,23 @@ namespace ts.NavigationBar {
           case AssignmentDeclarationKind.ObjectDefinePropertyValue:
           case AssignmentDeclarationKind.ObjectDefinePrototypeProperty: {
             const defineCall = node as BindableObjectDefinePropertyCall;
-            const className =
-              special === AssignmentDeclarationKind.ObjectDefinePropertyValue
-                ? defineCall.arguments[0]
-                : ((defineCall.arguments[0] as PropertyAccessExpression)
-                    .expression as EntityNameExpression);
+            const className = special === AssignmentDeclarationKind.ObjectDefinePropertyValue
+              ? defineCall.arguments[0]
+              : ((defineCall.arguments[0] as PropertyAccessExpression)
+                .expression as EntityNameExpression);
 
             const memberName = defineCall.arguments[1];
             const [depth, classNameIdentifier] = startNestedNodes(
               node,
-              className
+              className,
             );
             startNode(node, classNameIdentifier);
             startNode(
               node,
               setTextRange(
                 factory.createIdentifier(memberName.text),
-                memberName
-              )
+                memberName,
+              ),
             );
             addChildrenRecursively((node as CallExpression).arguments[2]);
             endNode();
@@ -501,27 +496,27 @@ namespace ts.NavigationBar {
               | BindableElementAccessExpression;
             const targetFunction = assignmentTarget.expression;
             if (
-              isIdentifier(targetFunction) &&
-              getElementOrPropertyAccessName(assignmentTarget) !==
-                "prototype" &&
-              trackedEs5Classes &&
-              trackedEs5Classes.has(targetFunction.text)
+              isIdentifier(targetFunction)
+              && getElementOrPropertyAccessName(assignmentTarget)
+                !== "prototype"
+              && trackedEs5Classes
+              && trackedEs5Classes.has(targetFunction.text)
             ) {
               if (
-                isFunctionExpression(binaryExpression.right) ||
-                isArrowFunction(binaryExpression.right)
+                isFunctionExpression(binaryExpression.right)
+                || isArrowFunction(binaryExpression.right)
               ) {
                 addNodeWithRecursiveChild(
                   node,
                   binaryExpression.right,
-                  targetFunction
+                  targetFunction,
                 );
               } else if (isBindableStaticAccessExpression(assignmentTarget)) {
                 startNode(binaryExpression, targetFunction);
                 addNodeWithRecursiveChild(
                   binaryExpression.left,
                   binaryExpression.right,
-                  getNameOrArgument(assignmentTarget)
+                  getNameOrArgument(assignmentTarget),
                 );
                 endNode();
               }
@@ -538,7 +533,6 @@ namespace ts.NavigationBar {
         }
       }
       // falls through
-
       default:
         if (hasJSDocNodes(node)) {
           forEach(node.jsDoc, (jsDoc) => {
@@ -557,15 +551,14 @@ namespace ts.NavigationBar {
   /** Merge declarations of the same kind. */
   function mergeChildren(
     children: NavigationBarNode[],
-    node: NavigationBarNode
+    node: NavigationBarNode,
   ): void {
     const nameToItems = new Map<
       string,
       NavigationBarNode | NavigationBarNode[]
     >();
     filterMutate(children, (child, index) => {
-      const declName =
-        child.name || getNameOfDeclaration(child.node as Declaration);
+      const declName = child.name || getNameOfDeclaration(child.node as Declaration);
       const name = declName && nodeText(declName);
       if (!name) {
         // Anonymous items are never merged.
@@ -612,52 +605,56 @@ namespace ts.NavigationBar {
     a: NavigationBarNode,
     b: NavigationBarNode,
     bIndex: number,
-    parent: NavigationBarNode
+    parent: NavigationBarNode,
   ): boolean | undefined {
     function isPossibleConstructor(node: Node) {
       return (
-        isFunctionExpression(node) ||
-        isFunctionDeclaration(node) ||
-        isVariableDeclaration(node)
+        isFunctionExpression(node)
+        || isFunctionDeclaration(node)
+        || isVariableDeclaration(node)
       );
     }
-    const bAssignmentDeclarationKind =
-      isBinaryExpression(b.node) || isCallExpression(b.node)
-        ? getAssignmentDeclarationKind(b.node)
-        : AssignmentDeclarationKind.None;
+    const bAssignmentDeclarationKind = isBinaryExpression(b.node) || isCallExpression(b.node)
+      ? getAssignmentDeclarationKind(b.node)
+      : AssignmentDeclarationKind.None;
 
-    const aAssignmentDeclarationKind =
-      isBinaryExpression(a.node) || isCallExpression(a.node)
-        ? getAssignmentDeclarationKind(a.node)
-        : AssignmentDeclarationKind.None;
+    const aAssignmentDeclarationKind = isBinaryExpression(a.node) || isCallExpression(a.node)
+      ? getAssignmentDeclarationKind(a.node)
+      : AssignmentDeclarationKind.None;
 
     // We treat this as an es5 class and merge the nodes in in one of several cases
     if (
-      (isEs5ClassMember[bAssignmentDeclarationKind] &&
-        isEs5ClassMember[aAssignmentDeclarationKind]) || // merge two class elements
-      (isPossibleConstructor(a.node) &&
-        isEs5ClassMember[bAssignmentDeclarationKind]) || // ctor function & member
-      (isPossibleConstructor(b.node) &&
-        isEs5ClassMember[aAssignmentDeclarationKind]) || // member & ctor function
-      (isClassDeclaration(a.node) &&
-        isSynthesized(a.node) &&
-        isEs5ClassMember[bAssignmentDeclarationKind]) || // class (generated) & member
-      (isClassDeclaration(b.node) &&
-        isEs5ClassMember[aAssignmentDeclarationKind]) || // member & class (generated)
-      (isClassDeclaration(a.node) &&
-        isSynthesized(a.node) &&
-        isPossibleConstructor(b.node)) || // class (generated) & ctor
-      (isClassDeclaration(b.node) &&
-        isPossibleConstructor(a.node) &&
-        isSynthesized(a.node)) // ctor & class (generated)
+      (isEs5ClassMember[bAssignmentDeclarationKind]
+        && isEs5ClassMember[aAssignmentDeclarationKind])
+      // merge two class elements
+      || (isPossibleConstructor(a.node)
+        && isEs5ClassMember[bAssignmentDeclarationKind])
+      // ctor function & member
+      || (isPossibleConstructor(b.node)
+        && isEs5ClassMember[aAssignmentDeclarationKind])
+      // member & ctor function
+      || (isClassDeclaration(a.node)
+        && isSynthesized(a.node)
+        && isEs5ClassMember[bAssignmentDeclarationKind])
+      // class (generated) & member
+      || (isClassDeclaration(b.node)
+        && isEs5ClassMember[aAssignmentDeclarationKind])
+      // member & class (generated)
+      || (isClassDeclaration(a.node)
+        && isSynthesized(a.node)
+        && isPossibleConstructor(b.node))
+      // class (generated) & ctor
+      || (isClassDeclaration(b.node)
+        && isPossibleConstructor(a.node)
+        && isSynthesized(a.node)) // ctor & class (generated)
     ) {
-      let lastANode =
-        (a.additionalNodes && lastOrUndefined(a.additionalNodes)) || a.node;
+      let lastANode = (a.additionalNodes && lastOrUndefined(a.additionalNodes)) || a.node;
 
       if (
-        (!isClassDeclaration(a.node) && !isClassDeclaration(b.node)) || // If neither outline node is a class
-        isPossibleConstructor(a.node) ||
-        isPossibleConstructor(b.node) // If either function is a constructor function
+        (!isClassDeclaration(a.node) && !isClassDeclaration(b.node))
+        // If neither outline node is a class
+        || isPossibleConstructor(a.node)
+        || isPossibleConstructor(b.node) // If either function is a constructor function
       ) {
         const ctorFunction = isPossibleConstructor(a.node)
           ? a.node
@@ -671,22 +668,21 @@ namespace ts.NavigationBar {
               /* decorators */ undefined,
               /* modifiers */ undefined,
               [],
-              /* body */ undefined
+              /* body */ undefined,
             ),
-            ctorFunction
+            ctorFunction,
           );
           const ctor = emptyNavigationBarNode(ctorNode);
           ctor.indent = a.indent + 1;
           ctor.children = a.node === ctorFunction ? a.children : b.children;
-          a.children =
-            a.node === ctorFunction
-              ? concatenate([ctor], b.children || [b])
-              : concatenate(a.children || [{ ...a }], [ctor]);
+          a.children = a.node === ctorFunction
+            ? concatenate([ctor], b.children || [b])
+            : concatenate(a.children || [{ ...a }], [ctor]);
         } else {
           if (a.children || b.children) {
             a.children = concatenate(
               a.children || [{ ...a }],
-              b.children || [b]
+              b.children || [b],
             );
             if (a.children) {
               mergeChildren(a.children, a);
@@ -702,9 +698,9 @@ namespace ts.NavigationBar {
             (a.name as Identifier) || factory.createIdentifier("__class__"),
             /* typeParameters */ undefined,
             /* heritageClauses */ undefined,
-            []
+            [],
           ),
-          a.node
+          a.node,
         );
       } else {
         a.children = concatenate(a.children, b.children);
@@ -732,10 +728,10 @@ namespace ts.NavigationBar {
               (a.name as Identifier) || factory.createIdentifier("__class__"),
               /* typeParameters */ undefined,
               /* heritageClauses */ undefined,
-              []
+              [],
             ),
-            b.node
-          )
+            b.node,
+          ),
         );
       }
       return true;
@@ -749,7 +745,7 @@ namespace ts.NavigationBar {
     a: NavigationBarNode,
     b: NavigationBarNode,
     bIndex: number,
-    parent: NavigationBarNode
+    parent: NavigationBarNode,
   ): boolean {
     // const v = false as boolean;
     if (tryMergeEs5Class(a, b, bIndex, parent)) {
@@ -766,12 +762,12 @@ namespace ts.NavigationBar {
   function shouldReallyMerge(
     a: Node,
     b: Node,
-    parent: NavigationBarNode
+    parent: NavigationBarNode,
   ): boolean {
     if (
-      a.kind !== b.kind ||
-      (a.parent !== b.parent &&
-        !(isOwnChild(a, parent) && isOwnChild(b, parent)))
+      a.kind !== b.kind
+      || (a.parent !== b.parent
+        && !(isOwnChild(a, parent) && isOwnChild(b, parent)))
     ) {
       return false;
     }
@@ -783,9 +779,9 @@ namespace ts.NavigationBar {
         return isStatic(a) === isStatic(b);
       case SyntaxKind.ModuleDeclaration:
         return (
-          areSameModule(a as ModuleDeclaration, b as ModuleDeclaration) &&
-          getFullyQualifiedModuleName(a as ModuleDeclaration) ===
-            getFullyQualifiedModuleName(b as ModuleDeclaration)
+          areSameModule(a as ModuleDeclaration, b as ModuleDeclaration)
+          && getFullyQualifiedModuleName(a as ModuleDeclaration)
+            === getFullyQualifiedModuleName(b as ModuleDeclaration)
         );
       default:
         return true;
@@ -810,9 +806,9 @@ namespace ts.NavigationBar {
       return a.body === b.body;
     }
     return (
-      a.body.kind === b.body.kind &&
-      (a.body.kind !== SyntaxKind.ModuleDeclaration ||
-        areSameModule(a.body as ModuleDeclaration, b.body as ModuleDeclaration))
+      a.body.kind === b.body.kind
+      && (a.body.kind !== SyntaxKind.ModuleDeclaration
+        || areSameModule(a.body as ModuleDeclaration, b.body as ModuleDeclaration))
     );
   }
 
@@ -838,16 +834,17 @@ namespace ts.NavigationBar {
 
   function compareChildren(
     child1: NavigationBarNode,
-    child2: NavigationBarNode
+    child2: NavigationBarNode,
   ) {
     return (
       compareStringsCaseSensitiveUI(
         tryGetName(child1.node)!,
-        tryGetName(child2.node)!
-      ) || // TODO: GH#18217
-      compareValues(
+        tryGetName(child2.node)!,
+      )
+      // TODO: GH#18217
+      || compareValues(
         navigationBarNodeKind(child1),
-        navigationBarNodeKind(child2)
+        navigationBarNodeKind(child2),
       )
     );
   }
@@ -872,7 +869,7 @@ namespace ts.NavigationBar {
       case SyntaxKind.ArrowFunction:
       case SyntaxKind.ClassExpression:
         return getFunctionOrClassName(
-          node as FunctionExpression | ArrowFunction | ClassExpression
+          node as FunctionExpression | ArrowFunction | ClassExpression,
         );
       default:
         return undefined;
@@ -899,11 +896,13 @@ namespace ts.NavigationBar {
       case SyntaxKind.SourceFile:
         const sourceFile = node as SourceFile;
         return isExternalModule(sourceFile)
-          ? `"${escapeString(
+          ? `"${
+            escapeString(
               getBaseFileName(
-                removeFileExtension(normalizePath(sourceFile.fileName))
-              )
-            )}"`
+                removeFileExtension(normalizePath(sourceFile.fileName)),
+              ),
+            )
+          }"`
           : "<global>";
       case SyntaxKind.ExportAssignment:
         return isExportAssignment(node) && node.isExportEquals
@@ -922,7 +921,7 @@ namespace ts.NavigationBar {
         // (eg: "app\n.onactivated"), so we should remove the whitespace for readability in the
         // navigation bar.
         return getFunctionOrClassName(
-          node as ArrowFunction | FunctionExpression | ClassExpression
+          node as ArrowFunction | FunctionExpression | ClassExpression,
         );
       case SyntaxKind.Constructor:
         return "constructor";
@@ -939,7 +938,7 @@ namespace ts.NavigationBar {
 
   /** Flattens the NavNode tree to a list of items to appear in the primary navbar menu. */
   function primaryNavBarMenuItems(
-    root: NavigationBarNode
+    root: NavigationBarNode,
   ): NavigationBarNode[] {
     // The primary (middle) navbar menu displays the general code navigation hierarchy, similar to the navtree.
     // The secondary (right) navbar menu displays the child items of whichever primary item is selected.
@@ -1016,23 +1015,22 @@ namespace ts.NavigationBar {
   }
 
   function convertToPrimaryNavBarMenuItem(
-    n: NavigationBarNode
+    n: NavigationBarNode,
   ): NavigationBarItem {
     return {
       text: getItemName(n.node, n.name),
       kind: getNodeKind(n.node),
       kindModifiers: getModifiers(n.node),
       spans: getSpans(n),
-      childItems:
-        map(n.children, convertToSecondaryNavBarMenuItem) ||
-        emptyChildItemArray,
+      childItems: map(n.children, convertToSecondaryNavBarMenuItem)
+        || emptyChildItemArray,
       indent: n.indent,
       bolded: false,
       grayed: false,
     };
 
     function convertToSecondaryNavBarMenuItem(
-      n: NavigationBarNode
+      n: NavigationBarNode,
     ): NavigationBarItem {
       return {
         text: getItemName(n.node, n.name),
@@ -1067,13 +1065,13 @@ namespace ts.NavigationBar {
   }
 
   function getFullyQualifiedModuleName(
-    moduleDeclaration: ModuleDeclaration
+    moduleDeclaration: ModuleDeclaration,
   ): string {
     // Otherwise, we need to aggregate each identifier to build up the qualified name.
     const result = [getTextOfIdentifierOrLiteral(moduleDeclaration.name)];
     while (
-      moduleDeclaration.body &&
-      moduleDeclaration.body.kind === SyntaxKind.ModuleDeclaration
+      moduleDeclaration.body
+      && moduleDeclaration.body.kind === SyntaxKind.ModuleDeclaration
     ) {
       moduleDeclaration = moduleDeclaration.body;
       result.push(getTextOfIdentifierOrLiteral(moduleDeclaration.name));
@@ -1113,28 +1111,24 @@ namespace ts.NavigationBar {
       | FunctionExpression
       | FunctionDeclaration
       | ArrowFunction
-      | ClassLikeDeclaration
+      | ClassLikeDeclaration,
   ): string {
     const { parent } = node;
     if (node.name && getFullWidth(node.name) > 0) {
       return cleanText(declarationNameToString(node.name));
-    }
-    // See if it is a var initializer. If so, use the var name.
+    } // See if it is a var initializer. If so, use the var name.
     else if (isVariableDeclaration(parent)) {
       return cleanText(declarationNameToString(parent.name));
-    }
-    // See if it is of the form "<expr> = function(){...}". If so, use the text from the left-hand side.
+    } // See if it is of the form "<expr> = function(){...}". If so, use the text from the left-hand side.
     else if (
-      isBinaryExpression(parent) &&
-      parent.operatorToken.kind === SyntaxKind.EqualsToken
+      isBinaryExpression(parent)
+      && parent.operatorToken.kind === SyntaxKind.EqualsToken
     ) {
       return nodeText(parent.left).replace(whiteSpaceRegex, "");
-    }
-    // See if it is a property assignment, and if so use the property name
+    } // See if it is a property assignment, and if so use the property name
     else if (isPropertyAssignment(parent)) {
       return nodeText(parent.name);
-    }
-    // Default exports are named "default"
+    } // Default exports are named "default"
     else if (getSyntacticModifierFlags(node) & ModifierFlags.Default) {
       return "default";
     } else if (isClassLike(node)) {
@@ -1149,9 +1143,7 @@ namespace ts.NavigationBar {
         }
 
         const args = cleanText(
-          mapDefined(parent.arguments, (a) =>
-            isStringLiteralLike(a) ? a.getText(curSourceFile) : undefined
-          ).join(", ")
+          mapDefined(parent.arguments, (a) => isStringLiteralLike(a) ? a.getText(curSourceFile) : undefined).join(", "),
         );
         return `${name}(${args}) callback`;
       }
@@ -1173,7 +1165,7 @@ namespace ts.NavigationBar {
   }
 
   function isFunctionOrClassExpression(
-    node: Node
+    node: Node,
   ): node is ArrowFunction | FunctionExpression | ClassExpression {
     switch (node.kind) {
       case SyntaxKind.ArrowFunction:
@@ -1187,8 +1179,7 @@ namespace ts.NavigationBar {
 
   function cleanText(text: string): string {
     // Truncate to maximum amount of characters as we don't want to do a big replace operation.
-    text =
-      text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    text = text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 
     // Replaces ECMAScript line terminators and removes the trailing `\` from each line:
     // \n - Line Feed

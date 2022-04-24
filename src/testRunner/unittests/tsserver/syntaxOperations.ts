@@ -5,7 +5,7 @@ namespace ts.projectSystem {
         session.executeCommandSeq<protocol.FileRequest>({
           command: protocol.CommandTypes.NavBarFull,
           arguments: { file: file.path },
-        }).response
+        }).response,
       );
     }
 
@@ -54,7 +54,7 @@ describe("Test Suite 1", () => {
       host.writeFile(unitTest1.path, unitTest1.content);
       host.runQueuedTimeoutCallbacks();
       const expectedFilesWithUnitTest1 = expectedFilesWithoutUnitTest1.concat(
-        unitTest1.path
+        unitTest1.path,
       );
       checkProjectActualFiles(project, expectedFilesWithUnitTest1);
 
@@ -99,12 +99,12 @@ export function Test2() {
 
       const navBarResultUnitTest1WithChangedContent = navBarFull(
         session,
-        unitTest1WithChangedContent
+        unitTest1WithChangedContent,
       );
       assert.notStrictEqual(
         navBarResultUnitTest1WithChangedContent,
         navBarResultUnitTest1,
-        "With changes in contents of unitTest file, we should see changed naviagation bar item result"
+        "With changes in contents of unitTest file, we should see changed naviagation bar item result",
       );
     });
   });

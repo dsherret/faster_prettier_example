@@ -29,7 +29,7 @@ namespace ts {
         "c:/ext/ext.ts": "",
         "c:/ext/b/a..b.ts": "",
       },
-    })
+    }),
   );
 
   const caseSensitiveBasePath = "/dev/";
@@ -59,7 +59,7 @@ namespace ts {
         "/dev/js/a.js": "",
         "/dev/js/b.js": "",
       },
-    })
+    }),
   );
 
   const caseInsensitiveMixedExtensionHost = new fakes.ParseConfigHost(
@@ -78,7 +78,7 @@ namespace ts {
         "c:/dev/e.jsx": "",
         "c:/dev/f.other": "",
       },
-    })
+    }),
   );
 
   const caseInsensitiveCommonFoldersHost = new fakes.ParseConfigHost(
@@ -94,7 +94,7 @@ namespace ts {
         "c:/dev/bower_components/a.ts": "",
         "c:/dev/jspm_packages/a.ts": "",
       },
-    })
+    }),
   );
 
   const caseInsensitiveDottedFoldersHost = new fakes.ParseConfigHost(
@@ -110,7 +110,7 @@ namespace ts {
         "c:/dev/w/.u/e.ts": "",
         "c:/dev/g.min.js/.g/g.ts": "",
       },
-    })
+    }),
   );
 
   const caseInsensitiveOrderingDiffersWithCaseHost = new fakes.ParseConfigHost(
@@ -121,7 +121,7 @@ namespace ts {
         "c:/dev/Yosemite.ts": "",
         "c:/dev/zebra.ts": "",
       },
-    })
+    }),
   );
 
   const caseSensitiveOrderingDiffersWithCaseHost = new fakes.ParseConfigHost(
@@ -132,12 +132,12 @@ namespace ts {
         "/dev/Yosemite.ts": "",
         "/dev/zebra.ts": "",
       },
-    })
+    }),
   );
 
   function assertParsed(
     actual: ParsedCommandLine,
-    expected: ParsedCommandLine
+    expected: ParsedCommandLine,
   ): void {
     assert.deepEqual(actual.fileNames, expected.fileNames);
     assert.deepEqual(actual.wildcardDirectories, expected.wildcardDirectories);
@@ -151,7 +151,7 @@ namespace ts {
     basePath: string,
     existingOptions?: CompilerOptions,
     configFileName?: string,
-    resolutionStack?: Path[]
+    resolutionStack?: Path[],
   ) {
     {
       const jsonText = JSON.stringify(json);
@@ -162,7 +162,7 @@ namespace ts {
         basePath,
         existingOptions,
         configFileName,
-        resolutionStack
+        resolutionStack,
       );
       for (const error of expected.errors) {
         if (error.file) {
@@ -178,7 +178,7 @@ namespace ts {
         basePath,
         existingOptions,
         configFileName,
-        resolutionStack
+        resolutionStack,
       );
       expected.errors = expected.errors.map(
         (error): Diagnostic => ({
@@ -190,7 +190,7 @@ namespace ts {
           start: undefined,
           reportsUnnecessary: undefined,
           reportsDeprecated: undefined,
-        })
+        }),
       );
       assertParsed(actual, expected);
     }
@@ -201,7 +201,7 @@ namespace ts {
     start: number,
     length: number,
     diagnosticMessage: DiagnosticMessage,
-    arg0: string
+    arg0: string,
   ) {
     const text = JSON.stringify(json);
     const file = {
@@ -227,7 +227,7 @@ namespace ts {
         expected,
         json,
         caseInsensitiveCommonFoldersHost,
-        caseInsensitiveBasePath
+        caseInsensitiveBasePath,
       );
     });
 
@@ -246,7 +246,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("missing files are still present", () => {
@@ -263,7 +263,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("are not removed due to excludes", () => {
@@ -281,7 +281,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
     });
@@ -301,7 +301,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with non .ts file extensions are excluded", () => {
@@ -315,7 +315,7 @@ namespace ts {
               Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
               caseInsensitiveTsconfigPath,
               JSON.stringify(json.include),
-              "[]"
+              "[]",
             ),
           ],
           fileNames: [],
@@ -327,7 +327,7 @@ namespace ts {
           caseInsensitiveHost,
           caseInsensitiveBasePath,
           /*existingOptions*/ undefined,
-          caseInsensitiveTsconfigPath
+          caseInsensitiveTsconfigPath,
         );
       });
       it("with missing files are excluded", () => {
@@ -341,7 +341,7 @@ namespace ts {
               Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
               caseInsensitiveTsconfigPath,
               JSON.stringify(json.include),
-              "[]"
+              "[]",
             ),
           ],
           fileNames: [],
@@ -353,7 +353,7 @@ namespace ts {
           caseInsensitiveHost,
           caseInsensitiveBasePath,
           /*existingOptions*/ undefined,
-          caseInsensitiveTsconfigPath
+          caseInsensitiveTsconfigPath,
         );
       });
       it("with literal excludes", () => {
@@ -371,7 +371,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with wildcard excludes", () => {
@@ -389,7 +389,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with recursive excludes", () => {
@@ -407,7 +407,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with case sensitive exclude", () => {
@@ -425,7 +425,7 @@ namespace ts {
           expected,
           json,
           caseSensitiveHost,
-          caseSensitiveBasePath
+          caseSensitiveBasePath,
         );
       });
       it("with common package folders and no exclusions", () => {
@@ -454,7 +454,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveCommonFoldersHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with common package folders and exclusions", () => {
@@ -482,7 +482,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveCommonFoldersHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with common package folders and empty exclude", () => {
@@ -511,7 +511,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveCommonFoldersHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
     });
@@ -544,7 +544,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("same named declarations are excluded", () => {
@@ -563,7 +563,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("`*` matches only ts files", () => {
@@ -582,7 +582,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("`?` matches only a single character", () => {
@@ -601,7 +601,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with recursive directory", () => {
@@ -625,7 +625,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with multiple recursive directories", () => {
@@ -645,7 +645,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("case sensitive", () => {
@@ -664,7 +664,7 @@ namespace ts {
           expected,
           json,
           caseSensitiveHost,
-          caseSensitiveBasePath
+          caseSensitiveBasePath,
         );
       });
       it("with missing files are excluded", () => {
@@ -678,7 +678,7 @@ namespace ts {
               Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
               caseInsensitiveTsconfigPath,
               JSON.stringify(json.include),
-              "[]"
+              "[]",
             ),
           ],
           fileNames: [],
@@ -692,7 +692,7 @@ namespace ts {
           caseInsensitiveHost,
           caseInsensitiveBasePath,
           /*existingOptions*/ undefined,
-          caseInsensitiveTsconfigPath
+          caseInsensitiveTsconfigPath,
         );
       });
       it("always include literal files", () => {
@@ -713,7 +713,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("exclude folders", () => {
@@ -733,7 +733,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       describe("with common package folders", () => {
@@ -753,7 +753,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveCommonFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("and exclusions", () => {
@@ -773,7 +773,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveCommonFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("and empty exclude", () => {
@@ -793,7 +793,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveCommonFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("and explicit recursive include", () => {
@@ -816,7 +816,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveCommonFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("and wildcard include", () => {
@@ -835,7 +835,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveCommonFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("and explicit wildcard include", () => {
@@ -854,7 +854,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveCommonFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
       });
@@ -874,7 +874,7 @@ namespace ts {
               Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
               caseInsensitiveTsconfigPath,
               JSON.stringify(json.include),
-              "[]"
+              "[]",
             ),
           ],
           fileNames: [],
@@ -888,7 +888,7 @@ namespace ts {
           caseInsensitiveHost,
           caseInsensitiveBasePath,
           /*existingOptions*/ undefined,
-          caseInsensitiveTsconfigPath
+          caseInsensitiveTsconfigPath,
         );
       });
       it("include .js files when allowJs=true", () => {
@@ -912,7 +912,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("include explicitly listed .min.js files when allowJs=true", () => {
@@ -936,7 +936,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("include paths outside of the project", () => {
@@ -961,7 +961,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("include paths outside of the project using relative paths", () => {
@@ -981,7 +981,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("exclude paths outside of the project using relative paths", () => {
@@ -996,7 +996,7 @@ namespace ts {
               Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
               caseInsensitiveTsconfigPath,
               JSON.stringify(json.include),
-              JSON.stringify(json.exclude)
+              JSON.stringify(json.exclude),
             ),
           ],
           fileNames: [],
@@ -1008,7 +1008,7 @@ namespace ts {
           caseInsensitiveHost,
           caseInsensitiveBasePath,
           /*existingOptions*/ undefined,
-          caseInsensitiveTsconfigPath
+          caseInsensitiveTsconfigPath,
         );
       });
       it("include files with .. in their name", () => {
@@ -1026,7 +1026,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("exclude files with .. in their name", () => {
@@ -1046,7 +1046,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with jsx=none, allowJs=false", () => {
@@ -1069,7 +1069,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveMixedExtensionHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with jsx=preserve, allowJs=false", () => {
@@ -1094,7 +1094,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveMixedExtensionHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with jsx=react-native, allowJs=false", () => {
@@ -1119,7 +1119,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveMixedExtensionHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with jsx=none, allowJs=true", () => {
@@ -1148,7 +1148,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveMixedExtensionHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with jsx=preserve, allowJs=true", () => {
@@ -1179,7 +1179,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveMixedExtensionHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("with jsx=react-native, allowJs=true", () => {
@@ -1210,7 +1210,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveMixedExtensionHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       it("exclude .min.js files using wildcards", () => {
@@ -1235,7 +1235,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
 
@@ -1252,13 +1252,14 @@ namespace ts {
                 12,
                 4,
                 Diagnostics.File_specification_cannot_end_in_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
-                "**"
+                "**",
               ),
               createCompilerDiagnostic(
-                Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
+                Diagnostics
+                  .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
                 caseInsensitiveTsconfigPath,
                 JSON.stringify(json.include),
-                "[]"
+                "[]",
               ),
             ],
             fileNames: [],
@@ -1270,7 +1271,7 @@ namespace ts {
             caseInsensitiveHost,
             caseInsensitiveBasePath,
             /*existingOptions*/ undefined,
-            caseInsensitiveTsconfigPath
+            caseInsensitiveTsconfigPath,
           );
         });
         it("in excludes", () => {
@@ -1282,10 +1283,11 @@ namespace ts {
             options: {},
             errors: [
               createCompilerDiagnostic(
-                Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
+                Diagnostics
+                  .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
                 caseInsensitiveTsconfigPath,
                 JSON.stringify(json.include),
-                JSON.stringify(json.exclude)
+                JSON.stringify(json.exclude),
               ),
             ],
             fileNames: [],
@@ -1297,7 +1299,7 @@ namespace ts {
             caseInsensitiveHost,
             caseInsensitiveBasePath,
             /*existingOptions*/ undefined,
-            caseInsensitiveTsconfigPath
+            caseInsensitiveTsconfigPath,
           );
         });
       });
@@ -1326,7 +1328,7 @@ namespace ts {
             caseInsensitiveHost,
             caseInsensitiveBasePath,
             /*existingOptions*/ undefined,
-            caseInsensitiveTsconfigPath
+            caseInsensitiveTsconfigPath,
           );
         });
         it("in excludes", () => {
@@ -1346,7 +1348,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
       });
@@ -1363,14 +1365,16 @@ namespace ts {
                 json,
                 12,
                 9,
-                Diagnostics.File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
-                "**/../*"
+                Diagnostics
+                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
+                "**/../*",
               ),
               createCompilerDiagnostic(
-                Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
+                Diagnostics
+                  .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
                 caseInsensitiveTsconfigPath,
                 JSON.stringify(json.include),
-                "[]"
+                "[]",
               ),
             ],
             fileNames: [],
@@ -1382,7 +1386,7 @@ namespace ts {
             caseInsensitiveHost,
             caseInsensitiveBasePath,
             /*existingOptions*/ undefined,
-            caseInsensitiveTsconfigPath
+            caseInsensitiveTsconfigPath,
           );
         });
 
@@ -1397,14 +1401,16 @@ namespace ts {
                 json,
                 12,
                 11,
-                Diagnostics.File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
-                "**/y/../*"
+                Diagnostics
+                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
+                "**/y/../*",
               ),
               createCompilerDiagnostic(
-                Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
+                Diagnostics
+                  .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
                 caseInsensitiveTsconfigPath,
                 JSON.stringify(json.include),
-                "[]"
+                "[]",
               ),
             ],
             fileNames: [],
@@ -1416,7 +1422,7 @@ namespace ts {
             caseInsensitiveHost,
             caseInsensitiveBasePath,
             /*existingOptions*/ undefined,
-            caseInsensitiveTsconfigPath
+            caseInsensitiveTsconfigPath,
           );
         });
 
@@ -1432,8 +1438,9 @@ namespace ts {
                 json,
                 34,
                 7,
-                Diagnostics.File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
-                "**/.."
+                Diagnostics
+                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
+                "**/..",
               ),
             ],
             fileNames: [
@@ -1450,7 +1457,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
 
@@ -1466,8 +1473,9 @@ namespace ts {
                 json,
                 34,
                 9,
-                Diagnostics.File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
-                "**/y/.."
+                Diagnostics
+                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0,
+                "**/y/..",
               ),
             ],
             fileNames: [
@@ -1484,7 +1492,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
       });
@@ -1513,7 +1521,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
       });
@@ -1537,7 +1545,7 @@ namespace ts {
           expected,
           json,
           caseInsensitiveDottedFoldersHost,
-          caseInsensitiveBasePath
+          caseInsensitiveBasePath,
         );
       });
       describe("that are explicitly included", () => {
@@ -1555,7 +1563,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveDottedFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("with recursive wildcards that match directories", () => {
@@ -1579,7 +1587,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveDottedFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("with recursive wildcards that match nothing", () => {
@@ -1599,7 +1607,7 @@ namespace ts {
             expected,
             json,
             caseInsensitiveDottedFoldersHost,
-            caseInsensitiveBasePath
+            caseInsensitiveBasePath,
           );
         });
         it("with wildcard excludes that implicitly exclude dotted files", () => {
@@ -1611,10 +1619,11 @@ namespace ts {
             options: {},
             errors: [
               createCompilerDiagnostic(
-                Diagnostics.No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
+                Diagnostics
+                  .No_inputs_were_found_in_config_file_0_Specified_include_paths_were_1_and_exclude_paths_were_2,
                 caseInsensitiveTsconfigPath,
                 JSON.stringify(json.include),
-                JSON.stringify(json.exclude)
+                JSON.stringify(json.exclude),
               ),
             ],
             fileNames: [],
@@ -1626,7 +1635,7 @@ namespace ts {
             caseInsensitiveDottedFoldersHost,
             caseInsensitiveBasePath,
             /*existingOptions*/ undefined,
-            caseInsensitiveTsconfigPath
+            caseInsensitiveTsconfigPath,
           );
         });
       });
@@ -1662,7 +1671,7 @@ namespace ts {
           expected,
           json,
           caseSensitiveHost,
-          caseSensitiveBasePath
+          caseSensitiveBasePath,
         );
       });
       it("can include dirs whose pattern starts with **", () => {
@@ -1687,7 +1696,7 @@ namespace ts {
           expected,
           json,
           caseSensitiveHost,
-          caseSensitiveBasePath
+          caseSensitiveBasePath,
         );
       });
     });
@@ -1703,8 +1712,7 @@ namespace ts {
             `${basePath}zebra.ts`,
           ],
           wildcardDirectories: {
-            [basePath.slice(0, basePath.length - 1)]:
-              WatchDirectoryFlags.Recursive,
+            [basePath.slice(0, basePath.length - 1)]: WatchDirectoryFlags.Recursive,
           },
         };
       }
@@ -1713,13 +1721,13 @@ namespace ts {
         getExpected(caseSensitiveBasePath),
         json,
         caseSensitiveOrderingDiffersWithCaseHost,
-        caseSensitiveBasePath
+        caseSensitiveBasePath,
       );
       validateMatches(
         getExpected(caseInsensitiveBasePath),
         json,
         caseInsensitiveOrderingDiffersWithCaseHost,
-        caseInsensitiveBasePath
+        caseInsensitiveBasePath,
       );
     });
 

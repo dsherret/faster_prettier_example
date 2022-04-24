@@ -44,12 +44,11 @@ namespace ts {
               strict: true,
             },
           }),
-          "dev/node_modules/config-box-implied/unstrict/tsconfig.json":
-            JSON.stringify({
-              compilerOptions: {
-                strict: false,
-              },
-            }),
+          "dev/node_modules/config-box-implied/unstrict/tsconfig.json": JSON.stringify({
+            compilerOptions: {
+              strict: false,
+            },
+          }),
           "dev/tsconfig.extendsBoxImplied.json": JSON.stringify({
             extends: "config-box-implied",
             files: ["main.ts"],
@@ -58,11 +57,10 @@ namespace ts {
             extends: "config-box-implied/unstrict",
             files: ["main.ts"],
           }),
-          "dev/tsconfig.extendsBoxImpliedUnstrictExtension.json":
-            JSON.stringify({
-              extends: "config-box-implied/unstrict/tsconfig",
-              files: ["main.ts"],
-            }),
+          "dev/tsconfig.extendsBoxImpliedUnstrictExtension.json": JSON.stringify({
+            extends: "config-box-implied/unstrict/tsconfig",
+            files: ["main.ts"],
+          }),
           "dev/tsconfig.extendsBoxImpliedPath.json": JSON.stringify({
             extends: "config-box-implied/tsconfig.json",
             files: ["main.ts"],
@@ -169,23 +167,25 @@ namespace ts {
 
   const caseInsensitiveBasePath = "c:/dev/";
   const caseInsensitiveHost = new fakes.ParseConfigHost(
-    createFileSystem(/*ignoreCase*/ true, caseInsensitiveBasePath, "c:/")
+    createFileSystem(/*ignoreCase*/ true, caseInsensitiveBasePath, "c:/"),
   );
 
   const caseSensitiveBasePath = "/dev/";
   const caseSensitiveHost = new fakes.ParseConfigHost(
-    createFileSystem(/*ignoreCase*/ false, caseSensitiveBasePath, "/")
+    createFileSystem(/*ignoreCase*/ false, caseSensitiveBasePath, "/"),
   );
 
   function verifyDiagnostics(
     actual: Diagnostic[],
-    expected: { code: number; messageText: string }[]
+    expected: { code: number; messageText: string }[],
   ) {
     assert.isTrue(
       expected.length === actual.length,
-      `Expected error: ${JSON.stringify(
-        expected
-      )}. Actual error: ${JSON.stringify(actual)}.`
+      `Expected error: ${
+        JSON.stringify(
+          expected,
+        )
+      }. Actual error: ${JSON.stringify(actual)}.`,
     );
     for (let i = 0; i < actual.length; i++) {
       const actualError = actual[i];
@@ -194,11 +194,11 @@ namespace ts {
       assert.equal(
         actualError.category,
         DiagnosticCategory.Error,
-        "Category mismatch"
+        "Category mismatch",
       ); // Should always be error
       assert.equal(
         flattenDiagnosticMessageText(actualError.messageText, "\n"),
-        expectedError.messageText
+        expectedError.messageText,
       );
     }
   }
@@ -219,28 +219,24 @@ namespace ts {
       ],
       ([testName, basePath, host]) => {
         function getParseCommandLine(entry: string) {
-          const { config, error } = readConfigFile(entry, (name) =>
-            host.readFile(name)
-          );
+          const { config, error } = readConfigFile(entry, (name) => host.readFile(name));
           assert(
             config && !error,
-            flattenDiagnosticMessageText(error && error.messageText, "\n")
+            flattenDiagnosticMessageText(error && error.messageText, "\n"),
           );
           return parseJsonConfigFileContent(config, host, basePath, {}, entry);
         }
 
         function getParseCommandLineJsonSourceFile(entry: string) {
-          const jsonSourceFile = readJsonConfigFile(entry, (name) =>
-            host.readFile(name)
-          );
+          const jsonSourceFile = readJsonConfigFile(entry, (name) => host.readFile(name));
           assert(
-            jsonSourceFile.endOfFileToken &&
-              !jsonSourceFile.parseDiagnostics.length,
+            jsonSourceFile.endOfFileToken
+              && !jsonSourceFile.parseDiagnostics.length,
             flattenDiagnosticMessageText(
-              jsonSourceFile.parseDiagnostics[0] &&
-                jsonSourceFile.parseDiagnostics[0].messageText,
-              "\n"
-            )
+              jsonSourceFile.parseDiagnostics[0]
+                && jsonSourceFile.parseDiagnostics[0].messageText,
+              "\n",
+            ),
           );
           return {
             jsonSourceFile,
@@ -249,7 +245,7 @@ namespace ts {
               host,
               basePath,
               {},
-              entry
+              entry,
             ),
           };
         }
@@ -258,7 +254,7 @@ namespace ts {
           name: string,
           entry: string,
           expected: CompilerOptions,
-          expectedFiles: string[]
+          expectedFiles: string[],
         ) {
           expected.configFilePath = entry;
           it(name, () => {
@@ -267,22 +263,21 @@ namespace ts {
               !parsed.errors.length,
               flattenDiagnosticMessageText(
                 parsed.errors[0] && parsed.errors[0].messageText,
-                "\n"
-              )
+                "\n",
+              ),
             );
             assert.deepEqual(parsed.options, expected);
             assert.deepEqual(parsed.fileNames, expectedFiles);
           });
 
           it(name + " with jsonSourceFile", () => {
-            const { parsed, jsonSourceFile } =
-              getParseCommandLineJsonSourceFile(entry);
+            const { parsed, jsonSourceFile } = getParseCommandLineJsonSourceFile(entry);
             assert(
               !parsed.errors.length,
               flattenDiagnosticMessageText(
                 parsed.errors[0] && parsed.errors[0].messageText,
-                "\n"
-              )
+                "\n",
+              ),
             );
             assert.deepEqual(parsed.options, expected);
             assert.equal(parsed.options.configFile, jsonSourceFile);
@@ -293,7 +288,7 @@ namespace ts {
         function testFailure(
           name: string,
           entry: string,
-          expectedDiagnostics: { code: number; messageText: string }[]
+          expectedDiagnostics: { code: number; messageText: string }[],
         ) {
           it(name, () => {
             const parsed = getParseCommandLine(entry);
@@ -318,7 +313,7 @@ namespace ts {
             [
               combinePaths(basePath, "main.ts"),
               combinePaths(basePath, "supplemental.ts"),
-            ]
+            ],
           );
 
           testSuccess(
@@ -332,7 +327,7 @@ namespace ts {
             [
               combinePaths(basePath, "main.ts"),
               combinePaths(basePath, "supplemental.ts"),
-            ]
+            ],
           );
 
           testFailure(
@@ -341,13 +336,15 @@ namespace ts {
             [
               {
                 code: 18000,
-                messageText: `Circularity detected while resolving configuration: ${[
-                  combinePaths(basePath, "circular.json"),
-                  combinePaths(basePath, "circular2.json"),
-                  combinePaths(basePath, "circular.json"),
-                ].join(" -> ")}`,
+                messageText: `Circularity detected while resolving configuration: ${
+                  [
+                    combinePaths(basePath, "circular.json"),
+                    combinePaths(basePath, "circular2.json"),
+                    combinePaths(basePath, "circular.json"),
+                  ].join(" -> ")
+                }`,
               },
-            ]
+            ],
           );
 
           testFailure("can report missing configurations", "missing.json", [
@@ -372,7 +369,7 @@ namespace ts {
                 code: 5024,
                 messageText: `Compiler option 'extends' requires a value of type string.`,
               },
-            ]
+            ],
           );
 
           testSuccess(
@@ -384,7 +381,7 @@ namespace ts {
               strictNullChecks: true,
               module: undefined, // Technically, this is distinct from the key never being set; but within the compiler we don't make the distinction
             },
-            [combinePaths(basePath, "supplemental.ts")]
+            [combinePaths(basePath, "supplemental.ts")],
           );
 
           testSuccess(
@@ -396,7 +393,7 @@ namespace ts {
               strictNullChecks: true,
               module: ModuleKind.System,
             },
-            [combinePaths(basePath, "main.ts")]
+            [combinePaths(basePath, "main.ts")],
           );
 
           testSuccess(
@@ -408,7 +405,7 @@ namespace ts {
               strictNullChecks: true,
               module: ModuleKind.System,
             },
-            [combinePaths(basePath, "tests/utils.ts")]
+            [combinePaths(basePath, "tests/utils.ts")],
           );
 
           describe("finding extended configs from node_modules", () => {
@@ -416,56 +413,56 @@ namespace ts {
               "can lookup via tsconfig field",
               "tsconfig.extendsBox.json",
               { strict: true },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via package-relative path",
               "tsconfig.extendsStrict.json",
               { strict: true },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via non-redirected-to package-relative path",
               "tsconfig.extendsUnStrict.json",
               { strict: false },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via package-relative path with extension",
               "tsconfig.extendsStrictExtension.json",
               { strict: true },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via an implicit tsconfig",
               "tsconfig.extendsBoxImplied.json",
               { strict: true },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via an implicit tsconfig in a package-relative directory",
               "tsconfig.extendsBoxImpliedUnstrict.json",
               { strict: false },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via an implicit tsconfig in a package-relative directory with name",
               "tsconfig.extendsBoxImpliedUnstrictExtension.json",
               { strict: false },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
             testSuccess(
               "can lookup via an implicit tsconfig in a package-relative directory with extension",
               "tsconfig.extendsBoxImpliedPath.json",
               { strict: true },
-              [combinePaths(basePath, "main.ts")]
+              [combinePaths(basePath, "main.ts")],
             );
           });
 
           it("adds extendedSourceFiles only once", () => {
             const sourceFile = readJsonConfigFile(
               "configs/fourth.json",
-              (path) => host.readFile(path)
+              (path) => host.readFile(path),
             );
             const dir = combinePaths(basePath, "configs");
             const expected = [
@@ -478,7 +475,7 @@ namespace ts {
               host,
               dir,
               {},
-              "fourth.json"
+              "fourth.json",
             );
             assert.deepEqual(sourceFile.extendedSourceFiles, expected);
             parseJsonSourceFileConfigFileContent(
@@ -486,12 +483,12 @@ namespace ts {
               host,
               dir,
               {},
-              "fourth.json"
+              "fourth.json",
             );
             assert.deepEqual(sourceFile.extendedSourceFiles, expected);
           });
         });
-      }
+      },
     );
   });
 }

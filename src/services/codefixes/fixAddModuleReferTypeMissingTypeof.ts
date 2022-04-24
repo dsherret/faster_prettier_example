@@ -13,16 +13,14 @@ namespace ts.codefix {
     getCodeActions: function getCodeActionsToAddMissingTypeof(context) {
       const { sourceFile, span } = context;
       const importType = getImportTypeNode(sourceFile, span.start);
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, importType)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, importType));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Add_missing_typeof,
           fixId,
-          Diagnostics.Add_missing_typeof
+          Diagnostics.Add_missing_typeof,
         ),
       ];
     },
@@ -32,23 +30,22 @@ namespace ts.codefix {
         doChange(
           changes,
           context.sourceFile,
-          getImportTypeNode(diag.file, diag.start)
-        )
-      ),
+          getImportTypeNode(diag.file, diag.start),
+        )),
   });
 
   function getImportTypeNode(
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ): ImportTypeNode {
     const token = getTokenAtPosition(sourceFile, pos);
     Debug.assert(
       token.kind === SyntaxKind.ImportKeyword,
-      "This token should be an ImportKeyword"
+      "This token should be an ImportKeyword",
     );
     Debug.assert(
       token.parent.kind === SyntaxKind.ImportType,
-      "Token parent should be an ImportType"
+      "Token parent should be an ImportType",
     );
     return token.parent as ImportTypeNode;
   }
@@ -56,14 +53,14 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    importType: ImportTypeNode
+    importType: ImportTypeNode,
   ) {
     const newTypeNode = factory.updateImportTypeNode(
       importType,
       importType.argument,
       importType.qualifier,
       importType.typeArguments,
-      /* isTypeOf */ true
+      /* isTypeOf */ true,
     );
     changes.replaceNode(sourceFile, importType, newTypeNode);
   }

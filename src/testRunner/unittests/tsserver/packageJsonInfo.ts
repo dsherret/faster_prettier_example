@@ -27,13 +27,13 @@ namespace ts.projectSystem {
       // Initialize project without package.json
       const { projectService, host } = setup([tsConfig]);
       assert.isUndefined(
-        projectService.packageJsonCache.getInDirectory("/" as Path)
+        projectService.packageJsonCache.getInDirectory("/" as Path),
       );
 
       // Add package.json
       host.writeFile(packageJson.path, packageJson.content);
       let packageJsonInfo = projectService.packageJsonCache.getInDirectory(
-        "/" as Path
+        "/" as Path,
       )!;
       assert.ok(packageJsonInfo);
       assert.ok(packageJsonInfo.dependencies);
@@ -47,10 +47,10 @@ namespace ts.projectSystem {
         JSON.stringify({
           ...packageJsonContent,
           dependencies: undefined,
-        })
+        }),
       );
       packageJsonInfo = projectService.packageJsonCache.getInDirectory(
-        "/" as Path
+        "/" as Path,
       )!;
       assert.isUndefined(packageJsonInfo.dependencies);
     });
@@ -59,14 +59,14 @@ namespace ts.projectSystem {
       // Initialize project with package.json
       const { projectService, host } = setup();
       projectService.getPackageJsonsVisibleToFile(
-        "/src/whatever/blah.ts" as Path
+        "/src/whatever/blah.ts" as Path,
       );
       assert.ok(projectService.packageJsonCache.getInDirectory("/" as Path));
 
       // Delete package.json
       host.deleteFile(packageJson.path);
       assert.isUndefined(
-        projectService.packageJsonCache.getInDirectory("/" as Path)
+        projectService.packageJsonCache.getInDirectory("/" as Path),
       );
     });
 
@@ -77,11 +77,11 @@ namespace ts.projectSystem {
       host.writeFile("/src/package.json", packageJson.content);
       assert.lengthOf(
         projectService.getPackageJsonsVisibleToFile("/a.ts" as Path),
-        1
+        1,
       );
       assert.lengthOf(
         projectService.getPackageJsonsVisibleToFile("/src/b.ts" as Path),
-        2
+        2,
       );
     });
 
@@ -92,19 +92,19 @@ namespace ts.projectSystem {
         { path: packageJson.path, content: packageJsonContent },
       ]);
       projectService.getPackageJsonsVisibleToFile(
-        "/src/whatever/blah.ts" as Path
+        "/src/whatever/blah.ts" as Path,
       );
       const packageJsonInfo = projectService.packageJsonCache.getInDirectory(
-        "/" as Path
+        "/" as Path,
       )!;
       assert.isFalse(packageJsonInfo.parseable);
 
       host.writeFile(packageJson.path, packageJson.content);
       projectService.getPackageJsonsVisibleToFile(
-        "/src/whatever/blah.ts" as Path
+        "/src/whatever/blah.ts" as Path,
       );
       const packageJsonInfo2 = projectService.packageJsonCache.getInDirectory(
-        "/" as Path
+        "/" as Path,
       )!;
       assert.ok(packageJsonInfo2);
       assert.ok(packageJsonInfo2.dependencies);
@@ -120,19 +120,19 @@ namespace ts.projectSystem {
         { path: packageJson.path, content: packageJsonContent },
       ]);
       projectService.getPackageJsonsVisibleToFile(
-        "/src/whatever/blah.ts" as Path
+        "/src/whatever/blah.ts" as Path,
       );
       const packageJsonInfo = projectService.packageJsonCache.getInDirectory(
-        "/" as Path
+        "/" as Path,
       )!;
       assert.isFalse(packageJsonInfo.parseable);
 
       host.writeFile(packageJson.path, packageJson.content);
       projectService.getPackageJsonsVisibleToFile(
-        "/src/whatever/blah.ts" as Path
+        "/src/whatever/blah.ts" as Path,
       );
       const packageJsonInfo2 = projectService.packageJsonCache.getInDirectory(
-        "/" as Path
+        "/" as Path,
       )!;
       assert.ok(packageJsonInfo2);
       assert.ok(packageJsonInfo2.dependencies);

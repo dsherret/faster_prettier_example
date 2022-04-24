@@ -5,8 +5,9 @@ describe("unittests:: Public APIs", () => {
     let fileContent: string;
     before(() => {
       fileContent = Harness.IO.readFile(builtFile)!;
-      if (!fileContent)
+      if (!fileContent) {
         throw new Error(`File ${fileName} was not present in built/local`);
+      }
       fileContent = fileContent.replace(/\r\n/g, "\n");
     });
 
@@ -18,21 +19,21 @@ describe("unittests:: Public APIs", () => {
       const fs = vfs.createFromFileSystem(Harness.IO, /*ignoreCase*/ false);
       fs.linkSync(
         `${vfs.builtFolder}/${fileName}`,
-        `${vfs.srcFolder}/${fileName}`
+        `${vfs.srcFolder}/${fileName}`,
       );
       const sys = new fakes.System(fs);
       const host = new fakes.CompilerHost(sys);
       const result = compiler.compileFiles(
         host,
         [`${vfs.srcFolder}/${fileName}`],
-        {}
+        {},
       );
       assert(
         !result.diagnostics || !result.diagnostics.length,
         Harness.Compiler.minimalDiagnosticsToString(
           result.diagnostics,
-          /*pretty*/ true
-        )
+          /*pretty*/ true,
+        ),
       );
     });
   }
@@ -49,12 +50,12 @@ describe("unittests:: Public APIs", () => {
 describe("unittests:: Public APIs:: token to string", () => {
   function assertDefinedTokenToString(
     initial: ts.SyntaxKind,
-    last: ts.SyntaxKind
+    last: ts.SyntaxKind,
   ) {
     for (let t = initial; t <= last; t++) {
       assert.isDefined(
         ts.tokenToString(t),
-        `Expected tokenToString defined for ${ts.Debug.formatSyntaxKind(t)}`
+        `Expected tokenToString defined for ${ts.Debug.formatSyntaxKind(t)}`,
       );
     }
   }
@@ -62,13 +63,13 @@ describe("unittests:: Public APIs:: token to string", () => {
   it("for punctuations", () => {
     assertDefinedTokenToString(
       ts.SyntaxKind.FirstPunctuation,
-      ts.SyntaxKind.LastPunctuation
+      ts.SyntaxKind.LastPunctuation,
     );
   });
   it("for keywords", () => {
     assertDefinedTokenToString(
       ts.SyntaxKind.FirstKeyword,
-      ts.SyntaxKind.LastKeyword
+      ts.SyntaxKind.LastKeyword,
     );
   });
 });
@@ -77,7 +78,7 @@ describe("unittests:: Public APIs:: createPrivateIdentifier", () => {
   it("throws when name doesn't start with #", () => {
     assert.throw(
       () => ts.factory.createPrivateIdentifier("not"),
-      "Debug Failure. First character of private identifier must be #: not"
+      "Debug Failure. First character of private identifier must be #: not",
     );
   });
 });
@@ -96,7 +97,7 @@ function test() {}`;
       testFilePath,
       testFileText,
       ts.ScriptTarget.Latest,
-      /*setParentNodes*/ true
+      /*setParentNodes*/ true,
     );
     const funcDec = testSourceFile.statements.find(ts.isFunctionDeclaration)!;
     const tags = ts.getJSDocTags(funcDec);
@@ -112,7 +113,7 @@ describe("unittests:: Public APIs:: isPropertyName", () => {
     const prop = ts.factory.createPrivateIdentifier("#foo");
     assert.isTrue(
       ts.isPropertyName(prop),
-      "PrivateIdentifier must be a valid property name."
+      "PrivateIdentifier must be a valid property name.",
     );
   });
 });
@@ -128,7 +129,7 @@ describe("unittests:: Public APIs:: getTypeAtLocation", () => {
       vfs.createFromFileSystem(Harness.IO, /*ignoreCase*/ true, {
         documents: [new documents.TextDocument("/file.ts", content)],
         cwd: "/",
-      })
+      }),
     );
 
     const program = ts.createProgram({
@@ -153,7 +154,7 @@ describe("unittests:: Public APIs:: getTypeAtLocation", () => {
       vfs.createFromFileSystem(Harness.IO, /*ignoreCase*/ true, {
         documents: [new documents.TextDocument("/file.ts", content)],
         cwd: "/",
-      })
+      }),
     );
 
     const program = ts.createProgram({
@@ -175,9 +176,7 @@ describe("unittests:: Public APIs:: validateLocaleAndSetLanguage", () => {
   afterEach(() => ts.setUILocale(savedUILocale));
 
   function verifyValidateLocale(locale: string, expectedToReadFile: boolean) {
-    it(`Verifying ${locale} ${
-      expectedToReadFile ? "reads" : "does not read"
-    } file`, () => {
+    it(`Verifying ${locale} ${expectedToReadFile ? "reads" : "does not read"} file`, () => {
       const errors: ts.Diagnostic[] = [];
       ts.validateLocaleAndSetLanguage(
         locale,
@@ -187,33 +186,25 @@ describe("unittests:: Public APIs:: validateLocaleAndSetLanguage", () => {
           fileExists: (fileName) => {
             assert.isTrue(
               expectedToReadFile,
-              `Locale : ${locale} ${
-                expectedToReadFile ? "should" : "should not"
-              } check if ${fileName} exists.`
+              `Locale : ${locale} ${expectedToReadFile ? "should" : "should not"} check if ${fileName} exists.`,
             );
             return expectedToReadFile;
           },
           readFile: (fileName) => {
             assert.isTrue(
               expectedToReadFile,
-              `Locale : ${locale} ${
-                expectedToReadFile ? "should" : "should not"
-              } read ${fileName}.`
+              `Locale : ${locale} ${expectedToReadFile ? "should" : "should not"} read ${fileName}.`,
             );
             // Throw error here so that actual change to localized diagnostics messages doesnt take place
             throw new Error("cannot read file");
           },
         },
-        errors
+        errors,
       );
     });
   }
-  ts.supportedLocaleDirectories.forEach((locale) =>
-    verifyValidateLocale(locale, /*expectedToReadFile*/ true)
-  );
-  ["en", "en-us"].forEach((locale) =>
-    verifyValidateLocale(locale, /*expectedToReadFile*/ false)
-  );
+  ts.supportedLocaleDirectories.forEach((locale) => verifyValidateLocale(locale, /*expectedToReadFile*/ true));
+  ["en", "en-us"].forEach((locale) => verifyValidateLocale(locale, /*expectedToReadFile*/ false));
 });
 
 describe("unittests:: Public APIs :: forEachChild of @param comments in JSDoc", () => {
@@ -227,7 +218,7 @@ var x
     "/file.ts",
     content,
     ts.ScriptTarget.ESNext,
-    /*setParentNodes*/ true
+    /*setParentNodes*/ true,
   );
   const paramTag = sourceFile
     .getChildren()[0]
@@ -240,7 +231,7 @@ var x
     assert.strictEqual(
       /*actual*/ false,
       seen.has(n),
-      "Found a duplicate-added child"
+      "Found a duplicate-added child",
     );
     seen.add(n);
   });
@@ -255,7 +246,7 @@ describe("unittests:: Public APIs:: getChild* methods on EndOfFileToken with JSD
     "/file.ts",
     content,
     ts.ScriptTarget.ESNext,
-    /*setParentNodes*/ true
+    /*setParentNodes*/ true,
   );
   const endOfFileToken = sourceFile.getChildren()[1];
   assert.equal(endOfFileToken.getChildren().length, 1);

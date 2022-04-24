@@ -3,7 +3,7 @@ namespace ts.projectSystem {
     it("works for host implementing 'resolveModuleNames' and 'getResolvedModuleWithFailedLookupLocationsFromCache'", () => {
       const userTs: File = {
         path: "/user.ts",
-        content: 'import { x } from "./old";',
+        content: "import { x } from \"./old\";",
       };
       const newTs: File = {
         path: "/new.ts",
@@ -27,7 +27,7 @@ namespace ts.projectSystem {
           "/old.ts",
           "/new.ts",
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
       assert.deepEqual<readonly FileTextChanges[]>(edits, [
         {
@@ -45,7 +45,7 @@ namespace ts.projectSystem {
     it("works with multiple projects", () => {
       const aUserTs: File = {
         path: "/a/user.ts",
-        content: 'import { x } from "./old";',
+        content: "import { x } from \"./old\";",
       };
       const aOldTs: File = {
         path: "/a/old.ts",
@@ -57,7 +57,7 @@ namespace ts.projectSystem {
       };
       const bUserTs: File = {
         path: "/b/user.ts",
-        content: 'import { x } from "../a/old";',
+        content: "import { x } from \"../a/old\";",
       };
       const bTsconfig: File = {
         path: "/b/tsconfig.json",
@@ -113,7 +113,7 @@ namespace ts.projectSystem {
     });
 
     it("works with file moved to inferred project", () => {
-      const aTs: File = { path: "/a.ts", content: 'import {} from "./b";' };
+      const aTs: File = { path: "/a.ts", content: "import {} from \"./b\";" };
       const cTs: File = { path: "/c.ts", content: "export {};" };
       const tsconfig: File = {
         path: "/tsconfig.json",

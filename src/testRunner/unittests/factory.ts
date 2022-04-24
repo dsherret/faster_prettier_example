@@ -4,9 +4,11 @@ namespace ts {
       assert.strictEqual(
         node.kind,
         expected,
-        `Actual: ${Debug.formatSyntaxKind(
-          node.kind
-        )} Expected: ${Debug.formatSyntaxKind(expected)}`
+        `Actual: ${
+          Debug.formatSyntaxKind(
+            node.kind,
+          )
+        } Expected: ${Debug.formatSyntaxKind(expected)}`,
       );
     }
     describe("factory.createExportAssignment", () => {
@@ -16,7 +18,7 @@ namespace ts {
             /*decorators*/ undefined,
             /*modifiers*/ undefined,
             /*isExportEquals*/ false,
-            expression
+            expression,
           );
           assertSyntaxKind(node.expression, SyntaxKind.ParenthesizedExpression);
         }
@@ -34,9 +36,9 @@ namespace ts {
               "prop",
               /*questionOrExclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createStringLiteral("1")
+              factory.createStringLiteral("1"),
             ),
-          ]
+          ],
         );
         checkExpression(clazz);
         checkExpression(factory.createPropertyAccessExpression(clazz, "prop"));
@@ -48,36 +50,36 @@ namespace ts {
           /*typeParameters*/ undefined,
           /*parameters*/ undefined,
           /*type*/ undefined,
-          factory.createBlock([])
+          factory.createBlock([]),
         );
         checkExpression(func);
         checkExpression(
           factory.createCallExpression(
             func,
             /*typeArguments*/ undefined,
-            /*argumentsArray*/ undefined
-          )
+            /*argumentsArray*/ undefined,
+          ),
         );
         checkExpression(
           factory.createTaggedTemplateExpression(
             func,
             /*typeArguments*/ undefined,
-            factory.createNoSubstitutionTemplateLiteral("")
-          )
+            factory.createNoSubstitutionTemplateLiteral(""),
+          ),
         );
 
         checkExpression(
           factory.createBinaryExpression(
             factory.createStringLiteral("a"),
             SyntaxKind.CommaToken,
-            factory.createStringLiteral("b")
-          )
+            factory.createStringLiteral("b"),
+          ),
         );
         checkExpression(
           factory.createCommaListExpression([
             factory.createStringLiteral("a"),
             factory.createStringLiteral("b"),
-          ])
+          ]),
         );
       });
     });
@@ -91,7 +93,7 @@ namespace ts {
             [],
             /*type*/ undefined,
             /*equalsGreaterThanToken*/ undefined,
-            body
+            body,
           );
           assertSyntaxKind(node.body, SyntaxKind.ParenthesizedExpression);
         }
@@ -100,38 +102,38 @@ namespace ts {
         checkBody(
           factory.createPropertyAccessExpression(
             factory.createObjectLiteralExpression(),
-            "prop"
-          )
+            "prop",
+          ),
         );
         checkBody(
           factory.createAsExpression(
             factory.createPropertyAccessExpression(
               factory.createObjectLiteralExpression(),
-              "prop"
+              "prop",
             ),
-            factory.createTypeReferenceNode("T", /*typeArguments*/ undefined)
-          )
+            factory.createTypeReferenceNode("T", /*typeArguments*/ undefined),
+          ),
         );
         checkBody(
           factory.createNonNullExpression(
             factory.createPropertyAccessExpression(
               factory.createObjectLiteralExpression(),
-              "prop"
-            )
-          )
+              "prop",
+            ),
+          ),
         );
         checkBody(
           factory.createCommaListExpression([
             factory.createStringLiteral("a"),
             factory.createStringLiteral("b"),
-          ])
+          ]),
         );
         checkBody(
           factory.createBinaryExpression(
             factory.createStringLiteral("a"),
             SyntaxKind.CommaToken,
-            factory.createStringLiteral("b")
-          )
+            factory.createStringLiteral("b"),
+          ),
         );
       });
     });
@@ -145,7 +147,7 @@ namespace ts {
           [],
           /*type*/ undefined,
           /*equalsGreaterThanToken*/ undefined,
-          factory.createBlock([])
+          factory.createBlock([]),
         );
         function checkRhs(operator: BinaryOperator, expectParens: boolean) {
           const node = factory.createBinaryExpression(lhs, operator, rhs);
@@ -153,7 +155,7 @@ namespace ts {
             node.right,
             expectParens
               ? SyntaxKind.ParenthesizedExpression
-              : SyntaxKind.ArrowFunction
+              : SyntaxKind.ArrowFunction,
           );
         }
 
@@ -167,11 +169,11 @@ namespace ts {
         checkRhs(SyntaxKind.BarBarEqualsToken, /*expectParens*/ false);
         checkRhs(
           SyntaxKind.AmpersandAmpersandEqualsToken,
-          /*expectParens*/ false
+          /*expectParens*/ false,
         );
         checkRhs(
           SyntaxKind.QuestionQuestionEqualsToken,
-          /*expectParens*/ false
+          /*expectParens*/ false,
         );
       });
     });

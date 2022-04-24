@@ -6,14 +6,13 @@ namespace ts.projectSystem {
     options,
     contextOptions,
   }: DocumentSpanFromSubstring): DocumentSpan {
-    const contextSpan =
-      contextText !== undefined
-        ? documentSpanFromSubstring({
-            file,
-            text: contextText,
-            options: contextOptions,
-          })
-        : undefined;
+    const contextSpan = contextText !== undefined
+      ? documentSpanFromSubstring({
+        file,
+        text: contextText,
+        options: contextOptions,
+      })
+      : undefined;
     return {
       fileName: file.path,
       textSpan: textSpanFromSubstring(file.content, text, options),
@@ -43,7 +42,7 @@ namespace ts.projectSystem {
   function checkDeclarationFiles(
     file: File,
     session: TestSession,
-    expectedFiles: readonly File[]
+    expectedFiles: readonly File[],
   ): void {
     openFilesForSession([file], session);
     const project = Debug.checkDefined(
@@ -51,14 +50,14 @@ namespace ts.projectSystem {
         .getProjectService()
         .getDefaultProjectForFile(
           file.path as server.NormalizedPath,
-          /*ensureProject*/ false
-        )
+          /*ensureProject*/ false,
+        ),
     );
     const program = project.getCurrentProgram()!;
     const output = getFileEmitOutput(
       program,
       Debug.checkDefined(program.getSourceFile(file.path)),
-      /*emitOnlyDtsFiles*/ true
+      /*emitOnlyDtsFiles*/ true,
     );
     closeFilesForSession([file], session);
 
@@ -70,16 +69,15 @@ namespace ts.projectSystem {
           name: e.path,
           text: e.content,
           writeByteOrderMark: false,
-        })
-      )
+        }),
+      ),
     );
   }
 
   describe("unittests:: tsserver:: with declaration file maps:: project references", () => {
     const aTs: File = {
       path: "/a/a.ts",
-      content:
-        "export function fnA() {}\nexport interface IfaceA {}\nexport const instanceA: IfaceA = {};",
+      content: "export function fnA() {}\nexport interface IfaceA {}\nexport const instanceA: IfaceA = {};",
     };
     const compilerOptions: CompilerOptions = {
       outDir: "bin",
@@ -99,8 +97,7 @@ namespace ts.projectSystem {
       sourceRoot: "",
       sources: ["../a.ts"],
       names: [],
-      mappings:
-        "AAAA,wBAAgB,GAAG,SAAK;AACxB,MAAM,WAAW,MAAM;CAAG;AAC1B,eAAO,MAAM,SAAS,EAAE,MAAW,CAAC",
+      mappings: "AAAA,wBAAgB,GAAG,SAAK;AACxB,MAAM,WAAW,MAAM;CAAG;AAC1B,eAAO,MAAM,SAAS,EAAE,MAAW,CAAC",
     };
     const aDtsMap: File = {
       path: "/a/bin/a.d.ts.map",
@@ -109,7 +106,8 @@ namespace ts.projectSystem {
     const aDts: File = {
       path: "/a/bin/a.d.ts",
       // ${""} is needed to mangle the sourceMappingURL part or it breaks the build
-      content: `export declare function fnA(): void;\nexport interface IfaceA {\n}\nexport declare const instanceA: IfaceA;\n//# source${""}MappingURL=a.d.ts.map`,
+      content:
+        `export declare function fnA(): void;\nexport interface IfaceA {\n}\nexport declare const instanceA: IfaceA;\n//# source${""}MappingURL=a.d.ts.map`,
     };
 
     const bTs: File = {
@@ -147,13 +145,13 @@ namespace ts.projectSystem {
     const userTs: File = {
       path: "/user/user.ts",
       content:
-        'import * as a from "../a/bin/a";\nimport * as b from "../b/bin/b";\nexport function fnUser() { a.fnA(); b.fnB(); a.instanceA; }',
+        "import * as a from \"../a/bin/a\";\nimport * as b from \"../b/bin/b\";\nexport function fnUser() { a.fnA(); b.fnB(); a.instanceA; }",
     };
 
     const userTsForConfigProject: File = {
       path: "/user/user.ts",
       content:
-        'import * as a from "../a/a";\nimport * as b from "../b/b";\nexport function fnUser() { a.fnA(); b.fnB(); a.instanceA; }',
+        "import * as a from \"../a/a\";\nimport * as b from \"../b/b\";\nexport function fnUser() { a.fnA(); b.fnB(); a.instanceA; }",
     };
 
     const userTsconfig: File = {
@@ -166,7 +164,7 @@ namespace ts.projectSystem {
 
     function makeSampleProjects(
       addUserTsConfig?: boolean,
-      keepAllFiles?: boolean
+      keepAllFiles?: boolean,
     ) {
       const host = createServerHost([
         aTs,
@@ -197,7 +195,7 @@ namespace ts.projectSystem {
       // If config file then userConfig project and bConfig project since it is referenced
       checkNumberOfProjects(
         service,
-        addUserTsConfig ? { configuredProjects: 2 } : { inferredProjects: 1 }
+        addUserTsConfig ? { configuredProjects: 2 } : { inferredProjects: 1 },
       );
       return session;
     }
@@ -238,7 +236,7 @@ namespace ts.projectSystem {
     function verifyATsConfigProject(session: TestSession) {
       checkProjectActualFiles(
         session.getProjectService().configuredProjects.get(aTsconfig.path)!,
-        [aTs.path, aTsconfig.path]
+        [aTs.path, aTsconfig.path],
       );
     }
 
@@ -275,7 +273,7 @@ namespace ts.projectSystem {
     function verifyUserTsConfigProject(session: TestSession) {
       checkProjectActualFiles(
         session.getProjectService().configuredProjects.get(userTsconfig.path)!,
-        [userTs.path, aTs.path, userTsconfig.path]
+        [userTs.path, aTs.path, userTsconfig.path],
       );
     }
 
@@ -287,7 +285,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Definition,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual(response, [
         protocolFileSpanWithContextFromSubstring({
@@ -307,7 +305,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.DefinitionAndBoundSpan,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual(response, {
         textSpan: protocolTextSpanFromSubstring(userTs.content, "fnA"),
@@ -330,7 +328,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.DefinitionAndBoundSpan,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual(response, {
         textSpan: protocolTextSpanFromSubstring(userTs.content, "fnA"),
@@ -370,7 +368,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.TypeDefinition,
-        protocolFileLocationFromSubstring(userTs, "instanceA")
+        protocolFileLocationFromSubstring(userTs, "instanceA"),
       );
       assert.deepEqual(response, [
         protocolFileSpanWithContextFromSubstring({
@@ -390,7 +388,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Implementation,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual(response, [
         protocolFileSpanWithContextFromSubstring({
@@ -410,7 +408,7 @@ namespace ts.projectSystem {
       >(
         session,
         CommandNames.Definition,
-        protocolFileLocationFromSubstring(userTs, "fnB()")
+        protocolFileLocationFromSubstring(userTs, "fnB()"),
       );
       // bTs does not exist, so stick with bDts
       assert.deepEqual(response, [
@@ -462,7 +460,7 @@ namespace ts.projectSystem {
     it("navigateToAll -- when neither file nor project is specified", () => {
       const session = makeSampleProjects(
         /*addUserTsConfig*/ true,
-        /*keepAllFiles*/ true
+        /*keepAllFiles*/ true,
       );
       const response = executeSessionRequest<
         protocol.NavtoRequest,
@@ -508,7 +506,7 @@ namespace ts.projectSystem {
     it("navigateToAll -- when file is not specified but project is", () => {
       const session = makeSampleProjects(
         /*addUserTsConfig*/ true,
-        /*keepAllFiles*/ true
+        /*keepAllFiles*/ true,
       );
       const response = executeSessionRequest<
         protocol.NavtoRequest,
@@ -542,7 +540,7 @@ namespace ts.projectSystem {
         lineText: "export function fnA() {}",
       });
     const referencesUserTs = (
-      userTs: File
+      userTs: File,
     ): readonly protocol.ReferencesResponseItem[] => [
       makeReferenceItem({
         file: userTs,
@@ -561,14 +559,14 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual<protocol.ReferencesResponseBody | undefined>(response, {
         refs: [...referencesUserTs(userTs), referenceATs(aTs)],
         symbolName: "fnA",
         symbolStartOffset: protocolLocationFromSubstring(
           userTs.content,
-          "fnA()"
+          "fnA()",
         ).offset,
         symbolDisplayString: "function fnA(): void",
       });
@@ -585,7 +583,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(aTs, "fnA")
+        protocolFileLocationFromSubstring(aTs, "fnA"),
       );
       assert.deepEqual<protocol.ReferencesResponseBody | undefined>(response, {
         refs: [referenceATs(aTs), ...referencesUserTs(userTs)],
@@ -613,7 +611,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.ReferencesFull,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
 
       assert.deepEqual<readonly ReferencedSymbol[]>(responseFull, [
@@ -691,7 +689,7 @@ namespace ts.projectSystem {
       };
 
       const session = createSession(
-        createServerHost([aTs, aTsconfig, bTs, bTsconfig, aDts, aDtsMap])
+        createServerHost([aTs, aTsconfig, bTs, bTsconfig, aDts, aDtsMap]),
       );
       checkDeclarationFiles(aTs, session, [aDtsMap, aDts]);
       openFilesForSession([bTs], session);
@@ -705,7 +703,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.ReferencesFull,
-        protocolFileLocationFromSubstring(bTs, "f()")
+        protocolFileLocationFromSubstring(bTs, "f()"),
       );
 
       assert.deepEqual<readonly ReferencedSymbol[]>(responseFull, [
@@ -761,7 +759,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(userTs, "fnB()")
+        protocolFileLocationFromSubstring(userTs, "fnB()"),
       );
       assert.deepEqual<protocol.ReferencesResponseBody | undefined>(response, {
         refs: [
@@ -776,14 +774,13 @@ namespace ts.projectSystem {
             file: userTs,
             isDefinition: false,
             text: "fnB",
-            lineText:
-              "export function fnUser() { a.fnA(); b.fnB(); a.instanceA; }",
+            lineText: "export function fnUser() { a.fnA(); b.fnB(); a.instanceA; }",
           }),
         ],
         symbolName: "fnB",
         symbolStartOffset: protocolLocationFromSubstring(
           userTs.content,
-          "fnB()"
+          "fnB()",
         ).offset,
         symbolDisplayString: "function fnB(): void",
       });
@@ -818,14 +815,14 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response, {
         info: {
           canRename: true,
           displayName: "fnA",
           fileToRename: undefined,
-          fullDisplayName: '"/a/bin/a".fnA', // Ideally this would use the original source's path instead of the declaration file's path.
+          fullDisplayName: "\"/a/bin/a\".fnA", // Ideally this would use the original source's path instead of the declaration file's path.
           kind: ScriptElementKind.functionElement,
           kindModifiers: [
             ScriptElementKindModifier.exportedModifier,
@@ -847,14 +844,14 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(aTs, "fnA")
+        protocolFileLocationFromSubstring(aTs, "fnA"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response, {
         info: {
           canRename: true,
           displayName: "fnA",
           fileToRename: undefined,
-          fullDisplayName: '"/a/a".fnA',
+          fullDisplayName: "\"/a/a\".fnA",
           kind: ScriptElementKind.functionElement,
           kindModifiers: ScriptElementKindModifier.exportedModifier,
           triggerSpan: protocolTextSpanFromSubstring(aTs.content, "fnA"),
@@ -872,7 +869,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.RenameLocationsFull,
-        protocolFileLocationFromSubstring(userTs, "fnA()")
+        protocolFileLocationFromSubstring(userTs, "fnA()"),
       );
       assert.deepEqual<readonly RenameLocation[]>(response, [
         renameLocation({ file: userTs, text: "fnA" }),
@@ -893,14 +890,14 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(userTs, "fnB()")
+        protocolFileLocationFromSubstring(userTs, "fnB()"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response, {
         info: {
           canRename: true,
           displayName: "fnB",
           fileToRename: undefined,
-          fullDisplayName: '"/b/bin/b".fnB',
+          fullDisplayName: "\"/b/bin/b\".fnB",
           kind: ScriptElementKind.functionElement,
           kindModifiers: [
             ScriptElementKindModifier.exportedModifier,
@@ -1029,7 +1026,7 @@ namespace ts.projectSystem {
         >(
           session,
           protocol.CommandTypes.DefinitionAndBoundSpan,
-          protocolFileLocationFromSubstring(userTs, "fnA()")
+          protocolFileLocationFromSubstring(userTs, "fnA()"),
         ),
         {
           textSpan: protocolTextSpanFromSubstring(userTs.content, "fnA"),
@@ -1040,7 +1037,7 @@ namespace ts.projectSystem {
               contextText: "export declare function fnA(): void;",
             }),
           ],
-        }
+        },
       );
 
       // Not inlined, jumps to bTs
@@ -1051,7 +1048,7 @@ namespace ts.projectSystem {
         >(
           session,
           protocol.CommandTypes.DefinitionAndBoundSpan,
-          protocolFileLocationFromSubstring(userTs, "fnB()")
+          protocolFileLocationFromSubstring(userTs, "fnB()"),
         ),
         {
           textSpan: protocolTextSpanFromSubstring(userTs.content, "fnB"),
@@ -1062,7 +1059,7 @@ namespace ts.projectSystem {
               contextText: "export function fnB() {}",
             }),
           ],
-        }
+        },
       );
 
       verifySingleInferredProject(session);

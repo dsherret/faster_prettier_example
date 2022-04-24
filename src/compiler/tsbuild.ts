@@ -145,7 +145,7 @@ namespace ts {
   }
 
   export function resolveConfigFileProjectName(
-    project: string
+    project: string,
   ): ResolvedConfigFileName {
     if (fileExtensionIs(project, Extension.Json)) {
       return project as ResolvedConfigFileName;

@@ -65,7 +65,7 @@ describe("unittests:: services:: PatternMatcher", () => {
         "_",
         "STYLE",
         "_",
-        "CONSTANT"
+        "CONSTANT",
       );
     });
 
@@ -242,7 +242,7 @@ describe("unittests:: services:: PatternMatcher", () => {
       assertSegmentMatch(
         "FogBarChangedEventArgs",
         "changedeventarrrgh",
-        undefined
+        undefined,
       );
     });
 
@@ -455,13 +455,13 @@ describe("unittests:: services:: PatternMatcher", () => {
   function assertSegmentMatch(
     candidate: string,
     pattern: string,
-    expected: ts.PatternMatch | undefined
+    expected: ts.PatternMatch | undefined,
   ): void {
     assert.deepEqual(
       ts
         .createPatternMatcher(pattern)!
         .getMatchForLastSegmentOfPattern(candidate),
-      expected
+      expected,
     );
   }
 
@@ -473,13 +473,13 @@ describe("unittests:: services:: PatternMatcher", () => {
     dottedContainer: string,
     candidate: string,
     pattern: string,
-    expected: ts.PatternMatch | undefined
+    expected: ts.PatternMatch | undefined,
   ): void {
     assert.deepEqual(
       ts
         .createPatternMatcher(pattern)!
         .getFullMatch(dottedContainer.split("."), candidate),
-      expected
+      expected,
     );
   }
 
@@ -490,7 +490,7 @@ describe("unittests:: services:: PatternMatcher", () => {
   function breakIntoCharacterSpans(identifier: string) {
     return spanListToSubstrings(
       identifier,
-      ts.breakIntoCharacterSpans(identifier)
+      ts.breakIntoCharacterSpans(identifier),
     );
   }
 

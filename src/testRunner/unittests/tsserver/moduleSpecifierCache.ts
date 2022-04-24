@@ -41,7 +41,7 @@ namespace ts.projectSystem {
       const { moduleSpecifierCache } = setup();
       assert.isTrue(
         moduleSpecifierCache.get(bTs.path as Path, aTs.path as Path, {}, {})
-          ?.isAutoImportable
+          ?.isAutoImportable,
       );
     });
 
@@ -57,7 +57,7 @@ namespace ts.projectSystem {
         cTs.path as Path,
         mobxDts.path as Path,
         {},
-        {}
+        {},
       );
       assert.deepEqual(mobxCache, {
         modulePaths: [
@@ -83,7 +83,7 @@ namespace ts.projectSystem {
       checkWatchedDirectories(
         host,
         ["/src", "/node_modules"],
-        /*recursive*/ true
+        /*recursive*/ true,
       );
       host.writeFile("/node_modules/.staging/mobx-12345678/package.json", "{}");
       host.runQueuedTimeoutCallbacks();
@@ -96,7 +96,7 @@ namespace ts.projectSystem {
       host.runQueuedTimeoutCallbacks();
       assert.isTrue(
         moduleSpecifierCache.get(bTs.path as Path, aTs.path as Path, {}, {})
-          ?.isAutoImportable
+          ?.isAutoImportable,
       );
     });
 
@@ -118,7 +118,7 @@ namespace ts.projectSystem {
       const { host, moduleSpecifierCache } = setup();
       host.writeFile(
         tsconfig.path,
-        `{ "compilerOptions": { "moduleResolution": "classic" }, "include": ["src"] }`
+        `{ "compilerOptions": { "moduleResolution": "classic" }, "include": ["src"] }`,
       );
       host.runQueuedTimeoutCallbacks();
       assert.equal(moduleSpecifierCache.count(), 0);
@@ -158,7 +158,7 @@ namespace ts.projectSystem {
           bTs.path as Path,
           aTs.path as Path,
           preferences,
-          {}
+          {},
         );
       }
     });
@@ -203,7 +203,7 @@ namespace ts.projectSystem {
     };
 
     function triggerCompletions(
-      requestLocation: protocol.FileLocationRequestArgs
+      requestLocation: protocol.FileLocationRequestArgs,
     ) {
       executeSessionRequest<
         protocol.CompletionsRequest,

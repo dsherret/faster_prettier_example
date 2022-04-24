@@ -3,23 +3,23 @@ namespace ts.projectSystem {
     function verifyFiles(
       caption: string,
       actual: readonly string[],
-      expected: readonly string[]
+      expected: readonly string[],
     ) {
       assert.equal(
         actual.length,
         expected.length,
-        `Incorrect number of ${caption}. Actual: ${actual} Expected: ${expected}`
+        `Incorrect number of ${caption}. Actual: ${actual} Expected: ${expected}`,
       );
       const seen = new Map<string, true>();
       forEach(actual, (f) => {
         assert.isFalse(
           seen.has(f),
-          `${caption}: Found duplicate ${f}. Actual: ${actual} Expected: ${expected}`
+          `${caption}: Found duplicate ${f}. Actual: ${actual} Expected: ${expected}`,
         );
         seen.set(f, true);
         assert.isTrue(
           contains(expected, f),
-          `${caption}: Expected not to contain ${f}. Actual: ${actual} Expected: ${expected}`
+          `${caption}: Expected not to contain ${f}. Actual: ${actual} Expected: ${expected}`,
         );
       });
     }
@@ -27,8 +27,8 @@ namespace ts.projectSystem {
     function createVerifyInitialOpen(
       session: TestSession,
       verifyProjectsUpdatedInBackgroundEventHandler: (
-        events: server.ProjectsUpdatedInBackgroundEvent[]
-      ) => void
+        events: server.ProjectsUpdatedInBackgroundEvent[],
+      ) => void,
     ) {
       return (file: File) => {
         session.executeCommandSeq({
@@ -44,15 +44,15 @@ namespace ts.projectSystem {
     interface ProjectsUpdatedInBackgroundEventVerifier {
       session: TestSession;
       verifyProjectsUpdatedInBackgroundEventHandler(
-        events: server.ProjectsUpdatedInBackgroundEvent[]
+        events: server.ProjectsUpdatedInBackgroundEvent[],
       ): void;
       verifyInitialOpen(file: File): void;
     }
 
     function verifyProjectsUpdatedInBackgroundEvent(
       createSession: (
-        host: TestServerHost
-      ) => ProjectsUpdatedInBackgroundEventVerifier
+        host: TestServerHost,
+      ) => ProjectsUpdatedInBackgroundEventVerifier,
     ) {
       it("when adding new file", () => {
         const commonFile1: File = {
@@ -104,7 +104,7 @@ namespace ts.projectSystem {
 
       describe("with --out or --outFile setting", () => {
         function verifyEventWithOutSettings(
-          compilerOptions: CompilerOptions = {}
+          compilerOptions: CompilerOptions = {},
         ) {
           const config: File = {
             path: "/a/tsconfig.json",
@@ -231,8 +231,7 @@ namespace ts.projectSystem {
             configFile,
           ];
 
-          const filesToReload =
-            (firstReloadFileList && getFiles(firstReloadFileList)) || files;
+          const filesToReload = (firstReloadFileList && getFiles(firstReloadFileList)) || files;
           const host = createServerHost([filesToReload[0], configFile]);
 
           // Initial project creation
@@ -304,20 +303,19 @@ namespace ts.projectSystem {
         }
 
         it("should contains only itself if a module file's shape didn't change, and all files referencing it if its shape changed", () => {
-          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState();
+          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } = getInitialState();
 
           // Change the content of moduleFile1 to `export var T: number;export function Foo() { };`
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
 
           // Change the content of moduleFile1 to `export var T: number;export function Foo() { console.log('hi'); };`
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { console.log('hi'); };`
+            `export var T: number;export function Foo() { console.log('hi'); };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
@@ -339,21 +337,21 @@ namespace ts.projectSystem {
           // Change the content of moduleFile1 to `export var T: number;export function Foo() { };`
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
 
           // Add the import statements back to file1Consumer1
           updateContentOfOpenFile(
             file1Consumer1,
-            `import {Foo} from "./moduleFile1";let y = Foo();`
+            `import {Foo} from "./moduleFile1";let y = Foo();`,
           );
           verifyNoProjectsUpdatedInBackgroundEvent();
 
           // Change the content of moduleFile1 to `export var T: number;export var T2: string;export function Foo() { };`
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export var T2: string;export function Foo() { };`
+            `export var T: number;export var T2: string;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
 
@@ -364,7 +362,7 @@ namespace ts.projectSystem {
           updateContentOfOpenFile(file1Consumer1, `export let y = Foo();`);
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
@@ -380,7 +378,7 @@ namespace ts.projectSystem {
           // Change the content of moduleFile1 to `export var T: number;export function Foo() { };`
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
 
           // Delete file1Consumer2
@@ -389,76 +387,71 @@ namespace ts.projectSystem {
         });
 
         it("should be up-to-date with newly created files", () => {
-          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState();
+          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } = getInitialState();
 
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           host.writeFile(
             "/a/b/file1Consumer3.ts",
-            `import {Foo} from "./moduleFile1"; let y = Foo();`
+            `import {Foo} from "./moduleFile1"; let y = Foo();`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
 
         it("should detect changes in non-root files", () => {
-          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState({
-              configObj: { files: [file1Consumer1Path] },
-            });
+          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } = getInitialState({
+            configObj: { files: [file1Consumer1Path] },
+          });
 
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
 
           // change file1 internal, and verify only file1 is affected
           host.writeFile(
             moduleFile1.path,
-            moduleFile1.content + "var T1: number;"
+            moduleFile1.content + "var T1: number;",
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
 
         it("should return all files if a global file changed shape", () => {
-          const { host, globalFile3, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState();
+          const { host, globalFile3, verifyProjectsUpdatedInBackgroundEvent } = getInitialState();
 
           host.writeFile(
             globalFile3.path,
-            globalFile3.content + "var T2: string;"
+            globalFile3.content + "var T2: string;",
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
 
         it("should always return the file itself if '--isolatedModules' is specified", () => {
-          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState({
-              configObj: { compilerOptions: { isolatedModules: true } },
-            });
+          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } = getInitialState({
+            configObj: { compilerOptions: { isolatedModules: true } },
+          });
 
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
 
         it("should always return the file itself if '--out' or '--outFile' is specified", () => {
           const outFilePath = "/a/b/out.js";
-          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState({
-              configObj: {
-                compilerOptions: { module: "system", outFile: outFilePath },
-              },
-            });
+          const { host, moduleFile1, verifyProjectsUpdatedInBackgroundEvent } = getInitialState({
+            configObj: {
+              compilerOptions: { module: "system", outFile: outFilePath },
+            },
+          });
 
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
@@ -481,25 +474,25 @@ namespace ts.projectSystem {
 
           updateContentOfOpenFile(
             file1Consumer1,
-            file1Consumer1.content + "export var T: number;"
+            file1Consumer1.content + "export var T: number;",
           );
           verifyNoProjectsUpdatedInBackgroundEvent();
 
           // Doesnt change the shape of file1Consumer1
           host.writeFile(
             moduleFile1.path,
-            `export var T: number;export function Foo() { };`
+            `export var T: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
 
           // Change both files before the timeout
           updateContentOfOpenFile(
             file1Consumer1,
-            file1Consumer1.content + "export var T2: number;"
+            file1Consumer1.content + "export var T2: number;",
           );
           host.writeFile(
             moduleFile1.path,
-            `export var T2: number;export function Foo() { };`
+            `export var T2: number;export function Foo() { };`,
           );
           verifyProjectsUpdatedInBackgroundEvent();
         });
@@ -517,16 +510,15 @@ namespace ts.projectSystem {
                     /// <reference path="./file1.ts" />
                     export var t2 = 10;`,
           };
-          const { host, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState({
-              getAdditionalFileOrFolder: () => [file1, file2],
-              firstReloadFileList: [
-                file1.path,
-                libFile.path,
-                file2.path,
-                configFilePath,
-              ],
-            });
+          const { host, verifyProjectsUpdatedInBackgroundEvent } = getInitialState({
+            getAdditionalFileOrFolder: () => [file1, file2],
+            firstReloadFileList: [
+              file1.path,
+              libFile.path,
+              file2.path,
+              configFilePath,
+            ],
+          });
 
           host.writeFile(file2.path, file2.content + "export var t3 = 10;");
           verifyProjectsUpdatedInBackgroundEvent();
@@ -539,16 +531,15 @@ namespace ts.projectSystem {
                     /// <reference path="./moduleFile1.ts" />
                     export var x = Foo();`,
           };
-          const { host, verifyProjectsUpdatedInBackgroundEvent } =
-            getInitialState({
-              getAdditionalFileOrFolder: () => [referenceFile1],
-              firstReloadFileList: [
-                referenceFile1.path,
-                libFile.path,
-                moduleFile1Path,
-                configFilePath,
-              ],
-            });
+          const { host, verifyProjectsUpdatedInBackgroundEvent } = getInitialState({
+            getAdditionalFileOrFolder: () => [referenceFile1],
+            firstReloadFileList: [
+              referenceFile1.path,
+              libFile.path,
+              moduleFile1Path,
+              configFilePath,
+            ],
+          });
 
           host.deleteFile(moduleFile1Path);
           verifyProjectsUpdatedInBackgroundEvent();
@@ -578,7 +569,7 @@ namespace ts.projectSystem {
 
           updateContentOfOpenFile(
             referenceFile1,
-            referenceFile1.content + "export var yy = Foo();"
+            referenceFile1.content + "export var yy = Foo();",
           );
           verifyNoProjectsUpdatedInBackgroundEvent();
 
@@ -590,14 +581,14 @@ namespace ts.projectSystem {
 
       describe("resolution when resolution cache size", () => {
         function verifyWithMaxCacheLimit(
-          useSlashRootAsSomeNotRootFolderInUserDirectory: boolean
+          useSlashRootAsSomeNotRootFolderInUserDirectory: boolean,
         ) {
           const rootFolder = useSlashRootAsSomeNotRootFolderInUserDirectory
             ? "/user/username/rootfolder/otherfolder/"
             : "/";
           const file1: File = {
             path: rootFolder + "a/b/project/file1.ts",
-            content: 'import a from "file2"',
+            content: "import a from \"file2\"",
           };
           const file2: File = {
             path: rootFolder + "a/b/node_modules/file2.d.ts",
@@ -614,18 +605,17 @@ namespace ts.projectSystem {
 
           const projectFiles = [file1, file3, libFile, configFile];
           const openFiles = [file1.path];
-          const watchedRecursiveDirectories =
-            useSlashRootAsSomeNotRootFolderInUserDirectory
-              ? // Folders of node_modules lookup not in changedRoot
-                [
-                  "a/b/project",
-                  "a/b/project/node_modules",
-                  "a/b/node_modules",
-                  "a/node_modules",
-                  "node_modules",
-                ].map((v) => rootFolder + v)
-              : // Folder of tsconfig
-                ["/a/b/project", "/a/b/project/node_modules"];
+          const watchedRecursiveDirectories = useSlashRootAsSomeNotRootFolderInUserDirectory
+            ? // Folders of node_modules lookup not in changedRoot
+              [
+                "a/b/project",
+                "a/b/project/node_modules",
+                "a/b/node_modules",
+                "a/node_modules",
+                "node_modules",
+              ].map((v) => rootFolder + v)
+            : // Folder of tsconfig
+              ["/a/b/project", "/a/b/project/node_modules"];
           const host = createServerHost(projectFiles);
           const {
             session,
@@ -636,7 +626,7 @@ namespace ts.projectSystem {
           verifyInitialOpen(file1);
           checkNumberOfProjects(projectService, { configuredProjects: 1 });
           const project = projectService.configuredProjects.get(
-            configFile.path
+            configFile.path,
           )!;
           verifyProject();
 
@@ -671,39 +661,39 @@ namespace ts.projectSystem {
           verifyProjectsUpdatedInBackgroundEventHandler(
             useSlashRootAsSomeNotRootFolderInUserDirectory
               ? [
-                  {
-                    eventName: server.ProjectsUpdatedInBackgroundEvent,
-                    data: {
-                      openFiles,
-                    },
+                {
+                  eventName: server.ProjectsUpdatedInBackgroundEvent,
+                  data: {
+                    openFiles,
                   },
-                ]
-              : []
+                },
+              ]
+              : [],
           );
 
           function verifyProject() {
             checkProjectActualFiles(
               project,
-              map(projectFiles, (file) => file.path)
+              map(projectFiles, (file) => file.path),
             );
             checkWatchedDirectories(host, [], /*recursive*/ false);
             checkWatchedDirectories(
               host,
               watchedRecursiveDirectories,
-              /*recursive*/ true
+              /*recursive*/ true,
             );
           }
         }
 
         it("project is not at root level", () => {
           verifyWithMaxCacheLimit(
-            /*useSlashRootAsSomeNotRootFolderInUserDirectory*/ true
+            /*useSlashRootAsSomeNotRootFolderInUserDirectory*/ true,
           );
         });
 
         it("project is at root level", () => {
           verifyWithMaxCacheLimit(
-            /*useSlashRootAsSomeNotRootFolderInUserDirectory*/ false
+            /*useSlashRootAsSomeNotRootFolderInUserDirectory*/ false,
           );
         });
       });
@@ -711,47 +701,50 @@ namespace ts.projectSystem {
 
     describe("when event handler is set in the session", () => {
       verifyProjectsUpdatedInBackgroundEvent(
-        createSessionWithProjectChangedEventHandler
+        createSessionWithProjectChangedEventHandler,
       );
 
       function createSessionWithProjectChangedEventHandler(
-        host: TestServerHost
+        host: TestServerHost,
       ): ProjectsUpdatedInBackgroundEventVerifier {
-        const { session, events: projectChangedEvents } =
-          createSessionWithEventTracking<server.ProjectsUpdatedInBackgroundEvent>(
-            host,
-            server.ProjectsUpdatedInBackgroundEvent
-          );
+        const { session, events: projectChangedEvents } = createSessionWithEventTracking<
+          server.ProjectsUpdatedInBackgroundEvent
+        >(
+          host,
+          server.ProjectsUpdatedInBackgroundEvent,
+        );
         return {
           session,
           verifyProjectsUpdatedInBackgroundEventHandler,
           verifyInitialOpen: createVerifyInitialOpen(
             session,
-            verifyProjectsUpdatedInBackgroundEventHandler
+            verifyProjectsUpdatedInBackgroundEventHandler,
           ),
         };
 
         function eventToString(event: server.ProjectsUpdatedInBackgroundEvent) {
           return JSON.stringify(
-            event && { eventName: event.eventName, data: event.data }
+            event && { eventName: event.eventName, data: event.data },
           );
         }
 
         function eventsToString(
-          events: readonly server.ProjectsUpdatedInBackgroundEvent[]
+          events: readonly server.ProjectsUpdatedInBackgroundEvent[],
         ) {
           return "[" + map(events, eventToString).join(",") + "]";
         }
 
         function verifyProjectsUpdatedInBackgroundEventHandler(
-          expectedEvents: readonly server.ProjectsUpdatedInBackgroundEvent[]
+          expectedEvents: readonly server.ProjectsUpdatedInBackgroundEvent[],
         ) {
           assert.equal(
             projectChangedEvents.length,
             expectedEvents.length,
-            `Incorrect number of events Actual: ${eventsToString(
-              projectChangedEvents
-            )} Expected: ${eventsToString(expectedEvents)}`
+            `Incorrect number of events Actual: ${
+              eventsToString(
+                projectChangedEvents,
+              )
+            } Expected: ${eventsToString(expectedEvents)}`,
           );
           forEach(projectChangedEvents, (actualEvent, i) => {
             const expectedEvent = expectedEvents[i];
@@ -759,7 +752,7 @@ namespace ts.projectSystem {
             verifyFiles(
               "openFiles",
               actualEvent.data.openFiles,
-              expectedEvent.data.openFiles
+              expectedEvent.data.openFiles,
             );
           });
 
@@ -782,48 +775,50 @@ namespace ts.projectSystem {
 
       function createSessionThatUsesEvents(
         host: TestServerHost,
-        noGetErrOnBackgroundUpdate?: boolean
+        noGetErrOnBackgroundUpdate?: boolean,
       ): ProjectsUpdatedInBackgroundEventVerifier {
-        const { session, getEvents, clearEvents } =
-          createSessionWithDefaultEventHandler<protocol.ProjectsUpdatedInBackgroundEvent>(
-            host,
-            server.ProjectsUpdatedInBackgroundEvent,
-            { noGetErrOnBackgroundUpdate }
-          );
+        const { session, getEvents, clearEvents } = createSessionWithDefaultEventHandler<
+          protocol.ProjectsUpdatedInBackgroundEvent
+        >(
+          host,
+          server.ProjectsUpdatedInBackgroundEvent,
+          { noGetErrOnBackgroundUpdate },
+        );
 
         return {
           session,
           verifyProjectsUpdatedInBackgroundEventHandler,
           verifyInitialOpen: createVerifyInitialOpen(
             session,
-            verifyProjectsUpdatedInBackgroundEventHandler
+            verifyProjectsUpdatedInBackgroundEventHandler,
           ),
         };
 
         function verifyProjectsUpdatedInBackgroundEventHandler(
-          expected: readonly server.ProjectsUpdatedInBackgroundEvent[]
+          expected: readonly server.ProjectsUpdatedInBackgroundEvent[],
         ) {
-          const expectedEvents: protocol.ProjectsUpdatedInBackgroundEventBody[] =
-            map(expected, (e) => {
-              return {
-                openFiles: e.data.openFiles,
-              };
-            });
+          const expectedEvents: protocol.ProjectsUpdatedInBackgroundEventBody[] = map(expected, (e) => {
+            return {
+              openFiles: e.data.openFiles,
+            };
+          });
           const events = getEvents();
           assert.equal(
             events.length,
             expectedEvents.length,
-            `Incorrect number of events Actual: ${map(
-              events,
-              (e) => e.body
-            )} Expected: ${expectedEvents}`
+            `Incorrect number of events Actual: ${
+              map(
+                events,
+                (e) => e.body,
+              )
+            } Expected: ${expectedEvents}`,
           );
           forEach(events, (actualEvent, i) => {
             const expectedEvent = expectedEvents[i];
             verifyFiles(
               "openFiles",
               actualEvent.body.openFiles,
-              expectedEvent.openFiles
+              expectedEvent.openFiles,
             );
           });
 

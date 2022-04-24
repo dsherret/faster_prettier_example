@@ -5,27 +5,26 @@ namespace ts {
   export function computeSuggestionDiagnostics(
     sourceFile: SourceFile,
     program: Program,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): DiagnosticWithLocation[] {
     program.getSemanticDiagnostics(sourceFile, cancellationToken);
     const diags: DiagnosticWithLocation[] = [];
     const checker = program.getTypeChecker();
-    const isCommonJSFile =
-      sourceFile.impliedNodeFormat === ModuleKind.CommonJS ||
-      fileExtensionIsOneOf(sourceFile.fileName, [Extension.Cts, Extension.Cjs]);
+    const isCommonJSFile = sourceFile.impliedNodeFormat === ModuleKind.CommonJS
+      || fileExtensionIsOneOf(sourceFile.fileName, [Extension.Cts, Extension.Cjs]);
 
     if (
-      !isCommonJSFile &&
-      sourceFile.commonJsModuleIndicator &&
-      (programContainsEsModules(program) ||
-        compilerOptionsIndicateEsModules(program.getCompilerOptions())) &&
-      containsTopLevelCommonjs(sourceFile)
+      !isCommonJSFile
+      && sourceFile.commonJsModuleIndicator
+      && (programContainsEsModules(program)
+        || compilerOptionsIndicateEsModules(program.getCompilerOptions()))
+      && containsTopLevelCommonjs(sourceFile)
     ) {
       diags.push(
         createDiagnosticForNode(
           getErrorNodeFromCommonJsIndicator(sourceFile.commonJsModuleIndicator),
-          Diagnostics.File_is_a_CommonJS_module_it_may_be_converted_to_an_ES_module
-        )
+          Diagnostics.File_is_a_CommonJS_module_it_may_be_converted_to_an_ES_module,
+        ),
       );
     }
 
@@ -42,22 +41,21 @@ namespace ts {
         const module = getResolvedModule(
           sourceFile,
           moduleSpecifier.text,
-          getModeForUsageLocation(sourceFile, moduleSpecifier)
+          getModeForUsageLocation(sourceFile, moduleSpecifier),
         );
-        const resolvedFile =
-          module && program.getSourceFile(module.resolvedFileName);
+        const resolvedFile = module && program.getSourceFile(module.resolvedFileName);
         if (
-          resolvedFile &&
-          resolvedFile.externalModuleIndicator &&
-          resolvedFile.externalModuleIndicator !== true &&
-          isExportAssignment(resolvedFile.externalModuleIndicator) &&
-          resolvedFile.externalModuleIndicator.isExportEquals
+          resolvedFile
+          && resolvedFile.externalModuleIndicator
+          && resolvedFile.externalModuleIndicator !== true
+          && isExportAssignment(resolvedFile.externalModuleIndicator)
+          && resolvedFile.externalModuleIndicator.isExportEquals
         ) {
           diags.push(
             createDiagnosticForNode(
               name,
-              Diagnostics.Import_may_be_converted_to_a_default_import
-            )
+              Diagnostics.Import_may_be_converted_to_a_default_import,
+            ),
           );
         }
       }
@@ -66,7 +64,7 @@ namespace ts {
     addRange(diags, sourceFile.bindSuggestionDiagnostics);
     addRange(
       diags,
-      program.getSuggestionDiagnostics(sourceFile, cancellationToken)
+      program.getSuggestionDiagnostics(sourceFile, cancellationToken),
     );
     return diags.sort((d1, d2) => d1.start - d2.start);
 
@@ -76,27 +74,27 @@ namespace ts {
           diags.push(
             createDiagnosticForNode(
               isVariableDeclaration(node.parent) ? node.parent.name : node,
-              Diagnostics.This_constructor_function_may_be_converted_to_a_class_declaration
-            )
+              Diagnostics.This_constructor_function_may_be_converted_to_a_class_declaration,
+            ),
           );
         }
       } else {
         if (
-          isVariableStatement(node) &&
-          node.parent === sourceFile &&
-          node.declarationList.flags & NodeFlags.Const &&
-          node.declarationList.declarations.length === 1
+          isVariableStatement(node)
+          && node.parent === sourceFile
+          && node.declarationList.flags & NodeFlags.Const
+          && node.declarationList.declarations.length === 1
         ) {
           const init = node.declarationList.declarations[0].initializer;
           if (
-            init &&
-            isRequireCall(init, /*checkArgumentIsStringLiteralLike*/ true)
+            init
+            && isRequireCall(init, /*checkArgumentIsStringLiteralLike*/ true)
           ) {
             diags.push(
               createDiagnosticForNode(
                 init,
-                Diagnostics.require_call_may_be_converted_to_an_import
-              )
+                Diagnostics.require_call_may_be_converted_to_an_import,
+              ),
             );
           }
         }
@@ -105,8 +103,8 @@ namespace ts {
           diags.push(
             createDiagnosticForNode(
               node.name || node,
-              Diagnostics.JSDoc_types_may_be_moved_to_TypeScript_types
-            )
+              Diagnostics.JSDoc_types_may_be_moved_to_TypeScript_types,
+            ),
           );
         }
       }
@@ -127,23 +125,24 @@ namespace ts {
             statement as VariableStatement
           ).declarationList.declarations.some(
             (decl) =>
-              !!decl.initializer &&
-              isRequireCall(
+              !!decl.initializer
+              && isRequireCall(
                 propertyAccessLeftHandSide(decl.initializer),
-                /*checkArgumentIsStringLiteralLike*/ true
-              )
+                /*checkArgumentIsStringLiteralLike*/ true,
+              ),
           );
         case SyntaxKind.ExpressionStatement: {
           const { expression } = statement as ExpressionStatement;
-          if (!isBinaryExpression(expression))
+          if (!isBinaryExpression(expression)) {
             return isRequireCall(
               expression,
-              /*checkArgumentIsStringLiteralLike*/ true
+              /*checkArgumentIsStringLiteralLike*/ true,
             );
+          }
           const kind = getAssignmentDeclarationKind(expression);
           return (
-            kind === AssignmentDeclarationKind.ExportsProperty ||
-            kind === AssignmentDeclarationKind.ModuleExports
+            kind === AssignmentDeclarationKind.ExportsProperty
+            || kind === AssignmentDeclarationKind.ModuleExports
           );
         }
         default:
@@ -159,16 +158,16 @@ namespace ts {
   }
 
   function importNameForConvertToDefaultImport(
-    node: AnyValidImportOrReExport
+    node: AnyValidImportOrReExport,
   ): Identifier | undefined {
     switch (node.kind) {
       case SyntaxKind.ImportDeclaration:
         const { importClause, moduleSpecifier } = node;
-        return importClause &&
-          !importClause.name &&
-          importClause.namedBindings &&
-          importClause.namedBindings.kind === SyntaxKind.NamespaceImport &&
-          isStringLiteral(moduleSpecifier)
+        return importClause
+            && !importClause.name
+            && importClause.namedBindings
+            && importClause.namedBindings.kind === SyntaxKind.NamespaceImport
+            && isStringLiteral(moduleSpecifier)
           ? importClause.namedBindings.name
           : undefined;
       case SyntaxKind.ImportEqualsDeclaration:
@@ -181,42 +180,42 @@ namespace ts {
   function addConvertToAsyncFunctionDiagnostics(
     node: FunctionLikeDeclaration,
     checker: TypeChecker,
-    diags: Push<DiagnosticWithLocation>
+    diags: Push<DiagnosticWithLocation>,
   ): void {
     // need to check function before checking map so that deeper levels of nested callbacks are checked
     if (
-      isConvertibleFunction(node, checker) &&
-      !visitedNestedConvertibleFunctions.has(getKeyFromNode(node))
+      isConvertibleFunction(node, checker)
+      && !visitedNestedConvertibleFunctions.has(getKeyFromNode(node))
     ) {
       diags.push(
         createDiagnosticForNode(
-          !node.name &&
-            isVariableDeclaration(node.parent) &&
-            isIdentifier(node.parent.name)
+          !node.name
+            && isVariableDeclaration(node.parent)
+            && isIdentifier(node.parent.name)
             ? node.parent.name
             : node,
-          Diagnostics.This_may_be_converted_to_an_async_function
-        )
+          Diagnostics.This_may_be_converted_to_an_async_function,
+        ),
       );
     }
   }
 
   function isConvertibleFunction(
     node: FunctionLikeDeclaration,
-    checker: TypeChecker
+    checker: TypeChecker,
   ) {
     return (
-      !isAsyncFunction(node) &&
-      node.body &&
-      isBlock(node.body) &&
-      hasReturnStatementWithPromiseHandler(node.body, checker) &&
-      returnsPromise(node, checker)
+      !isAsyncFunction(node)
+      && node.body
+      && isBlock(node.body)
+      && hasReturnStatementWithPromiseHandler(node.body, checker)
+      && returnsPromise(node, checker)
     );
   }
 
   export function returnsPromise(
     node: FunctionLikeDeclaration,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
     const signature = checker.getSignatureFromDeclaration(node);
     const returnType = signature
@@ -226,7 +225,7 @@ namespace ts {
   }
 
   function getErrorNodeFromCommonJsIndicator(
-    commonJsModuleIndicator: Node
+    commonJsModuleIndicator: Node,
   ): Node {
     return isBinaryExpression(commonJsModuleIndicator)
       ? commonJsModuleIndicator.left
@@ -235,34 +234,35 @@ namespace ts {
 
   function hasReturnStatementWithPromiseHandler(
     body: Block,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
-    return !!forEachReturnStatement(body, (statement) =>
-      isReturnStatementWithFixablePromiseHandler(statement, checker)
+    return !!forEachReturnStatement(
+      body,
+      (statement) => isReturnStatementWithFixablePromiseHandler(statement, checker),
     );
   }
 
   export function isReturnStatementWithFixablePromiseHandler(
     node: Node,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): node is ReturnStatement & { expression: CallExpression } {
     return (
-      isReturnStatement(node) &&
-      !!node.expression &&
-      isFixablePromiseHandler(node.expression, checker)
+      isReturnStatement(node)
+      && !!node.expression
+      && isFixablePromiseHandler(node.expression, checker)
     );
   }
 
   // Should be kept up to date with transformExpression in convertToAsyncFunction.ts
   export function isFixablePromiseHandler(
     node: Node,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
     // ensure outermost call exists and is a promise handler
     if (
-      !isPromiseHandler(node) ||
-      !hasSupportedNumberOfArguments(node) ||
-      !node.arguments.every((arg) => isFixablePromiseArgument(arg, checker))
+      !isPromiseHandler(node)
+      || !hasSupportedNumberOfArguments(node)
+      || !node.arguments.every((arg) => isFixablePromiseArgument(arg, checker))
     ) {
       return false;
     }
@@ -270,15 +270,13 @@ namespace ts {
     // ensure all chained calls are valid
     let currentNode = node.expression.expression;
     while (
-      isPromiseHandler(currentNode) ||
-      isPropertyAccessExpression(currentNode)
+      isPromiseHandler(currentNode)
+      || isPropertyAccessExpression(currentNode)
     ) {
       if (isCallExpression(currentNode)) {
         if (
-          !hasSupportedNumberOfArguments(currentNode) ||
-          !currentNode.arguments.every((arg) =>
-            isFixablePromiseArgument(arg, checker)
-          )
+          !hasSupportedNumberOfArguments(currentNode)
+          || !currentNode.arguments.every((arg) => isFixablePromiseArgument(arg, checker))
         ) {
           return false;
         }
@@ -294,27 +292,26 @@ namespace ts {
     readonly expression: PropertyAccessExpression;
   } {
     return (
-      isCallExpression(node) &&
-      (hasPropertyAccessExpressionWithName(node, "then") ||
-        hasPropertyAccessExpressionWithName(node, "catch") ||
-        hasPropertyAccessExpressionWithName(node, "finally"))
+      isCallExpression(node)
+      && (hasPropertyAccessExpressionWithName(node, "then")
+        || hasPropertyAccessExpressionWithName(node, "catch")
+        || hasPropertyAccessExpressionWithName(node, "finally"))
     );
   }
 
   function hasSupportedNumberOfArguments(
-    node: CallExpression & { readonly expression: PropertyAccessExpression }
+    node: CallExpression & { readonly expression: PropertyAccessExpression },
   ) {
     const name = node.expression.name.text;
-    const maxArguments =
-      name === "then" ? 2 : name === "catch" ? 1 : name === "finally" ? 1 : 0;
+    const maxArguments = name === "then" ? 2 : name === "catch" ? 1 : name === "finally" ? 1 : 0;
     if (node.arguments.length > maxArguments) return false;
     if (node.arguments.length < maxArguments) return true;
     return (
-      maxArguments === 1 ||
-      some(node.arguments, (arg) => {
+      maxArguments === 1
+      || some(node.arguments, (arg) => {
         return (
-          arg.kind === SyntaxKind.NullKeyword ||
-          (isIdentifier(arg) && arg.text === "undefined")
+          arg.kind === SyntaxKind.NullKeyword
+          || (isIdentifier(arg) && arg.text === "undefined")
         );
       })
     );
@@ -323,13 +320,13 @@ namespace ts {
   // should be kept up to date with getTransformationBody in convertToAsyncFunction.ts
   function isFixablePromiseArgument(
     arg: Expression,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
     switch (arg.kind) {
       case SyntaxKind.FunctionDeclaration:
       case SyntaxKind.FunctionExpression:
         const functionFlags = getFunctionFlags(
-          arg as FunctionDeclaration | FunctionExpression
+          arg as FunctionDeclaration | FunctionExpression,
         );
         if (functionFlags & FunctionFlags.Generator) {
           return false;
@@ -338,7 +335,7 @@ namespace ts {
       case SyntaxKind.ArrowFunction:
         visitedNestedConvertibleFunctions.set(
           getKeyFromNode(arg as FunctionLikeDeclaration),
-          true
+          true,
         );
       // falls through
       case SyntaxKind.NullKeyword:
@@ -350,14 +347,14 @@ namespace ts {
           return false;
         }
         return (
-          checker.isUndefinedSymbol(symbol) ||
-          some(
+          checker.isUndefinedSymbol(symbol)
+          || some(
             skipAlias(symbol, checker).declarations,
             (d) =>
-              isFunctionLike(d) ||
-              (hasInitializer(d) &&
-                !!d.initializer &&
-                isFunctionLike(d.initializer))
+              isFunctionLike(d)
+              || (hasInitializer(d)
+                && !!d.initializer
+                && isFunctionLike(d.initializer)),
           )
         );
       }
@@ -378,7 +375,7 @@ namespace ts {
 
       const symbol = checker.getSymbolOfExpando(
         node,
-        /*allowDeclaration*/ false
+        /*allowDeclaration*/ false,
       );
       return !!(symbol && (symbol.exports?.size || symbol.members?.size));
     }
@@ -391,12 +388,13 @@ namespace ts {
   }
 
   export function canBeConvertedToAsync(
-    node: Node
+    node: Node,
   ): node is
     | FunctionDeclaration
     | MethodDeclaration
     | FunctionExpression
-    | ArrowFunction {
+    | ArrowFunction
+  {
     switch (node.kind) {
       case SyntaxKind.FunctionDeclaration:
       case SyntaxKind.MethodDeclaration:

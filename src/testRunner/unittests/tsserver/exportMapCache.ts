@@ -63,7 +63,7 @@ namespace ts.projectSystem {
       const { host, exportMapCache, project } = setup();
       host.writeFile(
         "/package.json",
-        `{ "name": "blah", "dependencies": { "mobx": "*" } }`
+        `{ "name": "blah", "dependencies": { "mobx": "*" } }`,
       );
       host.runQueuedTimeoutCallbacks();
       project.getPackageJsonAutoImportProvider();
@@ -96,7 +96,7 @@ namespace ts.projectSystem {
         returnTrue,
         (info, symbolName) => {
           if (symbolName === "SIGINT") sigintPropBefore = info;
-        }
+        },
       );
       assert.ok(sigintPropBefore);
       assert.ok(sigintPropBefore![0].symbol.flags & SymbolFlags.Transient);
@@ -131,7 +131,7 @@ namespace ts.projectSystem {
         returnTrue,
         (info, symbolName) => {
           if (symbolName === "SIGINT") sigintPropAfter = info;
-        }
+        },
       );
       assert.ok(sigintPropAfter);
       assert.notEqual(symbolIdBefore, getSymbolId(sigintPropAfter![0].symbol));

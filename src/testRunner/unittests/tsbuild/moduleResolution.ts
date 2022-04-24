@@ -49,7 +49,7 @@ namespace ts.tscWatch {
           },
           libFile,
         ],
-        { currentDirectory: projectRoot }
+        { currentDirectory: projectRoot },
       );
     }
 
@@ -68,7 +68,8 @@ namespace ts.tscWatch {
 
     verifyTscWatch({
       scenario: "moduleResolution",
-      subScenario: `resolves specifier in output declaration file from referenced project correctly with preserveSymlinks`,
+      subScenario:
+        `resolves specifier in output declaration file from referenced project correctly with preserveSymlinks`,
       sys: () => sys({ preserveSymlinks: true }),
       commandLineArgs: [
         "-b",
@@ -81,7 +82,8 @@ namespace ts.tscWatch {
 
     verifyTscWatch({
       scenario: "moduleResolution",
-      subScenario: `resolves specifier in output declaration file from referenced project correctly with cts and mts extensions`,
+      subScenario:
+        `resolves specifier in output declaration file from referenced project correctly with cts and mts extensions`,
       sys: () =>
         createWatchedSystem(
           [
@@ -143,7 +145,7 @@ namespace ts.tscWatch {
             },
             { ...libFile, path: `/a/lib/lib.es2020.full.d.ts` },
           ],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         ),
       commandLineArgs: [
         "-b",
@@ -160,7 +162,7 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg1/package.json`,
               `"module"`,
-              `"commonjs"`
+              `"commonjs"`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -171,7 +173,7 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg1/package.json`,
               `"commonjs"`,
-              `"module"`
+              `"module"`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -182,23 +184,22 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg1/package.json`,
               `"module"`,
-              `"commonjs"`
+              `"commonjs"`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
         {
-          caption:
-            "removes those errors when a package file is changed to cjs extensions",
+          caption: "removes those errors when a package file is changed to cjs extensions",
           change: (sys) => {
             replaceFileText(
               sys,
               `${projectRoot}/packages/pkg2/package.json`,
               `"build/index.js"`,
-              `"build/index.cjs"`
+              `"build/index.cjs"`,
             );
             sys.renameFile(
               `${projectRoot}/packages/pkg2/index.ts`,
-              `${projectRoot}/packages/pkg2/index.cts`
+              `${projectRoot}/packages/pkg2/index.cts`,
             );
           },
           timeouts: runQueuedTimeoutCallbacks,
@@ -287,7 +288,7 @@ namespace ts.tscWatch {
             },
             libFile,
           ],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         ),
       commandLineArgs: [
         "--project",
@@ -303,7 +304,7 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg2/package.json`,
               `index.js`,
-              `other.js`
+              `other.js`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -314,7 +315,7 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg2/package.json`,
               `other.js`,
-              `index.js`
+              `index.js`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -386,7 +387,7 @@ namespace ts.tscWatch {
             },
             libFile,
           ],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         ),
       commandLineArgs: [
         "-b",
@@ -403,7 +404,7 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg2/package.json`,
               `index.js`,
-              `other.js`
+              `other.js`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -414,7 +415,7 @@ namespace ts.tscWatch {
               sys,
               `${projectRoot}/packages/pkg2/package.json`,
               `other.js`,
-              `index.js`
+              `index.js`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },

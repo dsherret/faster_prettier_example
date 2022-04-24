@@ -11,7 +11,7 @@ namespace ts {
     function verifyNoEmitOnError(
       subScenario: string,
       fixModifyFs: TscIncremental["modifyFs"],
-      modifyFs?: TscIncremental["modifyFs"]
+      modifyFs?: TscIncremental["modifyFs"],
     ) {
       verifyTscSerializedIncrementalEdits({
         scenario: "noEmitOnError",
@@ -40,9 +40,8 @@ namespace ts {
 const a = {
     lastName: 'sdsd'
 };`,
-        "utf-8"
-      )
-    );
+        "utf-8",
+      ));
 
     verifyNoEmitOnError(
       "semantic errors",
@@ -51,15 +50,15 @@ const a = {
           "/src/src/main.ts",
           `import { A } from "../shared/types/db";
 const a: string = "hello";`,
-          "utf-8"
+          "utf-8",
         ),
       (fs) =>
         fs.writeFileSync(
           "/src/src/main.ts",
           `import { A } from "../shared/types/db";
 const a: string = 10;`,
-          "utf-8"
-        )
+          "utf-8",
+        ),
     );
   });
 }

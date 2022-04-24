@@ -85,23 +85,24 @@ namespace ts.projectSystem {
         protocol.CompletionDetailsRequest,
         protocol.CompletionDetailsResponse
       >(session, protocol.CommandTypes.CompletionDetails, detailsRequestArgs);
-      const detailsCommon: protocol.CompletionEntryDetails &
-        CompletionEntryDetails = {
-        displayParts: [
-          keywordPart(SyntaxKind.ConstKeyword),
-          spacePart(),
-          displayPart("foo", SymbolDisplayPartKind.localName),
-          punctuationPart(SyntaxKind.ColonToken),
-          spacePart(),
-          displayPart("0", SymbolDisplayPartKind.stringLiteral),
-        ],
-        documentation: emptyArray,
-        kind: ScriptElementKind.constElement,
-        kindModifiers: ScriptElementKindModifier.exportedModifier,
-        name: "foo",
-        source: [{ text: "./a", kind: "text" }],
-        sourceDisplay: [{ text: "./a", kind: "text" }],
-      };
+      const detailsCommon:
+        & protocol.CompletionEntryDetails
+        & CompletionEntryDetails = {
+          displayParts: [
+            keywordPart(SyntaxKind.ConstKeyword),
+            spacePart(),
+            displayPart("foo", SymbolDisplayPartKind.localName),
+            punctuationPart(SyntaxKind.ColonToken),
+            spacePart(),
+            displayPart("0", SymbolDisplayPartKind.stringLiteral),
+          ],
+          documentation: emptyArray,
+          kind: ScriptElementKind.constElement,
+          kindModifiers: ScriptElementKindModifier.exportedModifier,
+          name: "foo",
+          source: [{ text: "./a", kind: "text" }],
+          sourceDisplay: [{ text: "./a", kind: "text" }],
+        };
       assert.deepEqual<readonly protocol.CompletionEntryDetails[] | undefined>(
         detailsResponse,
         [
@@ -116,7 +117,7 @@ namespace ts.projectSystem {
                       {
                         start: { line: 1, offset: 1 },
                         end: { line: 1, offset: 1 },
-                        newText: 'import { foo } from "./a";\n\n',
+                        newText: "import { foo } from \"./a\";\n\n",
                       },
                     ],
                   },
@@ -127,11 +128,10 @@ namespace ts.projectSystem {
             tags: [],
             ...detailsCommon,
           },
-        ]
+        ],
       );
 
-      interface CompletionDetailsFullRequest
-        extends protocol.FileLocationRequest {
+      interface CompletionDetailsFullRequest extends protocol.FileLocationRequest {
         readonly command: protocol.CommandTypes.CompletionDetailsFull;
         readonly arguments: protocol.CompletionDetailsRequestArgs;
       }
@@ -144,7 +144,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.CompletionDetailsFull,
-        detailsRequestArgs
+        detailsRequestArgs,
       );
       assert.deepEqual<readonly CompletionEntryDetails[] | undefined>(
         detailsFullResponse,
@@ -159,7 +159,7 @@ namespace ts.projectSystem {
                     textChanges: [
                       createTextChange(
                         createTextSpan(0, 0),
-                        'import { foo } from "./a";\n\n'
+                        "import { foo } from \"./a\";\n\n",
                       ),
                     ],
                   },
@@ -170,7 +170,7 @@ namespace ts.projectSystem {
             tags: [],
             ...detailsCommon,
           },
-        ]
+        ],
       );
     });
 
@@ -288,7 +288,7 @@ export interface BrowserRouterProps {
         typingsInstaller: new TestTypingsInstaller(
           globalCacheLocation,
           /*throttleLimit*/ 5,
-          host
+          host,
         ),
       });
       const service = session.getProjectService();
@@ -297,7 +297,7 @@ export interface BrowserRouterProps {
       const windowsStyleLibFilePath = "c:/" + libFile.path.substring(1);
       checkProjectActualFiles(
         service.inferredProjects[0],
-        filesInProject.map((f) => f.path).concat(windowsStyleLibFilePath)
+        filesInProject.map((f) => f.path).concat(windowsStyleLibFilePath),
       );
       session.executeCommandSeq<protocol.CompletionsRequest>({
         command: protocol.CommandTypes.CompletionInfo,

@@ -11,19 +11,19 @@ namespace ts {
       cancellationToken: CancellationToken,
       sourceFile: SourceFile,
       position: number,
-      sourceFilesToSearch: readonly SourceFile[]
+      sourceFilesToSearch: readonly SourceFile[],
     ): DocumentHighlights[] | undefined {
       const node = getTouchingPropertyName(sourceFile, position);
 
       if (
-        node.parent &&
-        ((isJsxOpeningElement(node.parent) && node.parent.tagName === node) ||
-          isJsxClosingElement(node.parent))
+        node.parent
+        && ((isJsxOpeningElement(node.parent) && node.parent.tagName === node)
+          || isJsxClosingElement(node.parent))
       ) {
         // For a JSX element, just highlight the matching tag, not all references.
         const { openingElement, closingElement } = node.parent.parent;
         const highlightSpans = [openingElement, closingElement].map(
-          ({ tagName }) => getHighlightSpanForNode(tagName, sourceFile)
+          ({ tagName }) => getHighlightSpanForNode(tagName, sourceFile),
         );
         return [{ fileName: sourceFile.fileName, highlightSpans }];
       }
@@ -34,14 +34,14 @@ namespace ts {
           node,
           program,
           cancellationToken,
-          sourceFilesToSearch
+          sourceFilesToSearch,
         ) || getSyntacticDocumentHighlights(node, sourceFile)
       );
     }
 
     function getHighlightSpanForNode(
       node: Node,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): HighlightSpan {
       return {
         fileName: sourceFile.fileName,
@@ -55,10 +55,10 @@ namespace ts {
       node: Node,
       program: Program,
       cancellationToken: CancellationToken,
-      sourceFilesToSearch: readonly SourceFile[]
+      sourceFilesToSearch: readonly SourceFile[],
     ): DocumentHighlights[] | undefined {
       const sourceFilesSet = new Set(
-        sourceFilesToSearch.map((f) => f.fileName)
+        sourceFilesToSearch.map((f) => f.fileName),
       );
       const referenceEntries = FindAllReferences.getReferenceEntriesForNode(
         position,
@@ -67,16 +67,16 @@ namespace ts {
         sourceFilesToSearch,
         cancellationToken,
         /*options*/ undefined,
-        sourceFilesSet
+        sourceFilesSet,
       );
       if (!referenceEntries) return undefined;
       const map = arrayToMultiMap(
         referenceEntries.map(FindAllReferences.toHighlightSpan),
         (e) => e.fileName,
-        (e) => e.span
+        (e) => e.span,
       );
       const getCanonicalFileName = createGetCanonicalFileName(
-        program.useCaseSensitiveFileNames()
+        program.useCaseSensitiveFileNames(),
       );
       return mapDefined(
         arrayFrom(map.entries()),
@@ -87,8 +87,8 @@ namespace ts {
                 toPath(
                   fileName,
                   program.getCurrentDirectory(),
-                  getCanonicalFileName
-                )
+                  getCanonicalFileName,
+                ),
               )
             ) {
               return undefined;
@@ -97,20 +97,20 @@ namespace ts {
             const redirect = find(
               sourceFilesToSearch,
               (f) =>
-                !!f.redirectInfo &&
-                f.redirectInfo.redirectTarget === redirectTarget
+                !!f.redirectInfo
+                && f.redirectInfo.redirectTarget === redirectTarget,
             )!;
             fileName = redirect.fileName;
             Debug.assert(sourceFilesSet.has(fileName));
           }
           return { fileName, highlightSpans };
-        }
+        },
       );
     }
 
     function getSyntacticDocumentHighlights(
       node: Node,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): DocumentHighlights[] | undefined {
       const highlightSpans = getHighlightSpans(node, sourceFile);
       return (
@@ -120,7 +120,7 @@ namespace ts {
 
     function getHighlightSpans(
       node: Node,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): HighlightSpan[] | undefined {
       switch (node.kind) {
         case SyntaxKind.IfKeyword:
@@ -132,27 +132,26 @@ namespace ts {
           return useParent(
             node.parent,
             isReturnStatement,
-            getReturnOccurrences
+            getReturnOccurrences,
           );
         case SyntaxKind.ThrowKeyword:
           return useParent(node.parent, isThrowStatement, getThrowOccurrences);
         case SyntaxKind.TryKeyword:
         case SyntaxKind.CatchKeyword:
         case SyntaxKind.FinallyKeyword:
-          const tryStatement =
-            node.kind === SyntaxKind.CatchKeyword
-              ? node.parent.parent
-              : node.parent;
+          const tryStatement = node.kind === SyntaxKind.CatchKeyword
+            ? node.parent.parent
+            : node.parent;
           return useParent(
             tryStatement,
             isTryStatement,
-            getTryCatchFinallyOccurrences
+            getTryCatchFinallyOccurrences,
           );
         case SyntaxKind.SwitchKeyword:
           return useParent(
             node.parent,
             isSwitchStatement,
-            getSwitchCaseDefaultOccurrences
+            getSwitchCaseDefaultOccurrences,
           );
         case SyntaxKind.CaseKeyword:
         case SyntaxKind.DefaultKeyword: {
@@ -160,7 +159,7 @@ namespace ts {
             return useParent(
               node.parent.parent.parent,
               isSwitchStatement,
-              getSwitchCaseDefaultOccurrences
+              getSwitchCaseDefaultOccurrences,
             );
           }
           return undefined;
@@ -170,16 +169,15 @@ namespace ts {
           return useParent(
             node.parent,
             isBreakOrContinueStatement,
-            getBreakOrContinueStatementOccurrences
+            getBreakOrContinueStatementOccurrences,
           );
         case SyntaxKind.ForKeyword:
         case SyntaxKind.WhileKeyword:
         case SyntaxKind.DoKeyword:
           return useParent(
             node.parent,
-            (n): n is IterationStatement =>
-              isIterationStatement(n, /*lookInLabeledStatements*/ true),
-            getLoopBreakContinueOccurrences
+            (n): n is IterationStatement => isIterationStatement(n, /*lookInLabeledStatements*/ true),
+            getLoopBreakContinueOccurrences,
           );
         case SyntaxKind.ConstructorKeyword:
           return getFromAllDeclarations(isConstructorDeclaration, [
@@ -195,32 +193,28 @@ namespace ts {
           return useParent(
             node.parent,
             isAwaitExpression,
-            getAsyncAndAwaitOccurrences
+            getAsyncAndAwaitOccurrences,
           );
         case SyntaxKind.AsyncKeyword:
           return highlightSpans(getAsyncAndAwaitOccurrences(node));
         case SyntaxKind.YieldKeyword:
           return highlightSpans(getYieldOccurrences(node));
         default:
-          return isModifierKind(node.kind) &&
-            (isDeclaration(node.parent) || isVariableStatement(node.parent))
+          return isModifierKind(node.kind)
+              && (isDeclaration(node.parent) || isVariableStatement(node.parent))
             ? highlightSpans(getModifierOccurrences(node.kind, node.parent))
             : undefined;
       }
 
       function getFromAllDeclarations<T extends Node>(
         nodeTest: (node: Node) => node is T,
-        keywords: readonly SyntaxKind[]
+        keywords: readonly SyntaxKind[],
       ): HighlightSpan[] | undefined {
         return useParent(node.parent, nodeTest, (decl) =>
           mapDefined(decl.symbol.declarations, (d) =>
             nodeTest(d)
-              ? find(d.getChildren(sourceFile), (c) =>
-                  contains(keywords, c.kind)
-                )
-              : undefined
-          )
-        );
+              ? find(d.getChildren(sourceFile), (c) => contains(keywords, c.kind))
+              : undefined));
       }
 
       function useParent<T extends Node>(
@@ -228,8 +222,8 @@ namespace ts {
         nodeTest: (node: Node) => node is T,
         getNodes: (
           node: T,
-          sourceFile: SourceFile
-        ) => readonly Node[] | undefined
+          sourceFile: SourceFile,
+        ) => readonly Node[] | undefined,
       ): HighlightSpan[] | undefined {
         return nodeTest(node)
           ? highlightSpans(getNodes(node, sourceFile))
@@ -237,11 +231,11 @@ namespace ts {
       }
 
       function highlightSpans(
-        nodes: readonly Node[] | undefined
+        nodes: readonly Node[] | undefined,
       ): HighlightSpan[] | undefined {
         return (
-          nodes &&
-          nodes.map((node) => getHighlightSpanForNode(node, sourceFile))
+          nodes
+          && nodes.map((node) => getHighlightSpanForNode(node, sourceFile))
         );
       }
     }
@@ -251,7 +245,7 @@ namespace ts {
      * into function boundaries and try-blocks with catch-clauses.
      */
     function aggregateOwnedThrowStatements(
-      node: Node
+      node: Node,
     ): readonly ThrowStatement[] | undefined {
       if (isThrowStatement(node)) {
         return [node];
@@ -261,7 +255,7 @@ namespace ts {
           node.catchClause
             ? aggregateOwnedThrowStatements(node.catchClause)
             : node.tryBlock && aggregateOwnedThrowStatements(node.tryBlock),
-          node.finallyBlock && aggregateOwnedThrowStatements(node.finallyBlock)
+          node.finallyBlock && aggregateOwnedThrowStatements(node.finallyBlock),
         );
       }
       // Do not cross function boundaries.
@@ -276,7 +270,7 @@ namespace ts {
      * function-block, or source file.
      */
     function getThrowStatementOwner(
-      throwStatement: ThrowStatement
+      throwStatement: ThrowStatement,
     ): Node | undefined {
       let child: Node = throwStatement;
 
@@ -290,9 +284,9 @@ namespace ts {
         // A throw-statement is only owned by a try-statement if the try-statement has
         // a catch clause, and if the throw-statement occurs within the try block.
         if (
-          isTryStatement(parent) &&
-          parent.tryBlock === child &&
-          parent.catchClause
+          isTryStatement(parent)
+          && parent.tryBlock === child
+          && parent.catchClause
         ) {
           return child;
         }
@@ -304,7 +298,7 @@ namespace ts {
     }
 
     function aggregateAllBreakAndContinueStatements(
-      node: Node
+      node: Node,
     ): readonly BreakOrContinueStatement[] | undefined {
       return isBreakOrContinueStatement(node)
         ? [node]
@@ -315,7 +309,7 @@ namespace ts {
 
     function flatMapChildren<T>(
       node: Node,
-      cb: (child: Node) => readonly T[] | T | undefined
+      cb: (child: Node) => readonly T[] | T | undefined,
     ): readonly T[] {
       const result: T[] = [];
       node.forEachChild((child) => {
@@ -329,14 +323,14 @@ namespace ts {
 
     function ownsBreakOrContinueStatement(
       owner: Node,
-      statement: BreakOrContinueStatement
+      statement: BreakOrContinueStatement,
     ): boolean {
       const actualOwner = getBreakOrContinueOwner(statement);
       return !!actualOwner && actualOwner === owner;
     }
 
     function getBreakOrContinueOwner(
-      statement: BreakOrContinueStatement
+      statement: BreakOrContinueStatement,
     ): Node | undefined {
       return findAncestor(statement, (node) => {
         switch (node.kind) {
@@ -345,7 +339,6 @@ namespace ts {
               return false;
             }
           // falls through
-
           case SyntaxKind.ForStatement:
           case SyntaxKind.ForInStatement:
           case SyntaxKind.ForOfStatement:
@@ -364,17 +357,17 @@ namespace ts {
 
     function getModifierOccurrences(
       modifier: Modifier["kind"],
-      declaration: Node
+      declaration: Node,
     ): Node[] {
       return mapDefined(
         getNodesToSearchForModifier(declaration, modifierToFlag(modifier)),
-        (node) => findModifier(node, modifier)
+        (node) => findModifier(node, modifier),
       );
     }
 
     function getNodesToSearchForModifier(
       declaration: Node,
-      modifierFlag: ModifierFlags
+      modifierFlag: ModifierFlags,
     ): readonly Node[] | undefined {
       // Types of node whose children might have modifiers.
       const container = declaration.parent as
@@ -396,8 +389,8 @@ namespace ts {
         case SyntaxKind.DefaultClause:
           // Container is either a class declaration or the declaration is a classDeclaration
           if (
-            modifierFlag & ModifierFlags.Abstract &&
-            isClassDeclaration(declaration)
+            modifierFlag & ModifierFlags.Abstract
+            && isClassDeclaration(declaration)
           ) {
             return [...declaration.members, declaration];
           } else {
@@ -419,12 +412,12 @@ namespace ts {
           // If we're an accessibility modifier, we're in an instance member and should search
           // the constructor's parameter list for instance members as well.
           if (
-            modifierFlag &
-            (ModifierFlags.AccessibilityModifier | ModifierFlags.Readonly)
+            modifierFlag
+            & (ModifierFlags.AccessibilityModifier | ModifierFlags.Readonly)
           ) {
             const constructor = find(
               container.members,
-              isConstructorDeclaration
+              isConstructorDeclaration,
             );
             if (constructor) {
               return [...nodes, ...constructor.parameters];
@@ -435,6 +428,7 @@ namespace ts {
           return nodes;
 
         // Syntactically invalid positions that the parser might produce anyway
+
         case SyntaxKind.ObjectLiteralExpression:
           return undefined;
 
@@ -457,7 +451,7 @@ namespace ts {
     }
 
     function getLoopBreakContinueOccurrences(
-      loopNode: IterationStatement
+      loopNode: IterationStatement,
     ): Node[] {
       const keywords: Node[] = [];
 
@@ -467,7 +461,7 @@ namespace ts {
           loopNode.getFirstToken(),
           SyntaxKind.ForKeyword,
           SyntaxKind.WhileKeyword,
-          SyntaxKind.DoKeyword
+          SyntaxKind.DoKeyword,
         )
       ) {
         // If we succeeded and got a do-while loop, then start looking for a 'while' keyword.
@@ -492,17 +486,17 @@ namespace ts {
               keywords,
               statement.getFirstToken(),
               SyntaxKind.BreakKeyword,
-              SyntaxKind.ContinueKeyword
+              SyntaxKind.ContinueKeyword,
             );
           }
-        }
+        },
       );
 
       return keywords;
     }
 
     function getBreakOrContinueStatementOccurrences(
-      breakOrContinueStatement: BreakOrContinueStatement
+      breakOrContinueStatement: BreakOrContinueStatement,
     ): Node[] | undefined {
       const owner = getBreakOrContinueOwner(breakOrContinueStatement);
 
@@ -523,14 +517,14 @@ namespace ts {
     }
 
     function getSwitchCaseDefaultOccurrences(
-      switchStatement: SwitchStatement
+      switchStatement: SwitchStatement,
     ): Node[] {
       const keywords: Node[] = [];
 
       pushKeywordIf(
         keywords,
         switchStatement.getFirstToken(),
-        SyntaxKind.SwitchKeyword
+        SyntaxKind.SwitchKeyword,
       );
 
       // Go through each clause in the switch statement, collecting the 'case'/'default' keywords.
@@ -539,7 +533,7 @@ namespace ts {
           keywords,
           clause.getFirstToken(),
           SyntaxKind.CaseKeyword,
-          SyntaxKind.DefaultKeyword
+          SyntaxKind.DefaultKeyword,
         );
 
         forEach(aggregateAllBreakAndContinueStatements(clause), (statement) => {
@@ -547,7 +541,7 @@ namespace ts {
             pushKeywordIf(
               keywords,
               statement.getFirstToken(),
-              SyntaxKind.BreakKeyword
+              SyntaxKind.BreakKeyword,
             );
           }
         });
@@ -558,21 +552,21 @@ namespace ts {
 
     function getTryCatchFinallyOccurrences(
       tryStatement: TryStatement,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): Node[] {
       const keywords: Node[] = [];
 
       pushKeywordIf(
         keywords,
         tryStatement.getFirstToken(),
-        SyntaxKind.TryKeyword
+        SyntaxKind.TryKeyword,
       );
 
       if (tryStatement.catchClause) {
         pushKeywordIf(
           keywords,
           tryStatement.catchClause.getFirstToken(),
-          SyntaxKind.CatchKeyword
+          SyntaxKind.CatchKeyword,
         );
       }
 
@@ -580,7 +574,7 @@ namespace ts {
         const finallyKeyword = findChildOfKind(
           tryStatement,
           SyntaxKind.FinallyKeyword,
-          sourceFile
+          sourceFile,
         )!;
         pushKeywordIf(keywords, finallyKeyword, SyntaxKind.FinallyKeyword);
       }
@@ -590,7 +584,7 @@ namespace ts {
 
     function getThrowOccurrences(
       throwStatement: ThrowStatement,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): Node[] | undefined {
       const owner = getThrowStatementOwner(throwStatement);
 
@@ -602,7 +596,7 @@ namespace ts {
 
       forEach(aggregateOwnedThrowStatements(owner), (throwStatement) => {
         keywords.push(
-          findChildOfKind(throwStatement, SyntaxKind.ThrowKeyword, sourceFile)!
+          findChildOfKind(throwStatement, SyntaxKind.ThrowKeyword, sourceFile)!,
         );
       });
 
@@ -614,8 +608,8 @@ namespace ts {
             findChildOfKind(
               returnStatement,
               SyntaxKind.ReturnKeyword,
-              sourceFile
-            )!
+              sourceFile,
+            )!,
           );
         });
       }
@@ -625,10 +619,10 @@ namespace ts {
 
     function getReturnOccurrences(
       returnStatement: ReturnStatement,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): Node[] | undefined {
       const func = getContainingFunction(
-        returnStatement
+        returnStatement,
       ) as FunctionLikeDeclaration;
       if (!func) {
         return undefined;
@@ -640,15 +634,15 @@ namespace ts {
           findChildOfKind(
             returnStatement,
             SyntaxKind.ReturnKeyword,
-            sourceFile
-          )!
+            sourceFile,
+          )!,
         );
       });
 
       // Include 'throw' statements that do not occur within a try block.
       forEach(aggregateOwnedThrowStatements(func.body!), (throwStatement) => {
         keywords.push(
-          findChildOfKind(throwStatement, SyntaxKind.ThrowKeyword, sourceFile)!
+          findChildOfKind(throwStatement, SyntaxKind.ThrowKeyword, sourceFile)!,
         );
       });
 
@@ -675,7 +669,7 @@ namespace ts {
             pushKeywordIf(
               keywords,
               node.getFirstToken(),
-              SyntaxKind.AwaitKeyword
+              SyntaxKind.AwaitKeyword,
             );
           }
         });
@@ -698,7 +692,7 @@ namespace ts {
             pushKeywordIf(
               keywords,
               node.getFirstToken(),
-              SyntaxKind.YieldKeyword
+              SyntaxKind.YieldKeyword,
             );
           }
         });
@@ -710,26 +704,24 @@ namespace ts {
     // Do not cross function/class/interface/module/type boundaries.
     function traverseWithoutCrossingFunction(
       node: Node,
-      cb: (node: Node) => void
+      cb: (node: Node) => void,
     ) {
       cb(node);
       if (
-        !isFunctionLike(node) &&
-        !isClassLike(node) &&
-        !isInterfaceDeclaration(node) &&
-        !isModuleDeclaration(node) &&
-        !isTypeAliasDeclaration(node) &&
-        !isTypeNode(node)
+        !isFunctionLike(node)
+        && !isClassLike(node)
+        && !isInterfaceDeclaration(node)
+        && !isModuleDeclaration(node)
+        && !isTypeAliasDeclaration(node)
+        && !isTypeNode(node)
       ) {
-        forEachChild(node, (child) =>
-          traverseWithoutCrossingFunction(child, cb)
-        );
+        forEachChild(node, (child) => traverseWithoutCrossingFunction(child, cb));
       }
     }
 
     function getIfElseOccurrences(
       ifStatement: IfStatement,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): HighlightSpan[] {
       const keywords = getIfElseKeywords(ifStatement, sourceFile);
       const result: HighlightSpan[] = [];
@@ -738,8 +730,8 @@ namespace ts {
       // (i.e. the keywords are separated by no comments, no newlines).
       for (let i = 0; i < keywords.length; i++) {
         if (
-          keywords[i].kind === SyntaxKind.ElseKeyword &&
-          i < keywords.length - 1
+          keywords[i].kind === SyntaxKind.ElseKeyword
+          && i < keywords.length - 1
         ) {
           const elseKeyword = keywords[i];
           const ifKeyword = keywords[i + 1]; // this *should* always be an 'if' keyword.
@@ -763,7 +755,7 @@ namespace ts {
               fileName: sourceFile.fileName,
               textSpan: createTextSpanFromBounds(
                 elseKeyword.getStart(),
-                ifKeyword.end
+                ifKeyword.end,
               ),
               kind: HighlightSpanKind.reference,
             });
@@ -781,14 +773,14 @@ namespace ts {
 
     function getIfElseKeywords(
       ifStatement: IfStatement,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): Node[] {
       const keywords: Node[] = [];
 
       // Traverse upwards through all parent if-statements linked by their else-branches.
       while (
-        isIfStatement(ifStatement.parent) &&
-        ifStatement.parent.elseStatement === ifStatement
+        isIfStatement(ifStatement.parent)
+        && ifStatement.parent.elseStatement === ifStatement
       ) {
         ifStatement = ifStatement.parent;
       }
@@ -806,8 +798,8 @@ namespace ts {
         }
 
         if (
-          !ifStatement.elseStatement ||
-          !isIfStatement(ifStatement.elseStatement)
+          !ifStatement.elseStatement
+          || !isIfStatement(ifStatement.elseStatement)
         ) {
           break;
         }
@@ -826,8 +818,7 @@ namespace ts {
       return !!findAncestor(node.parent, (owner) =>
         !isLabeledStatement(owner)
           ? "quit"
-          : owner.label.escapedText === labelName
-      );
+          : owner.label.escapedText === labelName);
     }
   }
 }

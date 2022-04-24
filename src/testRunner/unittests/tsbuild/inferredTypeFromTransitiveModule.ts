@@ -3,7 +3,7 @@ namespace ts {
     let projFs: vfs.FileSystem;
     before(() => {
       projFs = loadProjectFromDisk(
-        "tests/projects/inferredTypeFromTransitiveModule"
+        "tests/projects/inferredTypeFromTransitiveModule",
       );
     });
     after(() => {
@@ -47,8 +47,7 @@ namespace ts {
 
     verifyTscSerializedIncrementalEdits({
       scenario: "inferredTypeFromTransitiveModule",
-      subScenario:
-        "reports errors in files affected by change in signature with isolatedModules",
+      subScenario: "reports errors in files affected by change in signature with isolatedModules",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src", "--verbose"],
       modifyFs: (fs) => {
@@ -58,7 +57,7 @@ namespace ts {
           "/src/lazyIndex.ts",
           `
 import { default as bar } from './bar';
-bar("hello");`
+bar("hello");`,
         );
       },
       incrementalScenarios: [
@@ -77,8 +76,7 @@ bar("hello");`
         {
           subScenario: "Fix Error",
           buildKind: BuildKind.IncrementalDtsChange,
-          modifyFs: (fs) =>
-            replaceText(fs, "/src/lazyIndex.ts", `bar("hello")`, "bar()"),
+          modifyFs: (fs) => replaceText(fs, "/src/lazyIndex.ts", `bar("hello")`, "bar()"),
         },
       ],
     });
@@ -89,7 +87,7 @@ bar("hello");`
       fs,
       "/src/tsconfig.json",
       `"incremental": true`,
-      `"incremental": true, "isolatedModules": true`
+      `"incremental": true, "isolatedModules": true`,
     );
   }
 

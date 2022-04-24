@@ -7,7 +7,7 @@ namespace ts.codefix {
     (key) => {
       const diag = Diagnostics[key];
       return diag.category === DiagnosticCategory.Error ? diag.code : undefined;
-    }
+    },
   );
 
   registerCodeFix({
@@ -16,8 +16,8 @@ namespace ts.codefix {
       const { sourceFile, program, span, host, formatContext } = context;
 
       if (
-        !isInJSFile(sourceFile) ||
-        !isCheckJsEnabledForFile(sourceFile, program.getCompilerOptions())
+        !isInJSFile(sourceFile)
+        || !isCheckJsEnabledForFile(sourceFile, program.getCompilerOptions())
       ) {
         return undefined;
       }
@@ -34,15 +34,15 @@ namespace ts.codefix {
               createTextChange(
                 sourceFile.checkJsDirective
                   ? createTextSpanFromBounds(
-                      sourceFile.checkJsDirective.pos,
-                      sourceFile.checkJsDirective.end
-                    )
+                    sourceFile.checkJsDirective.pos,
+                    sourceFile.checkJsDirective.end,
+                  )
                   : createTextSpan(0, 0),
-                `// @ts-nocheck${newLineCharacter}`
+                `// @ts-nocheck${newLineCharacter}`,
               ),
             ]),
           ],
-          Diagnostics.Disable_checking_for_this_file
+          Diagnostics.Disable_checking_for_this_file,
         ),
       ];
 
@@ -50,13 +50,11 @@ namespace ts.codefix {
         fixes.unshift(
           createCodeFixAction(
             fixName,
-            textChanges.ChangeTracker.with(context, (t) =>
-              makeChange(t, sourceFile, span.start)
-            ),
+            textChanges.ChangeTracker.with(context, (t) => makeChange(t, sourceFile, span.start)),
             Diagnostics.Ignore_this_error_message,
             fixId,
-            Diagnostics.Add_ts_ignore_to_all_error_messages
-          )
+            Diagnostics.Add_ts_ignore_to_all_error_messages,
+          ),
         );
       }
 
@@ -77,11 +75,11 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     position: number,
-    seenLines?: Set<number>
+    seenLines?: Set<number>,
   ) {
     const { line: lineNumber } = getLineAndCharacterOfPosition(
       sourceFile,
-      position
+      position,
     );
     // Only need to add `// @ts-ignore` for a line once.
     if (!seenLines || tryAddToSet(seenLines, lineNumber)) {
@@ -89,7 +87,7 @@ namespace ts.codefix {
         sourceFile,
         lineNumber,
         position,
-        " @ts-ignore"
+        " @ts-ignore",
       );
     }
   }

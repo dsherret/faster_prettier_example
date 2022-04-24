@@ -10,11 +10,11 @@ interface Array<T> {
    */
   find<S extends T>(
     predicate: (this: void, value: T, index: number, obj: T[]) => value is S,
-    thisArg?: any
+    thisArg?: any,
   ): S | undefined;
   find(
     predicate: (value: T, index: number, obj: T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): T | undefined;
 
   /**
@@ -28,7 +28,7 @@ interface Array<T> {
    */
   findIndex(
     predicate: (value: T, index: number, obj: T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -69,7 +69,7 @@ interface ArrayConstructor {
   from<T, U>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => U,
-    thisArg?: any
+    thisArg?: any,
   ): U[];
 
   /**
@@ -80,7 +80,7 @@ interface ArrayConstructor {
 }
 
 interface DateConstructor {
-  new (value: number | string | Date): Date;
+  new(value: number | string | Date): Date;
 }
 
 interface Function {
@@ -299,7 +299,7 @@ interface ObjectConstructor {
     target: T,
     source1: U,
     source2: V,
-    source3: W
+    source3: W,
   ): T & U & V & W;
 
   /**
@@ -352,13 +352,13 @@ interface ReadonlyArray<T> {
       this: void,
       value: T,
       index: number,
-      obj: readonly T[]
+      obj: readonly T[],
     ) => value is S,
-    thisArg?: any
+    thisArg?: any,
   ): S | undefined;
   find(
     predicate: (value: T, index: number, obj: readonly T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): T | undefined;
 
   /**
@@ -372,7 +372,7 @@ interface ReadonlyArray<T> {
    */
   findIndex(
     predicate: (value: T, index: number, obj: readonly T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 }
 
@@ -405,7 +405,7 @@ interface RegExp {
 }
 
 interface RegExpConstructor {
-  new (pattern: RegExp | string, flags?: string): RegExp;
+  new(pattern: RegExp | string, flags?: string): RegExp;
   (pattern: RegExp | string, flags?: string): RegExp;
 }
 

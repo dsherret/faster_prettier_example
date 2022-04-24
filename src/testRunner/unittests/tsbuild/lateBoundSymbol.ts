@@ -8,8 +8,7 @@ namespace ts {
       incrementalScenarios: [
         {
           buildKind: BuildKind.IncrementalDtsUnchanged,
-          modifyFs: (fs) =>
-            replaceText(fs, "/src/src/main.ts", "const x = 10;", ""),
+          modifyFs: (fs) => replaceText(fs, "/src/src/main.ts", "const x = 10;", ""),
         },
         {
           buildKind: BuildKind.IncrementalDtsUnchanged,

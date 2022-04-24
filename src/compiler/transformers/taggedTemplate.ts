@@ -11,7 +11,7 @@ namespace ts {
     visitor: Visitor,
     currentSourceFile: SourceFile,
     recordTaggedTemplateString: (temp: Identifier) => void,
-    level: ProcessLevel
+    level: ProcessLevel,
   ) {
     // Visit the tag expression
     const tag = visitNode(node.tag, visitor, isExpression);
@@ -38,7 +38,7 @@ namespace ts {
         cookedStrings.push(createTemplateCooked(templateSpan.literal));
         rawStrings.push(getRawLiteral(templateSpan.literal, currentSourceFile));
         templateArguments.push(
-          visitNode(templateSpan.expression, visitor, isExpression)
+          visitNode(templateSpan.expression, visitor, isExpression),
         );
       }
     }
@@ -47,7 +47,7 @@ namespace ts {
       .getEmitHelperFactory()
       .createTemplateObjectHelper(
         factory.createArrayLiteralExpression(cookedStrings),
-        factory.createArrayLiteralExpression(rawStrings)
+        factory.createArrayLiteralExpression(rawStrings),
       );
 
     // Create a variable to cache the template object if we're in a module.
@@ -58,7 +58,7 @@ namespace ts {
       recordTaggedTemplateString(tempVar);
       templateArguments[0] = factory.createLogicalOr(
         tempVar,
-        factory.createAssignment(tempVar, helperCall)
+        factory.createAssignment(tempVar, helperCall),
       );
     } else {
       templateArguments[0] = helperCall;
@@ -67,7 +67,7 @@ namespace ts {
     return factory.createCallExpression(
       tag,
       /*typeArguments*/ undefined,
-      templateArguments
+      templateArguments,
     );
   }
 
@@ -76,7 +76,7 @@ namespace ts {
       | TemplateHead
       | TemplateMiddle
       | TemplateTail
-      | NoSubstitutionTemplateLiteral
+      | NoSubstitutionTemplateLiteral,
   ) {
     return template.templateFlags
       ? factory.createVoidZero()
@@ -90,7 +90,7 @@ namespace ts {
    */
   function getRawLiteral(
     node: TemplateLiteralLikeNode,
-    currentSourceFile: SourceFile
+    currentSourceFile: SourceFile,
   ) {
     // Find original source text, since we need to emit the raw strings of the tagged template.
     // The raw strings contain the (escaped) strings of what the user wrote.
@@ -99,7 +99,7 @@ namespace ts {
     if (text === undefined) {
       Debug.assertIsDefined(
         currentSourceFile,
-        "Template literal node is missing 'rawText' and does not have a source file. Possibly bad transform."
+        "Template literal node is missing 'rawText' and does not have a source file. Possibly bad transform.",
       );
       text = getSourceTextOfNodeFromSourceFile(currentSourceFile, node);
 
@@ -107,9 +107,8 @@ namespace ts {
       // thus we need to remove those characters.
       // First template piece starts with "`", others with "}"
       // Last template piece ends with "`", others with "${"
-      const isLast =
-        node.kind === SyntaxKind.NoSubstitutionTemplateLiteral ||
-        node.kind === SyntaxKind.TemplateTail;
+      const isLast = node.kind === SyntaxKind.NoSubstitutionTemplateLiteral
+        || node.kind === SyntaxKind.TemplateTail;
       text = text.substring(1, text.length - (isLast ? 1 : 2));
     }
 

@@ -10,7 +10,7 @@ namespace ts.codefix {
         .code,
     ],
     getCodeActions: function getCodeActionsToAddEmptyExportDeclaration(
-      context
+      context,
     ) {
       const { sourceFile } = context;
       const changes = textChanges.ChangeTracker.with(context, (changes) => {
@@ -19,19 +19,19 @@ namespace ts.codefix {
           /*modifiers*/ undefined,
           /*isTypeOnly*/ false,
           factory.createNamedExports([]),
-          /*moduleSpecifier*/ undefined
+          /*moduleSpecifier*/ undefined,
         );
         changes.insertNodeAtEndOfScope(
           sourceFile,
           sourceFile,
-          exportDeclaration
+          exportDeclaration,
         );
       });
       return [
         createCodeFixActionWithoutFixAll(
           "addEmptyExportDeclaration",
           changes,
-          Diagnostics.Add_export_to_make_this_file_into_a_module
+          Diagnostics.Add_export_to_make_this_file_into_a_module,
         ),
       ];
     },

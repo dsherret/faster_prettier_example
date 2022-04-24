@@ -10,8 +10,8 @@ namespace Harness {
       const dupes: [string, string][] = [];
       for (const runner of runners) {
         if (
-          runner instanceof CompilerBaselineRunner ||
-          runner instanceof FourSlashRunner
+          runner instanceof CompilerBaselineRunner
+          || runner instanceof FourSlashRunner
         ) {
           for (const sf of runner.enumerateTestFiles()) {
             const full = typeof sf === "string" ? sf : sf.file;
@@ -37,7 +37,7 @@ ${JSON.stringify(dupes, undefined, 2)}`);
     const prefix = "--config=";
     const configPath = ts.forEach(
       args,
-      (arg) => arg.lastIndexOf(prefix, 0) === 0 && arg.substr(prefix.length)
+      (arg) => arg.lastIndexOf(prefix, 0) === 0 && arg.substr(prefix.length),
     );
     // strip leading and trailing quotes from the path (necessary on Windows since shell does not do it automatically)
     return configPath && configPath.replace(/(^[\"'])|([\"']$)/g, "");
@@ -55,7 +55,7 @@ ${JSON.stringify(dupes, undefined, 2)}`);
         return new FourSlashRunner(FourSlash.FourSlashTestType.Shims);
       case "fourslash-shims-pp":
         return new FourSlashRunner(
-          FourSlash.FourSlashTestType.ShimsWithPreprocess
+          FourSlash.FourSlashTestType.ShimsWithPreprocess,
         );
       case "fourslash-server":
         return new FourSlashRunner(FourSlash.FourSlashTestType.Server);
@@ -81,14 +81,13 @@ ${JSON.stringify(dupes, undefined, 2)}`);
   const testconfigFileName = "test.config";
 
   const customConfig = tryGetConfig(IO.args());
-  const testConfigContent =
-    customConfig && IO.fileExists(customConfig)
-      ? IO.readFile(customConfig)!
-      : IO.fileExists(mytestconfigFileName)
-      ? IO.readFile(mytestconfigFileName)!
-      : IO.fileExists(testconfigFileName)
-      ? IO.readFile(testconfigFileName)!
-      : "";
+  const testConfigContent = customConfig && IO.fileExists(customConfig)
+    ? IO.readFile(customConfig)!
+    : IO.fileExists(mytestconfigFileName)
+    ? IO.readFile(mytestconfigFileName)!
+    : IO.fileExists(testconfigFileName)
+    ? IO.readFile(testconfigFileName)!
+    : "";
 
   export let taskConfigsFolder: string;
   export let workerCount: number;
@@ -179,15 +178,15 @@ ${JSON.stringify(dupes, undefined, 2)}`);
           switch (option) {
             case "compiler":
               runners.push(
-                new CompilerBaselineRunner(CompilerTestType.Conformance)
+                new CompilerBaselineRunner(CompilerTestType.Conformance),
               );
               runners.push(
-                new CompilerBaselineRunner(CompilerTestType.Regressions)
+                new CompilerBaselineRunner(CompilerTestType.Regressions),
               );
               break;
             case "conformance":
               runners.push(
-                new CompilerBaselineRunner(CompilerTestType.Conformance)
+                new CompilerBaselineRunner(CompilerTestType.Conformance),
               );
               break;
             case "project":
@@ -195,29 +194,29 @@ ${JSON.stringify(dupes, undefined, 2)}`);
               break;
             case "fourslash":
               runners.push(
-                new FourSlashRunner(FourSlash.FourSlashTestType.Native)
+                new FourSlashRunner(FourSlash.FourSlashTestType.Native),
               );
               break;
             case "fourslash-shims":
               runners.push(
-                new FourSlashRunner(FourSlash.FourSlashTestType.Shims)
+                new FourSlashRunner(FourSlash.FourSlashTestType.Shims),
               );
               break;
             case "fourslash-shims-pp":
               runners.push(
                 new FourSlashRunner(
-                  FourSlash.FourSlashTestType.ShimsWithPreprocess
-                )
+                  FourSlash.FourSlashTestType.ShimsWithPreprocess,
+                ),
               );
               break;
             case "fourslash-server":
               runners.push(
-                new FourSlashRunner(FourSlash.FourSlashTestType.Server)
+                new FourSlashRunner(FourSlash.FourSlashTestType.Server),
               );
               break;
             case "fourslash-generated":
               runners.push(
-                new GeneratedFourslashRunner(FourSlash.FourSlashTestType.Native)
+                new GeneratedFourslashRunner(FourSlash.FourSlashTestType.Native),
               );
               break;
             case "rwc":
@@ -251,7 +250,7 @@ ${JSON.stringify(dupes, undefined, 2)}`);
       runners.push(new FourSlashRunner(FourSlash.FourSlashTestType.Native));
       runners.push(new FourSlashRunner(FourSlash.FourSlashTestType.Shims));
       runners.push(
-        new FourSlashRunner(FourSlash.FourSlashTestType.ShimsWithPreprocess)
+        new FourSlashRunner(FourSlash.FourSlashTestType.ShimsWithPreprocess),
       );
       runners.push(new FourSlashRunner(FourSlash.FourSlashTestType.Server));
       // runners.push(new GeneratedFourslashRunner());

@@ -22,22 +22,21 @@ namespace ts.codefix {
               sourceFile,
               classDeclaration,
               t,
-              context.preferences
-            )
-          );
+              context.preferences,
+            ));
           return changes.length === 0
             ? undefined
             : createCodeFixAction(
-                fixId,
-                changes,
-                [
-                  Diagnostics.Implement_interface_0,
-                  implementedTypeNode.getText(sourceFile),
-                ],
-                fixId,
-                Diagnostics.Implement_all_unimplemented_interfaces
-              );
-        }
+              fixId,
+              changes,
+              [
+                Diagnostics.Implement_interface_0,
+                implementedTypeNode.getText(sourceFile),
+              ],
+              fixId,
+              Diagnostics.Implement_all_unimplemented_interfaces,
+            );
+        },
       );
     },
     fixIds: [fixId],
@@ -46,16 +45,18 @@ namespace ts.codefix {
       return codeFixAll(context, errorCodes, (changes, diag) => {
         const classDeclaration = getClass(diag.file, diag.start);
         if (addToSeen(seenClassDeclarations, getNodeId(classDeclaration))) {
-          for (const implementedTypeNode of getEffectiveImplementsTypeNodes(
-            classDeclaration
-          )!) {
+          for (
+            const implementedTypeNode of getEffectiveImplementsTypeNodes(
+              classDeclaration,
+            )!
+          ) {
             addMissingDeclarations(
               context,
               implementedTypeNode,
               diag.file,
               classDeclaration,
               changes,
-              context.preferences
+              context.preferences,
             );
           }
         }
@@ -66,16 +67,16 @@ namespace ts.codefix {
   function getClass(sourceFile: SourceFile, pos: number): ClassLikeDeclaration {
     return Debug.checkDefined(
       getContainingClass(getTokenAtPosition(sourceFile, pos)),
-      "There should be a containing class"
+      "There should be a containing class",
     );
   }
 
   function symbolPointsToNonPrivateMember(symbol: Symbol) {
     return (
-      !symbol.valueDeclaration ||
-      !(
-        getEffectiveModifierFlags(symbol.valueDeclaration) &
-        ModifierFlags.Private
+      !symbol.valueDeclaration
+      || !(
+        getEffectiveModifierFlags(symbol.valueDeclaration)
+        & ModifierFlags.Private
       )
     );
   }
@@ -86,31 +87,28 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     classDeclaration: ClassLikeDeclaration,
     changeTracker: textChanges.ChangeTracker,
-    preferences: UserPreferences
+    preferences: UserPreferences,
   ): void {
     const checker = context.program.getTypeChecker();
     const maybeHeritageClauseSymbol = getHeritageClauseSymbolTable(
       classDeclaration,
-      checker
+      checker,
     );
     // Note that this is ultimately derived from a map indexed by symbol names,
     // so duplicates cannot occur.
     const implementedType = checker.getTypeAtLocation(
-      implementedTypeNode
+      implementedTypeNode,
     ) as InterfaceType;
     const implementedTypeSymbols = checker.getPropertiesOfType(implementedType);
-    const nonPrivateAndNotExistedInHeritageClauseMembers =
-      implementedTypeSymbols.filter(
-        and(
-          symbolPointsToNonPrivateMember,
-          (symbol) => !maybeHeritageClauseSymbol.has(symbol.escapedName)
-        )
-      );
+    const nonPrivateAndNotExistedInHeritageClauseMembers = implementedTypeSymbols.filter(
+      and(
+        symbolPointsToNonPrivateMember,
+        (symbol) => !maybeHeritageClauseSymbol.has(symbol.escapedName),
+      ),
+    );
 
     const classType = checker.getTypeAtLocation(classDeclaration);
-    const constructor = find(classDeclaration.members, (m) =>
-      isConstructorDeclaration(m)
-    );
+    const constructor = find(classDeclaration.members, (m) => isConstructorDeclaration(m));
 
     if (!classType.getNumberIndexType()) {
       createMissingIndexSignatureDeclaration(implementedType, IndexKind.Number);
@@ -123,7 +121,7 @@ namespace ts.codefix {
       sourceFile,
       context.program,
       preferences,
-      context.host
+      context.host,
     );
     createMissingMemberNodes(
       classDeclaration,
@@ -136,14 +134,14 @@ namespace ts.codefix {
         insertInterfaceMemberNode(
           sourceFile,
           classDeclaration,
-          member as ClassElement
-        )
+          member as ClassElement,
+        ),
     );
     importAdder.writeFixes(changeTracker);
 
     function createMissingIndexSignatureDeclaration(
       type: InterfaceType,
-      kind: IndexKind
+      kind: IndexKind,
     ): void {
       const indexInfoOfKind = checker.getIndexInfoOfType(type, kind);
       if (indexInfoOfKind) {
@@ -154,8 +152,8 @@ namespace ts.codefix {
             indexInfoOfKind,
             classDeclaration,
             /*flags*/ undefined,
-            getNoopSymbolTrackerWithResolver(context)
-          )!
+            getNoopSymbolTrackerWithResolver(context),
+          )!,
         );
       }
     }
@@ -164,7 +162,7 @@ namespace ts.codefix {
     function insertInterfaceMemberNode(
       sourceFile: SourceFile,
       cls: ClassLikeDeclaration | InterfaceDeclaration,
-      newElement: ClassElement
+      newElement: ClassElement,
     ): void {
       if (constructor) {
         changeTracker.insertNodeAfter(sourceFile, constructor, newElement);
@@ -176,17 +174,16 @@ namespace ts.codefix {
 
   function getHeritageClauseSymbolTable(
     classDeclaration: ClassLikeDeclaration,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): SymbolTable {
     const heritageClauseNode = getEffectiveBaseTypeNode(classDeclaration);
     if (!heritageClauseNode) return createSymbolTable();
     const heritageClauseType = checker.getTypeAtLocation(
-      heritageClauseNode
+      heritageClauseNode,
     ) as InterfaceType;
-    const heritageClauseTypeSymbols =
-      checker.getPropertiesOfType(heritageClauseType);
+    const heritageClauseTypeSymbols = checker.getPropertiesOfType(heritageClauseType);
     return createSymbolTable(
-      heritageClauseTypeSymbols.filter(symbolPointsToNonPrivateMember)
+      heritageClauseTypeSymbols.filter(symbolPointsToNonPrivateMember),
     );
   }
 }

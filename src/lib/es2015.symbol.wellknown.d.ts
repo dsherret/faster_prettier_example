@@ -183,7 +183,7 @@ interface RegExp {
    */
   [Symbol.replace](
     string: string,
-    replacer: (substring: string, ...args: any[]) => string
+    replacer: (substring: string, ...args: any[]) => string,
   ): string;
 
   /**
@@ -232,7 +232,7 @@ interface String {
     searchValue: {
       [Symbol.replace](string: string, replaceValue: string): string;
     },
-    replaceValue: string
+    replaceValue: string,
   ): string;
 
   /**
@@ -244,10 +244,10 @@ interface String {
     searchValue: {
       [Symbol.replace](
         string: string,
-        replacer: (substring: string, ...args: any[]) => string
+        replacer: (substring: string, ...args: any[]) => string,
       ): string;
     },
-    replacer: (substring: string, ...args: any[]) => string
+    replacer: (substring: string, ...args: any[]) => string,
   ): string;
 
   /**
@@ -263,7 +263,7 @@ interface String {
    */
   split(
     splitter: { [Symbol.split](string: string, limit?: number): string[] },
-    limit?: number
+    limit?: number,
   ): string[];
 }
 

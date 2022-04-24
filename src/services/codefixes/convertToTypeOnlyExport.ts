@@ -13,9 +13,8 @@ namespace ts.codefix {
         fixSingleExportDeclaration(
           t,
           getExportSpecifierForDiagnosticSpan(context.span, context.sourceFile),
-          context
-        )
-      );
+          context,
+        ));
       if (changes.length) {
         return [
           createCodeFixAction(
@@ -23,26 +22,26 @@ namespace ts.codefix {
             changes,
             Diagnostics.Convert_to_type_only_export,
             fixId,
-            Diagnostics.Convert_all_re_exported_types_to_type_only_exports
+            Diagnostics.Convert_all_re_exported_types_to_type_only_exports,
           ),
         ];
       }
     },
     fixIds: [fixId],
     getAllCodeActions: function getAllCodeActionsToConvertToTypeOnlyExport(
-      context
+      context,
     ) {
       const fixedExportDeclarations = new Map<number, true>();
       return codeFixAll(context, errorCodes, (changes, diag) => {
         const exportSpecifier = getExportSpecifierForDiagnosticSpan(
           diag,
-          context.sourceFile
+          context.sourceFile,
         );
         if (
-          exportSpecifier &&
-          addToSeen(
+          exportSpecifier
+          && addToSeen(
             fixedExportDeclarations,
-            getNodeId(exportSpecifier.parent.parent)
+            getNodeId(exportSpecifier.parent.parent),
           )
         ) {
           fixSingleExportDeclaration(changes, exportSpecifier, context);
@@ -53,18 +52,18 @@ namespace ts.codefix {
 
   function getExportSpecifierForDiagnosticSpan(
     span: TextSpan,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ) {
     return tryCast(
       getTokenAtPosition(sourceFile, span.start).parent,
-      isExportSpecifier
+      isExportSpecifier,
     );
   }
 
   function fixSingleExportDeclaration(
     changes: textChanges.ChangeTracker,
     exportSpecifier: ExportSpecifier | undefined,
-    context: CodeFixContextBase
+    context: CodeFixContextBase,
   ) {
     if (!exportSpecifier) {
       return;
@@ -74,13 +73,13 @@ namespace ts.codefix {
     const exportDeclaration = exportClause.parent;
     const typeExportSpecifiers = getTypeExportSpecifiers(
       exportSpecifier,
-      context
+      context,
     );
     if (typeExportSpecifiers.length === exportClause.elements.length) {
       changes.insertModifierBefore(
         context.sourceFile,
         SyntaxKind.TypeKeyword,
-        exportClause
+        exportClause,
       );
     } else {
       const valueExportDeclaration = factory.updateExportDeclaration(
@@ -92,11 +91,11 @@ namespace ts.codefix {
           exportClause,
           filter(
             exportClause.elements,
-            (e) => !contains(typeExportSpecifiers, e)
-          )
+            (e) => !contains(typeExportSpecifiers, e),
+          ),
         ),
         exportDeclaration.moduleSpecifier,
-        /*assertClause*/ undefined
+        /*assertClause*/ undefined,
       );
       const typeExportDeclaration = factory.createExportDeclaration(
         /*decorators*/ undefined,
@@ -104,7 +103,7 @@ namespace ts.codefix {
         /*isTypeOnly*/ true,
         factory.createNamedExports(typeExportSpecifiers),
         exportDeclaration.moduleSpecifier,
-        /*assertClause*/ undefined
+        /*assertClause*/ undefined,
       );
 
       changes.replaceNode(
@@ -114,19 +113,19 @@ namespace ts.codefix {
         {
           leadingTriviaOption: textChanges.LeadingTriviaOption.IncludeAll,
           trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-        }
+        },
       );
       changes.insertNodeAfter(
         context.sourceFile,
         exportDeclaration,
-        typeExportDeclaration
+        typeExportDeclaration,
       );
     }
   }
 
   function getTypeExportSpecifiers(
     originExportSpecifier: ExportSpecifier,
-    context: CodeFixContextBase
+    context: CodeFixContextBase,
   ): readonly ExportSpecifier[] {
     const exportClause = originExportSpecifier.parent;
     if (exportClause.elements.length === 1) {
@@ -137,14 +136,14 @@ namespace ts.codefix {
       createTextSpanFromNode(exportClause),
       context.program.getSemanticDiagnostics(
         context.sourceFile,
-        context.cancellationToken
-      )
+        context.cancellationToken,
+      ),
     );
 
     return filter(exportClause.elements, (element) => {
       return (
-        element === originExportSpecifier ||
-        findDiagnosticForNode(element, diagnostics)?.code === errorCodes[0]
+        element === originExportSpecifier
+        || findDiagnosticForNode(element, diagnostics)?.code === errorCodes[0]
       );
     });
   }

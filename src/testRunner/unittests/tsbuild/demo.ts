@@ -11,16 +11,14 @@ namespace ts {
 
     verifyTsc({
       scenario: "demo",
-      subScenario:
-        "in master branch with everything setup correctly and reports no error",
+      subScenario: "in master branch with everything setup correctly and reports no error",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src/tsconfig.json", "--verbose"],
     });
 
     verifyTsc({
       scenario: "demo",
-      subScenario:
-        "in circular branch reports the error about it by stopping build",
+      subScenario: "in circular branch reports the error about it by stopping build",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src/tsconfig.json", "--verbose"],
       modifyFs: (fs) =>
@@ -33,13 +31,12 @@ namespace ts {
     {
       "path": "../zoo"
     }
-  ]`
+  ]`,
         ),
     });
     verifyTsc({
       scenario: "demo",
-      subScenario:
-        "in bad-ref branch reports the error about files not in rootDir at the import location",
+      subScenario: "in bad-ref branch reports the error about files not in rootDir at the import location",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src/tsconfig.json", "--verbose"],
       modifyFs: (fs) =>
@@ -47,7 +44,7 @@ namespace ts {
           fs,
           "/src/core/utilities.ts",
           `import * as A from '../animals';
-`
+`,
         ),
     });
   });

@@ -16,7 +16,7 @@ namespace ts {
             foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction2",
@@ -32,7 +32,7 @@ namespace ts {
             return foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction3",
@@ -47,7 +47,7 @@ namespace ts {
             return foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction4",
@@ -64,7 +64,7 @@ namespace ts {
             return foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction5",
@@ -82,7 +82,7 @@ namespace ts {
             foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction6",
@@ -100,7 +100,7 @@ namespace ts {
             return foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction7",
@@ -120,7 +120,7 @@ namespace ts {
             return C.foo();|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction9",
@@ -132,7 +132,7 @@ namespace ts {
             return a1.x + 10;|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction10",
@@ -145,7 +145,7 @@ namespace ts {
             return a1.x + 10;|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction11",
@@ -160,7 +160,7 @@ namespace ts {
             return a1.x + 10;|]
         }
     }
-}`
+}`,
     );
     testExtractFunction(
       "extractFunction12",
@@ -177,7 +177,7 @@ namespace ts {
             return a1.x + 10;|]
         }
     }
-}`
+}`,
     );
     // The "b" type parameters aren't used and shouldn't be passed to the extracted function.
     // Type parameters should be in syntactic order (i.e. in order or character offset from BOF).
@@ -200,7 +200,7 @@ namespace ts {
             }
         }
     }
-}`
+}`,
     );
     // This test is descriptive, rather than normative.  The current implementation
     // doesn't handle type parameter shadowing.
@@ -211,7 +211,7 @@ namespace ts {
         [#|t1.toString();
         t2.toString();|]
     }
-}`
+}`,
     );
     // Confirm that the constraint is preserved.
     testExtractFunction(
@@ -221,7 +221,7 @@ namespace ts {
         [#|t2.toString();|]
     }
 }`,
-      /*includeLib*/ true
+      /*includeLib*/ true,
     );
     // Confirm that the contextual type of an extracted expression counts as a use.
     testExtractFunction(
@@ -229,7 +229,7 @@ namespace ts {
       `function F<T>() {
     const array: T[] = [#|[]|];
 }`,
-      /*includeLib*/ true
+      /*includeLib*/ true,
     );
     // Class type parameter
     testExtractFunction(
@@ -238,7 +238,7 @@ namespace ts {
     M(t1: T1, t2: T2) {
         [#|t1.toString()|];
     }
-}`
+}`,
     );
     // Function type parameter
     testExtractFunction(
@@ -247,7 +247,7 @@ namespace ts {
     M<T1, T2>(t1: T1, t2: T2) {
         [#|t1.toString()|];
     }
-}`
+}`,
     );
     // Coupled constraints
     testExtractFunction(
@@ -255,7 +255,7 @@ namespace ts {
       `function F<T, U extends T[], V extends U[]>(v: V) {
     [#|v.toString()|];
 }`,
-      /*includeLib*/ true
+      /*includeLib*/ true,
     );
 
     testExtractFunction(
@@ -265,7 +265,7 @@ namespace ts {
         [#|let a1 = { x: 1 };
         return a1.x + 10;|]
     }
-}`
+}`,
     );
     // Write + void return
     testExtractFunction(
@@ -274,7 +274,7 @@ namespace ts {
     let x = 10;
     [#|x++;
     return;|]
-}`
+}`,
     );
     // Return in finally block
     testExtractFunction(
@@ -285,7 +285,7 @@ namespace ts {
     finally {
         [#|return 1;|]
     }
-}`
+}`,
     );
     // Extraction position - namespace
     testExtractFunction(
@@ -296,7 +296,7 @@ namespace ts {
         [#|return 1;|]
     }
     function M3() { }
-}`
+}`,
     );
     // Extraction position - function
     testExtractFunction(
@@ -307,7 +307,7 @@ namespace ts {
         [#|return 1;|]
     }
     function M3() { }
-}`
+}`,
     );
     // Extraction position - file
     testExtractFunction(
@@ -316,7 +316,7 @@ namespace ts {
 function M2() {
     [#|return 1;|]
 }
-function M3() { }`
+function M3() { }`,
     );
     // Extraction position - class without ctor
     testExtractFunction(
@@ -327,7 +327,7 @@ function M3() { }`
         [#|return 1;|]
     }
     M3() { }
-}`
+}`,
     );
     // Extraction position - class with ctor in middle
     testExtractFunction(
@@ -339,7 +339,7 @@ function M3() { }`
     }
     constructor() { }
     M3() { }
-}`
+}`,
     );
     // Extraction position - class with ctor at end
     testExtractFunction(
@@ -351,7 +351,7 @@ function M3() { }`
     }
     M3() { }
     constructor() { }
-}`
+}`,
     );
     // Shorthand property names
     testExtractFunction(
@@ -372,14 +372,14 @@ function parseUnaryExpression(operator: string): UnaryExpression {
 
 function parsePrimaryExpression(): any {
     throw "Not implemented";
-}`
+}`,
     );
     // Type parameter as declared type
     testExtractFunction(
       "extractFunction30",
       `function F<T>() {
     [#|let t: T;|]
-}`
+}`,
     );
     // Return in nested function
     testExtractFunction(
@@ -394,7 +394,7 @@ function parsePrimaryExpression(): any {
             return value;
         }|]
     }
-}`
+}`,
     );
     // Return in nested class
     testExtractFunction(
@@ -410,21 +410,21 @@ function parsePrimaryExpression(): any {
             }
         }|]
     }
-}`
+}`,
     );
     // Selection excludes leading trivia of declaration
     testExtractFunction(
       "extractFunction33",
       `function F() {
     [#|function G() { }|]
-}`
+}`,
     );
     // Arrow function
     testExtractFunction(
       "extractFunction34",
       `const F = () => {
     [#|function G() { }|]
-};`
+};`,
     );
 
     testExtractFunction(
@@ -432,7 +432,7 @@ function parsePrimaryExpression(): any {
       `namespace X {
     export const j = 10;
     export const y = [#|j * j|];
-}`
+}`,
     );
 
     testExtractFunction(
@@ -441,7 +441,7 @@ function parsePrimaryExpression(): any {
 [#|var x = 1;
 "hello"|]
 x;
-`
+`,
     );
 
     testExtractFunction(
@@ -450,7 +450,7 @@ x;
 [#|let x: number = 1;
 "hello";|]
 x;
-`
+`,
     );
 
     testExtractFunction(
@@ -459,7 +459,7 @@ x;
 [#|let x = 1;
 "hello";|]
 x;
-`
+`,
     );
 
     testExtractFunction(
@@ -468,7 +468,7 @@ x;
 [#|const x: number = 1;
 "hello";|]
 x;
-`
+`,
     );
 
     testExtractFunction(
@@ -477,7 +477,7 @@ x;
 [#|const x = 1;
 "hello";|]
 x;
-`
+`,
     );
 
     testExtractFunction(
@@ -485,7 +485,7 @@ x;
       `
 [#|const x = 1, y: string = "a";|]
 x; y;
-`
+`,
     );
 
     testExtractFunction(
@@ -494,7 +494,7 @@ x; y;
 [#|const x = 1, y = "a";
 const z = 3;|]
 x; y; z;
-`
+`,
     );
 
     testExtractFunction(
@@ -503,7 +503,7 @@ x; y; z;
 [#|const x = 1, y: string = "a";
 let z = 3;|]
 x; y; z;
-`
+`,
     );
 
     testExtractFunction(
@@ -512,7 +512,7 @@ x; y; z;
 [#|const x: number = 1;
 "hello";|]
 x; x;
-`
+`,
     );
 
     testExtractFunction(
@@ -521,7 +521,7 @@ x; x;
 [#|var x = 1;
 var x = 2;|]
 x;
-`
+`,
     );
 
     testExtractFunction(
@@ -532,7 +532,7 @@ function f() {
     [#|var x = 1;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -543,7 +543,7 @@ function f() {
     [#|let x = 1;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -554,7 +554,7 @@ function f() {
     [#|let x: number = 1;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     // We propagate numericLiteralFlags, but it's not consumed by the emitter,
@@ -567,7 +567,7 @@ function f() {
     [#|let x: 0o10 | 10 | 0b10 = 10;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -578,7 +578,7 @@ function f() {
     [#|let x: "a" | 'b' = 'a';
     a++;|]
     a; x;
-}`
+}`,
     );
 
     // We propagate numericLiteralFlags, but it's not consumed by the emitter,
@@ -591,7 +591,7 @@ function f() {
     [#|let x: 0o10 | 10 | 0b10 = 10;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -602,7 +602,7 @@ function f() {
     [#|let x: /*A*/ "a" /*B*/ | /*C*/ 'b' /*D*/ = 'a';
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -613,7 +613,7 @@ function f() {
     [#|const x = 1;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -624,7 +624,7 @@ function f() {
     [#|const x: number = 1;
     a++;|]
     a; x;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -636,7 +636,7 @@ function f() {
     let y = 2;
     a++;|]
     a; x; y;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -648,7 +648,7 @@ function f() {
     let y = 2;
     a++;|]
     a; x; y;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -660,7 +660,7 @@ function f() {
     let y = 2;
     a++;|]
     a; x; y;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -673,7 +673,7 @@ function f() {
     let z: (undefined | number) = 3;
     a++;|]
     a; x; y; z;
-}`
+}`,
     );
 
     testExtractFunction(
@@ -682,7 +682,7 @@ function f() {
 function f() {
     [#|let x;|]
     return { x };
-}`
+}`,
     );
 
     testExtractFunction(
@@ -693,7 +693,7 @@ var q = /*b*/ //c
     /*d*/ [#|1 /*e*/ //f
     /*g*/ + /*h*/ //i
     /*j*/ 2|] /*k*/ //l
-    /*m*/; /*n*/ //o`
+    /*m*/; /*n*/ //o`,
     );
 
     testExtractFunction(
@@ -703,7 +703,7 @@ export default class {
     M() {
         [#|1 + 1|];
     }
-}`
+}`,
     );
 
     testExtractFunction(
@@ -711,21 +711,21 @@ export default class {
       `
 function F() {
 [#|arguments.length|]; // arguments has no declaration
-}`
+}`,
     );
   });
 
   function testExtractFunction(
     caption: string,
     text: string,
-    includeLib?: boolean
+    includeLib?: boolean,
   ) {
     testExtractSymbol(
       caption,
       text,
       "extractFunction",
       Diagnostics.Extract_function,
-      includeLib
+      includeLib,
     );
   }
 }

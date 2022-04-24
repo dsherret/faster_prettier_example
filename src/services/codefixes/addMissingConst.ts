@@ -11,8 +11,9 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToAddMissingConst(context) {
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        makeChange(t, context.sourceFile, context.span.start, context.program)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => makeChange(t, context.sourceFile, context.span.start, context.program),
       );
       if (changes.length > 0) {
         return [
@@ -21,7 +22,7 @@ namespace ts.codefix {
             changes,
             Diagnostics.Add_const_to_unresolved_variable,
             fixId,
-            Diagnostics.Add_const_to_all_unresolved_variables
+            Diagnostics.Add_const_to_all_unresolved_variables,
           ),
         ];
       }
@@ -29,8 +30,10 @@ namespace ts.codefix {
     fixIds: [fixId],
     getAllCodeActions: (context) => {
       const fixedNodes = new Set<Node>();
-      return codeFixAll(context, errorCodes, (changes, diag) =>
-        makeChange(changes, diag.file, diag.start, context.program, fixedNodes)
+      return codeFixAll(
+        context,
+        errorCodes,
+        (changes, diag) => makeChange(changes, diag.file, diag.start, context.program, fixedNodes),
       );
     },
   });
@@ -40,7 +43,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     pos: number,
     program: Program,
-    fixedNodes?: Set<Node>
+    fixedNodes?: Set<Node>,
   ) {
     const token = getTokenAtPosition(sourceFile, pos);
     const forInitializer = findAncestor(token, (node) =>
@@ -48,16 +51,16 @@ namespace ts.codefix {
         ? node.parent.initializer === node
         : isPossiblyPartOfDestructuring(node)
         ? false
-        : "quit"
-    );
-    if (forInitializer)
+        : "quit");
+    if (forInitializer) {
       return applyChange(changeTracker, forInitializer, sourceFile, fixedNodes);
+    }
 
     const parent = token.parent;
     if (
-      isBinaryExpression(parent) &&
-      parent.operatorToken.kind === SyntaxKind.EqualsToken &&
-      isExpressionStatement(parent.parent)
+      isBinaryExpression(parent)
+      && parent.operatorToken.kind === SyntaxKind.EqualsToken
+      && isExpressionStatement(parent.parent)
     ) {
       return applyChange(changeTracker, token, sourceFile, fixedNodes);
     }
@@ -65,9 +68,7 @@ namespace ts.codefix {
     if (isArrayLiteralExpression(parent)) {
       const checker = program.getTypeChecker();
       if (
-        !every(parent.elements, (element) =>
-          arrayElementCouldBeVariableDeclaration(element, checker)
-        )
+        !every(parent.elements, (element) => arrayElementCouldBeVariableDeclaration(element, checker))
       ) {
         return;
       }
@@ -80,8 +81,7 @@ namespace ts.codefix {
         ? true
         : isPossiblyPartOfCommaSeperatedInitializer(node)
         ? false
-        : "quit"
-    );
+        : "quit");
     if (commaExpression) {
       const checker = program.getTypeChecker();
       if (!expressionCouldBeVariableDeclaration(commaExpression, checker)) {
@@ -92,7 +92,7 @@ namespace ts.codefix {
         changeTracker,
         commaExpression,
         sourceFile,
-        fixedNodes
+        fixedNodes,
       );
     }
   }
@@ -101,13 +101,13 @@ namespace ts.codefix {
     changeTracker: textChanges.ChangeTracker,
     initializer: Node,
     sourceFile: SourceFile,
-    fixedNodes?: Set<Node>
+    fixedNodes?: Set<Node>,
   ) {
     if (!fixedNodes || tryAddToSet(fixedNodes, initializer)) {
       changeTracker.insertModifierBefore(
         sourceFile,
         SyntaxKind.ConstKeyword,
-        initializer
+        initializer,
       );
     }
   }
@@ -127,13 +127,13 @@ namespace ts.codefix {
 
   function arrayElementCouldBeVariableDeclaration(
     expression: Expression,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
     const identifier = isIdentifier(expression)
       ? expression
       : isAssignmentExpression(
           expression,
-          /*excludeCompoundAssignment*/ true
+          /*excludeCompoundAssignment*/ true,
         ) && isIdentifier(expression.left)
       ? expression.left
       : undefined;
@@ -153,22 +153,23 @@ namespace ts.codefix {
 
   function expressionCouldBeVariableDeclaration(
     expression: Node,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
     if (!isBinaryExpression(expression)) {
       return false;
     }
 
     if (expression.operatorToken.kind === SyntaxKind.CommaToken) {
-      return every([expression.left, expression.right], (expression) =>
-        expressionCouldBeVariableDeclaration(expression, checker)
+      return every(
+        [expression.left, expression.right],
+        (expression) => expressionCouldBeVariableDeclaration(expression, checker),
       );
     }
 
     return (
-      expression.operatorToken.kind === SyntaxKind.EqualsToken &&
-      isIdentifier(expression.left) &&
-      !checker.getSymbolAtLocation(expression.left)
+      expression.operatorToken.kind === SyntaxKind.EqualsToken
+      && isIdentifier(expression.left)
+      && !checker.getSymbolAtLocation(expression.left)
     );
   }
 }

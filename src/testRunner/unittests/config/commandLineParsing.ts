@@ -3,25 +3,27 @@ namespace ts {
     function assertParseResult(
       commandLine: string[],
       expectedParsedCommandLine: ParsedCommandLine,
-      workerDiagnostic?: () => ParseCommandLineWorkerDiagnostics
+      workerDiagnostic?: () => ParseCommandLineWorkerDiagnostics,
     ) {
       const parsed = parseCommandLineWorker(
         workerDiagnostic?.() || compilerOptionsDidYouMeanDiagnostics,
-        commandLine
+        commandLine,
       );
       assert.deepEqual(parsed.options, expectedParsedCommandLine.options);
       assert.deepEqual(
         parsed.watchOptions,
-        expectedParsedCommandLine.watchOptions
+        expectedParsedCommandLine.watchOptions,
       );
 
       const parsedErrors = parsed.errors;
       const expectedErrors = expectedParsedCommandLine.errors;
       assert.isTrue(
         parsedErrors.length === expectedErrors.length,
-        `Expected error: ${JSON.stringify(
-          expectedErrors
-        )}. Actual error: ${JSON.stringify(parsedErrors)}.`
+        `Expected error: ${
+          JSON.stringify(
+            expectedErrors,
+          )
+        }. Actual error: ${JSON.stringify(parsedErrors)}.`,
       );
       for (let i = 0; i < parsedErrors.length; i++) {
         const parsedError = parsedErrors[i];
@@ -30,8 +32,8 @@ namespace ts {
         assert.equal(parsedError.category, expectedError.category);
         // Allow matching a prefix of the error message
         if (
-          typeof expectedError.messageText === "string" &&
-          expectedError.messageText.includes("[...]")
+          typeof expectedError.messageText === "string"
+          && expectedError.messageText.includes("[...]")
         ) {
           const prefix = expectedError.messageText.split("[...]")[0];
           assert(expectedError.messageText.startsWith(prefix));
@@ -44,9 +46,11 @@ namespace ts {
       const expectedFileNames = expectedParsedCommandLine.fileNames;
       assert.isTrue(
         parsedFileNames.length === expectedFileNames.length,
-        `Expected fileNames: [${JSON.stringify(
-          expectedFileNames
-        )}]. Actual fileNames: [${JSON.stringify(parsedFileNames)}].`
+        `Expected fileNames: [${
+          JSON.stringify(
+            expectedFileNames,
+          )
+        }]. Actual fileNames: [${JSON.stringify(parsedFileNames)}].`,
       );
       for (let i = 0; i < parsedFileNames.length; i++) {
         const parsedFileName = parsedFileNames[i];
@@ -72,8 +76,7 @@ namespace ts {
       assertParseResult(buildFlags, {
         errors: buildFlags.map((buildFlag) => ({
           messageText: `Compiler option '${buildFlag}' may only be used with '--build'.`,
-          category:
-            Diagnostics.Compiler_option_0_may_only_be_used_with_build.category,
+          category: Diagnostics.Compiler_option_0_may_only_be_used_with_build.category,
           code: Diagnostics.Compiler_option_0_may_only_be_used_with_build.code,
           file: undefined,
           start: undefined,
@@ -89,20 +92,16 @@ namespace ts {
       assertParseResult(["--declarations", "--allowTS"], {
         errors: [
           {
-            messageText:
-              "Unknown compiler option '--declarations'. Did you mean 'declaration'?",
-            category:
-              Diagnostics.Unknown_compiler_option_0_Did_you_mean_1.category,
+            messageText: "Unknown compiler option '--declarations'. Did you mean 'declaration'?",
+            category: Diagnostics.Unknown_compiler_option_0_Did_you_mean_1.category,
             code: Diagnostics.Unknown_compiler_option_0_Did_you_mean_1.code,
             file: undefined,
             start: undefined,
             length: undefined,
           },
           {
-            messageText:
-              "Unknown compiler option '--allowTS'. Did you mean 'allowJs'?",
-            category:
-              Diagnostics.Unknown_compiler_option_0_Did_you_mean_1.category,
+            messageText: "Unknown compiler option '--allowTS'. Did you mean 'allowJs'?",
+            category: Diagnostics.Unknown_compiler_option_0_Did_you_mean_1.category,
             code: Diagnostics.Unknown_compiler_option_0_Did_you_mean_1.code,
             file: undefined,
             start: undefined,
@@ -130,10 +129,8 @@ namespace ts {
       assertParseResult(["--lib", "es5,invalidOption", "0.ts"], {
         errors: [
           {
-            messageText:
-              "Argument for '--lib' option must be: 'es5', 'es6' [...]",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            messageText: "Argument for '--lib' option must be: 'es5', 'es6' [...]",
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
             file: undefined,
             start: undefined,
@@ -152,8 +149,7 @@ namespace ts {
         errors: [
           {
             messageText: "Compiler option 'jsx' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -163,8 +159,7 @@ namespace ts {
           {
             messageText:
               "Argument for '--jsx' option must be: 'preserve', 'react-native', 'react', 'react-jsx', 'react-jsxdev'.",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
 
             file: undefined,
@@ -183,8 +178,7 @@ namespace ts {
         errors: [
           {
             messageText: "Compiler option 'module' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -194,8 +188,7 @@ namespace ts {
           {
             messageText:
               "Argument for '--module' option must be: 'none', 'commonjs', 'amd', 'system', 'umd', 'es6', 'es2015', 'es2020', 'es2022', 'esnext', 'node12', 'nodenext'.",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
 
             file: undefined,
@@ -214,8 +207,7 @@ namespace ts {
         errors: [
           {
             messageText: "Compiler option 'newLine' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -223,10 +215,8 @@ namespace ts {
             length: undefined,
           },
           {
-            messageText:
-              "Argument for '--newLine' option must be: 'crlf', 'lf'.",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            messageText: "Argument for '--newLine' option must be: 'crlf', 'lf'.",
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
 
             file: undefined,
@@ -245,8 +235,7 @@ namespace ts {
         errors: [
           {
             messageText: "Compiler option 'target' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -256,8 +245,7 @@ namespace ts {
           {
             messageText:
               "Argument for '--target' option must be: 'es3', 'es5', 'es6', 'es2015', 'es2016', 'es2017', 'es2018', 'es2019', 'es2020', 'es2021', 'es2022', 'esnext'.",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
 
             file: undefined,
@@ -275,10 +263,8 @@ namespace ts {
       assertParseResult(["0.ts", "--moduleResolution"], {
         errors: [
           {
-            messageText:
-              "Compiler option 'moduleResolution' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            messageText: "Compiler option 'moduleResolution' expects an argument.",
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -286,10 +272,8 @@ namespace ts {
             length: undefined,
           },
           {
-            messageText:
-              "Argument for '--moduleResolution' option must be: 'node', 'classic', 'node12', 'nodenext'.",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            messageText: "Argument for '--moduleResolution' option must be: 'node', 'classic', 'node12', 'nodenext'.",
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
 
             file: undefined,
@@ -308,8 +292,7 @@ namespace ts {
         errors: [
           {
             messageText: "Compiler option 'lib' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -331,8 +314,7 @@ namespace ts {
         errors: [
           {
             messageText: "Compiler option 'lib' expects an argument.",
-            category:
-              Diagnostics.Compiler_option_0_expects_an_argument.category,
+            category: Diagnostics.Compiler_option_0_expects_an_argument.category,
             code: Diagnostics.Compiler_option_0_expects_an_argument.code,
 
             file: undefined,
@@ -364,10 +346,8 @@ namespace ts {
       assertParseResult(["--lib", "es5,", "es7", "0.ts"], {
         errors: [
           {
-            messageText:
-              "Argument for '--lib' option must be: 'es5', 'es6' [...].",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            messageText: "Argument for '--lib' option must be: 'es5', 'es6' [...].",
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
             file: undefined,
             start: undefined,
@@ -386,10 +366,8 @@ namespace ts {
       assertParseResult(["--lib", "es5, ", "es7", "0.ts"], {
         errors: [
           {
-            messageText:
-              "Argument for '--lib' option must be: 'es5', 'es6', [...]",
-            category:
-              Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+            messageText: "Argument for '--lib' option must be: 'es5', 'es6', [...]",
+            category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
             code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
             file: undefined,
             start: undefined,
@@ -414,7 +392,7 @@ namespace ts {
             lib: ["lib.es5.d.ts", "lib.es2015.symbol.wellknown.d.ts"],
             target: ScriptTarget.ES5,
           },
-        }
+        },
       );
     });
 
@@ -438,7 +416,7 @@ namespace ts {
             target: ScriptTarget.ES5,
             lib: ["lib.es5.d.ts", "lib.es2015.symbol.wellknown.d.ts"],
           },
-        }
+        },
       );
     });
 
@@ -464,7 +442,7 @@ namespace ts {
             target: ScriptTarget.ES5,
             lib: ["lib.es2015.core.d.ts", "lib.es2015.symbol.wellknown.d.ts"],
           },
-        }
+        },
       );
     });
 
@@ -537,7 +515,7 @@ namespace ts {
               fileNames: ["0.ts"],
               options: { [optionName]: undefined },
             },
-            workerDiagnostic
+            workerDiagnostic,
           );
         });
 
@@ -550,7 +528,7 @@ namespace ts {
                   {
                     messageText: formatStringFromArgs(
                       diagnosticMessage.message,
-                      [optionName]
+                      [optionName],
                     ),
                     category: diagnosticMessage.category,
                     code: diagnosticMessage.code,
@@ -562,7 +540,7 @@ namespace ts {
                 fileNames: ["0.ts"],
                 options: {},
               },
-              workerDiagnostic
+              workerDiagnostic,
             );
           });
         }
@@ -586,7 +564,7 @@ namespace ts {
               fileNames: ["0.ts"],
               options: { strictNullChecks: true },
             },
-            workerDiagnostic
+            workerDiagnostic,
           );
         });
 
@@ -609,7 +587,7 @@ namespace ts {
               fileNames: ["0.ts"],
               options: {},
             },
-            workerDiagnostic
+            workerDiagnostic,
           );
         });
       }
@@ -703,7 +681,7 @@ namespace ts {
               getEntries({
                 node: ModuleResolutionKind.NodeJs,
                 classic: ModuleResolutionKind.Classic,
-              })
+              }),
             ),
           nonNullValue: "node",
         });
@@ -717,7 +695,7 @@ namespace ts {
           errors: [],
           fileNames: ["0.ts"],
           options: { composite: undefined, tsBuildInfoFile: undefined },
-        }
+        },
       );
     });
 
@@ -741,7 +719,7 @@ namespace ts {
             watchOptions: {
               watchDirectory: WatchDirectoryKind.FixedPollingInterval,
             },
-          }
+          },
         );
       });
 
@@ -767,10 +745,8 @@ namespace ts {
         assertParseResult(["0.ts", "--fallbackPolling"], {
           errors: [
             {
-              messageText:
-                "Watch option 'fallbackPolling' requires a value of type string.",
-              category:
-                Diagnostics.Watch_option_0_requires_a_value_of_type_1.category,
+              messageText: "Watch option 'fallbackPolling' requires a value of type string.",
+              category: Diagnostics.Watch_option_0_requires_a_value_of_type_1.category,
               code: Diagnostics.Watch_option_0_requires_a_value_of_type_1.code,
               file: undefined,
               start: undefined,
@@ -779,8 +755,7 @@ namespace ts {
             {
               messageText:
                 "Argument for '--fallbackPolling' option must be: 'fixedinterval', 'priorityinterval', 'dynamicpriority', 'fixedchunksize'.",
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
               file: undefined,
               start: undefined,
@@ -806,11 +781,11 @@ namespace ts {
         assertParseResult(["--excludeDirectories", "**/../*", "0.ts"], {
           errors: [
             {
-              messageText: `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
-              category:
-                Diagnostics
-                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
-                  .category,
+              messageText:
+                `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
+              category: Diagnostics
+                .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
+                .category,
               code: Diagnostics
                 .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
                 .code,
@@ -838,11 +813,11 @@ namespace ts {
         assertParseResult(["--excludeFiles", "**/../*", "0.ts"], {
           errors: [
             {
-              messageText: `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
-              category:
-                Diagnostics
-                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
-                  .category,
+              messageText:
+                `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
+              category: Diagnostics
+                .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
+                .category,
               code: Diagnostics
                 .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
                 .code,
@@ -862,25 +837,27 @@ namespace ts {
   describe("unittests:: config:: commandLineParsing:: parseBuildOptions", () => {
     function assertParseResult(
       commandLine: string[],
-      expectedParsedBuildCommand: ParsedBuildCommand
+      expectedParsedBuildCommand: ParsedBuildCommand,
     ) {
       const parsed = parseBuildCommand(commandLine);
       assert.deepEqual(
         parsed.buildOptions,
-        expectedParsedBuildCommand.buildOptions
+        expectedParsedBuildCommand.buildOptions,
       );
       assert.deepEqual(
         parsed.watchOptions,
-        expectedParsedBuildCommand.watchOptions
+        expectedParsedBuildCommand.watchOptions,
       );
 
       const parsedErrors = parsed.errors;
       const expectedErrors = expectedParsedBuildCommand.errors;
       assert.isTrue(
         parsedErrors.length === expectedErrors.length,
-        `Expected error: ${JSON.stringify(
-          expectedErrors
-        )}. Actual error: ${JSON.stringify(parsedErrors)}.`
+        `Expected error: ${
+          JSON.stringify(
+            expectedErrors,
+          )
+        }. Actual error: ${JSON.stringify(parsedErrors)}.`,
       );
       for (let i = 0; i < parsedErrors.length; i++) {
         const parsedError = parsedErrors[i];
@@ -895,9 +872,11 @@ namespace ts {
       assert.deepEqual(
         parsedProjects,
         expectedProjects,
-        `Expected projects: [${JSON.stringify(
-          expectedProjects
-        )}]. Actual projects: [${JSON.stringify(parsedProjects)}].`
+        `Expected projects: [${
+          JSON.stringify(
+            expectedProjects,
+          )
+        }]. Actual projects: [${JSON.stringify(parsedProjects)}].`,
       );
     }
     it("parse build without any options ", () => {
@@ -944,10 +923,8 @@ namespace ts {
       assertParseResult(["--listFilesOnly"], {
         errors: [
           {
-            messageText:
-              "Compiler option '--listFilesOnly' may not be used with '--build'.",
-            category:
-              Diagnostics.Compiler_option_0_may_not_be_used_with_build.category,
+            messageText: "Compiler option '--listFilesOnly' may not be used with '--build'.",
+            category: Diagnostics.Compiler_option_0_may_not_be_used_with_build.category,
             code: Diagnostics.Compiler_option_0_may_not_be_used_with_build.code,
             file: undefined,
             start: undefined,
@@ -1015,10 +992,8 @@ namespace ts {
       assertParseResult(["--tsBuildInfoFile", "build.tsbuildinfo", "tests"], {
         errors: [
           {
-            messageText:
-              "Compiler option '--tsBuildInfoFile' may not be used with '--build'.",
-            category:
-              Diagnostics.Compiler_option_0_may_not_be_used_with_build.category,
+            messageText: "Compiler option '--tsBuildInfoFile' may not be used with '--build'.",
+            category: Diagnostics.Compiler_option_0_may_not_be_used_with_build.category,
             code: Diagnostics.Compiler_option_0_may_not_be_used_with_build.code,
             file: undefined,
             start: undefined,
@@ -1037,8 +1012,7 @@ namespace ts {
       assertParseResult(buildFlags, {
         errors: buildFlags.map((buildFlag) => ({
           messageText: `Compiler option '${buildFlag}' may not be used with '--build'.`,
-          category:
-            Diagnostics.Compiler_option_0_may_not_be_used_with_build.category,
+          category: Diagnostics.Compiler_option_0_may_not_be_used_with_build.category,
           code: Diagnostics.Compiler_option_0_may_not_be_used_with_build.code,
           file: undefined,
           start: undefined,
@@ -1053,7 +1027,7 @@ namespace ts {
     describe("Combining options that make no sense together", () => {
       function verifyInvalidCombination(
         flag1: keyof BuildOptions,
-        flag2: keyof BuildOptions
+        flag2: keyof BuildOptions,
       ) {
         it(`--${flag1} and --${flag2} together is invalid`, () => {
           // --module commonjs --target es5 0.ts --lib es5,es2015.symbol.wellknown
@@ -1061,8 +1035,7 @@ namespace ts {
             errors: [
               {
                 messageText: `Options '${flag1}' and '${flag2}' cannot be combined.`,
-                category:
-                  Diagnostics.Options_0_and_1_cannot_be_combined.category,
+                category: Diagnostics.Options_0_and_1_cannot_be_combined.category,
                 code: Diagnostics.Options_0_and_1_cannot_be_combined.code,
                 file: undefined,
                 start: undefined,
@@ -1102,7 +1075,7 @@ namespace ts {
             watchOptions: {
               watchDirectory: WatchDirectoryKind.FixedPollingInterval,
             },
-          }
+          },
         );
       });
 
@@ -1116,7 +1089,7 @@ namespace ts {
             watchOptions: {
               fallbackPolling: PollingWatchKind.PriorityInterval,
             },
-          }
+          },
         );
       });
 
@@ -1133,10 +1106,8 @@ namespace ts {
         assertParseResult(["--verbose", "--fallbackPolling"], {
           errors: [
             {
-              messageText:
-                "Watch option 'fallbackPolling' requires a value of type string.",
-              category:
-                Diagnostics.Watch_option_0_requires_a_value_of_type_1.category,
+              messageText: "Watch option 'fallbackPolling' requires a value of type string.",
+              category: Diagnostics.Watch_option_0_requires_a_value_of_type_1.category,
               code: Diagnostics.Watch_option_0_requires_a_value_of_type_1.code,
               file: undefined,
               start: undefined,
@@ -1145,8 +1116,7 @@ namespace ts {
             {
               messageText:
                 "Argument for '--fallbackPolling' option must be: 'fixedinterval', 'priorityinterval', 'dynamicpriority', 'fixedchunksize'.",
-              category:
-                Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
+              category: Diagnostics.Argument_for_0_option_must_be_Colon_1.category,
               code: Diagnostics.Argument_for_0_option_must_be_Colon_1.code,
               file: undefined,
               start: undefined,
@@ -1163,11 +1133,11 @@ namespace ts {
         assertParseResult(["--excludeDirectories", "**/../*"], {
           errors: [
             {
-              messageText: `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
-              category:
-                Diagnostics
-                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
-                  .category,
+              messageText:
+                `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
+              category: Diagnostics
+                .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
+                .category,
               code: Diagnostics
                 .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
                 .code,
@@ -1195,11 +1165,11 @@ namespace ts {
         assertParseResult(["--excludeFiles", "**/../*"], {
           errors: [
             {
-              messageText: `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
-              category:
-                Diagnostics
-                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
-                  .category,
+              messageText:
+                `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
+              category: Diagnostics
+                .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
+                .category,
               code: Diagnostics
                 .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
                 .code,

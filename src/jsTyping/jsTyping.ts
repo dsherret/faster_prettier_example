@@ -9,7 +9,7 @@ namespace ts.JsTyping {
       extensions: readonly string[],
       excludes: readonly string[] | undefined,
       includes: readonly string[] | undefined,
-      depth?: number
+      depth?: number,
     ): string[];
   }
 
@@ -30,11 +30,11 @@ namespace ts.JsTyping {
 
   export function isTypingUpToDate(
     cachedTyping: CachedTyping,
-    availableTypingVersions: MapLike<string>
+    availableTypingVersions: MapLike<string>,
   ) {
     const availableVersion = new Version(
-      getProperty(availableTypingVersions, `ts${versionMajorMinor}`) ||
-        getProperty(availableTypingVersions, "latest")!
+      getProperty(availableTypingVersions, `ts${versionMajorMinor}`)
+        || getProperty(availableTypingVersions, "latest")!,
     );
     return availableVersion.compareTo(cachedTyping.version) <= 0;
   }
@@ -90,7 +90,7 @@ namespace ts.JsTyping {
   ];
 
   export const prefixedNodeCoreModuleList = unprefixedNodeCoreModuleList.map(
-    (name) => `node:${name}`
+    (name) => `node:${name}`,
   );
 
   export const nodeCoreModuleList: readonly string[] = [
@@ -111,7 +111,7 @@ namespace ts.JsTyping {
 
   export function loadSafeList(
     host: TypingResolutionHost,
-    safeListPath: Path
+    safeListPath: Path,
   ): SafeList {
     const result = readConfigFile(safeListPath, (path) => host.readFile(path));
     return new Map(getEntries<string>(result.config));
@@ -119,7 +119,7 @@ namespace ts.JsTyping {
 
   export function loadTypesMap(
     host: TypingResolutionHost,
-    typesMapPath: Path
+    typesMapPath: Path,
   ): SafeList | undefined {
     const result = readConfigFile(typesMapPath, (path) => host.readFile(path));
     if (result.config) {
@@ -146,7 +146,7 @@ namespace ts.JsTyping {
     packageNameToTypingLocation: ReadonlyESMap<string, CachedTyping>,
     typeAcquisition: TypeAcquisition,
     unresolvedImports: readonly string[],
-    typesRegistry: ReadonlyESMap<string, MapLike<string>>
+    typesRegistry: ReadonlyESMap<string, MapLike<string>>,
   ): {
     cachedTypingPaths: string[];
     newTypingNames: string[];
@@ -169,8 +169,9 @@ namespace ts.JsTyping {
 
     const filesToWatch: string[] = [];
 
-    if (typeAcquisition.include)
+    if (typeAcquisition.include) {
       addInferredTypings(typeAcquisition.include, "Explicitly included types");
+    }
     const exclude = typeAcquisition.exclude || [];
 
     // Directories to search for package.json, bower.json and other typing information
@@ -188,7 +189,7 @@ namespace ts.JsTyping {
       const module = deduplicate<string>(
         unresolvedImports.map(nonRelativeModuleNameForTypingCache),
         equateStringsCaseSensitive,
-        compareStringsCaseSensitive
+        compareStringsCaseSensitive,
       );
       addInferredTypings(module, "Inferred typings from unresolved imports");
     }
@@ -196,10 +197,10 @@ namespace ts.JsTyping {
     packageNameToTypingLocation.forEach((typing, name) => {
       const registryEntry = typesRegistry.get(name);
       if (
-        inferredTypings.has(name) &&
-        inferredTypings.get(name) === undefined &&
-        registryEntry !== undefined &&
-        isTypingUpToDate(typing, registryEntry)
+        inferredTypings.has(name)
+        && inferredTypings.get(name) === undefined
+        && registryEntry !== undefined
+        && isTypingUpToDate(typing, registryEntry)
       ) {
         inferredTypings.set(name, typing.typingLocation);
       }
@@ -208,10 +209,11 @@ namespace ts.JsTyping {
     // Remove typings that the user has added to the exclude list
     for (const excludeTypingName of exclude) {
       const didDelete = inferredTypings.delete(excludeTypingName);
-      if (didDelete && log)
+      if (didDelete && log) {
         log(
-          `Typing for ${excludeTypingName} is in exclude list, will be ignored.`
+          `Typing for ${excludeTypingName} is in exclude list, will be ignored.`,
         );
+      }
     }
 
     const newTypingNames: string[] = [];
@@ -234,7 +236,7 @@ namespace ts.JsTyping {
     }
     function addInferredTypings(
       typingNames: readonly string[],
-      message: string
+      message: string,
     ) {
       if (log) log(`${message}: ${JSON.stringify(typingNames)}`);
       forEach(typingNames, addInferredTyping);
@@ -252,7 +254,7 @@ namespace ts.JsTyping {
       projectRootPath: string,
       manifestName: string,
       modulesDirName: string,
-      filesToWatch: string[]
+      filesToWatch: string[],
     ): void {
       // First, we check the manifests themselves. They're not
       // _required_, but they allow us to do some filtering when dealing
@@ -262,9 +264,7 @@ namespace ts.JsTyping {
       let manifestTypingNames;
       if (host.fileExists(manifestPath)) {
         filesToWatch.push(manifestPath);
-        manifest = readConfigFile(manifestPath, (path) =>
-          host.readFile(path)
-        ).config;
+        manifest = readConfigFile(manifestPath, (path) => host.readFile(path)).config;
         manifestTypingNames = flatMap(
           [
             manifest.dependencies,
@@ -272,11 +272,11 @@ namespace ts.JsTyping {
             manifest.optionalDependencies,
             manifest.peerDependencies,
           ],
-          getOwnKeys
+          getOwnKeys,
         );
         addInferredTypings(
           manifestTypingNames,
-          `Typing names in '${manifestPath}' dependencies`
+          `Typing names in '${manifestPath}' dependencies`,
         );
       }
 
@@ -307,9 +307,7 @@ namespace ts.JsTyping {
 
       const dependencyManifestNames = manifestTypingNames
         ? // This is #1 described above.
-          manifestTypingNames.map((typingName) =>
-            combinePaths(packagesFolderPath, typingName, manifestName)
-          )
+          manifestTypingNames.map((typingName) => combinePaths(packagesFolderPath, typingName, manifestName))
         : // And #2. Depth = 3 because scoped packages look like `node_modules/@foo/bar/package.json`
           host
             .readDirectory(
@@ -317,7 +315,7 @@ namespace ts.JsTyping {
               [Extension.Json],
               /*excludes*/ undefined,
               /*includes*/ undefined,
-              /*depth*/ 3
+              /*depth*/ 3,
             )
             .filter((manifestPath) => {
               if (getBaseFileName(manifestPath) !== manifestName) {
@@ -329,35 +327,36 @@ namespace ts.JsTyping {
               // We only assume depth 3 is ok for formally scoped
               // packages. So that needs this dance here.
               const pathComponents = getPathComponents(
-                normalizePath(manifestPath)
+                normalizePath(manifestPath),
               );
-              const isScoped =
-                pathComponents[pathComponents.length - 3][0] === "@";
+              const isScoped = pathComponents[pathComponents.length - 3][0] === "@";
               return (
-                (isScoped &&
-                  pathComponents[pathComponents.length - 4].toLowerCase() ===
-                    modulesDirName) || // `node_modules/@foo/bar`
-                (!isScoped &&
-                  pathComponents[pathComponents.length - 3].toLowerCase() ===
-                    modulesDirName)
+                (isScoped
+                  && pathComponents[pathComponents.length - 4].toLowerCase()
+                    === modulesDirName)
+                // `node_modules/@foo/bar`
+                || (!isScoped
+                  && pathComponents[pathComponents.length - 3].toLowerCase()
+                    === modulesDirName)
               ); // `node_modules/foo`
             });
 
-      if (log)
+      if (log) {
         log(
-          `Searching for typing names in ${packagesFolderPath}; all files: ${JSON.stringify(
-            dependencyManifestNames
-          )}`
+          `Searching for typing names in ${packagesFolderPath}; all files: ${
+            JSON.stringify(
+              dependencyManifestNames,
+            )
+          }`,
         );
+      }
 
       // Once we have the names of things to look up, we iterate over
       // and either collect their included typings, or add them to the
       // list of typings we need to look up separately.
       for (const manifestPath of dependencyManifestNames) {
         const normalizedFileName = normalizePath(manifestPath);
-        const result = readConfigFile(normalizedFileName, (path: string) =>
-          host.readFile(path)
-        );
+        const result = readConfigFile(normalizedFileName, (path: string) => host.readFile(path));
         const manifest: PackageJson = result.config;
 
         // If the package has its own d.ts typings, those will take precedence. Otherwise the package name will be used
@@ -369,17 +368,19 @@ namespace ts.JsTyping {
         if (ownTypes) {
           const absolutePath = getNormalizedAbsolutePath(
             ownTypes,
-            getDirectoryPath(normalizedFileName)
+            getDirectoryPath(normalizedFileName),
           );
           if (host.fileExists(absolutePath)) {
-            if (log)
+            if (log) {
               log(`    Package '${manifest.name}' provides its own types.`);
+            }
             inferredTypings.set(manifest.name, absolutePath);
           } else {
-            if (log)
+            if (log) {
               log(
-                `    Package '${manifest.name}' provides its own types but they are missing.`
+                `    Package '${manifest.name}' provides its own types but they are missing.`,
               );
+            }
           }
         } else {
           packageNames.push(manifest.name);
@@ -400,22 +401,20 @@ namespace ts.JsTyping {
         if (!hasJSFileExtension(j)) return undefined;
 
         const inferredTypingName = removeFileExtension(
-          getBaseFileName(j.toLowerCase())
+          getBaseFileName(j.toLowerCase()),
         );
-        const cleanedTypingName =
-          removeMinAndVersionNumbers(inferredTypingName);
+        const cleanedTypingName = removeMinAndVersionNumbers(inferredTypingName);
         return safeList.get(cleanedTypingName);
       });
       if (fromFileNames.length) {
         addInferredTypings(fromFileNames, "Inferred typings from file names");
       }
 
-      const hasJsxFile = some(fileNames, (f) =>
-        fileExtensionIs(f, Extension.Jsx)
-      );
+      const hasJsxFile = some(fileNames, (f) => fileExtensionIs(f, Extension.Jsx));
       if (hasJsxFile) {
-        if (log)
+        if (log) {
           log(`Inferred 'react' typings due to presence of '.jsx' extension`);
+        }
         addInferredTyping("react");
       }
     }
@@ -445,25 +444,25 @@ namespace ts.JsTyping {
    * Validates package name using rules defined at https://docs.npmjs.com/files/package.json
    */
   export function validatePackageName(
-    packageName: string
+    packageName: string,
   ): PackageNameValidationResult {
     return validatePackageNameWorker(
       packageName,
-      /*supportScopedPackage*/ true
+      /*supportScopedPackage*/ true,
     );
   }
 
   function validatePackageNameWorker(
     packageName: string,
-    supportScopedPackage: false
+    supportScopedPackage: false,
   ): NameValidationResult;
   function validatePackageNameWorker(
     packageName: string,
-    supportScopedPackage: true
+    supportScopedPackage: true,
   ): PackageNameValidationResult;
   function validatePackageNameWorker(
     packageName: string,
-    supportScopedPackage: boolean
+    supportScopedPackage: boolean,
   ): PackageNameValidationResult {
     if (!packageName) {
       return NameValidationResult.EmptyName;
@@ -484,14 +483,14 @@ namespace ts.JsTyping {
       if (matches) {
         const scopeResult = validatePackageNameWorker(
           matches[1],
-          /*supportScopedPackage*/ false
+          /*supportScopedPackage*/ false,
         );
         if (scopeResult !== NameValidationResult.Ok) {
           return { name: matches[1], isScopeName: true, result: scopeResult };
         }
         const packageResult = validatePackageNameWorker(
           matches[2],
-          /*supportScopedPackage*/ false
+          /*supportScopedPackage*/ false,
         );
         if (packageResult !== NameValidationResult.Ok) {
           return {
@@ -511,28 +510,28 @@ namespace ts.JsTyping {
 
   export function renderPackageNameValidationFailure(
     result: PackageNameValidationResult,
-    typing: string
+    typing: string,
   ): string {
     return typeof result === "object"
       ? renderPackageNameValidationFailureWorker(
-          typing,
-          result.result,
-          result.name,
-          result.isScopeName
-        )
+        typing,
+        result.result,
+        result.name,
+        result.isScopeName,
+      )
       : renderPackageNameValidationFailureWorker(
-          typing,
-          result,
-          typing,
-          /*isScopeName*/ false
-        );
+        typing,
+        result,
+        typing,
+        /*isScopeName*/ false,
+      );
   }
 
   function renderPackageNameValidationFailureWorker(
     typing: string,
     result: NameValidationResult,
     name: string,
-    isScopeName: boolean
+    isScopeName: boolean,
   ): string {
     const kind = isScopeName ? "Scope" : "Package";
     switch (result) {

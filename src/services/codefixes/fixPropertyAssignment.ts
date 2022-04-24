@@ -13,47 +13,47 @@ namespace ts.codefix {
     getCodeActions(context) {
       const { sourceFile, span } = context;
       const property = getProperty(sourceFile, span.start);
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, context.sourceFile, property)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, context.sourceFile, property));
       return [
         createCodeFixAction(
           fixId,
           changes,
           [Diagnostics.Change_0_to_1, "=", ":"],
           fixId,
-          [Diagnostics.Switch_each_misused_0_to_1, "=", ":"]
+          [Diagnostics.Switch_each_misused_0_to_1, "=", ":"],
         ),
       ];
     },
     getAllCodeActions: (context) =>
-      codeFixAll(context, errorCodes, (changes, diag) =>
-        doChange(changes, diag.file, getProperty(diag.file, diag.start))
+      codeFixAll(
+        context,
+        errorCodes,
+        (changes, diag) => doChange(changes, diag.file, getProperty(diag.file, diag.start)),
       ),
   });
 
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    node: ShorthandPropertyAssignment
+    node: ShorthandPropertyAssignment,
   ): void {
     changes.replaceNode(
       sourceFile,
       node,
       factory.createPropertyAssignment(
         node.name,
-        node.objectAssignmentInitializer as Expression
-      )
+        node.objectAssignmentInitializer as Expression,
+      ),
     );
   }
 
   function getProperty(
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ): ShorthandPropertyAssignment {
     return cast(
       getTokenAtPosition(sourceFile, pos).parent,
-      isShorthandPropertyAssignment
+      isShorthandPropertyAssignment,
     );
   }
 }

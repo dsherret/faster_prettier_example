@@ -5,18 +5,14 @@ namespace ts {
       | readonly any[]
       | ReadonlySetShim<any>
       | ReadonlyMapShim<any, any>
-      | undefined
+      | undefined,
   >(
-    iterable: I
+    iterable: I,
   ) => IteratorShim<
-    I extends ReadonlyMapShim<infer K, infer V>
-      ? [K, V]
-      : I extends ReadonlySetShim<infer T>
-      ? T
-      : I extends readonly (infer T)[]
-      ? T
-      : I extends undefined
-      ? undefined
+    I extends ReadonlyMapShim<infer K, infer V> ? [K, V]
+      : I extends ReadonlySetShim<infer T> ? T
+      : I extends readonly (infer T)[] ? T
+      : I extends undefined ? undefined
       : never
   >;
 
@@ -44,8 +40,8 @@ namespace ts {
     clear(): void;
   }
 
-  type MapShimConstructor = new <K, V>(
-    iterable?: readonly (readonly [K, V])[] | ReadonlyMapShim<K, V>
+  type MapShimConstructor = new<K, V>(
+    iterable?: readonly (readonly [K, V])[] | ReadonlyMapShim<K, V>,
   ) => MapShim<K, V>;
 
   interface ReadonlySetShim<T> {
@@ -63,8 +59,8 @@ namespace ts {
     clear(): void;
   }
 
-  type SetShimConstructor = new <T>(
-    iterable?: readonly T[] | ReadonlySetShim<T>
+  type SetShimConstructor = new<T>(
+    iterable?: readonly T[] | ReadonlySetShim<T>,
   ) => SetShim<T>;
 
   interface MapData<K, V> {
@@ -134,7 +130,7 @@ namespace ts {
 
   function getEntry<K, V>(
     data: MapData<K, V>,
-    key: K
+    key: K,
   ): MapEntry<K, V> | undefined {
     // We walk backwards from 'tail' to prioritize recently added entries.
     // We skip 'head' because it is an empty entry used to track iteration start.
@@ -148,7 +144,7 @@ namespace ts {
   function addOrUpdateEntry<K, V>(
     data: MapData<K, V>,
     key: K,
-    value: V
+    value: V,
   ): MapEntry<K, V> | undefined {
     const existing = getEntry(data, key);
     if (existing) {
@@ -166,7 +162,7 @@ namespace ts {
 
   function deleteEntry<K, V>(
     data: MapData<K, V>,
-    key: K
+    key: K,
   ): MapEntry<K, V> | undefined {
     // We walk backwards from 'tail' to prioritize recently added entries.
     // We skip 'head' because it is an empty entry used to track iteration start.
@@ -206,7 +202,7 @@ namespace ts {
 
   function forEachEntry<K, V>(
     data: MapData<K, V>,
-    action: (value: V, key: K) => void
+    action: (value: V, key: K) => void,
   ) {
     let entry: MapEntry<K, V> | undefined = data.head;
     while (entry) {
@@ -219,7 +215,7 @@ namespace ts {
 
   function forEachIteration<T>(
     iterator: IteratorShim<T> | undefined,
-    action: (value: any) => void
+    action: (value: any) => void,
   ) {
     if (iterator) {
       for (let step = iterator.next(); !step.done; step = iterator.next()) {
@@ -230,13 +226,13 @@ namespace ts {
 
   function createIteratorData<K, V, U extends K | V | [K, V]>(
     data: MapData<K, V>,
-    selector: (key: K, value: V) => U
+    selector: (key: K, value: V) => U,
   ): IteratorData<K, V, U> {
     return { current: data.head, selector };
   }
 
   function iteratorNext<K, V, U extends K | V | [K, V]>(
-    data: IteratorData<K, V, U>
+    data: IteratorData<K, V, U>,
   ): IteratorResultShim<U> {
     // Navigate to the next entry.
     data.current = getNext(data.current);
@@ -253,7 +249,7 @@ namespace ts {
   /* @internal */
   export namespace ShimCollections {
     export function createMapShim(
-      getIterator: GetIteratorCallback
+      getIterator: GetIteratorCallback,
     ): MapShimConstructor {
       class MapIterator<K, V, U extends K | V | [K, V]> {
         private _data: IteratorData<K, V, U>;
@@ -267,11 +263,9 @@ namespace ts {
       return class Map<K, V> implements MapShim<K, V> {
         private _mapData = createMapData<K, V>();
         constructor(
-          iterable?: readonly (readonly [K, V])[] | ReadonlyMapShim<K, V>
+          iterable?: readonly (readonly [K, V])[] | ReadonlyMapShim<K, V>,
         ) {
-          forEachIteration(getIterator(iterable), ([key, value]) =>
-            this.set(key, value)
-          );
+          forEachIteration(getIterator(iterable), ([key, value]) => this.set(key, value));
         }
         get size() {
           return this._mapData.size;
@@ -307,7 +301,7 @@ namespace ts {
     }
 
     export function createSetShim(
-      getIterator: GetIteratorCallback
+      getIterator: GetIteratorCallback,
     ): SetShimConstructor {
       class SetIterator<K, V, U extends K | V | [K, V]> {
         private _data: IteratorData<K, V, U>;

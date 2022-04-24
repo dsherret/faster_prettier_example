@@ -2,13 +2,15 @@ namespace ts.projectSystem {
   export function verifyDynamic(service: server.ProjectService, path: string) {
     const info = Debug.checkDefined(
       service.filenameToScriptInfo.get(path),
-      `Expected ${path} in :: ${JSON.stringify(
-        arrayFrom(service.filenameToScriptInfo.entries(), ([key, f]) => ({
-          key,
-          fileName: f.fileName,
-          path: f.path,
-        }))
-      )}`
+      `Expected ${path} in :: ${
+        JSON.stringify(
+          arrayFrom(service.filenameToScriptInfo.entries(), ([key, f]) => ({
+            key,
+            fileName: f.fileName,
+            path: f.path,
+          })),
+        )
+      }`,
     );
     assert.isTrue(info.isDynamic);
   }
@@ -50,7 +52,7 @@ var x = 10;`,
           fileContent: `/// <reference path="../../../../../../typings/@epic/Core.d.ts" />\nlet foo = 1;\nfooo/**/`,
           scriptKindName: "TS",
           projectRootPath: "/proj",
-        }
+        },
       );
       verifyDynamic(session.getProjectService(), `/proj/untitled:^untitled-1`);
       const response = executeSessionRequest<
@@ -86,7 +88,7 @@ var x = 10;`,
             fixId: undefined,
             fixAllDescription: undefined,
           },
-        ]
+        ],
       );
     });
 
@@ -104,7 +106,7 @@ var x = 10;`,
         untitledFile,
         "const x = 10;",
         /*scriptKind*/ undefined,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       checkNumberOfProjects(service, { inferredProjects: 1 });
       checkProjectActualFiles(service.inferredProjects[0], [
@@ -123,7 +125,7 @@ var x = 10;`,
         untitled.path,
         untitled.content,
         /*scriptKind*/ undefined,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       checkNumberOfProjects(service, {
         configuredProjects: 1,
@@ -154,7 +156,7 @@ var x = 10;`,
         untitledFile,
         "const x = 10;",
         /*scriptKind*/ undefined,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       verifyDynamic(service, `${tscWatch.projectRoot}/${untitledFile}`);
       checkProjectActualFiles(service.configuredProjects.get(config.path)!, [
@@ -187,7 +189,7 @@ var x = 10;`,
         untitledFile,
         "const x = 10;",
         /*scriptKind*/ undefined,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       checkNumberOfProjects(service, { inferredProjects: 1 });
       checkProjectActualFiles(service.inferredProjects[0], [
@@ -215,7 +217,7 @@ var x = 10;`,
         untitledFile,
         "const x = 10;",
         ScriptKind.TS,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       checkNumberOfProjects(service, { inferredProjects: 1 });
       checkProjectActualFiles(service.inferredProjects[0], [
@@ -233,7 +235,7 @@ var x = 10;`,
         untitledFile,
         "const x = 10;",
         ScriptKind.TSX,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       checkNumberOfProjects(service, { inferredProjects: 1 });
       checkProjectActualFiles(service.inferredProjects[0], [
@@ -273,9 +275,9 @@ var x = 10;`,
 
       assert.strictEqual(
         projectService.ensureDefaultProjectForFile(
-          server.toNormalizedPath(file.path)
+          server.toNormalizedPath(file.path),
         ),
-        project
+        project,
       );
       const indexOfX = file.content.indexOf("x");
       assert.deepEqual(
@@ -296,13 +298,13 @@ var x = 10;`,
           ],
           documentation: [],
           tags: undefined,
-        }
+        },
       );
     });
 
     it("dynamic file with reference paths without external project", () => {
       verifyPathRecognizedAsDynamic(
-        "^walkThroughSnippet:/Users/UserName/projects/someProject/out/someFile#1.js"
+        "^walkThroughSnippet:/Users/UserName/projects/someProject/out/someFile#1.js",
       );
     });
 
@@ -322,14 +324,14 @@ var x = 10;`,
       it("with useInferredProjectPerProjectRoot", () => {
         const host = createServerHost(
           [libFile, configFile, configProjectFile],
-          { useCaseSensitiveFileNames: true }
+          { useCaseSensitiveFileNames: true },
         );
         const session = createSession(host, {
           useInferredProjectPerProjectRoot: true,
         });
         openFilesForSession(
           [{ file: file.path, projectRootPath: tscWatch.projectRoot }],
-          session
+          session,
         );
 
         const projectService = session.getProjectService();
@@ -364,7 +366,7 @@ var x = 10;`,
       it("fails when useInferredProjectPerProjectRoot is false", () => {
         const host = createServerHost(
           [libFile, configFile, configProjectFile],
-          { useCaseSensitiveFileNames: true }
+          { useCaseSensitiveFileNames: true },
         );
         const projectService = createProjectService(host);
         try {
@@ -372,12 +374,12 @@ var x = 10;`,
             file.path,
             file.content,
             /*scriptKind*/ undefined,
-            tscWatch.projectRoot
+            tscWatch.projectRoot,
           );
         } catch (e) {
           assert.strictEqual(
             e.message.replace(/\r?\n/, "\n"),
-            `Debug Failure. False expression.\nVerbose Debug Information: {"fileName":"^walkThroughSnippet:/Users/UserName/projects/someProject/out/someFile#1.js","currentDirectory":"/user/username/projects/myproject","hostCurrentDirectory":"/","openKeys":[]}\nDynamic files must always be opened with service's current directory or service should support inferred project per projectRootPath.`
+            `Debug Failure. False expression.\nVerbose Debug Information: {"fileName":"^walkThroughSnippet:/Users/UserName/projects/someProject/out/someFile#1.js","currentDirectory":"/user/username/projects/myproject","hostCurrentDirectory":"/","openKeys":[]}\nDynamic files must always be opened with service's current directory or service should support inferred project per projectRootPath.`,
           );
         }
         const file2Path = file.path.replace("#1", "#2");
@@ -393,13 +395,13 @@ var x = 10;`,
     describe("verify accepts known schemas as dynamic file", () => {
       it("walkThroughSnippet", () => {
         verifyPathRecognizedAsDynamic(
-          "walkThroughSnippet:/usr/share/code/resources/app/out/vs/workbench/contrib/welcome/walkThrough/browser/editor/^vs_code_editor_walkthrough.md#1.ts"
+          "walkThroughSnippet:/usr/share/code/resources/app/out/vs/workbench/contrib/welcome/walkThrough/browser/editor/^vs_code_editor_walkthrough.md#1.ts",
         );
       });
 
       it("untitled", () => {
         verifyPathRecognizedAsDynamic(
-          "untitled:/Users/matb/projects/san/^newFile.ts"
+          "untitled:/Users/matb/projects/san/^newFile.ts",
         );
       });
     });

@@ -7,7 +7,7 @@ namespace ts.codefix {
     getCodeActions(context) {
       const syntacticDiagnostics = context.program.getSyntacticDiagnostics(
         context.sourceFile,
-        context.cancellationToken
+        context.cancellationToken,
       );
       if (syntacticDiagnostics.length) return;
       const changes = textChanges.ChangeTracker.with(context, (t) =>
@@ -16,23 +16,24 @@ namespace ts.codefix {
           context.sourceFile,
           context.span.start,
           context.span.length,
-          context.errorCode
-        )
-      );
+          context.errorCode,
+        ));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Remove_unreachable_code,
           fixId,
-          Diagnostics.Remove_all_unreachable_code
+          Diagnostics.Remove_all_unreachable_code,
         ),
       ];
     },
     fixIds: [fixId],
     getAllCodeActions: (context) =>
-      codeFixAll(context, errorCodes, (changes, diag) =>
-        doChange(changes, diag.file, diag.start, diag.length, diag.code)
+      codeFixAll(
+        context,
+        errorCodes,
+        (changes, diag) => doChange(changes, diag.file, diag.start, diag.length, diag.code),
       ),
   });
 
@@ -41,7 +42,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     start: number,
     length: number,
-    errorCode: number
+    errorCode: number,
   ): void {
     const token = getTokenAtPosition(sourceFile, start);
     const statement = findAncestor(token, isStatement)!;
@@ -54,15 +55,15 @@ namespace ts.codefix {
         length,
       });
       Debug.fail(
-        "Token and statement should start at the same point. " + logData
+        "Token and statement should start at the same point. " + logData,
       );
     }
 
     const container = (isBlock(statement.parent) ? statement.parent : statement)
       .parent;
     if (
-      !isBlock(statement.parent) ||
-      statement === first(statement.parent.statements)
+      !isBlock(statement.parent)
+      || statement === first(statement.parent.statements)
     ) {
       switch (container.kind) {
         case SyntaxKind.IfStatement:
@@ -73,7 +74,7 @@ namespace ts.codefix {
               changes.replaceNode(
                 sourceFile,
                 statement,
-                factory.createBlock(emptyArray)
+                factory.createBlock(emptyArray),
               );
             }
             return;
@@ -91,9 +92,9 @@ namespace ts.codefix {
       const lastStatement = Debug.checkDefined(
         lastWhere(
           sliceAfter(statement.parent.statements, statement),
-          (s) => s.pos < end
+          (s) => s.pos < end,
         ),
-        "Some statement should be last"
+        "Some statement should be last",
       );
       changes.deleteNodeRange(sourceFile, statement, lastStatement);
     } else {
@@ -103,7 +104,7 @@ namespace ts.codefix {
 
   function lastWhere<T>(
     a: readonly T[],
-    pred: (value: T) => boolean
+    pred: (value: T) => boolean,
   ): T | undefined {
     let last: T | undefined;
     for (const value of a) {

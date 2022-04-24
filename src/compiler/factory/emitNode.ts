@@ -14,9 +14,8 @@ namespace ts {
           return (node.emitNode = { annotatedNodes: [node] } as EmitNode);
         }
 
-        const sourceFile =
-          getSourceFileOfNode(getParseTreeNode(getSourceFileOfNode(node))) ??
-          Debug.fail("Could not determine parsed source file.");
+        const sourceFile = getSourceFileOfNode(getParseTreeNode(getSourceFileOfNode(node)))
+          ?? Debug.fail("Could not determine parsed source file.");
         getOrCreateEmitNode(sourceFile).annotatedNodes!.push(node);
       }
 
@@ -24,7 +23,7 @@ namespace ts {
     } else {
       Debug.assert(
         !(node.emitNode.flags & EmitFlags.Immutable),
-        "Invalid attempt to mutate an immutable node."
+        "Invalid attempt to mutate an immutable node.",
       );
     }
     return node.emitNode;
@@ -92,7 +91,7 @@ namespace ts {
    */
   export function setSourceMapRange<T extends Node>(
     node: T,
-    range: SourceMapRange | undefined
+    range: SourceMapRange | undefined,
   ) {
     getOrCreateEmitNode(node).sourceMapRange = range;
     return node;
@@ -103,7 +102,7 @@ namespace ts {
    */
   export function getTokenSourceMapRange(
     node: Node,
-    token: SyntaxKind
+    token: SyntaxKind,
   ): SourceMapRange | undefined {
     return node.emitNode?.tokenSourceMapRanges?.[token];
   }
@@ -114,11 +113,10 @@ namespace ts {
   export function setTokenSourceMapRange<T extends Node>(
     node: T,
     token: SyntaxKind,
-    range: SourceMapRange | undefined
+    range: SourceMapRange | undefined,
   ) {
     const emitNode = getOrCreateEmitNode(node);
-    const tokenSourceMapRanges =
-      emitNode.tokenSourceMapRanges ?? (emitNode.tokenSourceMapRanges = []);
+    const tokenSourceMapRanges = emitNode.tokenSourceMapRanges ?? (emitNode.tokenSourceMapRanges = []);
     tokenSourceMapRanges[token] = range;
     return node;
   }
@@ -137,7 +135,7 @@ namespace ts {
   /*@internal*/
   export function setStartsOnNewLine<T extends Node>(
     node: T,
-    newLine: boolean
+    newLine: boolean,
   ) {
     getOrCreateEmitNode(node).startsOnNewLine = newLine;
     return node;
@@ -159,14 +157,14 @@ namespace ts {
   }
 
   export function getSyntheticLeadingComments(
-    node: Node
+    node: Node,
   ): SynthesizedComment[] | undefined {
     return node.emitNode?.leadingComments;
   }
 
   export function setSyntheticLeadingComments<T extends Node>(
     node: T,
-    comments: SynthesizedComment[] | undefined
+    comments: SynthesizedComment[] | undefined,
   ) {
     getOrCreateEmitNode(node).leadingComments = comments;
     return node;
@@ -178,7 +176,7 @@ namespace ts {
       | SyntaxKind.SingleLineCommentTrivia
       | SyntaxKind.MultiLineCommentTrivia,
     text: string,
-    hasTrailingNewLine?: boolean
+    hasTrailingNewLine?: boolean,
   ) {
     return setSyntheticLeadingComments(
       node,
@@ -188,19 +186,19 @@ namespace ts {
         end: -1,
         hasTrailingNewLine,
         text,
-      })
+      }),
     );
   }
 
   export function getSyntheticTrailingComments(
-    node: Node
+    node: Node,
   ): SynthesizedComment[] | undefined {
     return node.emitNode?.trailingComments;
   }
 
   export function setSyntheticTrailingComments<T extends Node>(
     node: T,
-    comments: SynthesizedComment[] | undefined
+    comments: SynthesizedComment[] | undefined,
   ) {
     getOrCreateEmitNode(node).trailingComments = comments;
     return node;
@@ -212,7 +210,7 @@ namespace ts {
       | SyntaxKind.SingleLineCommentTrivia
       | SyntaxKind.MultiLineCommentTrivia,
     text: string,
-    hasTrailingNewLine?: boolean
+    hasTrailingNewLine?: boolean,
   ) {
     return setSyntheticTrailingComments(
       node,
@@ -222,13 +220,13 @@ namespace ts {
         end: -1,
         hasTrailingNewLine,
         text,
-      })
+      }),
     );
   }
 
   export function moveSyntheticComments<T extends Node>(
     node: T,
-    original: Node
+    original: Node,
   ): T {
     setSyntheticLeadingComments(node, getSyntheticLeadingComments(original));
     setSyntheticTrailingComments(node, getSyntheticTrailingComments(original));
@@ -242,7 +240,7 @@ namespace ts {
    * Gets the constant value to emit for an expression representing an enum.
    */
   export function getConstantValue(
-    node: AccessExpression
+    node: AccessExpression,
   ): string | number | undefined {
     return node.emitNode?.constantValue;
   }
@@ -252,7 +250,7 @@ namespace ts {
    */
   export function setConstantValue(
     node: AccessExpression,
-    value: string | number
+    value: string | number,
   ): AccessExpression {
     const emitNode = getOrCreateEmitNode(node);
     emitNode.constantValue = value;
@@ -264,7 +262,7 @@ namespace ts {
    */
   export function addEmitHelper<T extends Node>(
     node: T,
-    helper: EmitHelper
+    helper: EmitHelper,
   ): T {
     const emitNode = getOrCreateEmitNode(node);
     emitNode.helpers = append(emitNode.helpers, helper);
@@ -276,7 +274,7 @@ namespace ts {
    */
   export function addEmitHelpers<T extends Node>(
     node: T,
-    helpers: EmitHelper[] | undefined
+    helpers: EmitHelper[] | undefined,
   ): T {
     if (some(helpers)) {
       const emitNode = getOrCreateEmitNode(node);
@@ -311,7 +309,7 @@ namespace ts {
   export function moveEmitHelpers(
     source: Node,
     target: Node,
-    predicate: (helper: EmitHelper) => boolean
+    predicate: (helper: EmitHelper) => boolean,
   ) {
     const sourceEmitNode = source.emitNode;
     const sourceEmitHelpers = sourceEmitNode && sourceEmitNode.helpers;
@@ -348,7 +346,7 @@ namespace ts {
   /* @internal */
   export function setSnippetElement<T extends Node>(
     node: T,
-    snippet: SnippetElement
+    snippet: SnippetElement,
   ): T {
     const emitNode = getOrCreateEmitNode(node);
     emitNode.snippetElement = snippet;

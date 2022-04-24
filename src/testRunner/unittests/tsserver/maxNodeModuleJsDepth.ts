@@ -50,7 +50,7 @@ namespace ts.projectSystem {
       projectService.openClientFile(file2.path);
       project = projectService.inferredProjects[0];
       assert.isTrue(
-        project.getCompilationSettings().maxNodeModuleJsDepth === 2
+        project.getCompilationSettings().maxNodeModuleJsDepth === 2,
       );
 
       projectService.closeClientFile(file2.path);

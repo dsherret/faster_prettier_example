@@ -8,7 +8,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 const order = (n: any): any => output.push(n);
                 let [{ [order(1)]: x } = order(0)] = [];
             `,
-        { target: ts.ScriptTarget.ES5 }
+        { target: ts.ScriptTarget.ES5 },
       );
       assert.deepEqual(result.output, [0, 1]);
     });
@@ -19,7 +19,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 const order = (n: any): any => output.push(n);
                 let [{ [order(1)]: x } = order(0)] = [{}];
             `,
-        { target: ts.ScriptTarget.ES5 }
+        { target: ts.ScriptTarget.ES5 },
       );
       assert.deepEqual(result.output, [1]);
     });
@@ -32,7 +32,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 const order = (n: any): any => output.push(n);
                 let { [order(0)]: { [order(2)]: z } = order(1), ...w } = {} as any;
                 `,
-        { target: ts.ScriptTarget.ES5 }
+        { target: ts.ScriptTarget.ES5 },
       );
       assert.deepEqual(result.output, [0, 1, 2]);
     });
@@ -43,7 +43,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 const order = (n: any): any => output.push(n);
                 let { [order(0)]: { [order(2)]: z } = order(1), ...w } = {} as any;
                 `,
-        { target: ts.ScriptTarget.ES2015 }
+        { target: ts.ScriptTarget.ES2015 },
       );
       assert.deepEqual(result.output, [0, 1, 2]);
     });
@@ -56,7 +56,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 ({ x: { a, ...b } = d } = c);
                 export const output = { a, b };
             `,
-        { target: ts.ScriptTarget.ES5 }
+        { target: ts.ScriptTarget.ES5 },
       );
       assert.deepEqual(result.output, { a: 1, b: { y: 2 } });
     });
@@ -67,7 +67,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 ({ x: { a, ...b } = d } = c);
                 export const output = { a, b };
             `,
-        { target: ts.ScriptTarget.ES2015 }
+        { target: ts.ScriptTarget.ES2015 },
       );
       assert.deepEqual(result.output, { a: 1, b: { y: 2 } });
     });
@@ -78,7 +78,7 @@ describe("unittests:: evaluation:: destructuring", () => {
                 ({ x: { a, ...b } = d } = c);
                 export const output = { a, b };
             `,
-        { target: ts.ScriptTarget.ES2018 }
+        { target: ts.ScriptTarget.ES2018 },
       );
       assert.deepEqual(result.output, { a: 1, b: { y: 2 } });
     });

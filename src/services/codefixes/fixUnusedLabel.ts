@@ -5,8 +5,9 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions(context) {
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, context.sourceFile, context.span.start)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChange(t, context.sourceFile, context.span.start),
       );
       return [
         createCodeFixAction(
@@ -14,21 +15,19 @@ namespace ts.codefix {
           changes,
           Diagnostics.Remove_unused_label,
           fixId,
-          Diagnostics.Remove_all_unused_labels
+          Diagnostics.Remove_all_unused_labels,
         ),
       ];
     },
     fixIds: [fixId],
     getAllCodeActions: (context) =>
-      codeFixAll(context, errorCodes, (changes, diag) =>
-        doChange(changes, diag.file, diag.start)
-      ),
+      codeFixAll(context, errorCodes, (changes, diag) => doChange(changes, diag.file, diag.start)),
   });
 
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    start: number
+    start: number,
   ): void {
     const token = getTokenAtPosition(sourceFile, start);
     const labeledStatement = cast(token.parent, isLabeledStatement);
@@ -38,11 +37,11 @@ namespace ts.codefix {
     const end = positionsAreOnSameLine(pos, statementPos, sourceFile)
       ? statementPos
       : skipTrivia(
-          sourceFile.text,
-          findChildOfKind(labeledStatement, SyntaxKind.ColonToken, sourceFile)!
-            .end,
-          /*stopAfterLineBreak*/ true
-        );
+        sourceFile.text,
+        findChildOfKind(labeledStatement, SyntaxKind.ColonToken, sourceFile)!
+          .end,
+        /*stopAfterLineBreak*/ true,
+      );
     changes.deleteRange(sourceFile, { pos, end });
   }
 }

@@ -667,14 +667,14 @@ interface ANGLE_instanced_arrays {
     mode: GLenum,
     first: GLint,
     count: GLsizei,
-    primcount: GLsizei
+    primcount: GLsizei,
   ): void;
   drawElementsInstancedANGLE(
     mode: GLenum,
     count: GLsizei,
     type: GLenum,
     offset: GLintptr,
-    primcount: GLsizei
+    primcount: GLsizei,
   ): void;
   vertexAttribDivisorANGLE(index: GLuint, divisor: GLuint): void;
   readonly VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE: GLenum;
@@ -690,7 +690,7 @@ interface AbortController {
 
 declare var AbortController: {
   prototype: AbortController;
-  new (): AbortController;
+  new(): AbortController;
 };
 
 interface AbortSignalEventMap {
@@ -705,28 +705,28 @@ interface AbortSignal extends EventTarget {
   addEventListener<K extends keyof AbortSignalEventMap>(
     type: K,
     listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof AbortSignalEventMap>(
     type: K,
     listener: (this: AbortSignal, ev: AbortSignalEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var AbortSignal: {
   prototype: AbortSignal;
-  new (): AbortSignal;
+  new(): AbortSignal;
   // abort(): AbortSignal; - To be re-added in the future
 };
 
@@ -739,22 +739,22 @@ interface AbstractWorker {
   addEventListener<K extends keyof AbstractWorkerEventMap>(
     type: K,
     listener: (this: AbstractWorker, ev: AbstractWorkerEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof AbstractWorkerEventMap>(
     type: K,
     listener: (this: AbstractWorker, ev: AbstractWorkerEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
@@ -775,7 +775,7 @@ interface Blob {
 
 declare var Blob: {
   prototype: Blob;
-  new (blobParts?: BlobPart[], options?: BlobPropertyBag): Blob;
+  new(blobParts?: BlobPart[], options?: BlobPropertyBag): Blob;
 };
 
 interface Body {
@@ -805,28 +805,28 @@ interface BroadcastChannel extends EventTarget {
   addEventListener<K extends keyof BroadcastChannelEventMap>(
     type: K,
     listener: (this: BroadcastChannel, ev: BroadcastChannelEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof BroadcastChannelEventMap>(
     type: K,
     listener: (this: BroadcastChannel, ev: BroadcastChannelEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var BroadcastChannel: {
   prototype: BroadcastChannel;
-  new (name: string): BroadcastChannel;
+  new(name: string): BroadcastChannel;
 };
 
 /** This Streams API interface provides a built-in byte length queuing strategy that can be used when constructing streams. */
@@ -837,7 +837,7 @@ interface ByteLengthQueuingStrategy extends QueuingStrategy<ArrayBufferView> {
 
 declare var ByteLengthQueuingStrategy: {
   prototype: ByteLengthQueuingStrategy;
-  new (init: QueuingStrategyInit): ByteLengthQueuingStrategy;
+  new(init: QueuingStrategyInit): ByteLengthQueuingStrategy;
 };
 
 /**
@@ -850,22 +850,22 @@ interface Cache {
   delete(request: RequestInfo, options?: CacheQueryOptions): Promise<boolean>;
   keys(
     request?: RequestInfo,
-    options?: CacheQueryOptions
+    options?: CacheQueryOptions,
   ): Promise<ReadonlyArray<Request>>;
   match(
     request: RequestInfo,
-    options?: CacheQueryOptions
+    options?: CacheQueryOptions,
   ): Promise<Response | undefined>;
   matchAll(
     request?: RequestInfo,
-    options?: CacheQueryOptions
+    options?: CacheQueryOptions,
   ): Promise<ReadonlyArray<Response>>;
   put(request: RequestInfo, response: Response): Promise<void>;
 }
 
 declare var Cache: {
   prototype: Cache;
-  new (): Cache;
+  new(): Cache;
 };
 
 /**
@@ -878,14 +878,14 @@ interface CacheStorage {
   keys(): Promise<string[]>;
   match(
     request: RequestInfo,
-    options?: MultiCacheQueryOptions
+    options?: MultiCacheQueryOptions,
   ): Promise<Response | undefined>;
   open(cacheName: string): Promise<Cache>;
 }
 
 declare var CacheStorage: {
   prototype: CacheStorage;
-  new (): CacheStorage;
+  new(): CacheStorage;
 };
 
 /** An opaque object describing a gradient. It is returned by the methods CanvasRenderingContext2D.createLinearGradient() or CanvasRenderingContext2D.createRadialGradient(). */
@@ -900,7 +900,7 @@ interface CanvasGradient {
 
 declare var CanvasGradient: {
   prototype: CanvasGradient;
-  new (): CanvasGradient;
+  new(): CanvasGradient;
 };
 
 interface CanvasPath {
@@ -910,7 +910,7 @@ interface CanvasPath {
     radius: number,
     startAngle: number,
     endAngle: number,
-    counterclockwise?: boolean
+    counterclockwise?: boolean,
   ): void;
   arcTo(x1: number, y1: number, x2: number, y2: number, radius: number): void;
   bezierCurveTo(
@@ -919,7 +919,7 @@ interface CanvasPath {
     cp2x: number,
     cp2y: number,
     x: number,
-    y: number
+    y: number,
   ): void;
   closePath(): void;
   ellipse(
@@ -930,7 +930,7 @@ interface CanvasPath {
     rotation: number,
     startAngle: number,
     endAngle: number,
-    counterclockwise?: boolean
+    counterclockwise?: boolean,
   ): void;
   lineTo(x: number, y: number): void;
   moveTo(x: number, y: number): void;
@@ -946,7 +946,7 @@ interface CanvasPattern {
 
 declare var CanvasPattern: {
   prototype: CanvasPattern;
-  new (): CanvasPattern;
+  new(): CanvasPattern;
 };
 
 /** The Client interface represents an executable context such as a Worker, or a SharedWorker. Window clients are represented by the more-specific WindowClient. You can get Client/WindowClient objects from methods such as Clients.matchAll() and Clients.get(). */
@@ -961,7 +961,7 @@ interface Client {
 
 declare var Client: {
   prototype: Client;
-  new (): Client;
+  new(): Client;
 };
 
 /** Provides access to Client objects. Access it via self.clients within a service worker. */
@@ -969,14 +969,14 @@ interface Clients {
   claim(): Promise<void>;
   get(id: string): Promise<Client | undefined>;
   matchAll<T extends ClientQueryOptions>(
-    options?: T
+    options?: T,
   ): Promise<ReadonlyArray<T["type"] extends "window" ? WindowClient : Client>>;
   openWindow(url: string | URL): Promise<WindowClient | null>;
 }
 
 declare var Clients: {
   prototype: Clients;
-  new (): Clients;
+  new(): Clients;
 };
 
 /** A CloseEvent is sent to clients using WebSockets when the connection is closed. This is delivered to the listener indicated by the WebSocket object's onclose attribute. */
@@ -991,7 +991,7 @@ interface CloseEvent extends Event {
 
 declare var CloseEvent: {
   prototype: CloseEvent;
-  new (type: string, eventInitDict?: CloseEventInit): CloseEvent;
+  new(type: string, eventInitDict?: CloseEventInit): CloseEvent;
 };
 
 /** This Streams API interface provides a built-in byte length queuing strategy that can be used when constructing streams. */
@@ -1002,7 +1002,7 @@ interface CountQueuingStrategy extends QueuingStrategy {
 
 declare var CountQueuingStrategy: {
   prototype: CountQueuingStrategy;
-  new (init: QueuingStrategyInit): CountQueuingStrategy;
+  new(init: QueuingStrategyInit): CountQueuingStrategy;
 };
 
 /** Basic cryptography features available in the current context. It allows access to a cryptographically strong random number generator and to cryptographic primitives. */
@@ -1016,7 +1016,7 @@ interface Crypto {
 
 declare var Crypto: {
   prototype: Crypto;
-  new (): Crypto;
+  new(): Crypto;
 };
 
 /**
@@ -1032,7 +1032,7 @@ interface CryptoKey {
 
 declare var CryptoKey: {
   prototype: CryptoKey;
-  new (): CryptoKey;
+  new(): CryptoKey;
 };
 
 interface CustomEvent<T = any> extends Event {
@@ -1043,13 +1043,13 @@ interface CustomEvent<T = any> extends Event {
     type: string,
     bubbles?: boolean,
     cancelable?: boolean,
-    detail?: T
+    detail?: T,
   ): void;
 }
 
 declare var CustomEvent: {
   prototype: CustomEvent;
-  new <T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
+  new<T>(type: string, eventInitDict?: CustomEventInit<T>): CustomEvent<T>;
 };
 
 /** An abnormal event (called an exception) which occurs as a result of calling a method or accessing a property of a web API. */
@@ -1086,7 +1086,7 @@ interface DOMException extends Error {
 
 declare var DOMException: {
   prototype: DOMException;
-  new (message?: string, name?: string): DOMException;
+  new(message?: string, name?: string): DOMException;
   readonly ABORT_ERR: number;
   readonly DATA_CLONE_ERR: number;
   readonly DOMSTRING_SIZE_ERR: number;
@@ -1144,7 +1144,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
     x?: number,
     y?: number,
     z?: number,
-    angle?: number
+    angle?: number,
   ): DOMMatrix;
   rotateFromVectorSelf(x?: number, y?: number): DOMMatrix;
   rotateSelf(rotX?: number, rotY?: number, rotZ?: number): DOMMatrix;
@@ -1152,7 +1152,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
     scale?: number,
     originX?: number,
     originY?: number,
-    originZ?: number
+    originZ?: number,
   ): DOMMatrix;
   scaleSelf(
     scaleX?: number,
@@ -1160,7 +1160,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
     scaleZ?: number,
     originX?: number,
     originY?: number,
-    originZ?: number
+    originZ?: number,
   ): DOMMatrix;
   skewXSelf(sx?: number): DOMMatrix;
   skewYSelf(sy?: number): DOMMatrix;
@@ -1169,7 +1169,7 @@ interface DOMMatrix extends DOMMatrixReadOnly {
 
 declare var DOMMatrix: {
   prototype: DOMMatrix;
-  new (init?: string | number[]): DOMMatrix;
+  new(init?: string | number[]): DOMMatrix;
   fromFloat32Array(array32: Float32Array): DOMMatrix;
   fromFloat64Array(array64: Float64Array): DOMMatrix;
   fromMatrix(other?: DOMMatrixInit): DOMMatrix;
@@ -1209,7 +1209,7 @@ interface DOMMatrixReadOnly {
     x?: number,
     y?: number,
     z?: number,
-    angle?: number
+    angle?: number,
   ): DOMMatrix;
   rotateFromVector(x?: number, y?: number): DOMMatrix;
   scale(
@@ -1218,13 +1218,13 @@ interface DOMMatrixReadOnly {
     scaleZ?: number,
     originX?: number,
     originY?: number,
-    originZ?: number
+    originZ?: number,
   ): DOMMatrix;
   scale3d(
     scale?: number,
     originX?: number,
     originY?: number,
-    originZ?: number
+    originZ?: number,
   ): DOMMatrix;
   /** @deprecated */
   scaleNonUniform(scaleX?: number, scaleY?: number): DOMMatrix;
@@ -1239,7 +1239,7 @@ interface DOMMatrixReadOnly {
 
 declare var DOMMatrixReadOnly: {
   prototype: DOMMatrixReadOnly;
-  new (init?: string | number[]): DOMMatrixReadOnly;
+  new(init?: string | number[]): DOMMatrixReadOnly;
   fromFloat32Array(array32: Float32Array): DOMMatrixReadOnly;
   fromFloat64Array(array64: Float64Array): DOMMatrixReadOnly;
   fromMatrix(other?: DOMMatrixInit): DOMMatrixReadOnly;
@@ -1254,7 +1254,7 @@ interface DOMPoint extends DOMPointReadOnly {
 
 declare var DOMPoint: {
   prototype: DOMPoint;
-  new (x?: number, y?: number, z?: number, w?: number): DOMPoint;
+  new(x?: number, y?: number, z?: number, w?: number): DOMPoint;
   fromPoint(other?: DOMPointInit): DOMPoint;
 };
 
@@ -1269,7 +1269,7 @@ interface DOMPointReadOnly {
 
 declare var DOMPointReadOnly: {
   prototype: DOMPointReadOnly;
-  new (x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
+  new(x?: number, y?: number, z?: number, w?: number): DOMPointReadOnly;
   fromPoint(other?: DOMPointInit): DOMPointReadOnly;
 };
 
@@ -1284,11 +1284,11 @@ interface DOMQuad {
 
 declare var DOMQuad: {
   prototype: DOMQuad;
-  new (
+  new(
     p1?: DOMPointInit,
     p2?: DOMPointInit,
     p3?: DOMPointInit,
-    p4?: DOMPointInit
+    p4?: DOMPointInit,
   ): DOMQuad;
   fromQuad(other?: DOMQuadInit): DOMQuad;
   fromRect(other?: DOMRectInit): DOMQuad;
@@ -1303,7 +1303,7 @@ interface DOMRect extends DOMRectReadOnly {
 
 declare var DOMRect: {
   prototype: DOMRect;
-  new (x?: number, y?: number, width?: number, height?: number): DOMRect;
+  new(x?: number, y?: number, width?: number, height?: number): DOMRect;
   fromRect(other?: DOMRectInit): DOMRect;
 };
 
@@ -1321,11 +1321,11 @@ interface DOMRectReadOnly {
 
 declare var DOMRectReadOnly: {
   prototype: DOMRectReadOnly;
-  new (
+  new(
     x?: number,
     y?: number,
     width?: number,
-    height?: number
+    height?: number,
   ): DOMRectReadOnly;
   fromRect(other?: DOMRectInit): DOMRectReadOnly;
 };
@@ -1343,7 +1343,7 @@ interface DOMStringList {
 
 declare var DOMStringList: {
   prototype: DOMStringList;
-  new (): DOMStringList;
+  new(): DOMStringList;
 };
 
 interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
@@ -1352,9 +1352,7 @@ interface DedicatedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
 }
 
 /** (the Worker global scope) is accessible through the self keyword. Some additional global functions, namespaces objects, and constructors, not typically associated with the worker global scope, but available on it, are listed in the JavaScript Reference. See also: Functions available to workers. */
-interface DedicatedWorkerGlobalScope
-  extends WorkerGlobalScope,
-    AnimationFrameProvider {
+interface DedicatedWorkerGlobalScope extends WorkerGlobalScope, AnimationFrameProvider {
   /** Returns dedicatedWorkerGlobal's name, i.e. the value given to the Worker constructor. Primarily useful for debugging. */
   readonly name: string;
   onmessage:
@@ -1372,33 +1370,33 @@ interface DedicatedWorkerGlobalScope
     type: K,
     listener: (
       this: DedicatedWorkerGlobalScope,
-      ev: DedicatedWorkerGlobalScopeEventMap[K]
+      ev: DedicatedWorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof DedicatedWorkerGlobalScopeEventMap>(
     type: K,
     listener: (
       this: DedicatedWorkerGlobalScope,
-      ev: DedicatedWorkerGlobalScopeEventMap[K]
+      ev: DedicatedWorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var DedicatedWorkerGlobalScope: {
   prototype: DedicatedWorkerGlobalScope;
-  new (): DedicatedWorkerGlobalScope;
+  new(): DedicatedWorkerGlobalScope;
 };
 
 interface EXT_blend_minmax {
@@ -1453,7 +1451,7 @@ interface ErrorEvent extends Event {
 
 declare var ErrorEvent: {
   prototype: ErrorEvent;
-  new (type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
+  new(type: string, eventInitDict?: ErrorEventInit): ErrorEvent;
 };
 
 /** An event which takes place in the DOM. */
@@ -1501,7 +1499,7 @@ interface Event {
 
 declare var Event: {
   prototype: Event;
-  new (type: string, eventInitDict?: EventInit): Event;
+  new(type: string, eventInitDict?: EventInit): Event;
   readonly AT_TARGET: number;
   readonly BUBBLING_PHASE: number;
   readonly CAPTURING_PHASE: number;
@@ -1540,38 +1538,38 @@ interface EventSource extends EventTarget {
   addEventListener<K extends keyof EventSourceEventMap>(
     type: K,
     listener: (this: EventSource, ev: EventSourceEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: (this: EventSource, event: MessageEvent) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof EventSourceEventMap>(
     type: K,
     listener: (this: EventSource, ev: EventSourceEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: (this: EventSource, event: MessageEvent) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var EventSource: {
   prototype: EventSource;
-  new (url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
+  new(url: string | URL, eventSourceInitDict?: EventSourceInit): EventSource;
   readonly CLOSED: number;
   readonly CONNECTING: number;
   readonly OPEN: number;
@@ -1597,7 +1595,7 @@ interface EventTarget {
   addEventListener(
     type: string,
     callback: EventListenerOrEventListenerObject | null,
-    options?: AddEventListenerOptions | boolean
+    options?: AddEventListenerOptions | boolean,
   ): void;
   /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
   dispatchEvent(event: Event): boolean;
@@ -1605,13 +1603,13 @@ interface EventTarget {
   removeEventListener(
     type: string,
     callback: EventListenerOrEventListenerObject | null,
-    options?: EventListenerOptions | boolean
+    options?: EventListenerOptions | boolean,
   ): void;
 }
 
 declare var EventTarget: {
   prototype: EventTarget;
-  new (): EventTarget;
+  new(): EventTarget;
 };
 
 /** Extends the lifetime of the install and activate events dispatched on the global scope as part of the service worker lifecycle. This ensures that any functional events (like FetchEvent) are not dispatched until it upgrades database schemas and deletes the outdated cache entries. */
@@ -1621,7 +1619,7 @@ interface ExtendableEvent extends Event {
 
 declare var ExtendableEvent: {
   prototype: ExtendableEvent;
-  new (type: string, eventInitDict?: ExtendableEventInit): ExtendableEvent;
+  new(type: string, eventInitDict?: ExtendableEventInit): ExtendableEvent;
 };
 
 /** This ServiceWorker API interface represents the event object of a message event fired on a service worker (when a channel message is received on the ServiceWorkerGlobalScope from another context) — extends the lifetime of such events. */
@@ -1635,9 +1633,9 @@ interface ExtendableMessageEvent extends ExtendableEvent {
 
 declare var ExtendableMessageEvent: {
   prototype: ExtendableMessageEvent;
-  new (
+  new(
     type: string,
-    eventInitDict?: ExtendableMessageEventInit
+    eventInitDict?: ExtendableMessageEventInit,
   ): ExtendableMessageEvent;
 };
 
@@ -1652,7 +1650,7 @@ interface FetchEvent extends ExtendableEvent {
 
 declare var FetchEvent: {
   prototype: FetchEvent;
-  new (type: string, eventInitDict: FetchEventInit): FetchEvent;
+  new(type: string, eventInitDict: FetchEventInit): FetchEvent;
 };
 
 /** Provides information about files and allows JavaScript in a web page to access their content. */
@@ -1664,7 +1662,7 @@ interface File extends Blob {
 
 declare var File: {
   prototype: File;
-  new (fileBits: BlobPart[], fileName: string, options?: FilePropertyBag): File;
+  new(fileBits: BlobPart[], fileName: string, options?: FilePropertyBag): File;
 };
 
 /** An object of this type is returned by the files property of the HTML <input> element; this lets you access the list of files selected with the <input type="file"> element. It's also used for a list of files dropped into web content when using the drag and drop API; see the DataTransfer object for details on this usage. */
@@ -1676,7 +1674,7 @@ interface FileList {
 
 declare var FileList: {
   prototype: FileList;
-  new (): FileList;
+  new(): FileList;
 };
 
 interface FileReaderEventMap {
@@ -1712,28 +1710,28 @@ interface FileReader extends EventTarget {
   addEventListener<K extends keyof FileReaderEventMap>(
     type: K,
     listener: (this: FileReader, ev: FileReaderEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof FileReaderEventMap>(
     type: K,
     listener: (this: FileReader, ev: FileReaderEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var FileReader: {
   prototype: FileReader;
-  new (): FileReader;
+  new(): FileReader;
   readonly DONE: number;
   readonly EMPTY: number;
   readonly LOADING: number;
@@ -1750,7 +1748,7 @@ interface FileReaderSync {
 
 declare var FileReaderSync: {
   prototype: FileReaderSync;
-  new (): FileReaderSync;
+  new(): FileReaderSync;
 };
 
 /** Available only in secure contexts. */
@@ -1758,11 +1756,11 @@ interface FileSystemDirectoryHandle extends FileSystemHandle {
   readonly kind: "directory";
   getDirectoryHandle(
     name: string,
-    options?: FileSystemGetDirectoryOptions
+    options?: FileSystemGetDirectoryOptions,
   ): Promise<FileSystemDirectoryHandle>;
   getFileHandle(
     name: string,
-    options?: FileSystemGetFileOptions
+    options?: FileSystemGetFileOptions,
   ): Promise<FileSystemFileHandle>;
   removeEntry(name: string, options?: FileSystemRemoveOptions): Promise<void>;
   resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
@@ -1770,7 +1768,7 @@ interface FileSystemDirectoryHandle extends FileSystemHandle {
 
 declare var FileSystemDirectoryHandle: {
   prototype: FileSystemDirectoryHandle;
-  new (): FileSystemDirectoryHandle;
+  new(): FileSystemDirectoryHandle;
 };
 
 /** Available only in secure contexts. */
@@ -1781,7 +1779,7 @@ interface FileSystemFileHandle extends FileSystemHandle {
 
 declare var FileSystemFileHandle: {
   prototype: FileSystemFileHandle;
-  new (): FileSystemFileHandle;
+  new(): FileSystemFileHandle;
 };
 
 /** Available only in secure contexts. */
@@ -1793,7 +1791,7 @@ interface FileSystemHandle {
 
 declare var FileSystemHandle: {
   prototype: FileSystemHandle;
-  new (): FileSystemHandle;
+  new(): FileSystemHandle;
 };
 
 interface FontFace {
@@ -1816,10 +1814,10 @@ interface FontFace {
 
 declare var FontFace: {
   prototype: FontFace;
-  new (
+  new(
     family: string,
     source: string | BinaryData,
-    descriptors?: FontFaceDescriptors
+    descriptors?: FontFaceDescriptors,
   ): FontFace;
 };
 
@@ -1839,33 +1837,33 @@ interface FontFaceSet extends EventTarget {
   load(font: string, text?: string): Promise<FontFace[]>;
   forEach(
     callbackfn: (value: FontFace, key: FontFace, parent: FontFaceSet) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   addEventListener<K extends keyof FontFaceSetEventMap>(
     type: K,
     listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof FontFaceSetEventMap>(
     type: K,
     listener: (this: FontFaceSet, ev: FontFaceSetEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var FontFaceSet: {
   prototype: FontFaceSet;
-  new (initialFaces: FontFace[]): FontFaceSet;
+  new(initialFaces: FontFace[]): FontFaceSet;
 };
 
 interface FontFaceSetLoadEvent extends Event {
@@ -1874,9 +1872,9 @@ interface FontFaceSetLoadEvent extends Event {
 
 declare var FontFaceSetLoadEvent: {
   prototype: FontFaceSetLoadEvent;
-  new (
+  new(
     type: string,
-    eventInitDict?: FontFaceSetLoadEventInit
+    eventInitDict?: FontFaceSetLoadEventInit,
   ): FontFaceSetLoadEvent;
 };
 
@@ -1896,15 +1894,15 @@ interface FormData {
     callbackfn: (
       value: FormDataEntryValue,
       key: string,
-      parent: FormData
+      parent: FormData,
     ) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 }
 
 declare var FormData: {
   prototype: FormData;
-  new (): FormData;
+  new(): FormData;
 };
 
 interface GenericTransformStream {
@@ -1921,13 +1919,13 @@ interface Headers {
   set(name: string, value: string): void;
   forEach(
     callbackfn: (value: string, key: string, parent: Headers) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 }
 
 declare var Headers: {
   prototype: Headers;
-  new (init?: HeadersInit): Headers;
+  new(init?: HeadersInit): Headers;
 };
 
 /** This IndexedDB API interface represents a cursor for traversing or iterating over multiple records in a database. */
@@ -1965,7 +1963,7 @@ interface IDBCursor {
 
 declare var IDBCursor: {
   prototype: IDBCursor;
-  new (): IDBCursor;
+  new(): IDBCursor;
 };
 
 /** This IndexedDB API interface represents a cursor for traversing or iterating over multiple records in a database. It is the same as the IDBCursor, except that it includes the value property. */
@@ -1976,7 +1974,7 @@ interface IDBCursorWithValue extends IDBCursor {
 
 declare var IDBCursorWithValue: {
   prototype: IDBCursorWithValue;
-  new (): IDBCursorWithValue;
+  new(): IDBCursorWithValue;
 };
 
 interface IDBDatabaseEventMap {
@@ -2009,7 +2007,7 @@ interface IDBDatabase extends EventTarget {
    */
   createObjectStore(
     name: string,
-    options?: IDBObjectStoreParameters
+    options?: IDBObjectStoreParameters,
   ): IDBObjectStore;
   /**
    * Deletes the object store with the given name.
@@ -2020,33 +2018,33 @@ interface IDBDatabase extends EventTarget {
   /** Returns a new transaction with the given mode ("readonly" or "readwrite") and scope which can be a single object store name or an array of names. */
   transaction(
     storeNames: string | string[],
-    mode?: IDBTransactionMode
+    mode?: IDBTransactionMode,
   ): IDBTransaction;
   addEventListener<K extends keyof IDBDatabaseEventMap>(
     type: K,
     listener: (this: IDBDatabase, ev: IDBDatabaseEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof IDBDatabaseEventMap>(
     type: K,
     listener: (this: IDBDatabase, ev: IDBDatabaseEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var IDBDatabase: {
   prototype: IDBDatabase;
-  new (): IDBDatabase;
+  new(): IDBDatabase;
 };
 
 /** In the following code snippet, we make a request to open a database, and include handlers for the success and error cases. For a full working example, see our To-do Notifications app (view example live.) */
@@ -2066,7 +2064,7 @@ interface IDBFactory {
 
 declare var IDBFactory: {
   prototype: IDBFactory;
-  new (): IDBFactory;
+  new(): IDBFactory;
 };
 
 /** IDBIndex interface of the IndexedDB API provides asynchronous access to an index in a database. An index is a kind of object store for looking up records in another object store, called the referenced object store. You use this interface to retrieve data. */
@@ -2097,7 +2095,7 @@ interface IDBIndex {
    */
   getAll(
     query?: IDBValidKey | IDBKeyRange | null,
-    count?: number
+    count?: number,
   ): IDBRequest<any[]>;
   /**
    * Retrieves the keys of records matching the given key or key range in query (up to count if given).
@@ -2106,7 +2104,7 @@ interface IDBIndex {
    */
   getAllKeys(
     query?: IDBValidKey | IDBKeyRange | null,
-    count?: number
+    count?: number,
   ): IDBRequest<IDBValidKey[]>;
   /**
    * Retrieves the key of the first record matching the given key or key range in query.
@@ -2121,7 +2119,7 @@ interface IDBIndex {
    */
   openCursor(
     query?: IDBValidKey | IDBKeyRange | null,
-    direction?: IDBCursorDirection
+    direction?: IDBCursorDirection,
   ): IDBRequest<IDBCursorWithValue | null>;
   /**
    * Opens a cursor with key only flag set over the records matching query, ordered by direction. If query is null, all records in index are matched.
@@ -2130,13 +2128,13 @@ interface IDBIndex {
    */
   openKeyCursor(
     query?: IDBValidKey | IDBKeyRange | null,
-    direction?: IDBCursorDirection
+    direction?: IDBCursorDirection,
   ): IDBRequest<IDBCursor | null>;
 }
 
 declare var IDBIndex: {
   prototype: IDBIndex;
-  new (): IDBIndex;
+  new(): IDBIndex;
 };
 
 /** A key range can be a single value or a range with upper and lower bounds or endpoints. If the key range has both upper and lower bounds, then it is bounded; if it has no bounds, it is unbounded. A bounded key range can either be open (the endpoints are excluded) or closed (the endpoints are included). To retrieve all keys within a certain range, you can use the following code constructs: */
@@ -2155,13 +2153,13 @@ interface IDBKeyRange {
 
 declare var IDBKeyRange: {
   prototype: IDBKeyRange;
-  new (): IDBKeyRange;
+  new(): IDBKeyRange;
   /** Returns a new IDBKeyRange spanning from lower to upper. If lowerOpen is true, lower is not included in the range. If upperOpen is true, upper is not included in the range. */
   bound(
     lower: any,
     upper: any,
     lowerOpen?: boolean,
-    upperOpen?: boolean
+    upperOpen?: boolean,
   ): IDBKeyRange;
   /** Returns a new IDBKeyRange starting at key with no upper bound. If open is true, key is not included in the range. */
   lowerBound(lower: any, open?: boolean): IDBKeyRange;
@@ -2213,7 +2211,7 @@ interface IDBObjectStore {
   createIndex(
     name: string,
     keyPath: string | string[],
-    options?: IDBIndexParameters
+    options?: IDBIndexParameters,
   ): IDBIndex;
   /**
    * Deletes records in store with the given key or in the given key range in query.
@@ -2240,7 +2238,7 @@ interface IDBObjectStore {
    */
   getAll(
     query?: IDBValidKey | IDBKeyRange | null,
-    count?: number
+    count?: number,
   ): IDBRequest<any[]>;
   /**
    * Retrieves the keys of records matching the given key or key range in query (up to count if given).
@@ -2249,7 +2247,7 @@ interface IDBObjectStore {
    */
   getAllKeys(
     query?: IDBValidKey | IDBKeyRange | null,
-    count?: number
+    count?: number,
   ): IDBRequest<IDBValidKey[]>;
   /**
    * Retrieves the key of the first record matching the given key or key range in query.
@@ -2265,7 +2263,7 @@ interface IDBObjectStore {
    */
   openCursor(
     query?: IDBValidKey | IDBKeyRange | null,
-    direction?: IDBCursorDirection
+    direction?: IDBCursorDirection,
   ): IDBRequest<IDBCursorWithValue | null>;
   /**
    * Opens a cursor with key only flag set over the records matching query, ordered by direction. If query is null, all records in store are matched.
@@ -2274,7 +2272,7 @@ interface IDBObjectStore {
    */
   openKeyCursor(
     query?: IDBValidKey | IDBKeyRange | null,
-    direction?: IDBCursorDirection
+    direction?: IDBCursorDirection,
   ): IDBRequest<IDBCursor | null>;
   /**
    * Adds or updates a record in store with the given value and key.
@@ -2290,7 +2288,7 @@ interface IDBObjectStore {
 
 declare var IDBObjectStore: {
   prototype: IDBObjectStore;
-  new (): IDBObjectStore;
+  new(): IDBObjectStore;
 };
 
 interface IDBOpenDBRequestEventMap extends IDBRequestEventMap {
@@ -2307,28 +2305,28 @@ interface IDBOpenDBRequest extends IDBRequest<IDBDatabase> {
   addEventListener<K extends keyof IDBOpenDBRequestEventMap>(
     type: K,
     listener: (this: IDBOpenDBRequest, ev: IDBOpenDBRequestEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof IDBOpenDBRequestEventMap>(
     type: K,
     listener: (this: IDBOpenDBRequest, ev: IDBOpenDBRequestEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var IDBOpenDBRequest: {
   prototype: IDBOpenDBRequest;
-  new (): IDBOpenDBRequest;
+  new(): IDBOpenDBRequest;
 };
 
 interface IDBRequestEventMap {
@@ -2353,28 +2351,28 @@ interface IDBRequest<T = any> extends EventTarget {
   addEventListener<K extends keyof IDBRequestEventMap>(
     type: K,
     listener: (this: IDBRequest<T>, ev: IDBRequestEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof IDBRequestEventMap>(
     type: K,
     listener: (this: IDBRequest<T>, ev: IDBRequestEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var IDBRequest: {
   prototype: IDBRequest;
-  new (): IDBRequest;
+  new(): IDBRequest;
 };
 
 interface IDBTransactionEventMap {
@@ -2404,28 +2402,28 @@ interface IDBTransaction extends EventTarget {
   addEventListener<K extends keyof IDBTransactionEventMap>(
     type: K,
     listener: (this: IDBTransaction, ev: IDBTransactionEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof IDBTransactionEventMap>(
     type: K,
     listener: (this: IDBTransaction, ev: IDBTransactionEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var IDBTransaction: {
   prototype: IDBTransaction;
-  new (): IDBTransaction;
+  new(): IDBTransaction;
 };
 
 /** This IndexedDB API interface indicates that the version of the database has changed, as the result of an IDBOpenDBRequest.onupgradeneeded event handler function. */
@@ -2436,9 +2434,9 @@ interface IDBVersionChangeEvent extends Event {
 
 declare var IDBVersionChangeEvent: {
   prototype: IDBVersionChangeEvent;
-  new (
+  new(
     type: string,
-    eventInitDict?: IDBVersionChangeEventInit
+    eventInitDict?: IDBVersionChangeEventInit,
   ): IDBVersionChangeEvent;
 };
 
@@ -2453,7 +2451,7 @@ interface ImageBitmap {
 
 declare var ImageBitmap: {
   prototype: ImageBitmap;
-  new (): ImageBitmap;
+  new(): ImageBitmap;
 };
 
 interface ImageBitmapRenderingContext {
@@ -2463,7 +2461,7 @@ interface ImageBitmapRenderingContext {
 
 declare var ImageBitmapRenderingContext: {
   prototype: ImageBitmapRenderingContext;
-  new (): ImageBitmapRenderingContext;
+  new(): ImageBitmapRenderingContext;
 };
 
 /** The underlying pixel data of an area of a <canvas> element. It is created using the ImageData() constructor or creator methods on the CanvasRenderingContext2D object associated with a canvas: createImageData() and getImageData(). It can also be used to set a part of the canvas by using putImageData(). */
@@ -2478,12 +2476,12 @@ interface ImageData {
 
 declare var ImageData: {
   prototype: ImageData;
-  new (sw: number, sh: number, settings?: ImageDataSettings): ImageData;
-  new (
+  new(sw: number, sh: number, settings?: ImageDataSettings): ImageData;
+  new(
     data: Uint8ClampedArray,
     sw: number,
     sh?: number,
-    settings?: ImageDataSettings
+    settings?: ImageDataSettings,
   ): ImageData;
 };
 
@@ -2499,7 +2497,7 @@ interface Lock {
 
 declare var Lock: {
   prototype: Lock;
-  new (): Lock;
+  new(): Lock;
 };
 
 /** Available only in secure contexts. */
@@ -2509,27 +2507,27 @@ interface LockManager {
   request(
     name: string,
     options: LockOptions,
-    callback: LockGrantedCallback
+    callback: LockGrantedCallback,
   ): Promise<any>;
 }
 
 declare var LockManager: {
   prototype: LockManager;
-  new (): LockManager;
+  new(): LockManager;
 };
 
 interface MediaCapabilities {
   decodingInfo(
-    configuration: MediaDecodingConfiguration
+    configuration: MediaDecodingConfiguration,
   ): Promise<MediaCapabilitiesDecodingInfo>;
   encodingInfo(
-    configuration: MediaEncodingConfiguration
+    configuration: MediaEncodingConfiguration,
   ): Promise<MediaCapabilitiesEncodingInfo>;
 }
 
 declare var MediaCapabilities: {
   prototype: MediaCapabilities;
-  new (): MediaCapabilities;
+  new(): MediaCapabilities;
 };
 
 /** This Channel Messaging API interface allows us to create a new message channel and send data through it via its two MessagePort properties. */
@@ -2542,7 +2540,7 @@ interface MessageChannel {
 
 declare var MessageChannel: {
   prototype: MessageChannel;
-  new (): MessageChannel;
+  new(): MessageChannel;
 };
 
 /** A message received by a target object. */
@@ -2566,13 +2564,13 @@ interface MessageEvent<T = any> extends Event {
     origin?: string,
     lastEventId?: string,
     source?: MessageEventSource | null,
-    ports?: MessagePort[]
+    ports?: MessagePort[],
   ): void;
 }
 
 declare var MessageEvent: {
   prototype: MessageEvent;
-  new <T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
+  new<T>(type: string, eventInitDict?: MessageEventInit<T>): MessageEvent<T>;
 };
 
 interface MessagePortEventMap {
@@ -2598,28 +2596,28 @@ interface MessagePort extends EventTarget {
   addEventListener<K extends keyof MessagePortEventMap>(
     type: K,
     listener: (this: MessagePort, ev: MessagePortEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof MessagePortEventMap>(
     type: K,
     listener: (this: MessagePort, ev: MessagePortEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var MessagePort: {
   prototype: MessagePort;
-  new (): MessagePort;
+  new(): MessagePort;
 };
 
 interface NavigatorConcurrentHardware {
@@ -2664,7 +2662,7 @@ interface NetworkInformation extends EventTarget {
 
 declare var NetworkInformation: {
   prototype: NetworkInformation;
-  new (): NetworkInformation;
+  new(): NetworkInformation;
 };
 
 interface NotificationEventMap {
@@ -2691,28 +2689,28 @@ interface Notification extends EventTarget {
   addEventListener<K extends keyof NotificationEventMap>(
     type: K,
     listener: (this: Notification, ev: NotificationEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof NotificationEventMap>(
     type: K,
     listener: (this: Notification, ev: NotificationEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var Notification: {
   prototype: Notification;
-  new (title: string, options?: NotificationOptions): Notification;
+  new(title: string, options?: NotificationOptions): Notification;
   readonly permission: NotificationPermission;
 };
 
@@ -2724,7 +2722,7 @@ interface NotificationEvent extends ExtendableEvent {
 
 declare var NotificationEvent: {
   prototype: NotificationEvent;
-  new (type: string, eventInitDict: NotificationEventInit): NotificationEvent;
+  new(type: string, eventInitDict: NotificationEventInit): NotificationEvent;
 };
 
 /** The OES_element_index_uint extension is part of the WebGL API and adds support for gl.UNSIGNED_INT types to WebGLRenderingContext.drawElements(). */
@@ -2766,7 +2764,7 @@ interface OVR_multiview2 {
     texture: WebGLTexture | null,
     level: GLint,
     baseViewIndex: GLint,
-    numViews: GLsizei
+    numViews: GLsizei,
   ): void;
   readonly FRAMEBUFFER_ATTACHMENT_TEXTURE_BASE_VIEW_INDEX_OVR: GLenum;
   readonly FRAMEBUFFER_ATTACHMENT_TEXTURE_NUM_VIEWS_OVR: GLenum;
@@ -2785,7 +2783,7 @@ interface Path2D extends CanvasPath {
 
 declare var Path2D: {
   prototype: Path2D;
-  new (path?: Path2D | string): Path2D;
+  new(path?: Path2D | string): Path2D;
 };
 
 interface PerformanceEventMap {
@@ -2806,7 +2804,7 @@ interface Performance extends EventTarget {
   measure(
     measureName: string,
     startOrMeasureOptions?: string | PerformanceMeasureOptions,
-    endMark?: string
+    endMark?: string,
   ): PerformanceMeasure;
   now(): DOMHighResTimeStamp;
   setResourceTimingBufferSize(maxSize: number): void;
@@ -2814,28 +2812,28 @@ interface Performance extends EventTarget {
   addEventListener<K extends keyof PerformanceEventMap>(
     type: K,
     listener: (this: Performance, ev: PerformanceEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof PerformanceEventMap>(
     type: K,
     listener: (this: Performance, ev: PerformanceEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var Performance: {
   prototype: Performance;
-  new (): Performance;
+  new(): Performance;
 };
 
 /** Encapsulates a single performance metric that is part of the performance timeline. A performance entry can be directly created by making a performance mark or measure (for example by calling the mark() method) at an explicit point in an application. Performance entries are also created in indirect ways such as loading a resource (such as an image). */
@@ -2849,7 +2847,7 @@ interface PerformanceEntry {
 
 declare var PerformanceEntry: {
   prototype: PerformanceEntry;
-  new (): PerformanceEntry;
+  new(): PerformanceEntry;
 };
 
 /** PerformanceMark is an abstract interface for PerformanceEntry objects with an entryType of "mark". Entries of this type are created by calling performance.mark() to add a named DOMHighResTimeStamp (the mark) to the browser's performance timeline. */
@@ -2859,7 +2857,7 @@ interface PerformanceMark extends PerformanceEntry {
 
 declare var PerformanceMark: {
   prototype: PerformanceMark;
-  new (markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
+  new(markName: string, markOptions?: PerformanceMarkOptions): PerformanceMark;
 };
 
 /** PerformanceMeasure is an abstract interface for PerformanceEntry objects with an entryType of "measure". Entries of this type are created by calling performance.measure() to add a named DOMHighResTimeStamp (the measure) between two marks to the browser's performance timeline. */
@@ -2869,7 +2867,7 @@ interface PerformanceMeasure extends PerformanceEntry {
 
 declare var PerformanceMeasure: {
   prototype: PerformanceMeasure;
-  new (): PerformanceMeasure;
+  new(): PerformanceMeasure;
 };
 
 interface PerformanceObserver {
@@ -2880,7 +2878,7 @@ interface PerformanceObserver {
 
 declare var PerformanceObserver: {
   prototype: PerformanceObserver;
-  new (callback: PerformanceObserverCallback): PerformanceObserver;
+  new(callback: PerformanceObserverCallback): PerformanceObserver;
   readonly supportedEntryTypes: ReadonlyArray<string>;
 };
 
@@ -2892,7 +2890,7 @@ interface PerformanceObserverEntryList {
 
 declare var PerformanceObserverEntryList: {
   prototype: PerformanceObserverEntryList;
-  new (): PerformanceObserverEntryList;
+  new(): PerformanceObserverEntryList;
 };
 
 /** Enables retrieval and analysis of detailed network timing data regarding the loading of an application's resources. An application can use the timing metrics to determine, for example, the length of time it takes to fetch a specific resource, such as an XMLHttpRequest, <SVG>, image, or script. */
@@ -2920,7 +2918,7 @@ interface PerformanceResourceTiming extends PerformanceEntry {
 
 declare var PerformanceResourceTiming: {
   prototype: PerformanceResourceTiming;
-  new (): PerformanceResourceTiming;
+  new(): PerformanceResourceTiming;
 };
 
 interface PerformanceServerTiming {
@@ -2932,7 +2930,7 @@ interface PerformanceServerTiming {
 
 declare var PerformanceServerTiming: {
   prototype: PerformanceServerTiming;
-  new (): PerformanceServerTiming;
+  new(): PerformanceServerTiming;
 };
 
 interface PermissionStatusEventMap {
@@ -2945,28 +2943,28 @@ interface PermissionStatus extends EventTarget {
   addEventListener<K extends keyof PermissionStatusEventMap>(
     type: K,
     listener: (this: PermissionStatus, ev: PermissionStatusEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof PermissionStatusEventMap>(
     type: K,
     listener: (this: PermissionStatus, ev: PermissionStatusEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var PermissionStatus: {
   prototype: PermissionStatus;
-  new (): PermissionStatus;
+  new(): PermissionStatus;
 };
 
 interface Permissions {
@@ -2975,7 +2973,7 @@ interface Permissions {
 
 declare var Permissions: {
   prototype: Permissions;
-  new (): Permissions;
+  new(): Permissions;
 };
 
 /** Events measuring progress of an underlying process, like an HTTP request (for an XMLHttpRequest, or the loading of the underlying resource of an <img>, <audio>, <video>, <style> or <link>). */
@@ -2988,7 +2986,7 @@ interface ProgressEvent<T extends EventTarget = EventTarget> extends Event {
 
 declare var ProgressEvent: {
   prototype: ProgressEvent;
-  new (type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
+  new(type: string, eventInitDict?: ProgressEventInit): ProgressEvent;
 };
 
 interface PromiseRejectionEvent extends Event {
@@ -2998,9 +2996,9 @@ interface PromiseRejectionEvent extends Event {
 
 declare var PromiseRejectionEvent: {
   prototype: PromiseRejectionEvent;
-  new (
+  new(
     type: string,
-    eventInitDict: PromiseRejectionEventInit
+    eventInitDict: PromiseRejectionEventInit,
   ): PromiseRejectionEvent;
 };
 
@@ -3014,7 +3012,7 @@ interface PushEvent extends ExtendableEvent {
 
 declare var PushEvent: {
   prototype: PushEvent;
-  new (type: string, eventInitDict?: PushEventInit): PushEvent;
+  new(type: string, eventInitDict?: PushEventInit): PushEvent;
 };
 
 /**
@@ -3024,14 +3022,14 @@ declare var PushEvent: {
 interface PushManager {
   getSubscription(): Promise<PushSubscription | null>;
   permissionState(
-    options?: PushSubscriptionOptionsInit
+    options?: PushSubscriptionOptionsInit,
   ): Promise<PermissionState>;
   subscribe(options?: PushSubscriptionOptionsInit): Promise<PushSubscription>;
 }
 
 declare var PushManager: {
   prototype: PushManager;
-  new (): PushManager;
+  new(): PushManager;
   readonly supportedContentEncodings: ReadonlyArray<string>;
 };
 
@@ -3048,7 +3046,7 @@ interface PushMessageData {
 
 declare var PushMessageData: {
   prototype: PushMessageData;
-  new (): PushMessageData;
+  new(): PushMessageData;
 };
 
 /**
@@ -3065,7 +3063,7 @@ interface PushSubscription {
 
 declare var PushSubscription: {
   prototype: PushSubscription;
-  new (): PushSubscription;
+  new(): PushSubscription;
 };
 
 /** Available only in secure contexts. */
@@ -3075,7 +3073,7 @@ interface PushSubscriptionOptions {
 
 declare var PushSubscriptionOptions: {
   prototype: PushSubscriptionOptions;
-  new (): PushSubscriptionOptions;
+  new(): PushSubscriptionOptions;
 };
 
 /** This Streams API interface represents a readable stream of byte data. The Fetch API offers a concrete instance of a ReadableStream through the body property of a Response object. */
@@ -3085,20 +3083,20 @@ interface ReadableStream<R = any> {
   getReader(): ReadableStreamDefaultReader<R>;
   pipeThrough<T>(
     transform: ReadableWritablePair<T, R>,
-    options?: StreamPipeOptions
+    options?: StreamPipeOptions,
   ): ReadableStream<T>;
   pipeTo(
     destination: WritableStream<R>,
-    options?: StreamPipeOptions
+    options?: StreamPipeOptions,
   ): Promise<void>;
   tee(): [ReadableStream<R>, ReadableStream<R>];
 }
 
 declare var ReadableStream: {
   prototype: ReadableStream;
-  new <R = any>(
+  new<R = any>(
     underlyingSource?: UnderlyingSource<R>,
-    strategy?: QueuingStrategy<R>
+    strategy?: QueuingStrategy<R>,
   ): ReadableStream<R>;
 };
 
@@ -3111,18 +3109,17 @@ interface ReadableStreamDefaultController<R = any> {
 
 declare var ReadableStreamDefaultController: {
   prototype: ReadableStreamDefaultController;
-  new (): ReadableStreamDefaultController;
+  new(): ReadableStreamDefaultController;
 };
 
-interface ReadableStreamDefaultReader<R = any>
-  extends ReadableStreamGenericReader {
+interface ReadableStreamDefaultReader<R = any> extends ReadableStreamGenericReader {
   read(): Promise<ReadableStreamDefaultReadResult<R>>;
   releaseLock(): void;
 }
 
 declare var ReadableStreamDefaultReader: {
   prototype: ReadableStreamDefaultReader;
-  new <R = any>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
+  new<R = any>(stream: ReadableStream<R>): ReadableStreamDefaultReader<R>;
 };
 
 interface ReadableStreamGenericReader {
@@ -3163,7 +3160,7 @@ interface Request extends Body {
 
 declare var Request: {
   prototype: Request;
-  new (input: RequestInfo, init?: RequestInit): Request;
+  new(input: RequestInfo, init?: RequestInit): Request;
 };
 
 /** This Fetch API interface represents the response to a request. */
@@ -3180,7 +3177,7 @@ interface Response extends Body {
 
 declare var Response: {
   prototype: Response;
-  new (body?: BodyInit | null, init?: ResponseInit): Response;
+  new(body?: BodyInit | null, init?: ResponseInit): Response;
   error(): Response;
   redirect(url: string | URL, status?: number): Response;
 };
@@ -3203,9 +3200,9 @@ interface SecurityPolicyViolationEvent extends Event {
 
 declare var SecurityPolicyViolationEvent: {
   prototype: SecurityPolicyViolationEvent;
-  new (
+  new(
     type: string,
-    eventInitDict?: SecurityPolicyViolationEventInit
+    eventInitDict?: SecurityPolicyViolationEventInit,
   ): SecurityPolicyViolationEvent;
 };
 
@@ -3226,28 +3223,28 @@ interface ServiceWorker extends EventTarget, AbstractWorker {
   addEventListener<K extends keyof ServiceWorkerEventMap>(
     type: K,
     listener: (this: ServiceWorker, ev: ServiceWorkerEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof ServiceWorkerEventMap>(
     type: K,
     listener: (this: ServiceWorker, ev: ServiceWorkerEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var ServiceWorker: {
   prototype: ServiceWorker;
-  new (): ServiceWorker;
+  new(): ServiceWorker;
 };
 
 interface ServiceWorkerContainerEventMap {
@@ -3269,45 +3266,45 @@ interface ServiceWorkerContainer extends EventTarget {
     | null;
   readonly ready: Promise<ServiceWorkerRegistration>;
   getRegistration(
-    clientURL?: string | URL
+    clientURL?: string | URL,
   ): Promise<ServiceWorkerRegistration | undefined>;
   getRegistrations(): Promise<ReadonlyArray<ServiceWorkerRegistration>>;
   register(
     scriptURL: string | URL,
-    options?: RegistrationOptions
+    options?: RegistrationOptions,
   ): Promise<ServiceWorkerRegistration>;
   startMessages(): void;
   addEventListener<K extends keyof ServiceWorkerContainerEventMap>(
     type: K,
     listener: (
       this: ServiceWorkerContainer,
-      ev: ServiceWorkerContainerEventMap[K]
+      ev: ServiceWorkerContainerEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof ServiceWorkerContainerEventMap>(
     type: K,
     listener: (
       this: ServiceWorkerContainer,
-      ev: ServiceWorkerContainerEventMap[K]
+      ev: ServiceWorkerContainerEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var ServiceWorkerContainer: {
   prototype: ServiceWorkerContainer;
-  new (): ServiceWorkerContainer;
+  new(): ServiceWorkerContainer;
 };
 
 interface ServiceWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
@@ -3350,33 +3347,33 @@ interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
     type: K,
     listener: (
       this: ServiceWorkerGlobalScope,
-      ev: ServiceWorkerGlobalScopeEventMap[K]
+      ev: ServiceWorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof ServiceWorkerGlobalScopeEventMap>(
     type: K,
     listener: (
       this: ServiceWorkerGlobalScope,
-      ev: ServiceWorkerGlobalScopeEventMap[K]
+      ev: ServiceWorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var ServiceWorkerGlobalScope: {
   prototype: ServiceWorkerGlobalScope;
-  new (): ServiceWorkerGlobalScope;
+  new(): ServiceWorkerGlobalScope;
 };
 
 interface ServiceWorkerRegistrationEventMap {
@@ -3403,33 +3400,33 @@ interface ServiceWorkerRegistration extends EventTarget {
     type: K,
     listener: (
       this: ServiceWorkerRegistration,
-      ev: ServiceWorkerRegistrationEventMap[K]
+      ev: ServiceWorkerRegistrationEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof ServiceWorkerRegistrationEventMap>(
     type: K,
     listener: (
       this: ServiceWorkerRegistration,
-      ev: ServiceWorkerRegistrationEventMap[K]
+      ev: ServiceWorkerRegistrationEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var ServiceWorkerRegistration: {
   prototype: ServiceWorkerRegistration;
-  new (): ServiceWorkerRegistration;
+  new(): ServiceWorkerRegistration;
 };
 
 interface SharedWorkerGlobalScopeEventMap extends WorkerGlobalScopeEventMap {
@@ -3446,33 +3443,33 @@ interface SharedWorkerGlobalScope extends WorkerGlobalScope {
     type: K,
     listener: (
       this: SharedWorkerGlobalScope,
-      ev: SharedWorkerGlobalScopeEventMap[K]
+      ev: SharedWorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof SharedWorkerGlobalScopeEventMap>(
     type: K,
     listener: (
       this: SharedWorkerGlobalScope,
-      ev: SharedWorkerGlobalScopeEventMap[K]
+      ev: SharedWorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var SharedWorkerGlobalScope: {
   prototype: SharedWorkerGlobalScope;
-  new (): SharedWorkerGlobalScope;
+  new(): SharedWorkerGlobalScope;
 };
 
 /** Available only in secure contexts. */
@@ -3484,7 +3481,7 @@ interface StorageManager {
 
 declare var StorageManager: {
   prototype: StorageManager;
-  new (): StorageManager;
+  new(): StorageManager;
 };
 
 /**
@@ -3500,7 +3497,7 @@ interface SubtleCrypto {
       | AesCbcParams
       | AesGcmParams,
     key: CryptoKey,
-    data: BufferSource
+    data: BufferSource,
   ): Promise<any>;
   deriveBits(
     algorithm:
@@ -3509,7 +3506,7 @@ interface SubtleCrypto {
       | HkdfParams
       | Pbkdf2Params,
     baseKey: CryptoKey,
-    length: number
+    length: number,
   ): Promise<ArrayBuffer>;
   deriveKey(
     algorithm:
@@ -3525,11 +3522,11 @@ interface SubtleCrypto {
       | HkdfParams
       | Pbkdf2Params,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKey>;
   digest(
     algorithm: AlgorithmIdentifier,
-    data: BufferSource
+    data: BufferSource,
   ): Promise<ArrayBuffer>;
   encrypt(
     algorithm:
@@ -3539,27 +3536,27 @@ interface SubtleCrypto {
       | AesCbcParams
       | AesGcmParams,
     key: CryptoKey,
-    data: BufferSource
+    data: BufferSource,
   ): Promise<any>;
   exportKey(format: "jwk", key: CryptoKey): Promise<JsonWebKey>;
   exportKey(
     format: Exclude<KeyFormat, "jwk">,
-    key: CryptoKey
+    key: CryptoKey,
   ): Promise<ArrayBuffer>;
   generateKey(
     algorithm: RsaHashedKeyGenParams | EcKeyGenParams,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKeyPair>;
   generateKey(
     algorithm: AesKeyGenParams | HmacKeyGenParams | Pbkdf2Params,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKey>;
   generateKey(
     algorithm: AlgorithmIdentifier,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKeyPair | CryptoKey>;
   importKey(
     format: "jwk",
@@ -3571,7 +3568,7 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKey>;
   importKey(
     format: Exclude<KeyFormat, "jwk">,
@@ -3583,12 +3580,12 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKey>;
   sign(
     algorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
     key: CryptoKey,
-    data: BufferSource
+    data: BufferSource,
   ): Promise<ArrayBuffer>;
   unwrapKey(
     format: KeyFormat,
@@ -3607,13 +3604,13 @@ interface SubtleCrypto {
       | HmacImportParams
       | AesKeyAlgorithm,
     extractable: boolean,
-    keyUsages: KeyUsage[]
+    keyUsages: KeyUsage[],
   ): Promise<CryptoKey>;
   verify(
     algorithm: AlgorithmIdentifier | RsaPssParams | EcdsaParams,
     key: CryptoKey,
     signature: BufferSource,
-    data: BufferSource
+    data: BufferSource,
   ): Promise<boolean>;
   wrapKey(
     format: KeyFormat,
@@ -3624,13 +3621,13 @@ interface SubtleCrypto {
       | RsaOaepParams
       | AesCtrParams
       | AesCbcParams
-      | AesGcmParams
+      | AesGcmParams,
   ): Promise<ArrayBuffer>;
 }
 
 declare var SubtleCrypto: {
   prototype: SubtleCrypto;
-  new (): SubtleCrypto;
+  new(): SubtleCrypto;
 };
 
 /** A decoder for a specific method, that is a specific character encoding, like utf-8, iso-8859-2, koi8, cp1261, gbk, etc. A decoder takes a stream of bytes as input and emits a stream of code points. For a more scalable, non-native library, see StringView – a C-like representation of strings based on typed arrays. */
@@ -3653,7 +3650,7 @@ interface TextDecoder extends TextDecoderCommon {
 
 declare var TextDecoder: {
   prototype: TextDecoder;
-  new (label?: string, options?: TextDecoderOptions): TextDecoder;
+  new(label?: string, options?: TextDecoderOptions): TextDecoder;
 };
 
 interface TextDecoderCommon {
@@ -3672,7 +3669,7 @@ interface TextDecoderStream extends GenericTransformStream, TextDecoderCommon {
 
 declare var TextDecoderStream: {
   prototype: TextDecoderStream;
-  new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
+  new(label?: string, options?: TextDecoderOptions): TextDecoderStream;
 };
 
 /** TextEncoder takes a stream of code points as input and emits a stream of bytes. For a more scalable, non-native library, see StringView – a C-like representation of strings based on typed arrays. */
@@ -3682,13 +3679,13 @@ interface TextEncoder extends TextEncoderCommon {
   /** Runs the UTF-8 encoder on source, stores the result of that operation into destination, and returns the progress made as an object wherein read is the number of converted code units of source and written is the number of bytes modified in destination. */
   encodeInto(
     source: string,
-    destination: Uint8Array
+    destination: Uint8Array,
   ): TextEncoderEncodeIntoResult;
 }
 
 declare var TextEncoder: {
   prototype: TextEncoder;
-  new (): TextEncoder;
+  new(): TextEncoder;
 };
 
 interface TextEncoderCommon {
@@ -3703,7 +3700,7 @@ interface TextEncoderStream extends GenericTransformStream, TextEncoderCommon {
 
 declare var TextEncoderStream: {
   prototype: TextEncoderStream;
-  new (): TextEncoderStream;
+  new(): TextEncoderStream;
 };
 
 /** The dimensions of a piece of text in the canvas, as created by the CanvasRenderingContext2D.measureText() method. */
@@ -3726,7 +3723,7 @@ interface TextMetrics {
 
 declare var TextMetrics: {
   prototype: TextMetrics;
-  new (): TextMetrics;
+  new(): TextMetrics;
 };
 
 interface TransformStream<I = any, O = any> {
@@ -3736,10 +3733,10 @@ interface TransformStream<I = any, O = any> {
 
 declare var TransformStream: {
   prototype: TransformStream;
-  new <I = any, O = any>(
+  new<I = any, O = any>(
     transformer?: Transformer<I, O>,
     writableStrategy?: QueuingStrategy<I>,
-    readableStrategy?: QueuingStrategy<O>
+    readableStrategy?: QueuingStrategy<O>,
   ): TransformStream<I, O>;
 };
 
@@ -3752,7 +3749,7 @@ interface TransformStreamDefaultController<O = any> {
 
 declare var TransformStreamDefaultController: {
   prototype: TransformStreamDefaultController;
-  new (): TransformStreamDefaultController;
+  new(): TransformStreamDefaultController;
 };
 
 /** The URL interface represents an object providing static methods used for creating object URLs. */
@@ -3775,7 +3772,7 @@ interface URL {
 
 declare var URL: {
   prototype: URL;
-  new (url: string | URL, base?: string | URL): URL;
+  new(url: string | URL, base?: string | URL): URL;
   createObjectURL(obj: Blob): string;
   revokeObjectURL(url: string): void;
 };
@@ -3798,14 +3795,14 @@ interface URLSearchParams {
   toString(): string;
   forEach(
     callbackfn: (value: string, key: string, parent: URLSearchParams) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 }
 
 declare var URLSearchParams: {
   prototype: URLSearchParams;
-  new (
-    init?: string[][] | Record<string, string> | string | URLSearchParams
+  new(
+    init?: string[][] | Record<string, string> | string | URLSearchParams,
   ): URLSearchParams;
   toString(): string;
 };
@@ -3954,7 +3951,7 @@ interface WEBGL_multi_draw {
     countsOffset: GLuint,
     instanceCountsList: Int32Array | GLsizei[],
     instanceCountsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
   multiDrawArraysWEBGL(
     mode: GLenum,
@@ -3962,7 +3959,7 @@ interface WEBGL_multi_draw {
     firstsOffset: GLuint,
     countsList: Int32Array | GLsizei[],
     countsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
   multiDrawElementsInstancedWEBGL(
     mode: GLenum,
@@ -3973,7 +3970,7 @@ interface WEBGL_multi_draw {
     offsetsOffset: GLuint,
     instanceCountsList: Int32Array | GLsizei[],
     instanceCountsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
   multiDrawElementsWEBGL(
     mode: GLenum,
@@ -3982,18 +3979,17 @@ interface WEBGL_multi_draw {
     type: GLenum,
     offsetsList: Int32Array | GLsizei[],
     offsetsOffset: GLuint,
-    drawcount: GLsizei
+    drawcount: GLsizei,
   ): void;
 }
 
 interface WebGL2RenderingContext
-  extends WebGL2RenderingContextBase,
-    WebGL2RenderingContextOverloads,
-    WebGLRenderingContextBase {}
+  extends WebGL2RenderingContextBase, WebGL2RenderingContextOverloads, WebGLRenderingContextBase
+{}
 
 declare var WebGL2RenderingContext: {
   prototype: WebGL2RenderingContext;
-  new (): WebGL2RenderingContext;
+  new(): WebGL2RenderingContext;
   readonly ACTIVE_UNIFORM_BLOCKS: GLenum;
   readonly ALREADY_SIGNALED: GLenum;
   readonly ANY_SAMPLES_PASSED: GLenum;
@@ -4561,19 +4557,19 @@ interface WebGL2RenderingContextBase {
   bindBufferBase(
     target: GLenum,
     index: GLuint,
-    buffer: WebGLBuffer | null
+    buffer: WebGLBuffer | null,
   ): void;
   bindBufferRange(
     target: GLenum,
     index: GLuint,
     buffer: WebGLBuffer | null,
     offset: GLintptr,
-    size: GLsizeiptr
+    size: GLsizeiptr,
   ): void;
   bindSampler(unit: GLuint, sampler: WebGLSampler | null): void;
   bindTransformFeedback(
     target: GLenum,
-    tf: WebGLTransformFeedback | null
+    tf: WebGLTransformFeedback | null,
   ): void;
   bindVertexArray(array: WebGLVertexArrayObject | null): void;
   blitFramebuffer(
@@ -4586,31 +4582,31 @@ interface WebGL2RenderingContextBase {
     dstX1: GLint,
     dstY1: GLint,
     mask: GLbitfield,
-    filter: GLenum
+    filter: GLenum,
   ): void;
   clearBufferfi(
     buffer: GLenum,
     drawbuffer: GLint,
     depth: GLfloat,
-    stencil: GLint
+    stencil: GLint,
   ): void;
   clearBufferfv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Float32List,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   clearBufferiv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Int32List,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   clearBufferuiv(
     buffer: GLenum,
     drawbuffer: GLint,
     values: Uint32List,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   clientWaitSync(sync: WebGLSync, flags: GLbitfield, timeout: GLuint64): GLenum;
   compressedTexImage3D(
@@ -4622,7 +4618,7 @@ interface WebGL2RenderingContextBase {
     depth: GLsizei,
     border: GLint,
     imageSize: GLsizei,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   compressedTexImage3D(
     target: GLenum,
@@ -4634,7 +4630,7 @@ interface WebGL2RenderingContextBase {
     border: GLint,
     srcData: ArrayBufferView,
     srcOffset?: GLuint,
-    srcLengthOverride?: GLuint
+    srcLengthOverride?: GLuint,
   ): void;
   compressedTexSubImage3D(
     target: GLenum,
@@ -4647,7 +4643,7 @@ interface WebGL2RenderingContextBase {
     depth: GLsizei,
     format: GLenum,
     imageSize: GLsizei,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   compressedTexSubImage3D(
     target: GLenum,
@@ -4661,14 +4657,14 @@ interface WebGL2RenderingContextBase {
     format: GLenum,
     srcData: ArrayBufferView,
     srcOffset?: GLuint,
-    srcLengthOverride?: GLuint
+    srcLengthOverride?: GLuint,
   ): void;
   copyBufferSubData(
     readTarget: GLenum,
     writeTarget: GLenum,
     readOffset: GLintptr,
     writeOffset: GLintptr,
-    size: GLsizeiptr
+    size: GLsizeiptr,
   ): void;
   copyTexSubImage3D(
     target: GLenum,
@@ -4679,7 +4675,7 @@ interface WebGL2RenderingContextBase {
     x: GLint,
     y: GLint,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   createQuery(): WebGLQuery | null;
   createSampler(): WebGLSampler | null;
@@ -4694,7 +4690,7 @@ interface WebGL2RenderingContextBase {
     mode: GLenum,
     first: GLint,
     count: GLsizei,
-    instanceCount: GLsizei
+    instanceCount: GLsizei,
   ): void;
   drawBuffers(buffers: GLenum[]): void;
   drawElementsInstanced(
@@ -4702,7 +4698,7 @@ interface WebGL2RenderingContextBase {
     count: GLsizei,
     type: GLenum,
     offset: GLintptr,
-    instanceCount: GLsizei
+    instanceCount: GLsizei,
   ): void;
   drawRangeElements(
     mode: GLenum,
@@ -4710,7 +4706,7 @@ interface WebGL2RenderingContextBase {
     end: GLuint,
     count: GLsizei,
     type: GLenum,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   endQuery(target: GLenum): void;
   endTransformFeedback(): void;
@@ -4720,35 +4716,35 @@ interface WebGL2RenderingContextBase {
     attachment: GLenum,
     texture: WebGLTexture | null,
     level: GLint,
-    layer: GLint
+    layer: GLint,
   ): void;
   getActiveUniformBlockName(
     program: WebGLProgram,
-    uniformBlockIndex: GLuint
+    uniformBlockIndex: GLuint,
   ): string | null;
   getActiveUniformBlockParameter(
     program: WebGLProgram,
     uniformBlockIndex: GLuint,
-    pname: GLenum
+    pname: GLenum,
   ): any;
   getActiveUniforms(
     program: WebGLProgram,
     uniformIndices: GLuint[],
-    pname: GLenum
+    pname: GLenum,
   ): any;
   getBufferSubData(
     target: GLenum,
     srcByteOffset: GLintptr,
     dstBuffer: ArrayBufferView,
     dstOffset?: GLuint,
-    length?: GLuint
+    length?: GLuint,
   ): void;
   getFragDataLocation(program: WebGLProgram, name: string): GLint;
   getIndexedParameter(target: GLenum, index: GLuint): any;
   getInternalformatParameter(
     target: GLenum,
     internalformat: GLenum,
-    pname: GLenum
+    pname: GLenum,
   ): any;
   getQuery(target: GLenum, pname: GLenum): WebGLQuery | null;
   getQueryParameter(query: WebGLQuery, pname: GLenum): any;
@@ -4756,12 +4752,12 @@ interface WebGL2RenderingContextBase {
   getSyncParameter(sync: WebGLSync, pname: GLenum): any;
   getTransformFeedbackVarying(
     program: WebGLProgram,
-    index: GLuint
+    index: GLuint,
   ): WebGLActiveInfo | null;
   getUniformBlockIndex(program: WebGLProgram, uniformBlockName: string): GLuint;
   getUniformIndices(
     program: WebGLProgram,
-    uniformNames: string[]
+    uniformNames: string[],
   ): GLuint[] | null;
   invalidateFramebuffer(target: GLenum, attachments: GLenum[]): void;
   invalidateSubFramebuffer(
@@ -4770,7 +4766,7 @@ interface WebGL2RenderingContextBase {
     x: GLint,
     y: GLint,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   isQuery(query: WebGLQuery | null): GLboolean;
   isSampler(sampler: WebGLSampler | null): GLboolean;
@@ -4784,7 +4780,7 @@ interface WebGL2RenderingContextBase {
     samples: GLsizei,
     internalformat: GLenum,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   resumeTransformFeedback(): void;
   samplerParameterf(sampler: WebGLSampler, pname: GLenum, param: GLfloat): void;
@@ -4799,7 +4795,7 @@ interface WebGL2RenderingContextBase {
     border: GLint,
     format: GLenum,
     type: GLenum,
-    pboOffset: GLintptr
+    pboOffset: GLintptr,
   ): void;
   texImage3D(
     target: GLenum,
@@ -4811,7 +4807,7 @@ interface WebGL2RenderingContextBase {
     border: GLint,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
+    source: TexImageSource,
   ): void;
   texImage3D(
     target: GLenum,
@@ -4823,7 +4819,7 @@ interface WebGL2RenderingContextBase {
     border: GLint,
     format: GLenum,
     type: GLenum,
-    srcData: ArrayBufferView | null
+    srcData: ArrayBufferView | null,
   ): void;
   texImage3D(
     target: GLenum,
@@ -4836,14 +4832,14 @@ interface WebGL2RenderingContextBase {
     format: GLenum,
     type: GLenum,
     srcData: ArrayBufferView,
-    srcOffset: GLuint
+    srcOffset: GLuint,
   ): void;
   texStorage2D(
     target: GLenum,
     levels: GLsizei,
     internalformat: GLenum,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   texStorage3D(
     target: GLenum,
@@ -4851,7 +4847,7 @@ interface WebGL2RenderingContextBase {
     internalformat: GLenum,
     width: GLsizei,
     height: GLsizei,
-    depth: GLsizei
+    depth: GLsizei,
   ): void;
   texSubImage3D(
     target: GLenum,
@@ -4864,7 +4860,7 @@ interface WebGL2RenderingContextBase {
     depth: GLsizei,
     format: GLenum,
     type: GLenum,
-    pboOffset: GLintptr
+    pboOffset: GLintptr,
   ): void;
   texSubImage3D(
     target: GLenum,
@@ -4877,7 +4873,7 @@ interface WebGL2RenderingContextBase {
     depth: GLsizei,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
+    source: TexImageSource,
   ): void;
   texSubImage3D(
     target: GLenum,
@@ -4891,102 +4887,102 @@ interface WebGL2RenderingContextBase {
     format: GLenum,
     type: GLenum,
     srcData: ArrayBufferView | null,
-    srcOffset?: GLuint
+    srcOffset?: GLuint,
   ): void;
   transformFeedbackVaryings(
     program: WebGLProgram,
     varyings: string[],
-    bufferMode: GLenum
+    bufferMode: GLenum,
   ): void;
   uniform1ui(location: WebGLUniformLocation | null, v0: GLuint): void;
   uniform1uiv(
     location: WebGLUniformLocation | null,
     data: Uint32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform2ui(
     location: WebGLUniformLocation | null,
     v0: GLuint,
-    v1: GLuint
+    v1: GLuint,
   ): void;
   uniform2uiv(
     location: WebGLUniformLocation | null,
     data: Uint32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform3ui(
     location: WebGLUniformLocation | null,
     v0: GLuint,
     v1: GLuint,
-    v2: GLuint
+    v2: GLuint,
   ): void;
   uniform3uiv(
     location: WebGLUniformLocation | null,
     data: Uint32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform4ui(
     location: WebGLUniformLocation | null,
     v0: GLuint,
     v1: GLuint,
     v2: GLuint,
-    v3: GLuint
+    v3: GLuint,
   ): void;
   uniform4uiv(
     location: WebGLUniformLocation | null,
     data: Uint32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformBlockBinding(
     program: WebGLProgram,
     uniformBlockIndex: GLuint,
-    uniformBlockBinding: GLuint
+    uniformBlockBinding: GLuint,
   ): void;
   uniformMatrix2x3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix2x4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix3x2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix3x4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix4x2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix4x3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
   vertexAttribI4i(index: GLuint, x: GLint, y: GLint, z: GLint, w: GLint): void;
@@ -4996,7 +4992,7 @@ interface WebGL2RenderingContextBase {
     x: GLuint,
     y: GLuint,
     z: GLuint,
-    w: GLuint
+    w: GLuint,
   ): void;
   vertexAttribI4uiv(index: GLuint, values: Uint32List): void;
   vertexAttribIPointer(
@@ -5004,7 +5000,7 @@ interface WebGL2RenderingContextBase {
     size: GLint,
     type: GLenum,
     stride: GLsizei,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   waitSync(sync: WebGLSync, flags: GLbitfield, timeout: GLint64): void;
   readonly ACTIVE_UNIFORM_BLOCKS: GLenum;
@@ -5280,19 +5276,19 @@ interface WebGL2RenderingContextOverloads {
     srcData: ArrayBufferView,
     usage: GLenum,
     srcOffset: GLuint,
-    length?: GLuint
+    length?: GLuint,
   ): void;
   bufferSubData(
     target: GLenum,
     dstByteOffset: GLintptr,
-    srcData: BufferSource
+    srcData: BufferSource,
   ): void;
   bufferSubData(
     target: GLenum,
     dstByteOffset: GLintptr,
     srcData: ArrayBufferView,
     srcOffset: GLuint,
-    length?: GLuint
+    length?: GLuint,
   ): void;
   compressedTexImage2D(
     target: GLenum,
@@ -5302,7 +5298,7 @@ interface WebGL2RenderingContextOverloads {
     height: GLsizei,
     border: GLint,
     imageSize: GLsizei,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   compressedTexImage2D(
     target: GLenum,
@@ -5313,7 +5309,7 @@ interface WebGL2RenderingContextOverloads {
     border: GLint,
     srcData: ArrayBufferView,
     srcOffset?: GLuint,
-    srcLengthOverride?: GLuint
+    srcLengthOverride?: GLuint,
   ): void;
   compressedTexSubImage2D(
     target: GLenum,
@@ -5324,7 +5320,7 @@ interface WebGL2RenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     imageSize: GLsizei,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   compressedTexSubImage2D(
     target: GLenum,
@@ -5336,7 +5332,7 @@ interface WebGL2RenderingContextOverloads {
     format: GLenum,
     srcData: ArrayBufferView,
     srcOffset?: GLuint,
-    srcLengthOverride?: GLuint
+    srcLengthOverride?: GLuint,
   ): void;
   readPixels(
     x: GLint,
@@ -5345,7 +5341,7 @@ interface WebGL2RenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     type: GLenum,
-    dstData: ArrayBufferView | null
+    dstData: ArrayBufferView | null,
   ): void;
   readPixels(
     x: GLint,
@@ -5354,7 +5350,7 @@ interface WebGL2RenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     type: GLenum,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   readPixels(
     x: GLint,
@@ -5364,7 +5360,7 @@ interface WebGL2RenderingContextOverloads {
     format: GLenum,
     type: GLenum,
     dstData: ArrayBufferView,
-    dstOffset: GLuint
+    dstOffset: GLuint,
   ): void;
   texImage2D(
     target: GLenum,
@@ -5375,7 +5371,7 @@ interface WebGL2RenderingContextOverloads {
     border: GLint,
     format: GLenum,
     type: GLenum,
-    pixels: ArrayBufferView | null
+    pixels: ArrayBufferView | null,
   ): void;
   texImage2D(
     target: GLenum,
@@ -5383,18 +5379,7 @@ interface WebGL2RenderingContextOverloads {
     internalformat: GLint,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
-  ): void;
-  texImage2D(
-    target: GLenum,
-    level: GLint,
-    internalformat: GLint,
-    width: GLsizei,
-    height: GLsizei,
-    border: GLint,
-    format: GLenum,
-    type: GLenum,
-    pboOffset: GLintptr
+    source: TexImageSource,
   ): void;
   texImage2D(
     target: GLenum,
@@ -5405,7 +5390,18 @@ interface WebGL2RenderingContextOverloads {
     border: GLint,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
+    pboOffset: GLintptr,
+  ): void;
+  texImage2D(
+    target: GLenum,
+    level: GLint,
+    internalformat: GLint,
+    width: GLsizei,
+    height: GLsizei,
+    border: GLint,
+    format: GLenum,
+    type: GLenum,
+    source: TexImageSource,
   ): void;
   texImage2D(
     target: GLenum,
@@ -5417,7 +5413,7 @@ interface WebGL2RenderingContextOverloads {
     format: GLenum,
     type: GLenum,
     srcData: ArrayBufferView,
-    srcOffset: GLuint
+    srcOffset: GLuint,
   ): void;
   texSubImage2D(
     target: GLenum,
@@ -5428,7 +5424,7 @@ interface WebGL2RenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     type: GLenum,
-    pixels: ArrayBufferView | null
+    pixels: ArrayBufferView | null,
   ): void;
   texSubImage2D(
     target: GLenum,
@@ -5437,18 +5433,7 @@ interface WebGL2RenderingContextOverloads {
     yoffset: GLint,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
-  ): void;
-  texSubImage2D(
-    target: GLenum,
-    level: GLint,
-    xoffset: GLint,
-    yoffset: GLint,
-    width: GLsizei,
-    height: GLsizei,
-    format: GLenum,
-    type: GLenum,
-    pboOffset: GLintptr
+    source: TexImageSource,
   ): void;
   texSubImage2D(
     target: GLenum,
@@ -5459,7 +5444,18 @@ interface WebGL2RenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
+    pboOffset: GLintptr,
+  ): void;
+  texSubImage2D(
+    target: GLenum,
+    level: GLint,
+    xoffset: GLint,
+    yoffset: GLint,
+    width: GLsizei,
+    height: GLsizei,
+    format: GLenum,
+    type: GLenum,
+    source: TexImageSource,
   ): void;
   texSubImage2D(
     target: GLenum,
@@ -5471,76 +5467,76 @@ interface WebGL2RenderingContextOverloads {
     format: GLenum,
     type: GLenum,
     srcData: ArrayBufferView,
-    srcOffset: GLuint
+    srcOffset: GLuint,
   ): void;
   uniform1fv(
     location: WebGLUniformLocation | null,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform1iv(
     location: WebGLUniformLocation | null,
     data: Int32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform2fv(
     location: WebGLUniformLocation | null,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform2iv(
     location: WebGLUniformLocation | null,
     data: Int32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform3fv(
     location: WebGLUniformLocation | null,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform3iv(
     location: WebGLUniformLocation | null,
     data: Int32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform4fv(
     location: WebGLUniformLocation | null,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniform4iv(
     location: WebGLUniformLocation | null,
     data: Int32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
   uniformMatrix4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
     data: Float32List,
     srcOffset?: GLuint,
-    srcLength?: GLuint
+    srcLength?: GLuint,
   ): void;
 }
 
@@ -5553,7 +5549,7 @@ interface WebGLActiveInfo {
 
 declare var WebGLActiveInfo: {
   prototype: WebGLActiveInfo;
-  new (): WebGLActiveInfo;
+  new(): WebGLActiveInfo;
 };
 
 /** Part of the WebGL API and represents an opaque buffer object storing data such as vertices or colors. */
@@ -5561,7 +5557,7 @@ interface WebGLBuffer {}
 
 declare var WebGLBuffer: {
   prototype: WebGLBuffer;
-  new (): WebGLBuffer;
+  new(): WebGLBuffer;
 };
 
 /** The WebContextEvent interface is part of the WebGL API and is an interface for an event that is generated in response to a status change to the WebGL rendering context. */
@@ -5571,7 +5567,7 @@ interface WebGLContextEvent extends Event {
 
 declare var WebGLContextEvent: {
   prototype: WebGLContextEvent;
-  new (type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
+  new(type: string, eventInit?: WebGLContextEventInit): WebGLContextEvent;
 };
 
 /** Part of the WebGL API and represents a collection of buffers that serve as a rendering destination. */
@@ -5579,7 +5575,7 @@ interface WebGLFramebuffer {}
 
 declare var WebGLFramebuffer: {
   prototype: WebGLFramebuffer;
-  new (): WebGLFramebuffer;
+  new(): WebGLFramebuffer;
 };
 
 /** The WebGLProgram is part of the WebGL API and is a combination of two compiled WebGLShaders consisting of a vertex shader and a fragment shader (both written in GLSL). */
@@ -5587,14 +5583,14 @@ interface WebGLProgram {}
 
 declare var WebGLProgram: {
   prototype: WebGLProgram;
-  new (): WebGLProgram;
+  new(): WebGLProgram;
 };
 
 interface WebGLQuery {}
 
 declare var WebGLQuery: {
   prototype: WebGLQuery;
-  new (): WebGLQuery;
+  new(): WebGLQuery;
 };
 
 /** Part of the WebGL API and represents a buffer that can contain an image, or can be source or target of an rendering operation. */
@@ -5602,17 +5598,15 @@ interface WebGLRenderbuffer {}
 
 declare var WebGLRenderbuffer: {
   prototype: WebGLRenderbuffer;
-  new (): WebGLRenderbuffer;
+  new(): WebGLRenderbuffer;
 };
 
 /** Provides an interface to the OpenGL ES 2.0 graphics rendering context for the drawing surface of an HTML <canvas> element. */
-interface WebGLRenderingContext
-  extends WebGLRenderingContextBase,
-    WebGLRenderingContextOverloads {}
+interface WebGLRenderingContext extends WebGLRenderingContextBase, WebGLRenderingContextOverloads {}
 
 declare var WebGLRenderingContext: {
   prototype: WebGLRenderingContext;
-  new (): WebGLRenderingContext;
+  new(): WebGLRenderingContext;
   readonly ACTIVE_ATTRIBUTES: GLenum;
   readonly ACTIVE_TEXTURE: GLenum;
   readonly ACTIVE_UNIFORMS: GLenum;
@@ -5921,14 +5915,14 @@ interface WebGLRenderingContextBase {
   bindFramebuffer(target: GLenum, framebuffer: WebGLFramebuffer | null): void;
   bindRenderbuffer(
     target: GLenum,
-    renderbuffer: WebGLRenderbuffer | null
+    renderbuffer: WebGLRenderbuffer | null,
   ): void;
   bindTexture(target: GLenum, texture: WebGLTexture | null): void;
   blendColor(
     red: GLclampf,
     green: GLclampf,
     blue: GLclampf,
-    alpha: GLclampf
+    alpha: GLclampf,
   ): void;
   blendEquation(mode: GLenum): void;
   blendEquationSeparate(modeRGB: GLenum, modeAlpha: GLenum): void;
@@ -5937,7 +5931,7 @@ interface WebGLRenderingContextBase {
     srcRGB: GLenum,
     dstRGB: GLenum,
     srcAlpha: GLenum,
-    dstAlpha: GLenum
+    dstAlpha: GLenum,
   ): void;
   checkFramebufferStatus(target: GLenum): GLenum;
   clear(mask: GLbitfield): void;
@@ -5945,7 +5939,7 @@ interface WebGLRenderingContextBase {
     red: GLclampf,
     green: GLclampf,
     blue: GLclampf,
-    alpha: GLclampf
+    alpha: GLclampf,
   ): void;
   clearDepth(depth: GLclampf): void;
   clearStencil(s: GLint): void;
@@ -5953,7 +5947,7 @@ interface WebGLRenderingContextBase {
     red: GLboolean,
     green: GLboolean,
     blue: GLboolean,
-    alpha: GLboolean
+    alpha: GLboolean,
   ): void;
   compileShader(shader: WebGLShader): void;
   copyTexImage2D(
@@ -5964,7 +5958,7 @@ interface WebGLRenderingContextBase {
     y: GLint,
     width: GLsizei,
     height: GLsizei,
-    border: GLint
+    border: GLint,
   ): void;
   copyTexSubImage2D(
     target: GLenum,
@@ -5974,7 +5968,7 @@ interface WebGLRenderingContextBase {
     x: GLint,
     y: GLint,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   createBuffer(): WebGLBuffer | null;
   createFramebuffer(): WebGLFramebuffer | null;
@@ -6000,7 +5994,7 @@ interface WebGLRenderingContextBase {
     mode: GLenum,
     count: GLsizei,
     type: GLenum,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   enable(cap: GLenum): void;
   enableVertexAttribArray(index: GLuint): void;
@@ -6010,21 +6004,21 @@ interface WebGLRenderingContextBase {
     target: GLenum,
     attachment: GLenum,
     renderbuffertarget: GLenum,
-    renderbuffer: WebGLRenderbuffer | null
+    renderbuffer: WebGLRenderbuffer | null,
   ): void;
   framebufferTexture2D(
     target: GLenum,
     attachment: GLenum,
     textarget: GLenum,
     texture: WebGLTexture | null,
-    level: GLint
+    level: GLint,
   ): void;
   frontFace(mode: GLenum): void;
   generateMipmap(target: GLenum): void;
   getActiveAttrib(program: WebGLProgram, index: GLuint): WebGLActiveInfo | null;
   getActiveUniform(
     program: WebGLProgram,
-    index: GLuint
+    index: GLuint,
   ): WebGLActiveInfo | null;
   getAttachedShaders(program: WebGLProgram): WebGLShader[] | null;
   getAttribLocation(program: WebGLProgram, name: string): GLint;
@@ -6033,83 +6027,83 @@ interface WebGLRenderingContextBase {
   getError(): GLenum;
   getExtension(extensionName: "EXT_blend_minmax"): EXT_blend_minmax | null;
   getExtension(
-    extensionName: "EXT_color_buffer_float"
+    extensionName: "EXT_color_buffer_float",
   ): EXT_color_buffer_float | null;
   getExtension(
-    extensionName: "EXT_color_buffer_half_float"
+    extensionName: "EXT_color_buffer_half_float",
   ): EXT_color_buffer_half_float | null;
   getExtension(extensionName: "EXT_float_blend"): EXT_float_blend | null;
   getExtension(
-    extensionName: "EXT_texture_filter_anisotropic"
+    extensionName: "EXT_texture_filter_anisotropic",
   ): EXT_texture_filter_anisotropic | null;
   getExtension(extensionName: "EXT_frag_depth"): EXT_frag_depth | null;
   getExtension(
-    extensionName: "EXT_shader_texture_lod"
+    extensionName: "EXT_shader_texture_lod",
   ): EXT_shader_texture_lod | null;
   getExtension(extensionName: "EXT_sRGB"): EXT_sRGB | null;
   getExtension(
-    extensionName: "KHR_parallel_shader_compile"
+    extensionName: "KHR_parallel_shader_compile",
   ): KHR_parallel_shader_compile | null;
   getExtension(
-    extensionName: "OES_vertex_array_object"
+    extensionName: "OES_vertex_array_object",
   ): OES_vertex_array_object | null;
   getExtension(extensionName: "OVR_multiview2"): OVR_multiview2 | null;
   getExtension(
-    extensionName: "WEBGL_color_buffer_float"
+    extensionName: "WEBGL_color_buffer_float",
   ): WEBGL_color_buffer_float | null;
   getExtension(
-    extensionName: "WEBGL_compressed_texture_astc"
+    extensionName: "WEBGL_compressed_texture_astc",
   ): WEBGL_compressed_texture_astc | null;
   getExtension(
-    extensionName: "WEBGL_compressed_texture_etc"
+    extensionName: "WEBGL_compressed_texture_etc",
   ): WEBGL_compressed_texture_etc | null;
   getExtension(
-    extensionName: "WEBGL_compressed_texture_etc1"
+    extensionName: "WEBGL_compressed_texture_etc1",
   ): WEBGL_compressed_texture_etc1 | null;
   getExtension(
-    extensionName: "WEBGL_compressed_texture_pvrtc"
+    extensionName: "WEBGL_compressed_texture_pvrtc",
   ): WEBGL_compressed_texture_pvrtc | null;
   getExtension(
-    extensionName: "WEBGL_compressed_texture_s3tc_srgb"
+    extensionName: "WEBGL_compressed_texture_s3tc_srgb",
   ): WEBGL_compressed_texture_s3tc_srgb | null;
   getExtension(
-    extensionName: "WEBGL_debug_shaders"
+    extensionName: "WEBGL_debug_shaders",
   ): WEBGL_debug_shaders | null;
   getExtension(extensionName: "WEBGL_draw_buffers"): WEBGL_draw_buffers | null;
   getExtension(extensionName: "WEBGL_lose_context"): WEBGL_lose_context | null;
   getExtension(
-    extensionName: "WEBGL_depth_texture"
+    extensionName: "WEBGL_depth_texture",
   ): WEBGL_depth_texture | null;
   getExtension(
-    extensionName: "WEBGL_debug_renderer_info"
+    extensionName: "WEBGL_debug_renderer_info",
   ): WEBGL_debug_renderer_info | null;
   getExtension(
-    extensionName: "WEBGL_compressed_texture_s3tc"
+    extensionName: "WEBGL_compressed_texture_s3tc",
   ): WEBGL_compressed_texture_s3tc | null;
   getExtension(
-    extensionName: "OES_texture_half_float_linear"
+    extensionName: "OES_texture_half_float_linear",
   ): OES_texture_half_float_linear | null;
   getExtension(
-    extensionName: "OES_texture_half_float"
+    extensionName: "OES_texture_half_float",
   ): OES_texture_half_float | null;
   getExtension(
-    extensionName: "OES_texture_float_linear"
+    extensionName: "OES_texture_float_linear",
   ): OES_texture_float_linear | null;
   getExtension(extensionName: "OES_texture_float"): OES_texture_float | null;
   getExtension(
-    extensionName: "OES_standard_derivatives"
+    extensionName: "OES_standard_derivatives",
   ): OES_standard_derivatives | null;
   getExtension(
-    extensionName: "OES_element_index_uint"
+    extensionName: "OES_element_index_uint",
   ): OES_element_index_uint | null;
   getExtension(
-    extensionName: "ANGLE_instanced_arrays"
+    extensionName: "ANGLE_instanced_arrays",
   ): ANGLE_instanced_arrays | null;
   getExtension(name: string): any;
   getFramebufferAttachmentParameter(
     target: GLenum,
     attachment: GLenum,
-    pname: GLenum
+    pname: GLenum,
   ): any;
   getParameter(pname: GLenum): any;
   getProgramInfoLog(program: WebGLProgram): string | null;
@@ -6119,7 +6113,7 @@ interface WebGLRenderingContextBase {
   getShaderParameter(shader: WebGLShader, pname: GLenum): any;
   getShaderPrecisionFormat(
     shadertype: GLenum,
-    precisiontype: GLenum
+    precisiontype: GLenum,
   ): WebGLShaderPrecisionFormat | null;
   getShaderSource(shader: WebGLShader): string | null;
   getSupportedExtensions(): string[] | null;
@@ -6127,7 +6121,7 @@ interface WebGLRenderingContextBase {
   getUniform(program: WebGLProgram, location: WebGLUniformLocation): any;
   getUniformLocation(
     program: WebGLProgram,
-    name: string
+    name: string,
   ): WebGLUniformLocation | null;
   getVertexAttrib(index: GLuint, pname: GLenum): any;
   getVertexAttribOffset(index: GLuint, pname: GLenum): GLintptr;
@@ -6148,7 +6142,7 @@ interface WebGLRenderingContextBase {
     target: GLenum,
     internalformat: GLenum,
     width: GLsizei,
-    height: GLsizei
+    height: GLsizei,
   ): void;
   sampleCoverage(value: GLclampf, invert: GLboolean): void;
   scissor(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void;
@@ -6158,7 +6152,7 @@ interface WebGLRenderingContextBase {
     face: GLenum,
     func: GLenum,
     ref: GLint,
-    mask: GLuint
+    mask: GLuint,
   ): void;
   stencilMask(mask: GLuint): void;
   stencilMaskSeparate(face: GLenum, mask: GLuint): void;
@@ -6167,7 +6161,7 @@ interface WebGLRenderingContextBase {
     face: GLenum,
     fail: GLenum,
     zfail: GLenum,
-    zpass: GLenum
+    zpass: GLenum,
   ): void;
   texParameterf(target: GLenum, pname: GLenum, param: GLfloat): void;
   texParameteri(target: GLenum, pname: GLenum, param: GLint): void;
@@ -6176,34 +6170,34 @@ interface WebGLRenderingContextBase {
   uniform2f(
     location: WebGLUniformLocation | null,
     x: GLfloat,
-    y: GLfloat
+    y: GLfloat,
   ): void;
   uniform2i(location: WebGLUniformLocation | null, x: GLint, y: GLint): void;
   uniform3f(
     location: WebGLUniformLocation | null,
     x: GLfloat,
     y: GLfloat,
-    z: GLfloat
+    z: GLfloat,
   ): void;
   uniform3i(
     location: WebGLUniformLocation | null,
     x: GLint,
     y: GLint,
-    z: GLint
+    z: GLint,
   ): void;
   uniform4f(
     location: WebGLUniformLocation | null,
     x: GLfloat,
     y: GLfloat,
     z: GLfloat,
-    w: GLfloat
+    w: GLfloat,
   ): void;
   uniform4i(
     location: WebGLUniformLocation | null,
     x: GLint,
     y: GLint,
     z: GLint,
-    w: GLint
+    w: GLint,
   ): void;
   useProgram(program: WebGLProgram | null): void;
   validateProgram(program: WebGLProgram): void;
@@ -6218,7 +6212,7 @@ interface WebGLRenderingContextBase {
     x: GLfloat,
     y: GLfloat,
     z: GLfloat,
-    w: GLfloat
+    w: GLfloat,
   ): void;
   vertexAttrib4fv(index: GLuint, values: Float32List): void;
   vertexAttribPointer(
@@ -6227,7 +6221,7 @@ interface WebGLRenderingContextBase {
     type: GLenum,
     normalized: GLboolean,
     stride: GLsizei,
-    offset: GLintptr
+    offset: GLintptr,
   ): void;
   viewport(x: GLint, y: GLint, width: GLsizei, height: GLsizei): void;
   readonly ACTIVE_ATTRIBUTES: GLenum;
@@ -6539,7 +6533,7 @@ interface WebGLRenderingContextOverloads {
     width: GLsizei,
     height: GLsizei,
     border: GLint,
-    data: ArrayBufferView
+    data: ArrayBufferView,
   ): void;
   compressedTexSubImage2D(
     target: GLenum,
@@ -6549,7 +6543,7 @@ interface WebGLRenderingContextOverloads {
     width: GLsizei,
     height: GLsizei,
     format: GLenum,
-    data: ArrayBufferView
+    data: ArrayBufferView,
   ): void;
   readPixels(
     x: GLint,
@@ -6558,7 +6552,7 @@ interface WebGLRenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     type: GLenum,
-    pixels: ArrayBufferView | null
+    pixels: ArrayBufferView | null,
   ): void;
   texImage2D(
     target: GLenum,
@@ -6569,7 +6563,7 @@ interface WebGLRenderingContextOverloads {
     border: GLint,
     format: GLenum,
     type: GLenum,
-    pixels: ArrayBufferView | null
+    pixels: ArrayBufferView | null,
   ): void;
   texImage2D(
     target: GLenum,
@@ -6577,7 +6571,7 @@ interface WebGLRenderingContextOverloads {
     internalformat: GLint,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
+    source: TexImageSource,
   ): void;
   texSubImage2D(
     target: GLenum,
@@ -6588,7 +6582,7 @@ interface WebGLRenderingContextOverloads {
     height: GLsizei,
     format: GLenum,
     type: GLenum,
-    pixels: ArrayBufferView | null
+    pixels: ArrayBufferView | null,
   ): void;
   texSubImage2D(
     target: GLenum,
@@ -6597,7 +6591,7 @@ interface WebGLRenderingContextOverloads {
     yoffset: GLint,
     format: GLenum,
     type: GLenum,
-    source: TexImageSource
+    source: TexImageSource,
   ): void;
   uniform1fv(location: WebGLUniformLocation | null, v: Float32List): void;
   uniform1iv(location: WebGLUniformLocation | null, v: Int32List): void;
@@ -6610,17 +6604,17 @@ interface WebGLRenderingContextOverloads {
   uniformMatrix2fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
-    value: Float32List
+    value: Float32List,
   ): void;
   uniformMatrix3fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
-    value: Float32List
+    value: Float32List,
   ): void;
   uniformMatrix4fv(
     location: WebGLUniformLocation | null,
     transpose: GLboolean,
-    value: Float32List
+    value: Float32List,
   ): void;
 }
 
@@ -6628,7 +6622,7 @@ interface WebGLSampler {}
 
 declare var WebGLSampler: {
   prototype: WebGLSampler;
-  new (): WebGLSampler;
+  new(): WebGLSampler;
 };
 
 /** The WebGLShader is part of the WebGL API and can either be a vertex or a fragment shader. A WebGLProgram requires both types of shaders. */
@@ -6636,7 +6630,7 @@ interface WebGLShader {}
 
 declare var WebGLShader: {
   prototype: WebGLShader;
-  new (): WebGLShader;
+  new(): WebGLShader;
 };
 
 /** Part of the WebGL API and represents the information returned by calling the WebGLRenderingContext.getShaderPrecisionFormat() method. */
@@ -6648,14 +6642,14 @@ interface WebGLShaderPrecisionFormat {
 
 declare var WebGLShaderPrecisionFormat: {
   prototype: WebGLShaderPrecisionFormat;
-  new (): WebGLShaderPrecisionFormat;
+  new(): WebGLShaderPrecisionFormat;
 };
 
 interface WebGLSync {}
 
 declare var WebGLSync: {
   prototype: WebGLSync;
-  new (): WebGLSync;
+  new(): WebGLSync;
 };
 
 /** Part of the WebGL API and represents an opaque texture object providing storage and state for texturing operations. */
@@ -6663,14 +6657,14 @@ interface WebGLTexture {}
 
 declare var WebGLTexture: {
   prototype: WebGLTexture;
-  new (): WebGLTexture;
+  new(): WebGLTexture;
 };
 
 interface WebGLTransformFeedback {}
 
 declare var WebGLTransformFeedback: {
   prototype: WebGLTransformFeedback;
-  new (): WebGLTransformFeedback;
+  new(): WebGLTransformFeedback;
 };
 
 /** Part of the WebGL API and represents the location of a uniform variable in a shader program. */
@@ -6678,14 +6672,14 @@ interface WebGLUniformLocation {}
 
 declare var WebGLUniformLocation: {
   prototype: WebGLUniformLocation;
-  new (): WebGLUniformLocation;
+  new(): WebGLUniformLocation;
 };
 
 interface WebGLVertexArrayObject {}
 
 declare var WebGLVertexArrayObject: {
   prototype: WebGLVertexArrayObject;
-  new (): WebGLVertexArrayObject;
+  new(): WebGLVertexArrayObject;
 };
 
 interface WebGLVertexArrayObjectOES {}
@@ -6734,28 +6728,28 @@ interface WebSocket extends EventTarget {
   addEventListener<K extends keyof WebSocketEventMap>(
     type: K,
     listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof WebSocketEventMap>(
     type: K,
     listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var WebSocket: {
   prototype: WebSocket;
-  new (url: string | URL, protocols?: string | string[]): WebSocket;
+  new(url: string | URL, protocols?: string | string[]): WebSocket;
   readonly CLOSED: number;
   readonly CLOSING: number;
   readonly CONNECTING: number;
@@ -6772,7 +6766,7 @@ interface WindowClient extends Client {
 
 declare var WindowClient: {
   prototype: WindowClient;
-  new (): WindowClient;
+  new(): WindowClient;
 };
 
 interface WindowOrWorkerGlobalScope {
@@ -6790,7 +6784,7 @@ interface WindowOrWorkerGlobalScope {
   clearTimeout(id?: number): void;
   createImageBitmap(
     image: ImageBitmapSource,
-    options?: ImageBitmapOptions
+    options?: ImageBitmapOptions,
   ): Promise<ImageBitmap>;
   createImageBitmap(
     image: ImageBitmapSource,
@@ -6798,7 +6792,7 @@ interface WindowOrWorkerGlobalScope {
     sy: number,
     sw: number,
     sh: number,
-    options?: ImageBitmapOptions
+    options?: ImageBitmapOptions,
   ): Promise<ImageBitmap>;
   fetch(input: RequestInfo, init?: RequestInit): Promise<Response>;
   queueMicrotask(callback: VoidFunction): void;
@@ -6832,28 +6826,28 @@ interface Worker extends EventTarget, AbstractWorker {
   addEventListener<K extends keyof WorkerEventMap>(
     type: K,
     listener: (this: Worker, ev: WorkerEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof WorkerEventMap>(
     type: K,
     listener: (this: Worker, ev: WorkerEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var Worker: {
   prototype: Worker;
-  new (scriptURL: string | URL, options?: WorkerOptions): Worker;
+  new(scriptURL: string | URL, options?: WorkerOptions): Worker;
 };
 
 interface WorkerGlobalScopeEventMap {
@@ -6866,10 +6860,7 @@ interface WorkerGlobalScopeEventMap {
 }
 
 /** This Web Workers API interface is an interface representing the scope of any worker. Workers have no browsing context; this scope contains the information usually conveyed by Window objects — in this case event handlers, the console or the associated WorkerNavigator object. Each WorkerGlobalScope has its own event loop. */
-interface WorkerGlobalScope
-  extends EventTarget,
-    FontFaceSource,
-    WindowOrWorkerGlobalScope {
+interface WorkerGlobalScope extends EventTarget, FontFaceSource, WindowOrWorkerGlobalScope {
   /** Returns workerGlobal's WorkerLocation object. */
   readonly location: WorkerLocation;
   /** Returns workerGlobal's WorkerNavigator object. */
@@ -6892,33 +6883,33 @@ interface WorkerGlobalScope
     type: K,
     listener: (
       this: WorkerGlobalScope,
-      ev: WorkerGlobalScopeEventMap[K]
+      ev: WorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof WorkerGlobalScopeEventMap>(
     type: K,
     listener: (
       this: WorkerGlobalScope,
-      ev: WorkerGlobalScopeEventMap[K]
+      ev: WorkerGlobalScopeEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var WorkerGlobalScope: {
   prototype: WorkerGlobalScope;
-  new (): WorkerGlobalScope;
+  new(): WorkerGlobalScope;
 };
 
 /** The absolute location of the script executed by the Worker. Such an object is initialized for each worker and is available via the WorkerGlobalScope.location property obtained by calling self.location. */
@@ -6937,23 +6928,25 @@ interface WorkerLocation {
 
 declare var WorkerLocation: {
   prototype: WorkerLocation;
-  new (): WorkerLocation;
+  new(): WorkerLocation;
 };
 
 /** A subset of the Navigator interface allowed to be accessed from a Worker. Such an object is initialized for each worker and is available via the WorkerGlobalScope.navigator property obtained by calling window.self.navigator. */
 interface WorkerNavigator
-  extends NavigatorConcurrentHardware,
+  extends
+    NavigatorConcurrentHardware,
     NavigatorID,
     NavigatorLanguage,
     NavigatorNetworkInformation,
     NavigatorOnLine,
-    NavigatorStorage {
+    NavigatorStorage
+{
   readonly mediaCapabilities: MediaCapabilities;
 }
 
 declare var WorkerNavigator: {
   prototype: WorkerNavigator;
-  new (): WorkerNavigator;
+  new(): WorkerNavigator;
 };
 
 /** This Streams API interface provides a standard abstraction for writing streaming data to a destination, known as a sink. This object comes with built-in backpressure and queuing. */
@@ -6966,9 +6959,9 @@ interface WritableStream<W = any> {
 
 declare var WritableStream: {
   prototype: WritableStream;
-  new <W = any>(
+  new<W = any>(
     underlyingSink?: UnderlyingSink<W>,
-    strategy?: QueuingStrategy<W>
+    strategy?: QueuingStrategy<W>,
   ): WritableStream<W>;
 };
 
@@ -6979,7 +6972,7 @@ interface WritableStreamDefaultController {
 
 declare var WritableStreamDefaultController: {
   prototype: WritableStreamDefaultController;
-  new (): WritableStreamDefaultController;
+  new(): WritableStreamDefaultController;
 };
 
 /** This Streams API interface is the object returned by WritableStream.getWriter() and once created locks the < writer to the WritableStream ensuring that no other streams can write to the underlying sink. */
@@ -6995,7 +6988,7 @@ interface WritableStreamDefaultWriter<W = any> {
 
 declare var WritableStreamDefaultWriter: {
   prototype: WritableStreamDefaultWriter;
-  new <W = any>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
+  new<W = any>(stream: WritableStream<W>): WritableStreamDefaultWriter<W>;
 };
 
 interface XMLHttpRequestEventMap extends XMLHttpRequestEventTargetEventMap {
@@ -7063,7 +7056,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     url: string | URL,
     async: boolean,
     username?: string | null,
-    password?: string | null
+    password?: string | null,
   ): void;
   /**
    * Acts as if the `Content-Type` header value for a response is mime. (It does not change the header.)
@@ -7093,28 +7086,28 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
   addEventListener<K extends keyof XMLHttpRequestEventMap>(
     type: K,
     listener: (this: XMLHttpRequest, ev: XMLHttpRequestEventMap[K]) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof XMLHttpRequestEventMap>(
     type: K,
     listener: (this: XMLHttpRequest, ev: XMLHttpRequestEventMap[K]) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var XMLHttpRequest: {
   prototype: XMLHttpRequest;
-  new (): XMLHttpRequest;
+  new(): XMLHttpRequest;
   readonly DONE: number;
   readonly HEADERS_RECEIVED: number;
   readonly LOADING: number;
@@ -7144,33 +7137,33 @@ interface XMLHttpRequestEventTarget extends EventTarget {
     type: K,
     listener: (
       this: XMLHttpRequestEventTarget,
-      ev: XMLHttpRequestEventTargetEventMap[K]
+      ev: XMLHttpRequestEventTargetEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
     type: K,
     listener: (
       this: XMLHttpRequestEventTarget,
-      ev: XMLHttpRequestEventTargetEventMap[K]
+      ev: XMLHttpRequestEventTargetEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var XMLHttpRequestEventTarget: {
   prototype: XMLHttpRequestEventTarget;
-  new (): XMLHttpRequestEventTarget;
+  new(): XMLHttpRequestEventTarget;
 };
 
 interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
@@ -7178,33 +7171,33 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
     type: K,
     listener: (
       this: XMLHttpRequestUpload,
-      ev: XMLHttpRequestEventTargetEventMap[K]
+      ev: XMLHttpRequestEventTargetEventMap[K],
     ) => any,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ): void;
   removeEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
     type: K,
     listener: (
       this: XMLHttpRequestUpload,
-      ev: XMLHttpRequestEventTargetEventMap[K]
+      ev: XMLHttpRequestEventTargetEventMap[K],
     ) => any,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions
+    options?: boolean | EventListenerOptions,
   ): void;
 }
 
 declare var XMLHttpRequestUpload: {
   prototype: XMLHttpRequestUpload;
-  new (): XMLHttpRequestUpload;
+  new(): XMLHttpRequestUpload;
 };
 
 interface Console {
@@ -7237,7 +7230,7 @@ declare namespace WebAssembly {
 
   var CompileError: {
     prototype: CompileError;
-    new (message?: string): CompileError;
+    new(message?: string): CompileError;
     (message?: string): CompileError;
   };
 
@@ -7248,7 +7241,7 @@ declare namespace WebAssembly {
 
   var Global: {
     prototype: Global;
-    new (descriptor: GlobalDescriptor, v?: any): Global;
+    new(descriptor: GlobalDescriptor, v?: any): Global;
   };
 
   interface Instance {
@@ -7257,14 +7250,14 @@ declare namespace WebAssembly {
 
   var Instance: {
     prototype: Instance;
-    new (module: Module, importObject?: Imports): Instance;
+    new(module: Module, importObject?: Imports): Instance;
   };
 
   interface LinkError extends Error {}
 
   var LinkError: {
     prototype: LinkError;
-    new (message?: string): LinkError;
+    new(message?: string): LinkError;
     (message?: string): LinkError;
   };
 
@@ -7275,14 +7268,14 @@ declare namespace WebAssembly {
 
   var Memory: {
     prototype: Memory;
-    new (descriptor: MemoryDescriptor): Memory;
+    new(descriptor: MemoryDescriptor): Memory;
   };
 
   interface Module {}
 
   var Module: {
     prototype: Module;
-    new (bytes: BufferSource): Module;
+    new(bytes: BufferSource): Module;
     customSections(moduleObject: Module, sectionName: string): ArrayBuffer[];
     exports(moduleObject: Module): ModuleExportDescriptor[];
     imports(moduleObject: Module): ModuleImportDescriptor[];
@@ -7292,7 +7285,7 @@ declare namespace WebAssembly {
 
   var RuntimeError: {
     prototype: RuntimeError;
-    new (message?: string): RuntimeError;
+    new(message?: string): RuntimeError;
     (message?: string): RuntimeError;
   };
 
@@ -7305,7 +7298,7 @@ declare namespace WebAssembly {
 
   var Table: {
     prototype: Table;
-    new (descriptor: TableDescriptor, value?: any): Table;
+    new(descriptor: TableDescriptor, value?: any): Table;
   };
 
   interface GlobalDescriptor {
@@ -7358,19 +7351,19 @@ declare namespace WebAssembly {
   type ModuleImports = Record<string, ImportValue>;
   function compile(bytes: BufferSource): Promise<Module>;
   function compileStreaming(
-    source: Response | PromiseLike<Response>
+    source: Response | PromiseLike<Response>,
   ): Promise<Module>;
   function instantiate(
     bytes: BufferSource,
-    importObject?: Imports
+    importObject?: Imports,
   ): Promise<WebAssemblyInstantiatedSource>;
   function instantiate(
     moduleObject: Module,
-    importObject?: Imports
+    importObject?: Imports,
   ): Promise<Instance>;
   function instantiateStreaming(
     source: Response | PromiseLike<Response>,
-    importObject?: Imports
+    importObject?: Imports,
   ): Promise<WebAssemblyInstantiatedSource>;
   function validate(bytes: BufferSource): boolean;
 }
@@ -7389,7 +7382,7 @@ interface OnErrorEventHandlerNonNull {
     source?: string,
     lineno?: number,
     colno?: number,
-    error?: Error
+    error?: Error,
   ): any;
 }
 
@@ -7412,7 +7405,7 @@ interface TransformerStartCallback<O> {
 interface TransformerTransformCallback<I, O> {
   (
     chunk: I,
-    controller: TransformStreamDefaultController<O>
+    controller: TransformStreamDefaultController<O>,
   ): void | PromiseLike<void>;
 }
 
@@ -7431,7 +7424,7 @@ interface UnderlyingSinkStartCallback {
 interface UnderlyingSinkWriteCallback<W> {
   (
     chunk: W,
-    controller: WritableStreamDefaultController
+    controller: WritableStreamDefaultController,
   ): void | PromiseLike<void>;
 }
 
@@ -7465,7 +7458,7 @@ declare function close(): void;
 declare function postMessage(message: any, transfer: Transferable[]): void;
 declare function postMessage(
   message: any,
-  options?: StructuredSerializeOptions
+  options?: StructuredSerializeOptions,
 ): void;
 /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
 declare function dispatchEvent(event: Event): boolean;
@@ -7512,7 +7505,7 @@ declare function clearInterval(id?: number): void;
 declare function clearTimeout(id?: number): void;
 declare function createImageBitmap(
   image: ImageBitmapSource,
-  options?: ImageBitmapOptions
+  options?: ImageBitmapOptions,
 ): Promise<ImageBitmap>;
 declare function createImageBitmap(
   image: ImageBitmapSource,
@@ -7520,11 +7513,11 @@ declare function createImageBitmap(
   sy: number,
   sw: number,
   sh: number,
-  options?: ImageBitmapOptions
+  options?: ImageBitmapOptions,
 ): Promise<ImageBitmap>;
 declare function fetch(
   input: RequestInfo,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<Response>;
 declare function queueMicrotask(callback: VoidFunction): void;
 declare function reportError(e: any): void;
@@ -7541,34 +7534,34 @@ declare function setTimeout(
 declare function cancelAnimationFrame(handle: number): void;
 declare function requestAnimationFrame(callback: FrameRequestCallback): number;
 declare function addEventListener<
-  K extends keyof DedicatedWorkerGlobalScopeEventMap
+  K extends keyof DedicatedWorkerGlobalScopeEventMap,
 >(
   type: K,
   listener: (
     this: DedicatedWorkerGlobalScope,
-    ev: DedicatedWorkerGlobalScopeEventMap[K]
+    ev: DedicatedWorkerGlobalScopeEventMap[K],
   ) => any,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ): void;
 declare function addEventListener(
   type: string,
   listener: EventListenerOrEventListenerObject,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ): void;
 declare function removeEventListener<
-  K extends keyof DedicatedWorkerGlobalScopeEventMap
+  K extends keyof DedicatedWorkerGlobalScopeEventMap,
 >(
   type: K,
   listener: (
     this: DedicatedWorkerGlobalScope,
-    ev: DedicatedWorkerGlobalScopeEventMap[K]
+    ev: DedicatedWorkerGlobalScopeEventMap[K],
   ) => any,
-  options?: boolean | EventListenerOptions
+  options?: boolean | EventListenerOptions,
 ): void;
 declare function removeEventListener(
   type: string,
   listener: EventListenerOrEventListenerObject,
-  options?: boolean | EventListenerOptions
+  options?: boolean | EventListenerOptions,
 ): void;
 type AlgorithmIdentifier = Algorithm | string;
 type BigInteger = Uint8Array;

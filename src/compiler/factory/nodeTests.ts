@@ -18,13 +18,13 @@ namespace ts {
   }
 
   export function isRegularExpressionLiteral(
-    node: Node
+    node: Node,
   ): node is RegularExpressionLiteral {
     return node.kind === SyntaxKind.RegularExpressionLiteral;
   }
 
   export function isNoSubstitutionTemplateLiteral(
-    node: Node
+    node: Node,
   ): node is NoSubstitutionTemplateLiteral {
     return node.kind === SyntaxKind.NoSubstitutionTemplateLiteral;
   }
@@ -51,7 +51,7 @@ namespace ts {
 
   /*@internal*/
   export function isCommaToken(
-    node: Node
+    node: Node,
   ): node is Token<SyntaxKind.CommaToken> {
     return node.kind === SyntaxKind.CommaToken;
   }
@@ -90,7 +90,7 @@ namespace ts {
 
   /*@internal*/
   export function isEqualsGreaterThanToken(
-    node: Node
+    node: Node,
   ): node is EqualsGreaterThanToken {
     return node.kind === SyntaxKind.EqualsGreaterThanToken;
   }
@@ -159,7 +159,7 @@ namespace ts {
   }
 
   export function isComputedPropertyName(
-    node: Node
+    node: Node,
   ): node is ComputedPropertyName {
     return node.kind === SyntaxKind.ComputedPropertyName;
   }
@@ -167,7 +167,7 @@ namespace ts {
   // Signature elements
 
   export function isTypeParameterDeclaration(
-    node: Node
+    node: Node,
   ): node is TypeParameterDeclaration {
     return node.kind === SyntaxKind.TypeParameter;
   }
@@ -188,7 +188,7 @@ namespace ts {
   }
 
   export function isPropertyDeclaration(
-    node: Node
+    node: Node,
   ): node is PropertyDeclaration {
     return node.kind === SyntaxKind.PropertyDeclaration;
   }
@@ -202,43 +202,43 @@ namespace ts {
   }
 
   export function isClassStaticBlockDeclaration(
-    node: Node
+    node: Node,
   ): node is ClassStaticBlockDeclaration {
     return node.kind === SyntaxKind.ClassStaticBlockDeclaration;
   }
 
   export function isConstructorDeclaration(
-    node: Node
+    node: Node,
   ): node is ConstructorDeclaration {
     return node.kind === SyntaxKind.Constructor;
   }
 
   export function isGetAccessorDeclaration(
-    node: Node
+    node: Node,
   ): node is GetAccessorDeclaration {
     return node.kind === SyntaxKind.GetAccessor;
   }
 
   export function isSetAccessorDeclaration(
-    node: Node
+    node: Node,
   ): node is SetAccessorDeclaration {
     return node.kind === SyntaxKind.SetAccessor;
   }
 
   export function isCallSignatureDeclaration(
-    node: Node
+    node: Node,
   ): node is CallSignatureDeclaration {
     return node.kind === SyntaxKind.CallSignature;
   }
 
   export function isConstructSignatureDeclaration(
-    node: Node
+    node: Node,
   ): node is ConstructSignatureDeclaration {
     return node.kind === SyntaxKind.ConstructSignature;
   }
 
   export function isIndexSignatureDeclaration(
-    node: Node
+    node: Node,
   ): node is IndexSignatureDeclaration {
     return node.kind === SyntaxKind.IndexSignature;
   }
@@ -258,7 +258,7 @@ namespace ts {
   }
 
   export function isConstructorTypeNode(
-    node: Node
+    node: Node,
   ): node is ConstructorTypeNode {
     return node.kind === SyntaxKind.ConstructorType;
   }
@@ -296,13 +296,13 @@ namespace ts {
   }
 
   export function isIntersectionTypeNode(
-    node: Node
+    node: Node,
   ): node is IntersectionTypeNode {
     return node.kind === SyntaxKind.IntersectionType;
   }
 
   export function isConditionalTypeNode(
-    node: Node
+    node: Node,
   ): node is ConditionalTypeNode {
     return node.kind === SyntaxKind.ConditionalType;
   }
@@ -312,7 +312,7 @@ namespace ts {
   }
 
   export function isParenthesizedTypeNode(
-    node: Node
+    node: Node,
   ): node is ParenthesizedTypeNode {
     return node.kind === SyntaxKind.ParenthesizedType;
   }
@@ -326,7 +326,7 @@ namespace ts {
   }
 
   export function isIndexedAccessTypeNode(
-    node: Node
+    node: Node,
   ): node is IndexedAccessTypeNode {
     return node.kind === SyntaxKind.IndexedAccessType;
   }
@@ -344,13 +344,13 @@ namespace ts {
   }
 
   export function isTemplateLiteralTypeSpan(
-    node: Node
+    node: Node,
   ): node is TemplateLiteralTypeSpan {
     return node.kind === SyntaxKind.TemplateLiteralTypeSpan;
   }
 
   export function isTemplateLiteralTypeNode(
-    node: Node
+    node: Node,
   ): node is TemplateLiteralTypeNode {
     return node.kind === SyntaxKind.TemplateLiteralType;
   }
@@ -358,13 +358,13 @@ namespace ts {
   // Binding patterns
 
   export function isObjectBindingPattern(
-    node: Node
+    node: Node,
   ): node is ObjectBindingPattern {
     return node.kind === SyntaxKind.ObjectBindingPattern;
   }
 
   export function isArrayBindingPattern(
-    node: Node
+    node: Node,
   ): node is ArrayBindingPattern {
     return node.kind === SyntaxKind.ArrayBindingPattern;
   }
@@ -376,25 +376,25 @@ namespace ts {
   // Expression
 
   export function isArrayLiteralExpression(
-    node: Node
+    node: Node,
   ): node is ArrayLiteralExpression {
     return node.kind === SyntaxKind.ArrayLiteralExpression;
   }
 
   export function isObjectLiteralExpression(
-    node: Node
+    node: Node,
   ): node is ObjectLiteralExpression {
     return node.kind === SyntaxKind.ObjectLiteralExpression;
   }
 
   export function isPropertyAccessExpression(
-    node: Node
+    node: Node,
   ): node is PropertyAccessExpression {
     return node.kind === SyntaxKind.PropertyAccessExpression;
   }
 
   export function isElementAccessExpression(
-    node: Node
+    node: Node,
   ): node is ElementAccessExpression {
     return node.kind === SyntaxKind.ElementAccessExpression;
   }
@@ -408,7 +408,7 @@ namespace ts {
   }
 
   export function isTaggedTemplateExpression(
-    node: Node
+    node: Node,
   ): node is TaggedTemplateExpression {
     return node.kind === SyntaxKind.TaggedTemplateExpression;
   }
@@ -418,7 +418,7 @@ namespace ts {
   }
 
   export function isParenthesizedExpression(
-    node: Node
+    node: Node,
   ): node is ParenthesizedExpression {
     return node.kind === SyntaxKind.ParenthesizedExpression;
   }
@@ -448,13 +448,13 @@ namespace ts {
   }
 
   export function isPrefixUnaryExpression(
-    node: Node
+    node: Node,
   ): node is PrefixUnaryExpression {
     return node.kind === SyntaxKind.PrefixUnaryExpression;
   }
 
   export function isPostfixUnaryExpression(
-    node: Node
+    node: Node,
   ): node is PostfixUnaryExpression {
     return node.kind === SyntaxKind.PostfixUnaryExpression;
   }
@@ -464,7 +464,7 @@ namespace ts {
   }
 
   export function isConditionalExpression(
-    node: Node
+    node: Node,
   ): node is ConditionalExpression {
     return node.kind === SyntaxKind.ConditionalExpression;
   }
@@ -490,7 +490,7 @@ namespace ts {
   }
 
   export function isExpressionWithTypeArguments(
-    node: Node
+    node: Node,
   ): node is ExpressionWithTypeArguments {
     return node.kind === SyntaxKind.ExpressionWithTypeArguments;
   }
@@ -508,19 +508,19 @@ namespace ts {
   }
 
   export function isSyntheticExpression(
-    node: Node
+    node: Node,
   ): node is SyntheticExpression {
     return node.kind === SyntaxKind.SyntheticExpression;
   }
 
   export function isPartiallyEmittedExpression(
-    node: Node
+    node: Node,
   ): node is PartiallyEmittedExpression {
     return node.kind === SyntaxKind.PartiallyEmittedExpression;
   }
 
   export function isCommaListExpression(
-    node: Node
+    node: Node,
   ): node is CommaListExpression {
     return node.kind === SyntaxKind.CommaListExpression;
   }
@@ -532,7 +532,7 @@ namespace ts {
   }
 
   export function isSemicolonClassElement(
-    node: Node
+    node: Node,
   ): node is SemicolonClassElement {
     return node.kind === SyntaxKind.SemicolonClassElement;
   }
@@ -552,7 +552,7 @@ namespace ts {
   }
 
   export function isExpressionStatement(
-    node: Node
+    node: Node,
   ): node is ExpressionStatement {
     return node.kind === SyntaxKind.ExpressionStatement;
   }
@@ -618,19 +618,19 @@ namespace ts {
   }
 
   export function isVariableDeclaration(
-    node: Node
+    node: Node,
   ): node is VariableDeclaration {
     return node.kind === SyntaxKind.VariableDeclaration;
   }
 
   export function isVariableDeclarationList(
-    node: Node
+    node: Node,
   ): node is VariableDeclarationList {
     return node.kind === SyntaxKind.VariableDeclarationList;
   }
 
   export function isFunctionDeclaration(
-    node: Node
+    node: Node,
   ): node is FunctionDeclaration {
     return node.kind === SyntaxKind.FunctionDeclaration;
   }
@@ -640,13 +640,13 @@ namespace ts {
   }
 
   export function isInterfaceDeclaration(
-    node: Node
+    node: Node,
   ): node is InterfaceDeclaration {
     return node.kind === SyntaxKind.InterfaceDeclaration;
   }
 
   export function isTypeAliasDeclaration(
-    node: Node
+    node: Node,
   ): node is TypeAliasDeclaration {
     return node.kind === SyntaxKind.TypeAliasDeclaration;
   }
@@ -668,13 +668,13 @@ namespace ts {
   }
 
   export function isNamespaceExportDeclaration(
-    node: Node
+    node: Node,
   ): node is NamespaceExportDeclaration {
     return node.kind === SyntaxKind.NamespaceExportDeclaration;
   }
 
   export function isImportEqualsDeclaration(
-    node: Node
+    node: Node,
   ): node is ImportEqualsDeclaration {
     return node.kind === SyntaxKind.ImportEqualsDeclaration;
   }
@@ -732,28 +732,28 @@ namespace ts {
   }
 
   export function isNotEmittedStatement(
-    node: Node
+    node: Node,
   ): node is NotEmittedStatement {
     return node.kind === SyntaxKind.NotEmittedStatement;
   }
 
   /* @internal */
   export function isSyntheticReference(
-    node: Node
+    node: Node,
   ): node is SyntheticReferenceExpression {
     return node.kind === SyntaxKind.SyntheticReferenceExpression;
   }
 
   /* @internal */
   export function isMergeDeclarationMarker(
-    node: Node
+    node: Node,
   ): node is MergeDeclarationMarker {
     return node.kind === SyntaxKind.MergeDeclarationMarker;
   }
 
   /* @internal */
   export function isEndOfDeclarationMarker(
-    node: Node
+    node: Node,
   ): node is EndOfDeclarationMarker {
     return node.kind === SyntaxKind.EndOfDeclarationMarker;
   }
@@ -761,7 +761,7 @@ namespace ts {
   // Module References
 
   export function isExternalModuleReference(
-    node: Node
+    node: Node,
   ): node is ExternalModuleReference {
     return node.kind === SyntaxKind.ExternalModuleReference;
   }
@@ -773,7 +773,7 @@ namespace ts {
   }
 
   export function isJsxSelfClosingElement(
-    node: Node
+    node: Node,
   ): node is JsxSelfClosingElement {
     return node.kind === SyntaxKind.JsxSelfClosingElement;
   }
@@ -839,7 +839,7 @@ namespace ts {
   }
 
   export function isShorthandPropertyAssignment(
-    node: Node
+    node: Node,
   ): node is ShorthandPropertyAssignment {
     return node.kind === SyntaxKind.ShorthandPropertyAssignment;
   }
@@ -884,7 +884,7 @@ namespace ts {
   // JSDoc Elements
 
   export function isJSDocTypeExpression(
-    node: Node
+    node: Node,
   ): node is JSDocTypeExpression {
     return node.kind === SyntaxKind.JSDocTypeExpression;
   }
@@ -922,7 +922,7 @@ namespace ts {
   }
 
   export function isJSDocNonNullableType(
-    node: Node
+    node: Node,
   ): node is JSDocNonNullableType {
     return node.kind === SyntaxKind.JSDocNonNullableType;
   }

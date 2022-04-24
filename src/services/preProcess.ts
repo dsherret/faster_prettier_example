@@ -2,7 +2,7 @@ namespace ts {
   export function preProcessFile(
     sourceText: string,
     readImportFiles = true,
-    detectJavaScriptImports = false
+    detectJavaScriptImports = false,
   ): PreProcessedFileInfo {
     const pragmaContext: PragmaContext = {
       languageVersion: ScriptTarget.ES5, // controls whether the token scanner considers unicode identifiers or not - shouldn't matter, since we're only using it for trivia
@@ -98,8 +98,8 @@ namespace ts {
         if (token === SyntaxKind.OpenParenToken) {
           token = nextToken();
           if (
-            token === SyntaxKind.StringLiteral ||
-            token === SyntaxKind.NoSubstitutionTemplateLiteral
+            token === SyntaxKind.StringLiteral
+            || token === SyntaxKind.NoSubstitutionTemplateLiteral
           ) {
             // import("mod");
             recordModuleName();
@@ -114,11 +114,11 @@ namespace ts {
             const skipTypeKeyword = scanner.lookAhead(() => {
               const token = scanner.scan();
               return (
-                token !== SyntaxKind.FromKeyword &&
-                (token === SyntaxKind.AsteriskToken ||
-                  token === SyntaxKind.OpenBraceToken ||
-                  token === SyntaxKind.Identifier ||
-                  isKeyword(token))
+                token !== SyntaxKind.FromKeyword
+                && (token === SyntaxKind.AsteriskToken
+                  || token === SyntaxKind.OpenBraceToken
+                  || token === SyntaxKind.Identifier
+                  || isKeyword(token))
               );
             });
             if (skipTypeKeyword) {
@@ -153,8 +153,8 @@ namespace ts {
             // consume "{ a as B, c, d as D}" clauses
             // make sure that it stops on EOF
             while (
-              token !== SyntaxKind.CloseBraceToken &&
-              token !== SyntaxKind.EndOfFileToken
+              token !== SyntaxKind.CloseBraceToken
+              && token !== SyntaxKind.EndOfFileToken
             ) {
               token = nextToken();
             }
@@ -204,8 +204,8 @@ namespace ts {
           const skipTypeKeyword = scanner.lookAhead(() => {
             const token = scanner.scan();
             return (
-              token === SyntaxKind.AsteriskToken ||
-              token === SyntaxKind.OpenBraceToken
+              token === SyntaxKind.AsteriskToken
+              || token === SyntaxKind.OpenBraceToken
             );
           });
           if (skipTypeKeyword) {
@@ -217,8 +217,8 @@ namespace ts {
           // consume "{ a as B, c, d as D}" clauses
           // make sure it stops on EOF
           while (
-            token !== SyntaxKind.CloseBraceToken &&
-            token !== SyntaxKind.EndOfFileToken
+            token !== SyntaxKind.CloseBraceToken
+            && token !== SyntaxKind.EndOfFileToken
           ) {
             token = nextToken();
           }
@@ -272,7 +272,7 @@ namespace ts {
 
     function tryConsumeRequireCall(
       skipCurrentToken: boolean,
-      allowTemplateLiterals = false
+      allowTemplateLiterals = false,
     ): boolean {
       let token = skipCurrentToken ? nextToken() : scanner.getToken();
       if (token === SyntaxKind.RequireKeyword) {
@@ -280,9 +280,9 @@ namespace ts {
         if (token === SyntaxKind.OpenParenToken) {
           token = nextToken();
           if (
-            token === SyntaxKind.StringLiteral ||
-            (allowTemplateLiterals &&
-              token === SyntaxKind.NoSubstitutionTemplateLiteral)
+            token === SyntaxKind.StringLiteral
+            || (allowTemplateLiterals
+              && token === SyntaxKind.NoSubstitutionTemplateLiteral)
           ) {
             //  require("mod");
             recordModuleName();
@@ -296,8 +296,8 @@ namespace ts {
     function tryConsumeDefine(): boolean {
       let token = scanner.getToken();
       if (
-        token === SyntaxKind.Identifier &&
-        scanner.getTokenValue() === "define"
+        token === SyntaxKind.Identifier
+        && scanner.getTokenValue() === "define"
       ) {
         token = nextToken();
         if (token !== SyntaxKind.OpenParenToken) {
@@ -306,8 +306,8 @@ namespace ts {
 
         token = nextToken();
         if (
-          token === SyntaxKind.StringLiteral ||
-          token === SyntaxKind.NoSubstitutionTemplateLiteral
+          token === SyntaxKind.StringLiteral
+          || token === SyntaxKind.NoSubstitutionTemplateLiteral
         ) {
           // looks like define ("modname", ... - skip string literal and comma
           token = nextToken();
@@ -328,13 +328,13 @@ namespace ts {
         token = nextToken();
         // scan until ']' or EOF
         while (
-          token !== SyntaxKind.CloseBracketToken &&
-          token !== SyntaxKind.EndOfFileToken
+          token !== SyntaxKind.CloseBracketToken
+          && token !== SyntaxKind.EndOfFileToken
         ) {
           // record string literals as module names
           if (
-            token === SyntaxKind.StringLiteral ||
-            token === SyntaxKind.NoSubstitutionTemplateLiteral
+            token === SyntaxKind.StringLiteral
+            || token === SyntaxKind.NoSubstitutionTemplateLiteral
           ) {
             recordModuleName();
           }
@@ -375,7 +375,8 @@ namespace ts {
         if (scanner.getToken() === SyntaxKind.TemplateHead) {
           const stack = [scanner.getToken()];
           let token = scanner.scan();
-          loop: while (length(stack)) {
+          loop:
+          while (length(stack)) {
             switch (token) {
               case SyntaxKind.EndOfFileToken:
                 break loop;
@@ -395,7 +396,7 @@ namespace ts {
                   if (lastOrUndefined(stack) === SyntaxKind.TemplateHead) {
                     if (
                       scanner.reScanTemplateToken(
-                        /* isTaggedTemplate */ false
+                        /* isTaggedTemplate */ false,
                       ) === SyntaxKind.TemplateTail
                     ) {
                       stack.pop();
@@ -413,15 +414,15 @@ namespace ts {
 
         // check if at least one of alternative have moved scanner forward
         if (
-          tryConsumeDeclare() ||
-          tryConsumeImport() ||
-          tryConsumeExport() ||
-          (detectJavaScriptImports &&
-            (tryConsumeRequireCall(
+          tryConsumeDeclare()
+          || tryConsumeImport()
+          || tryConsumeExport()
+          || (detectJavaScriptImports
+            && (tryConsumeRequireCall(
               /*skipCurrentToken*/ false,
-              /*allowTemplateLiterals*/ true
-            ) ||
-              tryConsumeDefine()))
+              /*allowTemplateLiterals*/ true,
+            )
+              || tryConsumeDefine()))
         ) {
           continue;
         } else {

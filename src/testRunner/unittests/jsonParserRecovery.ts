@@ -13,8 +13,8 @@ namespace ts {
                 unitName: name,
               },
             ],
-            file.parseDiagnostics
-          )
+            file.parseDiagnostics,
+          ),
         );
 
         // Will throw if parse tree does not cover full input text
@@ -25,7 +25,7 @@ namespace ts {
     parsesToValidSourceFileWithErrors("trailing identifier", "{} blah");
     parsesToValidSourceFileWithErrors(
       "TypeScript code",
-      "interface Foo {} blah"
+      "interface Foo {} blah",
     );
     parsesToValidSourceFileWithErrors("Two comma-separated objects", "{}, {}");
     parsesToValidSourceFileWithErrors("Two objects", "{} {}");
@@ -45,7 +45,7 @@ namespace ts {
               \`}
             </style>
           </div>
-        )`
+        )`,
     );
   });
 }

@@ -215,7 +215,7 @@ namespace ts.projectSystem {
         }),
       };
       const cancellationToken = new TestServerCancellationToken(
-        /*cancelAfterRequest*/ 3
+        /*cancelAfterRequest*/ 3,
       );
       const host = createServerHost([f1, config]);
       const session = createSession(host, {
@@ -256,7 +256,7 @@ namespace ts.projectSystem {
       }
 
       function verifyExecuteCommandSeqIsCancellable<
-        T extends server.protocol.Request
+        T extends server.protocol.Request,
       >(request: Partial<T>) {
         // Set the next request to be cancellable
         // The cancellation token will cancel the request the third time
@@ -272,8 +272,8 @@ namespace ts.projectSystem {
         }
         assert(
           operationCanceledExceptionThrown,
-          "Operation Canceled Exception not thrown for request: " +
-            JSON.stringify(request)
+          "Operation Canceled Exception not thrown for request: "
+            + JSON.stringify(request),
         );
       }
     });

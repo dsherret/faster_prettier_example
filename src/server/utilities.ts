@@ -27,14 +27,12 @@ namespace ts.server {
           delay,
           this,
           operationId,
-          cb
-        )
+          cb,
+        ),
       );
       if (this.logger) {
         this.logger.info(
-          `Scheduled: ${operationId}${
-            pendingTimeout ? ", Cancelled earlier one" : ""
-          }`
+          `Scheduled: ${operationId}${pendingTimeout ? ", Cancelled earlier one" : ""}`,
         );
       }
     }
@@ -49,7 +47,7 @@ namespace ts.server {
     private static run(
       self: ThrottledOperations,
       operationId: string,
-      cb: () => void
+      cb: () => void,
     ) {
       perfLogger.logStartScheduledOperation(operationId);
       self.pendingTimeouts.delete(operationId);
@@ -66,7 +64,7 @@ namespace ts.server {
     constructor(
       private readonly host: ServerHost,
       private readonly delay: number,
-      private readonly logger: Logger
+      private readonly logger: Logger,
     ) {}
 
     public scheduleCollect() {
@@ -94,7 +92,7 @@ namespace ts.server {
   }
 
   export function getBaseConfigFileName(
-    configFilePath: NormalizedPath
+    configFilePath: NormalizedPath,
   ): "tsconfig.json" | "jsconfig.json" | undefined {
     const base = getBaseFileName(configFilePath);
     return base === "tsconfig.json" || base === "jsconfig.json"
@@ -105,7 +103,7 @@ namespace ts.server {
   export function removeSorted<T>(
     array: SortedArray<T>,
     remove: T,
-    compare: Comparer<T>
+    compare: Comparer<T>,
   ): void {
     if (!array || array.length === 0) {
       return;

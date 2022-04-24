@@ -14,14 +14,12 @@ namespace collections {
 
     constructor(
       comparer: ((a: K, b: K) => number) | SortOptions<K>,
-      iterable?: Iterable<[K, V]>
+      iterable?: Iterable<[K, V]>,
     ) {
-      this._comparer =
-        typeof comparer === "object" ? comparer.comparer : comparer;
-      this._order =
-        typeof comparer === "object" && comparer.sort === "insertion"
-          ? []
-          : undefined;
+      this._comparer = typeof comparer === "object" ? comparer.comparer : comparer;
+      this._order = typeof comparer === "object" && comparer.sort === "insertion"
+        ? []
+        : undefined;
       if (iterable) {
         const iterator = getIterator(iterable);
         try {
@@ -56,7 +54,7 @@ namespace collections {
         this._keys,
         key,
         ts.identity,
-        this._comparer
+        this._comparer,
       );
       return index >= 0 ? this._values[index] : undefined;
     }
@@ -66,7 +64,7 @@ namespace collections {
         this._keys,
         key,
         ts.identity,
-        this._comparer
+        this._comparer,
       );
       return index >= 0 ? [this._keys[index], this._values[index]] : undefined;
     }
@@ -76,7 +74,7 @@ namespace collections {
         this._keys,
         key,
         ts.identity,
-        this._comparer
+        this._comparer,
       );
       if (index >= 0) {
         this._values[index] = value;
@@ -95,7 +93,7 @@ namespace collections {
         this._keys,
         key,
         ts.identity,
-        this._comparer
+        this._comparer,
       );
       if (index >= 0) {
         this.writePreamble();
@@ -120,7 +118,7 @@ namespace collections {
 
     public forEach(
       callback: (value: V, key: K, collection: this) => void,
-      thisArg?: any
+      thisArg?: any,
     ) {
       const keys = this._keys;
       const values = this._values;
@@ -251,7 +249,7 @@ namespace collections {
   }
 
   export function nextResult<T>(
-    iterator: Iterator<T>
+    iterator: Iterator<T>,
   ): IteratorResult<T> | undefined {
     const result = iterator.next();
     return result.done ? undefined : result;
@@ -280,8 +278,8 @@ namespace collections {
 
     public get size(): number {
       if (
-        this._size === -1 ||
-        (this._parent && this._parent._version !== this._parentVersion)
+        this._size === -1
+        || (this._parent && this._parent._version !== this._parentVersion)
       ) {
         let size = 0;
         for (const _ in this._map) size++;
@@ -307,8 +305,7 @@ namespace collections {
     }
 
     public set(key: string, value: any): this {
-      this._map[Metadata._escapeKey(key)] =
-        value === undefined ? Metadata._undefinedValue : value;
+      this._map[Metadata._escapeKey(key)] = value === undefined ? Metadata._undefinedValue : value;
       this._size = -1;
       this._version++;
       return this;
@@ -338,18 +335,18 @@ namespace collections {
     }
 
     private static _escapeKey(text: string) {
-      return text.length >= 2 &&
-        text.charAt(0) === "_" &&
-        text.charAt(1) === "_"
+      return text.length >= 2
+          && text.charAt(0) === "_"
+          && text.charAt(1) === "_"
         ? "_" + text
         : text;
     }
 
     private static _unescapeKey(text: string) {
-      return text.length >= 3 &&
-        text.charAt(0) === "_" &&
-        text.charAt(1) === "_" &&
-        text.charAt(2) === "_"
+      return text.length >= 3
+          && text.charAt(0) === "_"
+          && text.charAt(1) === "_"
+          && text.charAt(2) === "_"
         ? text.slice(1)
         : text;
     }

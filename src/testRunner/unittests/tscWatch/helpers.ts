@@ -25,23 +25,23 @@ namespace ts.tscWatch {
 
   export function checkProgramActualFiles(
     program: Program,
-    expectedFiles: readonly string[]
+    expectedFiles: readonly string[],
   ) {
     checkArray(
       `Program actual files`,
       program.getSourceFiles().map((file) => file.fileName),
-      expectedFiles
+      expectedFiles,
     );
   }
 
   export function checkProgramRootFiles(
     program: Program,
-    expectedFiles: readonly string[]
+    expectedFiles: readonly string[],
   ) {
     checkArray(
       `Program rootFileNames`,
       program.getRootFileNames(),
-      expectedFiles
+      expectedFiles,
     );
   }
 
@@ -53,7 +53,7 @@ namespace ts.tscWatch {
     configFileName: string,
     system: WatchedSystem,
     optionsToExtend?: CompilerOptions,
-    watchOptionsToExtend?: WatchOptions
+    watchOptionsToExtend?: WatchOptions,
   ) {
     const compilerHost = createWatchCompilerHostOfConfigFile({
       configFileName,
@@ -68,7 +68,7 @@ namespace ts.tscWatch {
     rootFiles: string[],
     system: WatchedSystem,
     options: CompilerOptions = {},
-    watchOptions?: WatchOptions
+    watchOptions?: WatchOptions,
   ) {
     const compilerHost = createWatchCompilerHostOfFilesAndCompilerOptions({
       rootFiles,
@@ -111,7 +111,7 @@ namespace ts.tscWatch {
   export function checkOutputErrors(
     host: WatchedSystem,
     expected: readonly HostOutput[],
-    disableConsoleClears?: boolean | undefined
+    disableConsoleClears?: boolean | undefined,
   ) {
     let screenClears = 0;
     const outputs = host.getOutput();
@@ -132,12 +132,12 @@ namespace ts.tscWatch {
     assert.equal(
       host.screenClears.length,
       screenClears,
-      "Expected number of screen clears"
+      "Expected number of screen clears",
     );
     host.clearOutput();
 
     function isDiagnostic(
-      diagnostic: Diagnostic | string
+      diagnostic: Diagnostic | string,
     ): diagnostic is Diagnostic {
       return !!(diagnostic as Diagnostic).messageText;
     }
@@ -149,7 +149,7 @@ namespace ts.tscWatch {
       assert.equal(
         outputs[index],
         expected,
-        getOutputAtFailedMessage("Diagnostic", expected)
+        getOutputAtFailedMessage("Diagnostic", expected),
       );
       index++;
     }
@@ -163,7 +163,7 @@ namespace ts.tscWatch {
       assert.equal(
         getCleanLogString(actual),
         getCleanLogString(expected),
-        getOutputAtFailedMessage(caption || "Log", expected)
+        getOutputAtFailedMessage(caption || "Log", expected),
       );
       index++;
     }
@@ -173,85 +173,89 @@ namespace ts.tscWatch {
         assert.equal(
           outputs[index],
           diagnostic,
-          getOutputAtFailedMessage("Diagnostic", diagnostic)
+          getOutputAtFailedMessage("Diagnostic", diagnostic),
         );
       } else {
         const expected = getWatchDiagnosticWithoutDate(diagnostic);
         if (
-          !disableConsoleClears &&
-          contains(screenStartingMessageCodes, diagnostic.code)
+          !disableConsoleClears
+          && contains(screenStartingMessageCodes, diagnostic.code)
         ) {
           assert.equal(
             host.screenClears[screenClears],
             index,
-            `Expected screen clear at this diagnostic: ${expected}`
+            `Expected screen clear at this diagnostic: ${expected}`,
           );
           screenClears++;
         }
         assert.isTrue(
           endsWith(outputs[index], expected),
-          getOutputAtFailedMessage("Watch diagnostic", expected)
+          getOutputAtFailedMessage("Watch diagnostic", expected),
         );
       }
       index++;
     }
 
     function getOutputAtFailedMessage(caption: string, expectedOutput: string) {
-      return `Expected ${caption}: ${JSON.stringify(
-        expectedOutput
-      )} at ${index} in ${JSON.stringify(outputs)}`;
+      return `Expected ${caption}: ${
+        JSON.stringify(
+          expectedOutput,
+        )
+      } at ${index} in ${JSON.stringify(outputs)}`;
     }
 
     function getWatchDiagnosticWithoutDate(diagnostic: Diagnostic) {
       const newLines = contains(screenStartingMessageCodes, diagnostic.code)
         ? `${host.newLine}${host.newLine}`
         : host.newLine;
-      return ` - ${flattenDiagnosticMessageText(
-        diagnostic.messageText,
-        host.newLine
-      )}${newLines}`;
+      return ` - ${
+        flattenDiagnosticMessageText(
+          diagnostic.messageText,
+          host.newLine,
+        )
+      }${newLines}`;
     }
   }
 
   export function hostOutputLog(
     expected: string,
-    caption?: string
+    caption?: string,
   ): HostOutputLog {
     return { kind: HostOutputKind.Log, expected, caption };
   }
   export function hostOutputDiagnostic(
-    diagnostic: Diagnostic | string
+    diagnostic: Diagnostic | string,
   ): HostOutputDiagnostic {
     return { kind: HostOutputKind.Diagnostic, diagnostic };
   }
   export function hostOutputWatchDiagnostic(
-    diagnostic: Diagnostic | string
+    diagnostic: Diagnostic | string,
   ): HostOutputWatchDiagnostic {
     return { kind: HostOutputKind.WatchDiagnostic, diagnostic };
   }
 
   export function startingCompilationInWatchMode() {
     return hostOutputWatchDiagnostic(
-      createCompilerDiagnostic(Diagnostics.Starting_compilation_in_watch_mode)
+      createCompilerDiagnostic(Diagnostics.Starting_compilation_in_watch_mode),
     );
   }
   export function foundErrorsWatching(errors: readonly any[]) {
     return hostOutputWatchDiagnostic(
       errors.length === 1
         ? createCompilerDiagnostic(
-            Diagnostics.Found_1_error_Watching_for_file_changes
-          )
+          Diagnostics.Found_1_error_Watching_for_file_changes,
+        )
         : createCompilerDiagnostic(
-            Diagnostics.Found_0_errors_Watching_for_file_changes,
-            errors.length
-          )
+          Diagnostics.Found_0_errors_Watching_for_file_changes,
+          errors.length,
+        ),
     );
   }
   export function fileChangeDetected() {
     return hostOutputWatchDiagnostic(
       createCompilerDiagnostic(
-        Diagnostics.File_change_detected_Starting_incremental_compilation
-      )
+        Diagnostics.File_change_detected_Starting_incremental_compilation,
+      ),
     );
   }
 
@@ -259,19 +263,17 @@ namespace ts.tscWatch {
     host: WatchedSystem,
     errors: readonly Diagnostic[] | readonly string[],
     disableConsoleClears?: boolean,
-    logsBeforeErrors?: string[]
+    logsBeforeErrors?: string[],
   ) {
     checkOutputErrors(
       host,
       [
         startingCompilationInWatchMode(),
-        ...map(logsBeforeErrors || emptyArray, (expected) =>
-          hostOutputLog(expected, "logBeforeError")
-        ),
+        ...map(logsBeforeErrors || emptyArray, (expected) => hostOutputLog(expected, "logBeforeError")),
         ...map(errors, hostOutputDiagnostic),
         foundErrorsWatching(errors),
       ],
-      disableConsoleClears
+      disableConsoleClears,
     );
   }
 
@@ -280,22 +282,21 @@ namespace ts.tscWatch {
     errors: readonly Diagnostic[] | readonly string[],
     disableConsoleClears?: boolean,
     logsBeforeWatchDiagnostic?: string[],
-    logsBeforeErrors?: string[]
+    logsBeforeErrors?: string[],
   ) {
     checkOutputErrors(
       host,
       [
-        ...map(logsBeforeWatchDiagnostic || emptyArray, (expected) =>
-          hostOutputLog(expected, "logsBeforeWatchDiagnostic")
+        ...map(
+          logsBeforeWatchDiagnostic || emptyArray,
+          (expected) => hostOutputLog(expected, "logsBeforeWatchDiagnostic"),
         ),
         fileChangeDetected(),
-        ...map(logsBeforeErrors || emptyArray, (expected) =>
-          hostOutputLog(expected, "logBeforeError")
-        ),
+        ...map(logsBeforeErrors || emptyArray, (expected) => hostOutputLog(expected, "logBeforeError")),
         ...map(errors, hostOutputDiagnostic),
         foundErrorsWatching(errors),
       ],
-      disableConsoleClears
+      disableConsoleClears,
     );
   }
 
@@ -305,21 +306,20 @@ namespace ts.tscWatch {
     expectedExitCode: ExitStatus,
     disableConsoleClears?: boolean,
     logsBeforeWatchDiagnostic?: string[],
-    logsBeforeErrors?: string[]
+    logsBeforeErrors?: string[],
   ) {
     checkOutputErrors(
       host,
       [
-        ...map(logsBeforeWatchDiagnostic || emptyArray, (expected) =>
-          hostOutputLog(expected, "logsBeforeWatchDiagnostic")
+        ...map(
+          logsBeforeWatchDiagnostic || emptyArray,
+          (expected) => hostOutputLog(expected, "logsBeforeWatchDiagnostic"),
         ),
         fileChangeDetected(),
-        ...map(logsBeforeErrors || emptyArray, (expected) =>
-          hostOutputLog(expected, "logBeforeError")
-        ),
+        ...map(logsBeforeErrors || emptyArray, (expected) => hostOutputLog(expected, "logBeforeError")),
         ...map(errors, hostOutputDiagnostic),
       ],
-      disableConsoleClears
+      disableConsoleClears,
     );
     assert.equal(host.exitCode, expectedExitCode);
   }
@@ -328,16 +328,16 @@ namespace ts.tscWatch {
     host: WatchedSystem,
     errors: readonly Diagnostic[] | readonly string[],
     files: readonly ReportFileInError[],
-    reportErrorSummary?: boolean
+    reportErrorSummary?: boolean,
   ) {
     checkOutputErrors(host, [
       ...map(errors, hostOutputDiagnostic),
       ...(reportErrorSummary
         ? [
-            hostOutputWatchDiagnostic(
-              getErrorSummaryText(errors.length, files, host.newLine, host)
-            ),
-          ]
+          hostOutputWatchDiagnostic(
+            getErrorSummaryText(errors.length, files, host.newLine, host),
+          ),
+        ]
         : emptyArray),
     ]);
   }
@@ -345,7 +345,7 @@ namespace ts.tscWatch {
   export function getDiagnosticMessageChain(
     message: DiagnosticMessage,
     args?: (string | number)[],
-    next?: DiagnosticMessageChain[]
+    next?: DiagnosticMessageChain[],
   ): DiagnosticMessageChain {
     let text = getLocaleSpecificMessage(message);
     if (args?.length) {
@@ -360,7 +360,7 @@ namespace ts.tscWatch {
   }
 
   function isDiagnosticMessageChain(
-    message: DiagnosticMessage | DiagnosticMessageChain
+    message: DiagnosticMessage | DiagnosticMessageChain,
   ): message is DiagnosticMessageChain {
     return !!(message as DiagnosticMessageChain).messageText;
   }
@@ -394,7 +394,7 @@ namespace ts.tscWatch {
       /*start*/ undefined,
       /*length*/ undefined,
       message,
-      ...args
+      ...args,
     );
   }
 
@@ -418,19 +418,19 @@ namespace ts.tscWatch {
   ): Diagnostic {
     return getDiagnosticOfFileFrom(
       program.getSourceFileByPath(
-        toPath(filePath, program.getCurrentDirectory(), (s) => s.toLowerCase())
+        toPath(filePath, program.getCurrentDirectory(), (s) => s.toLowerCase()),
       ),
       start,
       length,
       message,
-      ...args
+      ...args,
     );
   }
 
   export function getUnknownCompilerOption(
     program: Program,
     configFile: File,
-    option: string
+    option: string,
   ) {
     const quotedOption = `"${option}"`;
     return getDiagnosticOfFile(
@@ -438,7 +438,7 @@ namespace ts.tscWatch {
       configFile.content.indexOf(quotedOption),
       quotedOption.length,
       Diagnostics.Unknown_compiler_option_0,
-      option
+      option,
     );
   }
 
@@ -446,7 +446,7 @@ namespace ts.tscWatch {
     program: Program,
     configFile: File,
     option: string,
-    didYouMean: string
+    didYouMean: string,
   ) {
     const quotedOption = `"${option}"`;
     return getDiagnosticOfFile(
@@ -455,14 +455,14 @@ namespace ts.tscWatch {
       quotedOption.length,
       Diagnostics.Unknown_compiler_option_0_Did_you_mean_1,
       option,
-      didYouMean
+      didYouMean,
     );
   }
 
   export function getDiagnosticModuleNotFoundOfFile(
     program: Program,
     file: File,
-    moduleName: string
+    moduleName: string,
   ) {
     const quotedModuleName = `"${moduleName}"`;
     return getDiagnosticOfFileFromProgram(
@@ -470,8 +470,9 @@ namespace ts.tscWatch {
       file.path,
       file.content.indexOf(quotedModuleName),
       quotedModuleName.length,
-      Diagnostics.Cannot_find_module_0_Did_you_mean_to_set_the_moduleResolution_option_to_node_or_to_add_aliases_to_the_paths_option,
-      moduleName
+      Diagnostics
+        .Cannot_find_module_0_Did_you_mean_to_set_the_moduleResolution_option_to_node_or_to_add_aliases_to_the_paths_option,
+      moduleName,
     );
   }
 
@@ -484,7 +485,7 @@ namespace ts.tscWatch {
   }
 
   export function checkSingleTimeoutQueueLengthAndRunAndVerifyNoTimeout(
-    sys: WatchedSystem
+    sys: WatchedSystem,
   ) {
     sys.checkTimeoutQueueLengthAndRun(1);
     sys.checkTimeoutQueueLength(0);
@@ -496,7 +497,7 @@ namespace ts.tscWatch {
     timeouts: (
       sys: TestFSWithWatch.TestServerHostTrackingWrittenFiles,
       programs: readonly CommandLineProgram[],
-      watchOrSolution: ReturnType<typeof executeCommandLine>
+      watchOrSolution: ReturnType<typeof executeCommandLine>,
     ) => void;
   }
   export interface TscWatchCheckOptions {
@@ -532,8 +533,9 @@ namespace ts.tscWatch {
         baselineDependencies,
       } = input;
 
-      if (!isWatch(commandLineArgs))
+      if (!isWatch(commandLineArgs)) {
         sys.exit = (exitCode) => (sys.exitCode = exitCode);
+      }
       const { cb, getPrograms } = commandLineCallbacks(sys);
       const watchOrSolution = executeCommandLine(sys, cb, commandLineArgs);
       runWatchBaseline({
@@ -560,7 +562,7 @@ namespace ts.tscWatch {
 
   export function createBaseline(system: WatchedSystem): Baseline {
     const sys = TestFSWithWatch.changeToHostTrackingWrittenFiles(
-      fakes.patchHostForBuildInfoReadWrite(system)
+      fakes.patchHostForBuildInfoReadWrite(system),
     );
     const baseline: string[] = [];
     baseline.push("Input::");
@@ -572,7 +574,7 @@ namespace ts.tscWatch {
     sys: Baseline["sys"],
     baseline: Baseline["baseline"],
     change: TscWatchCompileChange["change"],
-    caption?: TscWatchCompileChange["caption"]
+    caption?: TscWatchCompileChange["caption"],
   ) {
     const oldSnap = sys.snap();
     baseline.push(`Change::${caption ? " " + caption : ""}`, "");
@@ -634,7 +636,7 @@ namespace ts.tscWatch {
           ? "tscWatch"
           : "tsc"
       }/${scenario}/${subScenario.split(" ").join("-")}.js`,
-      baseline.join("\r\n")
+      baseline.join("\r\n"),
     );
   }
 
@@ -667,12 +669,12 @@ namespace ts.tscWatch {
       baseline,
       getPrograms,
       oldPrograms,
-      baselineDependencies
+      baselineDependencies,
     );
     sys.serializeWatches(baseline);
     baseline.push(
       `exitCode:: ExitStatus.${ExitStatus[sys.exitCode as ExitStatus]}`,
-      ""
+      "",
     );
     sys.diff(baseline, oldSnap);
     sys.writtenFiles.forEach((value, key) => {
@@ -686,7 +688,7 @@ namespace ts.tscWatch {
     baseline: string[],
     getPrograms: () => readonly CommandLineProgram[],
     oldPrograms: readonly (CommandLineProgram | undefined)[],
-    baselineDependencies: boolean | undefined
+    baselineDependencies: boolean | undefined,
   ) {
     const programs = getPrograms();
     for (let i = 0; i < programs.length; i++) {
@@ -694,7 +696,7 @@ namespace ts.tscWatch {
         baseline,
         programs[i],
         oldPrograms[i],
-        baselineDependencies
+        baselineDependencies,
       );
     }
     return programs;
@@ -704,18 +706,16 @@ namespace ts.tscWatch {
     baseline: string[],
     [program, builderProgram]: CommandLineProgram,
     oldProgram: CommandLineProgram | undefined,
-    baselineDependencies: boolean | undefined
+    baselineDependencies: boolean | undefined,
   ) {
     if (program !== oldProgram?.[0]) {
       const options = program.getCompilerOptions();
       baseline.push(
-        `Program root files: ${JSON.stringify(program.getRootFileNames())}`
+        `Program root files: ${JSON.stringify(program.getRootFileNames())}`,
       );
       baseline.push(`Program options: ${JSON.stringify(options)}`);
       baseline.push(
-        `Program structureReused: ${
-          (ts as any).StructureIsReused[program.structureIsReused]
-        }`
+        `Program structureReused: ${(ts as any).StructureIsReused[program.structureIsReused]}`,
       );
       baseline.push("Program files::");
       for (const file of program.getSourceFiles()) {
@@ -734,8 +734,8 @@ namespace ts.tscWatch {
         baseline.push("Semantic diagnostics in builder refreshed for::");
         for (const file of program.getSourceFiles()) {
           if (
-            !state.semanticDiagnosticsFromOldState ||
-            !state.semanticDiagnosticsFromOldState.has(file.resolvedPath)
+            !state.semanticDiagnosticsFromOldState
+            || !state.semanticDiagnosticsFromOldState.has(file.resolvedPath)
           ) {
             baseline.push(file.fileName);
           }
@@ -798,7 +798,7 @@ namespace ts.tscWatch {
     sys: WatchedSystem,
     file: string,
     searchValue: string | RegExp,
-    replaceValue: string
+    replaceValue: string,
   ) {
     const content = Debug.checkDefined(sys.readFile(file));
     sys.writeFile(file, content.replace(searchValue, replaceValue));
@@ -807,7 +807,7 @@ namespace ts.tscWatch {
   export function createSolutionBuilder(
     system: WatchedSystem,
     rootNames: readonly string[],
-    defaultOptions?: BuildOptions
+    defaultOptions?: BuildOptions,
   ) {
     const host = createSolutionBuilderHost(system);
     return ts.createSolutionBuilder(host, rootNames, defaultOptions || {});
@@ -815,7 +815,7 @@ namespace ts.tscWatch {
 
   export function ensureErrorFreeBuild(
     host: WatchedSystem,
-    rootNames: readonly string[]
+    rootNames: readonly string[],
   ) {
     // ts build should succeed
     const solutionBuilder = createSolutionBuilder(host, rootNames, {});
@@ -823,14 +823,14 @@ namespace ts.tscWatch {
     assert.equal(
       host.getOutput().length,
       0,
-      JSON.stringify(host.getOutput(), /*replacer*/ undefined, " ")
+      JSON.stringify(host.getOutput(), /*replacer*/ undefined, " "),
     );
   }
 
   export function createSystemWithSolutionBuild(
     solutionRoots: readonly string[],
     files: readonly TestFSWithWatch.FileOrFolderOrSymLink[],
-    params?: TestFSWithWatch.TestServerHostCreationParameters
+    params?: TestFSWithWatch.TestServerHostCreationParameters,
   ) {
     const sys = createWatchedSystem(files, params);
     const originalReadFile = sys.readFile;
@@ -838,10 +838,10 @@ namespace ts.tscWatch {
     const originalWriteFile = sys.writeFile;
     const solutionBuilder = createSolutionBuilder(
       TestFSWithWatch.changeToHostTrackingWrittenFiles(
-        fakes.patchHostForBuildInfoReadWrite(sys)
+        fakes.patchHostForBuildInfoReadWrite(sys),
       ),
       solutionRoots,
-      {}
+      {},
     );
     solutionBuilder.build();
     sys.readFile = originalReadFile;

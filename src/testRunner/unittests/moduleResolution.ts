@@ -1,14 +1,14 @@
 namespace ts {
   export function checkResolvedModule(
     actual: ResolvedModuleFull | undefined,
-    expected: ResolvedModuleFull | undefined
+    expected: ResolvedModuleFull | undefined,
   ): boolean {
     if (!expected) {
       if (actual) {
         assert.fail(
           actual,
           expected,
-          "expected resolved module to be undefined"
+          "expected resolved module to be undefined",
         );
         return false;
       }
@@ -20,15 +20,15 @@ namespace ts {
 
     assert.isTrue(
       actual.resolvedFileName === expected.resolvedFileName,
-      `'resolvedFileName': expected '${actual.resolvedFileName}' to be equal to '${expected.resolvedFileName}'`
+      `'resolvedFileName': expected '${actual.resolvedFileName}' to be equal to '${expected.resolvedFileName}'`,
     );
     assert.isTrue(
       actual.extension === expected.extension,
-      `'ext': expected '${actual.extension}' to be equal to '${expected.extension}'`
+      `'ext': expected '${actual.extension}' to be equal to '${expected.extension}'`,
     );
     assert.isTrue(
       actual.isExternalLibraryImport === expected.isExternalLibraryImport,
-      `'isExternalLibraryImport': expected '${actual.isExternalLibraryImport}' to be equal to '${expected.isExternalLibraryImport}'`
+      `'isExternalLibraryImport': expected '${actual.isExternalLibraryImport}' to be equal to '${expected.isExternalLibraryImport}'`,
     );
     return true;
   }
@@ -36,23 +36,23 @@ namespace ts {
   export function checkResolvedModuleWithFailedLookupLocations(
     actual: ResolvedModuleWithFailedLookupLocations,
     expectedResolvedModule: ResolvedModuleFull,
-    expectedFailedLookupLocations: string[]
+    expectedFailedLookupLocations: string[],
   ): void {
     assert.isTrue(
       actual.resolvedModule !== undefined,
-      "module should be resolved"
+      "module should be resolved",
     );
     checkResolvedModule(actual.resolvedModule, expectedResolvedModule);
     assert.deepEqual(
       actual.failedLookupLocations,
       expectedFailedLookupLocations,
-      `Failed lookup locations should match - expected has ${expectedFailedLookupLocations.length}, actual has ${actual.failedLookupLocations.length}`
+      `Failed lookup locations should match - expected has ${expectedFailedLookupLocations.length}, actual has ${actual.failedLookupLocations.length}`,
     );
   }
 
   export function createResolvedModule(
     resolvedFileName: string,
-    isExternalLibraryImport = false
+    isExternalLibraryImport = false,
   ): ResolvedModuleFull {
     return {
       resolvedFileName,
@@ -101,7 +101,7 @@ namespace ts {
         fileExists: (path) => {
           assert.isTrue(
             directories.has(getDirectoryPath(path)),
-            `'fileExists' '${path}' request in non-existing directory`
+            `'fileExists' '${path}' request in non-existing directory`,
           );
           return map.has(path);
         },
@@ -136,12 +136,12 @@ namespace ts {
     ];
     const autoExtensions = filter(
       supportedTSExtensionsFlat,
-      (e) => nonImplicitExtensions.indexOf(e) === -1
+      (e) => nonImplicitExtensions.indexOf(e) === -1,
     );
     function testLoadAsFile(
       containingFileName: string,
       moduleFileNameNoExt: string,
-      moduleName: string
+      moduleName: string,
     ): void {
       for (const ext of autoExtensions) {
         test(ext, /*hasDirectoryExists*/ false);
@@ -158,12 +158,12 @@ namespace ts {
           createModuleResolutionHost(
             hasDirectoryExists,
             containingFile,
-            moduleFile
-          )
+            moduleFile,
+          ),
         );
         checkResolvedModule(
           resolution.resolvedModule,
-          createResolvedModule(moduleFile.name)
+          createResolvedModule(moduleFile.name),
         );
 
         const failedLookupLocations: string[] = [];
@@ -176,15 +176,15 @@ namespace ts {
               normalizePath(
                 getRootLength(moduleName) === 0
                   ? combinePaths(dir, moduleName)
-                  : moduleName
-              ) + e
+                  : moduleName,
+              ) + e,
             );
           }
         }
 
         assert.deepEqual(
           resolution.failedLookupLocations,
-          failedLookupLocations
+          failedLookupLocations,
         );
       }
     }
@@ -210,7 +210,7 @@ namespace ts {
       packageJsonFileName: string,
       fieldRef: string,
       moduleFileName: string,
-      moduleName: string
+      moduleName: string,
     ): void {
       test(/*hasDirectoryExists*/ false);
       test(/*hasDirectoryExists*/ true);
@@ -230,17 +230,17 @@ namespace ts {
             hasDirectoryExists,
             containingFile,
             packageJson,
-            moduleFile
-          )
+            moduleFile,
+          ),
         );
         checkResolvedModule(
           resolution.resolvedModule,
-          createResolvedModule(moduleFile.name)
+          createResolvedModule(moduleFile.name),
         );
         // expect three failed lookup location - attempt to load module as file with all supported extensions
         assert.equal(
           resolution.failedLookupLocations.length,
-          supportedTSExtensions[0].length
+          supportedTSExtensions[0].length,
         );
       }
     }
@@ -251,28 +251,28 @@ namespace ts {
         "/a/b/c/bar/package.json",
         "c/d/e.d.ts",
         "/a/b/c/bar/c/d/e.d.ts",
-        "./bar"
+        "./bar",
       );
       testLoadingFromPackageJson(
         "/a/b/c/d.ts",
         "/a/bar/package.json",
         "e.d.ts",
         "/a/bar/e.d.ts",
-        "../../bar"
+        "../../bar",
       );
       testLoadingFromPackageJson(
         "/a/b/c/d.ts",
         "/bar/package.json",
         "e.d.ts",
         "/bar/e.d.ts",
-        "/bar"
+        "/bar",
       );
       testLoadingFromPackageJson(
         "c:/a/b/c/d.ts",
         "c:/bar/package.json",
         "e.d.ts",
         "c:/bar/e.d.ts",
-        "c:/bar"
+        "c:/bar",
       );
     });
 
@@ -300,13 +300,13 @@ namespace ts {
             containingFile,
             packageJson,
             moduleFile,
-            indexFile
-          )
+            indexFile,
+          ),
         );
 
         checkResolvedModule(
           resolution.resolvedModule,
-          createResolvedModule(indexPath, /*isExternalLibraryImport*/ true)
+          createResolvedModule(indexPath, /*isExternalLibraryImport*/ true),
         );
       }
     }
@@ -337,8 +337,8 @@ namespace ts {
             hasDirectoryExists,
             containingFile,
             packageJson,
-            indexFile
-          )
+            indexFile,
+          ),
         );
         checkResolvedModuleWithFailedLookupLocations(
           resolution,
@@ -356,7 +356,7 @@ namespace ts {
             "/c/d/index.d.ts",
             "/a/b/foo/index.ts",
             "/a/b/foo/index.tsx",
-          ]
+          ],
         );
       }
     });
@@ -367,7 +367,7 @@ namespace ts {
       const resolutionCache = createModuleResolutionCache("/", (f) => f);
       let cache = resolutionCache.getOrCreateCacheForModuleName(
         "a",
-        /*mode*/ undefined
+        /*mode*/ undefined,
       );
       cache.set("/sub", {
         resolvedModule: {
@@ -383,7 +383,7 @@ namespace ts {
 
       cache = resolutionCache.getOrCreateCacheForModuleName(
         "b",
-        /*mode*/ undefined
+        /*mode*/ undefined,
       );
       cache.set("/sub/dir/foo", {
         resolvedModule: {
@@ -401,7 +401,7 @@ namespace ts {
 
       cache = resolutionCache.getOrCreateCacheForModuleName(
         "c",
-        /*mode*/ undefined
+        /*mode*/ undefined,
       );
       cache.set("/foo/bar", {
         resolvedModule: {
@@ -418,7 +418,7 @@ namespace ts {
 
       cache = resolutionCache.getOrCreateCacheForModuleName(
         "d",
-        /*mode*/ undefined
+        /*mode*/ undefined,
       );
       cache.set("/foo", {
         resolvedModule: {
@@ -434,7 +434,7 @@ namespace ts {
 
       cache = resolutionCache.getOrCreateCacheForModuleName(
         "e",
-        /*mode*/ undefined
+        /*mode*/ undefined,
       );
       cache.set("c:/foo", {
         resolvedModule: {
@@ -451,7 +451,7 @@ namespace ts {
 
       cache = resolutionCache.getOrCreateCacheForModuleName(
         "f",
-        /*mode*/ undefined
+        /*mode*/ undefined,
       );
       cache.set("/foo/bar/baz", {
         resolvedModule: undefined,
@@ -477,14 +477,14 @@ namespace ts {
           createModuleResolutionHost(
             hasDirectoryExists,
             containingFile,
-            moduleFile
-          )
+            moduleFile,
+          ),
         );
         checkResolvedModuleWithFailedLookupLocations(
           resolution,
           createResolvedModule(
             moduleFile.name,
-            /*isExternalLibraryImport*/ true
+            /*isExternalLibraryImport*/ true,
           ),
           [
             "/a/b/c/d/node_modules/foo/package.json",
@@ -515,7 +515,7 @@ namespace ts {
 
             "/a/b/c/node_modules/@types/foo/index.d.ts",
             "/a/b/node_modules/foo/package.json",
-          ]
+          ],
         );
       }
     });
@@ -534,15 +534,15 @@ namespace ts {
           createModuleResolutionHost(
             hasDirectoryExists,
             containingFile,
-            moduleFile
-          )
+            moduleFile,
+          ),
         );
         checkResolvedModule(
           resolution.resolvedModule,
           createResolvedModule(
             moduleFile.name,
-            /*isExternalLibraryImport*/ true
-          )
+            /*isExternalLibraryImport*/ true,
+          ),
         );
       }
     });
@@ -563,14 +563,14 @@ namespace ts {
           createModuleResolutionHost(
             hasDirectoryExists,
             containingFile,
-            moduleFile
-          )
+            moduleFile,
+          ),
         );
         checkResolvedModuleWithFailedLookupLocations(
           resolution,
           createResolvedModule(
             moduleFile.name,
-            /*isExternalLibraryImport*/ true
+            /*isExternalLibraryImport*/ true,
           ),
           [
             "/a/node_modules/b/c/node_modules/d/node_modules/foo/package.json",
@@ -622,7 +622,7 @@ namespace ts {
 
             "/a/node_modules/foo/index.ts",
             "/a/node_modules/foo/index.tsx",
-          ]
+          ],
         );
       }
     });
@@ -638,14 +638,14 @@ namespace ts {
           { name: realFileName, symlinks: [symlinkFileName] },
           {
             name: "/app/node_modules/linked/package.json",
-            content: '{"version": "0.0.0", "main": "./index"}',
-          }
+            content: "{\"version\": \"0.0.0\", \"main\": \"./index\"}",
+          },
         );
         const resolution = nodeModuleNameResolver(
           "linked",
           "/app/app.ts",
           { preserveSymlinks },
-          host
+          host,
         );
         const resolvedFileName = preserveSymlinks
           ? symlinkFileName
@@ -654,8 +654,8 @@ namespace ts {
           resolution.resolvedModule,
           createResolvedModule(
             resolvedFileName,
-            /*isExternalLibraryImport*/ true
-          )
+            /*isExternalLibraryImport*/ true,
+          ),
         );
       });
     }
@@ -669,8 +669,8 @@ namespace ts {
         },
         {
           name: "/sub/node_modules/a/package.json",
-          content: '{"version": "0.0.0", "main": "./index"}',
-        }
+          content: "{\"version\": \"0.0.0\", \"main\": \"./index\"}",
+        },
       );
       const compilerOptions: CompilerOptions = {
         moduleResolution: ModuleResolutionKind.NodeJs,
@@ -681,11 +681,11 @@ namespace ts {
         "/sub/dir/foo.ts",
         compilerOptions,
         host,
-        cache
+        cache,
       );
       checkResolvedModule(
         resolution.resolvedModule,
-        createResolvedModule("/modules/a.ts", /*isExternalLibraryImport*/ true)
+        createResolvedModule("/modules/a.ts", /*isExternalLibraryImport*/ true),
       );
 
       resolution = resolveModuleName(
@@ -693,11 +693,11 @@ namespace ts {
         "/sub/foo.ts",
         compilerOptions,
         host,
-        cache
+        cache,
       );
       checkResolvedModule(
         resolution.resolvedModule,
-        createResolvedModule("/modules/a.ts", /*isExternalLibraryImport*/ true)
+        createResolvedModule("/modules/a.ts", /*isExternalLibraryImport*/ true),
       );
 
       resolution = resolveModuleName(
@@ -705,11 +705,11 @@ namespace ts {
         "/foo.ts",
         compilerOptions,
         host,
-        cache
+        cache,
       );
       assert.isUndefined(
         resolution.resolvedModule,
-        "lookup in parent directory doesn't hit the cache"
+        "lookup in parent directory doesn't hit the cache",
       );
     });
 
@@ -722,8 +722,8 @@ namespace ts {
         },
         {
           name: "/app/node_modules/linked/package.json",
-          content: '{"version": "0.0.0", "main": "./index"}',
-        }
+          content: "{\"version\": \"0.0.0\", \"main\": \"./index\"}",
+        },
       );
       const cache = createModuleResolutionCache("/", (f) => f);
       const compilerOptions: CompilerOptions = {
@@ -735,8 +735,8 @@ namespace ts {
           "/app/src/app.ts",
           compilerOptions,
           host,
-          cache
-        )
+          cache,
+        ),
       );
       checkResolution(
         resolveModuleName(
@@ -744,23 +744,23 @@ namespace ts {
           "/app/lib/main.ts",
           compilerOptions,
           host,
-          cache
-        )
+          cache,
+        ),
       );
 
       function checkResolution(
-        resolution: ResolvedModuleWithFailedLookupLocations
+        resolution: ResolvedModuleWithFailedLookupLocations,
       ) {
         checkResolvedModule(
           resolution.resolvedModule,
           createResolvedModule(
             "/linked/index.d.ts",
-            /*isExternalLibraryImport*/ true
-          )
+            /*isExternalLibraryImport*/ true,
+          ),
         );
         assert.strictEqual(
           resolution.resolvedModule!.originalPath,
-          "/app/node_modules/linked/index.d.ts"
+          "/app/node_modules/linked/index.d.ts",
         );
       }
     });
@@ -772,7 +772,7 @@ namespace ts {
       currentDirectory: string,
       rootFiles: string[],
       expectedFilesCount: number,
-      relativeNamesToCheck: string[]
+      relativeNamesToCheck: string[],
     ) {
       const options: CompilerOptions = { module: ModuleKind.CommonJS };
       const host: CompilerHost = {
@@ -804,24 +804,28 @@ namespace ts {
       assert.equal(
         syntacticDiagnostics.length,
         0,
-        `expect no syntactic diagnostics, got: ${JSON.stringify(
-          Harness.Compiler.minimalDiagnosticsToString(syntacticDiagnostics)
-        )}`
+        `expect no syntactic diagnostics, got: ${
+          JSON.stringify(
+            Harness.Compiler.minimalDiagnosticsToString(syntacticDiagnostics),
+          )
+        }`,
       );
       const semanticDiagnostics = program.getSemanticDiagnostics();
       assert.equal(
         semanticDiagnostics.length,
         0,
-        `expect no semantic diagnostics, got: ${JSON.stringify(
-          Harness.Compiler.minimalDiagnosticsToString(semanticDiagnostics)
-        )}`
+        `expect no semantic diagnostics, got: ${
+          JSON.stringify(
+            Harness.Compiler.minimalDiagnosticsToString(semanticDiagnostics),
+          )
+        }`,
       );
 
       // try to get file using a relative name
       for (const relativeFileName of relativeNamesToCheck) {
         assert.isTrue(
           program.getSourceFile(relativeFileName) !== undefined,
-          `expected to get file by relative name, got undefined`
+          `expected to get file by relative name, got undefined`,
         );
       }
     }
@@ -842,7 +846,7 @@ import Shared = require('../first/shared');
 class C {}
 export = C;
                 `,
-        })
+        }),
       );
       test(files, "/a/b/c/first/second", ["class_a.ts"], 3, [
         "../../../c/third/class_c.ts",
@@ -854,7 +858,7 @@ export = C;
         getEntries({
           "/parent/node_modules/mod/index.d.ts": "export var x",
           "/parent/app/myapp.ts": `import {x} from "mod"`,
-        })
+        }),
       );
       test(files, "/parent/app", ["myapp.ts"], 2, []);
     });
@@ -864,7 +868,7 @@ export = C;
         getEntries({
           "/a/b/c.ts": `/// <reference path="b.ts"/>`,
           "/a/b/b.ts": "var x",
-        })
+        }),
       );
       test(files, "/a/b", ["c.ts", "/a/b/b.ts"], 2, []);
     });
@@ -878,10 +882,10 @@ export = C;
       currentDirectory: string,
       useCaseSensitiveFileNames: boolean,
       rootFiles: string[],
-      expectedDiagnostics: (program: Program) => readonly Diagnostic[]
+      expectedDiagnostics: (program: Program) => readonly Diagnostic[],
     ): void {
       const getCanonicalFileName = createGetCanonicalFileName(
-        useCaseSensitiveFileNames
+        useCaseSensitiveFileNames,
       );
       if (!useCaseSensitiveFileNames) {
         const oldFiles = files;
@@ -900,7 +904,7 @@ export = C;
             return library;
           }
           const path = getCanonicalFileName(
-            normalizePath(combinePaths(currentDirectory, fileName))
+            normalizePath(combinePaths(currentDirectory, fileName)),
           );
           const file = files.get(path);
           return file
@@ -916,7 +920,7 @@ export = C;
         useCaseSensitiveFileNames: () => useCaseSensitiveFileNames,
         fileExists: (fileName) => {
           const path = getCanonicalFileName(
-            normalizePath(combinePaths(currentDirectory, fileName))
+            normalizePath(combinePaths(currentDirectory, fileName)),
           );
           return files.has(path);
         },
@@ -929,7 +933,7 @@ export = C;
       ]);
       assert.deepEqual(
         diagnostics,
-        sortAndDeduplicateDiagnostics(expectedDiagnostics(program))
+        sortAndDeduplicateDiagnostics(expectedDiagnostics(program)),
       );
     }
 
@@ -938,7 +942,7 @@ export = C;
         getEntries({
           "/a/b/c.ts": `/// <reference path="d.ts"/>`,
           "/a/b/d.ts": "var x",
-        })
+        }),
       );
       test(
         files,
@@ -946,7 +950,7 @@ export = C;
         "/a/b",
         /*useCaseSensitiveFileNames*/ false,
         ["c.ts", "/a/b/d.ts"],
-        () => emptyArray
+        () => emptyArray,
       );
     });
 
@@ -955,7 +959,7 @@ export = C;
         getEntries({
           "/a/b/c.ts": `/// <reference path="D.ts"/>`,
           "/a/b/d.ts": "var x",
-        })
+        }),
       );
       test(
         files,
@@ -980,19 +984,19 @@ export = C;
                     [
                       tscWatch.getDiagnosticMessageChain(
                         Diagnostics.Referenced_via_0_from_file_1,
-                        ["D.ts", "c.ts"]
+                        ["D.ts", "c.ts"],
                       ),
                       tscWatch.getDiagnosticMessageChain(
-                        Diagnostics.Root_file_specified_for_compilation
+                        Diagnostics.Root_file_specified_for_compilation,
                       ),
-                    ]
+                    ],
                   ),
-                ]
-              )
+                ],
+              ),
             ),
             relatedInformation: undefined,
           },
-        ]
+        ],
       );
     });
 
@@ -1001,7 +1005,7 @@ export = C;
         getEntries({
           "/a/b/c.ts": `import {x} from "D"`,
           "/a/b/d.ts": "export var x",
-        })
+        }),
       );
       test(
         files,
@@ -1026,19 +1030,19 @@ export = C;
                     [
                       tscWatch.getDiagnosticMessageChain(
                         Diagnostics.Imported_via_0_from_file_1,
-                        [`"D"`, "c.ts"]
+                        [`"D"`, "c.ts"],
                       ),
                       tscWatch.getDiagnosticMessageChain(
-                        Diagnostics.Root_file_specified_for_compilation
+                        Diagnostics.Root_file_specified_for_compilation,
                       ),
-                    ]
+                    ],
                   ),
-                ]
-              )
+                ],
+              ),
             ),
             relatedInformation: undefined,
           },
-        ]
+        ],
       );
     });
 
@@ -1047,7 +1051,7 @@ export = C;
         getEntries({
           "moduleA.ts": `import {x} from "./ModuleB"`,
           "moduleB.ts": "export var x",
-        })
+        }),
       );
       test(
         files,
@@ -1072,19 +1076,19 @@ export = C;
                     [
                       tscWatch.getDiagnosticMessageChain(
                         Diagnostics.Imported_via_0_from_file_1,
-                        [`"./ModuleB"`, "moduleA.ts"]
+                        [`"./ModuleB"`, "moduleA.ts"],
                       ),
                       tscWatch.getDiagnosticMessageChain(
-                        Diagnostics.Root_file_specified_for_compilation
+                        Diagnostics.Root_file_specified_for_compilation,
                       ),
-                    ]
+                    ],
                   ),
-                ]
-              )
+                ],
+              ),
             ),
             relatedInformation: undefined,
           },
-        ]
+        ],
       );
     });
 
@@ -1094,7 +1098,7 @@ export = C;
           "/a/b/c.ts": `import {x} from "D"`,
           "/a/b/D.ts": "export var x",
           "/a/b/d.ts": "export var y",
-        })
+        }),
       );
       test(
         files,
@@ -1119,19 +1123,19 @@ export = C;
                     [
                       tscWatch.getDiagnosticMessageChain(
                         Diagnostics.Imported_via_0_from_file_1,
-                        [`"D"`, "c.ts"]
+                        [`"D"`, "c.ts"],
                       ),
                       tscWatch.getDiagnosticMessageChain(
-                        Diagnostics.Root_file_specified_for_compilation
+                        Diagnostics.Root_file_specified_for_compilation,
                       ),
-                    ]
+                    ],
                   ),
-                ]
-              )
+                ],
+              ),
             ),
             relatedInformation: undefined,
           },
-        ]
+        ],
       );
     });
 
@@ -1141,7 +1145,7 @@ export = C;
           "moduleA.ts": `import a = require("./ModuleC")`,
           "moduleB.ts": `import a = require("./moduleC")`,
           "moduleC.ts": "export var x",
-        })
+        }),
       );
       test(
         files,
@@ -1156,7 +1160,7 @@ export = C;
               "moduleA.ts",
               `import a = require("./ModuleC")`.indexOf(`"./ModuleC"`),
               `"./ModuleC"`.length,
-              Diagnostics.File_is_included_via_import_here
+              Diagnostics.File_is_included_via_import_here,
             ),
             reportsUnnecessary: undefined,
             reportsDeprecated: undefined,
@@ -1167,18 +1171,18 @@ export = C;
               "moduleB.ts",
               `import a = require("./moduleC")`.indexOf(`"./moduleC"`),
               `"./moduleC"`.length,
-              Diagnostics.File_is_included_via_import_here
+              Diagnostics.File_is_included_via_import_here,
             ),
             reportsUnnecessary: undefined,
             reportsDeprecated: undefined,
           };
           const importHereInA = tscWatch.getDiagnosticMessageChain(
             Diagnostics.Imported_via_0_from_file_1,
-            [`"./ModuleC"`, "moduleA.ts"]
+            [`"./ModuleC"`, "moduleA.ts"],
           );
           const importHereInB = tscWatch.getDiagnosticMessageChain(
             Diagnostics.Imported_via_0_from_file_1,
-            [`"./moduleC"`, "moduleB.ts"]
+            [`"./moduleC"`, "moduleB.ts"],
           );
           const details = [
             tscWatch.getDiagnosticMessageChain(
@@ -1188,9 +1192,9 @@ export = C;
                 importHereInA,
                 importHereInB,
                 tscWatch.getDiagnosticMessageChain(
-                  Diagnostics.Root_file_specified_for_compilation
+                  Diagnostics.Root_file_specified_for_compilation,
                 ),
-              ]
+              ],
             ),
           ];
           return [
@@ -1202,8 +1206,8 @@ export = C;
                 tscWatch.getDiagnosticMessageChain(
                   Diagnostics.Already_included_file_name_0_differs_from_file_name_1_only_in_casing,
                   ["ModuleC.ts", "moduleC.ts"],
-                  details
-                )
+                  details,
+                ),
               ),
               relatedInformation: [importInB],
             },
@@ -1215,13 +1219,13 @@ export = C;
                 tscWatch.getDiagnosticMessageChain(
                   Diagnostics.File_name_0_differs_from_already_included_file_name_1_only_in_casing,
                   ["moduleC.ts", "ModuleC.ts"],
-                  details
-                )
+                  details,
+                ),
               ),
               relatedInformation: [importInA],
             },
           ];
-        }
+        },
       );
     });
 
@@ -1235,7 +1239,7 @@ export = C;
 import a = require("./moduleA");
 import b = require("./moduleB");
                 `,
-        })
+        }),
       );
       test(
         files,
@@ -1260,16 +1264,16 @@ import b = require("./moduleB");
                     [
                       tscWatch.getDiagnosticMessageChain(
                         Diagnostics.Imported_via_0_from_file_1,
-                        [`"./ModuleC"`, "/a/B/c/moduleA.ts"]
+                        [`"./ModuleC"`, "/a/B/c/moduleA.ts"],
                       ),
                       tscWatch.getDiagnosticMessageChain(
                         Diagnostics.Imported_via_0_from_file_1,
-                        [`"./moduleC"`, "/a/B/c/moduleB.ts"]
+                        [`"./moduleC"`, "/a/B/c/moduleB.ts"],
                       ),
-                    ]
+                    ],
                   ),
-                ]
-              )
+                ],
+              ),
             ),
             relatedInformation: [
               {
@@ -1278,14 +1282,14 @@ import b = require("./moduleB");
                   "moduleA.ts",
                   `import a = require("./ModuleC")`.indexOf(`"./ModuleC"`),
                   `"./ModuleC"`.length,
-                  Diagnostics.File_is_included_via_import_here
+                  Diagnostics.File_is_included_via_import_here,
                 ),
                 reportsUnnecessary: undefined,
                 reportsDeprecated: undefined,
               },
             ],
           },
-        ]
+        ],
       );
     });
     it("should not fail when module names in 'require' calls has consistent casing and current directory has uppercase chars", () => {
@@ -1298,7 +1302,7 @@ import b = require("./moduleB");
 import a = require("./moduleA");
 import b = require("./moduleB");
                 `,
-        })
+        }),
       );
       test(
         files,
@@ -1306,7 +1310,7 @@ import b = require("./moduleB");
         "/a/B/c",
         /*useCaseSensitiveFileNames*/ false,
         ["moduleD.ts"],
-        () => emptyArray
+        () => emptyArray,
       );
     });
 
@@ -1316,7 +1320,7 @@ import b = require("./moduleB");
           "d:/someFolder/moduleA.ts": `import a = require("D:/someFolder/moduleC")`,
           "d:/someFolder/moduleB.ts": `import a = require("./moduleC")`,
           "D:/someFolder/moduleC.ts": "export const x = 10",
-        })
+        }),
       );
       test(
         files,
@@ -1324,7 +1328,7 @@ import b = require("./moduleB");
         "d:/someFolder",
         /*useCaseSensitiveFileNames*/ false,
         ["d:/someFolder/moduleA.ts", "d:/someFolder/moduleB.ts"],
-        () => emptyArray
+        () => emptyArray,
       );
     });
   });
@@ -1342,12 +1346,14 @@ import b = require("./moduleB");
           hasDirectoryExists,
           file1,
           file2,
-          file3
+          file3,
         );
-        for (const moduleResolution of [
-          ModuleResolutionKind.NodeJs,
-          ModuleResolutionKind.Classic,
-        ]) {
+        for (
+          const moduleResolution of [
+            ModuleResolutionKind.NodeJs,
+            ModuleResolutionKind.Classic,
+          ]
+        ) {
           const options: CompilerOptions = {
             moduleResolution,
             baseUrl: "/root",
@@ -1357,12 +1363,12 @@ import b = require("./moduleB");
               "folder2/file2",
               file1.name,
               options,
-              host
+              host,
             );
             checkResolvedModuleWithFailedLookupLocations(
               result,
               createResolvedModule(file2.name),
-              []
+              [],
             );
           }
           {
@@ -1370,12 +1376,12 @@ import b = require("./moduleB");
               "./file3",
               file2.name,
               options,
-              host
+              host,
             );
             checkResolvedModuleWithFailedLookupLocations(
               result,
               createResolvedModule(file3.name),
-              []
+              [],
             );
           }
           {
@@ -1383,12 +1389,12 @@ import b = require("./moduleB");
               "/root/folder1/file1",
               file2.name,
               options,
-              host
+              host,
             );
             checkResolvedModuleWithFailedLookupLocations(
               result,
               createResolvedModule(file1.name),
-              []
+              [],
             );
           }
         }
@@ -1422,7 +1428,7 @@ import b = require("./moduleB");
           m2,
           m3,
           m3Typings,
-          m4
+          m4,
         );
 
         check("m1", main, m1);
@@ -1434,12 +1440,12 @@ import b = require("./moduleB");
           name: string,
           caller: File,
           expected: File,
-          isExternalLibraryImport = false
+          isExternalLibraryImport = false,
         ) {
           const result = resolveModuleName(name, caller.name, options, host);
           checkResolvedModule(
             result.resolvedModule,
-            createResolvedModule(expected.name, isExternalLibraryImport)
+            createResolvedModule(expected.name, isExternalLibraryImport),
           );
         }
       }
@@ -1463,7 +1469,7 @@ import b = require("./moduleB");
           hasDirectoryExists,
           main,
           m1,
-          m2
+          m2,
         );
 
         check("m1", main, m1);
@@ -1473,7 +1479,7 @@ import b = require("./moduleB");
           const result = resolveModuleName(name, caller.name, options, host);
           checkResolvedModule(
             result.resolvedModule,
-            createResolvedModule(expected.name)
+            createResolvedModule(expected.name),
           );
         }
       }
@@ -1510,7 +1516,7 @@ import b = require("./moduleB");
           file4,
           file4Typings,
           file5,
-          file6
+          file6,
         );
 
         const options: CompilerOptions = {
@@ -1636,20 +1642,20 @@ import b = require("./moduleB");
             "/root/node_modules/file6/package.json",
             // success on /root/node_modules/file6.ts
           ],
-          /*isExternalLibraryImport*/ true
+          /*isExternalLibraryImport*/ true,
         );
 
         function check(
           name: string,
           expected: File,
           expectedFailedLookups: string[],
-          isExternalLibraryImport = false
+          isExternalLibraryImport = false,
         ) {
           const result = resolveModuleName(name, main.name, options, host);
           checkResolvedModuleWithFailedLookupLocations(
             result,
             createResolvedModule(expected.name, isExternalLibraryImport),
-            expectedFailedLookups
+            expectedFailedLookups,
           );
         }
       }
@@ -1669,7 +1675,7 @@ import b = require("./moduleB");
           hasDirectoryExists,
           file1,
           file2,
-          file3
+          file3,
         );
 
         const options: CompilerOptions = {
@@ -1712,13 +1718,13 @@ import b = require("./moduleB");
         function check(
           name: string,
           expected: File,
-          expectedFailedLookups: string[]
+          expectedFailedLookups: string[],
         ) {
           const result = resolveModuleName(name, main.name, options, host);
           checkResolvedModuleWithFailedLookupLocations(
             result,
             createResolvedModule(expected.name),
-            expectedFailedLookups
+            expectedFailedLookups,
           );
         }
       }
@@ -1738,7 +1744,7 @@ import b = require("./moduleB");
           file1,
           file1_1,
           file2,
-          file3
+          file3,
         );
         const options: CompilerOptions = {
           moduleResolution: ModuleResolutionKind.NodeJs,
@@ -1797,13 +1803,13 @@ import b = require("./moduleB");
           name: string,
           container: File,
           expected: File,
-          expectedFailedLookups: string[]
+          expectedFailedLookups: string[],
         ) {
           const result = resolveModuleName(name, container.name, options, host);
           checkResolvedModuleWithFailedLookupLocations(
             result,
             createResolvedModule(expected.name),
-            expectedFailedLookups
+            expectedFailedLookups,
           );
         }
       }
@@ -1822,7 +1828,7 @@ import b = require("./moduleB");
           file1,
           file2,
           file3,
-          file4
+          file4,
         );
         const options: CompilerOptions = {
           moduleResolution: ModuleResolutionKind.Classic,
@@ -1863,13 +1869,13 @@ import b = require("./moduleB");
           name: string,
           container: File,
           expected: File,
-          expectedFailedLookups: string[]
+          expectedFailedLookups: string[],
         ) {
           const result = resolveModuleName(name, container.name, options, host);
           checkResolvedModuleWithFailedLookupLocations(
             result,
             createResolvedModule(expected.name),
-            expectedFailedLookups
+            expectedFailedLookups,
           );
         }
       }
@@ -1892,7 +1898,7 @@ import b = require("./moduleB");
           hasDirectoryExists,
           app,
           libsPackage,
-          libsTypings
+          libsTypings,
         );
         const options: CompilerOptions = {
           moduleResolution: ModuleResolutionKind.NodeJs,
@@ -1910,7 +1916,7 @@ import b = require("./moduleB");
             "/root/src/libs/guid.ts",
             "/root/src/libs/guid.tsx",
             "/root/src/libs/guid.d.ts",
-          ]
+          ],
         );
       }
     });
@@ -1928,7 +1934,7 @@ import b = require("./moduleB");
         "someName",
         "/a/b/c/d",
         { moduleResolution: ModuleResolutionKind.NodeJs },
-        host
+        host,
       );
       assert(!result.resolvedModule);
     });
@@ -1946,27 +1952,27 @@ import b = require("./moduleB");
     ) {
       const host = createModuleResolutionHost(
         hasDirectoryExists,
-        ...[initialFile, targetFile].concat(...otherFiles)
+        ...[initialFile, targetFile].concat(...otherFiles),
       );
       const result = resolveTypeReferenceDirective(
         typeDirective,
         initialFile.name,
         typesRoot ? { typeRoots: [typesRoot] } : {},
-        host
+        host,
       );
       assert(
         result.resolvedTypeReferenceDirective!.resolvedFileName !== undefined,
-        "expected type directive to be resolved"
+        "expected type directive to be resolved",
       );
       assert.equal(
         result.resolvedTypeReferenceDirective!.resolvedFileName,
         targetFile.name,
-        "unexpected result of type reference resolution"
+        "unexpected result of type reference resolution",
       );
       assert.equal(
         result.resolvedTypeReferenceDirective!.primary,
         primary,
-        "unexpected 'primary' value"
+        "unexpected 'primary' value",
       );
     }
 
@@ -1985,7 +1991,7 @@ import b = require("./moduleB");
         primary,
         initialFile,
         targetFile,
-        ...otherFiles
+        ...otherFiles,
       );
     }
 
@@ -1998,7 +2004,7 @@ import b = require("./moduleB");
           /* typeDirective */ "lib",
           /*primary*/ true,
           f1,
-          f2
+          f2,
         );
       }
       {
@@ -2014,7 +2020,7 @@ import b = require("./moduleB");
           /*primary*/ true,
           f1,
           f2,
-          packageFile
+          packageFile,
         );
       }
       {
@@ -2025,7 +2031,7 @@ import b = require("./moduleB");
           /* typeDirective */ "lib",
           /*primary*/ false,
           f1,
-          f2
+          f2,
         );
       }
       {
@@ -2041,7 +2047,7 @@ import b = require("./moduleB");
           /*primary*/ false,
           f1,
           f2,
-          packageFile
+          packageFile,
         );
       }
       {
@@ -2052,7 +2058,7 @@ import b = require("./moduleB");
           /* typeDirective */ "lib",
           /*primary*/ false,
           f1,
-          f2
+          f2,
         );
       }
       {
@@ -2070,7 +2076,7 @@ import b = require("./moduleB");
           /*primary*/ false,
           f1,
           f2,
-          packageFile
+          packageFile,
         );
       }
     });
@@ -2083,7 +2089,7 @@ import b = require("./moduleB");
           /* typeDirective */ "lib",
           /*primary*/ false,
           f1,
-          f2
+          f2,
         );
       }
       {
@@ -2094,7 +2100,7 @@ import b = require("./moduleB");
           /* typeDirective */ "lib",
           /*primary*/ false,
           f1,
-          f2
+          f2,
         );
       }
       {
@@ -2110,7 +2116,7 @@ import b = require("./moduleB");
           /*primary*/ false,
           f1,
           f2,
-          packageFile
+          packageFile,
         );
       }
       {
@@ -2121,7 +2127,7 @@ import b = require("./moduleB");
           /* typeDirective */ "lib",
           /*primary*/ false,
           f1,
-          f2
+          f2,
         );
       }
       {
@@ -2137,7 +2143,7 @@ import b = require("./moduleB");
           /*primary*/ false,
           f1,
           f2,
-          packageFile
+          packageFile,
         );
       }
     });
@@ -2152,7 +2158,7 @@ import b = require("./moduleB");
           /*primary*/ true,
           f1,
           f2,
-          f3
+          f3,
         );
       }
     });
@@ -2177,10 +2183,8 @@ import b = require("./moduleB");
 
       const names = map(files, (f) => f.name);
       const sourceFiles = arrayToMap(
-        map(files, (f) =>
-          createSourceFile(f.name, f.content, ScriptTarget.ES2015)
-        ),
-        (f) => f.fileName
+        map(files, (f) => createSourceFile(f.name, f.content, ScriptTarget.ES2015)),
+        (f) => f.fileName,
       );
       const compilerHost: CompilerHost = {
         fileExists: (fileName) => sourceFiles.has(fileName),
@@ -2203,14 +2207,14 @@ import b = require("./moduleB");
 
       const program2 = createProgram(names, {}, compilerHost, program1);
       assert.isTrue(
-        program2.structureIsReused === StructureIsReused.Completely
+        program2.structureIsReused === StructureIsReused.Completely,
       );
       const diagnostics2 = program2.getOptionsDiagnostics();
       assert.equal(diagnostics2.length, 1, "expected one diagnostic");
       assert.deepEqual(
         diagnostics1[0].messageText,
         diagnostics2[0].messageText,
-        "expected one diagnostic"
+        "expected one diagnostic",
       );
     });
 
@@ -2229,8 +2233,7 @@ import b = require("./moduleB");
       const file = createSourceFile(f.name, f.content, ScriptTarget.ES2015);
       const compilerHost: CompilerHost = {
         fileExists: (fileName) => fileName === file.fileName,
-        getSourceFile: (fileName) =>
-          fileName === file.fileName ? file : undefined,
+        getSourceFile: (fileName) => fileName === file.fileName ? file : undefined,
         getDefaultLibFileName: () => "lib.d.ts",
         writeFile: notImplemented,
         getCurrentDirectory: () => "/",
@@ -2238,8 +2241,7 @@ import b = require("./moduleB");
         getCanonicalFileName: (f) => f.toLowerCase(),
         getNewLine: () => "\r\n",
         useCaseSensitiveFileNames: () => false,
-        readFile: (fileName) =>
-          fileName === file.fileName ? file.text : undefined,
+        readFile: (fileName) => fileName === file.fileName ? file.text : undefined,
         resolveModuleNames: notImplemented,
       };
       createProgram([f.name], {}, compilerHost);
@@ -2260,8 +2262,7 @@ import b = require("./moduleB");
       const file = createSourceFile(f.name, f.content, ScriptTarget.ES2015);
       const compilerHost: CompilerHost = {
         fileExists: (fileName) => fileName === file.fileName,
-        getSourceFile: (fileName) =>
-          fileName === file.fileName ? file : undefined,
+        getSourceFile: (fileName) => fileName === file.fileName ? file : undefined,
         getDefaultLibFileName: () => "lib.d.ts",
         writeFile: notImplemented,
         getCurrentDirectory: () => "/",
@@ -2269,8 +2270,7 @@ import b = require("./moduleB");
         getCanonicalFileName: (f) => f.toLowerCase(),
         getNewLine: () => "\r\n",
         useCaseSensitiveFileNames: () => false,
-        readFile: (fileName) =>
-          fileName === file.fileName ? file.text : undefined,
+        readFile: (fileName) => fileName === file.fileName ? file.text : undefined,
         resolveModuleNames(moduleNames: string[], _containingFile: string) {
           assert.deepEqual(moduleNames, ["fs"]);
           return [undefined!]; // TODO: GH#18217
@@ -2288,7 +2288,7 @@ import b = require("./moduleB");
           /*typeDirective*/ "../typedefs/filesystem",
           /*primary*/ false,
           initialFile,
-          targetFile
+          targetFile,
         );
       });
       it("when host has directoryExists", () => {
@@ -2298,7 +2298,7 @@ import b = require("./moduleB");
           /*typeDirective*/ "../typedefs/filesystem",
           /*primary*/ false,
           initialFile,
-          targetFile
+          targetFile,
         );
       });
     });

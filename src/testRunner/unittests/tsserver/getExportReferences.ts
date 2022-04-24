@@ -2,15 +2,12 @@ namespace ts.projectSystem {
   describe("unittests:: tsserver:: getExportReferences", () => {
     const exportVariable = "export const value = 0;";
     const exportArrayDestructured = "export const [valueA, valueB] = [0, 1];";
-    const exportObjectDestructured =
-      "export const { valueC, valueD: renamedD } = { valueC: 0, valueD: 1 };";
-    const exportNestedObject =
-      "export const { nest: [valueE, { valueF }] } = { nest: [0, { valueF: 1 }] };";
+    const exportObjectDestructured = "export const { valueC, valueD: renamedD } = { valueC: 0, valueD: 1 };";
+    const exportNestedObject = "export const { nest: [valueE, { valueF }] } = { nest: [0, { valueF: 1 }] };";
 
     const mainTs: File = {
       path: "/main.ts",
-      content:
-        'import { value, valueA, valueB, valueC, renamedD, valueE, valueF } from "./mod";',
+      content: "import { value, valueA, valueB, valueC, renamedD, valueE, valueF } from \"./mod\";",
     };
     const modTs: File = {
       path: "/mod.ts",
@@ -34,7 +31,7 @@ ${exportNestedObject}
 
     const referenceMainTs = (
       mainTs: File,
-      text: string
+      text: string,
     ): protocol.ReferencesResponseItem =>
       makeReferenceItem({
         file: mainTs,
@@ -47,7 +44,7 @@ ${exportNestedObject}
 
     const referenceModTs = (
       texts: { text: string; lineText: string; contextText?: string },
-      override: Partial<MakeReferenceItem> = {}
+      override: Partial<MakeReferenceItem> = {},
     ): protocol.ReferencesResponseItem =>
       makeReferenceItem({
         file: modTs,
@@ -65,7 +62,7 @@ ${exportNestedObject}
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(modTs, "value")
+        protocolFileLocationFromSubstring(modTs, "value"),
       );
 
       const expectResponse = {
@@ -94,7 +91,7 @@ ${exportNestedObject}
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(modTs, "valueA")
+        protocolFileLocationFromSubstring(modTs, "valueA"),
       );
 
       const expectResponse = {
@@ -110,7 +107,7 @@ ${exportNestedObject}
         symbolName: "valueA",
         symbolStartOffset: protocolLocationFromSubstring(
           modTs.content,
-          "valueA"
+          "valueA",
         ).offset,
       };
 
@@ -125,7 +122,7 @@ ${exportNestedObject}
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(modTs, "valueC")
+        protocolFileLocationFromSubstring(modTs, "valueC"),
       );
       const expectResponse = {
         refs: [
@@ -145,14 +142,14 @@ ${exportNestedObject}
               options: { index: 1 },
               isDefinition: false,
               isWriteAccess: true,
-            }
+            },
           ),
         ],
         symbolDisplayString: "const valueC: number",
         symbolName: "valueC",
         symbolStartOffset: protocolLocationFromSubstring(
           modTs.content,
-          "valueC"
+          "valueC",
         ).offset,
       };
 
@@ -167,7 +164,7 @@ ${exportNestedObject}
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(modTs, "renamedD")
+        protocolFileLocationFromSubstring(modTs, "renamedD"),
       );
 
       const expectResponse = {
@@ -183,7 +180,7 @@ ${exportNestedObject}
         symbolName: "renamedD",
         symbolStartOffset: protocolLocationFromSubstring(
           modTs.content,
-          "renamedD"
+          "renamedD",
         ).offset,
       };
 
@@ -198,7 +195,7 @@ ${exportNestedObject}
       >(
         session,
         protocol.CommandTypes.References,
-        protocolFileLocationFromSubstring(modTs, "valueF")
+        protocolFileLocationFromSubstring(modTs, "valueF"),
       );
 
       const expectResponse = {
@@ -219,14 +216,14 @@ ${exportNestedObject}
               options: { index: 1 },
               isDefinition: false,
               isWriteAccess: true,
-            }
+            },
           ),
         ],
         symbolDisplayString: "const valueF: number",
         symbolName: "valueF",
         symbolStartOffset: protocolLocationFromSubstring(
           modTs.content,
-          "valueF"
+          "valueF",
         ).offset,
       };
 

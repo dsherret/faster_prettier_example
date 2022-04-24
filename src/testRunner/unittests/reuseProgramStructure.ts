@@ -33,13 +33,13 @@ namespace ts {
       private importsAndExports: string,
       private program: string,
       private changedPart: ChangedPart = 0,
-      private version = 0
+      private version = 0,
     ) {}
 
     static New(
       references: string,
       importsAndExports: string,
-      program: string
+      program: string,
     ): SourceText {
       Debug.assert(references !== undefined);
       Debug.assert(importsAndExports !== undefined);
@@ -47,7 +47,7 @@ namespace ts {
       return new SourceText(
         references + newLine,
         importsAndExports + newLine,
-        program || ""
+        program || "",
       );
     }
 
@@ -62,7 +62,7 @@ namespace ts {
         this.importsAndExports,
         this.program,
         this.changedPart | ChangedPart.references,
-        this.version + 1
+        this.version + 1,
       );
     }
     public updateImportsAndExports(newImportsAndExports: string): SourceText {
@@ -72,7 +72,7 @@ namespace ts {
         newImportsAndExports + newLine,
         this.program,
         this.changedPart | ChangedPart.importsAndExports,
-        this.version + 1
+        this.version + 1,
       );
     }
     public updateProgram(newProgram: string): SourceText {
@@ -82,15 +82,14 @@ namespace ts {
         this.importsAndExports,
         newProgram,
         this.changedPart | ChangedPart.program,
-        this.version + 1
+        this.version + 1,
       );
     }
 
     public getFullText() {
       return (
-        this.fullText ||
-        (this.fullText =
-          this.references + this.importsAndExports + this.program)
+        this.fullText
+        || (this.fullText = this.references + this.importsAndExports + this.program)
       );
     }
 
@@ -114,14 +113,14 @@ namespace ts {
         case ChangedPart.importsAndExports:
           oldSpan = createTextSpan(
             oldText.references.length,
-            oldText.importsAndExports.length
+            oldText.importsAndExports.length,
           );
           newLength = this.importsAndExports.length;
           break;
         case ChangedPart.program:
           oldSpan = createTextSpan(
             oldText.references.length + oldText.importsAndExports.length,
-            oldText.program.length
+            oldText.program.length,
           );
           newLength = this.program.length;
           break;
@@ -136,12 +135,12 @@ namespace ts {
   function createSourceFileWithText(
     fileName: string,
     sourceText: SourceText,
-    target: ScriptTarget
+    target: ScriptTarget,
   ) {
     const file = createSourceFile(
       fileName,
       sourceText.getFullText(),
-      target
+      target,
     ) as SourceFileWithText;
     file.sourceText = sourceText;
     file.version = "" + sourceText.getVersion();
@@ -152,7 +151,7 @@ namespace ts {
     texts: readonly NamedSourceText[],
     target: ScriptTarget,
     oldProgram?: ProgramWithSourceTexts,
-    useGetSourceFileByPath?: boolean
+    useGetSourceFileByPath?: boolean,
   ) {
     const files = arrayToMap(
       texts,
@@ -164,18 +163,18 @@ namespace ts {
             oldFile = oldFile.redirectInfo.unredirected;
           }
           if (
-            oldFile &&
-            oldFile.sourceText!.getVersion() === t.text.getVersion()
+            oldFile
+            && oldFile.sourceText!.getVersion() === t.text.getVersion()
           ) {
             return oldFile;
           }
         }
         return createSourceFileWithText(t.name, t.text, target);
-      }
+      },
     );
     const useCaseSensitiveFileNames = sys && sys.useCaseSensitiveFileNames;
     const getCanonicalFileName = createGetCanonicalFileName(
-      useCaseSensitiveFileNames
+      useCaseSensitiveFileNames,
     );
     const trace: string[] = [];
     const result: TestCompilerHost = {
@@ -209,18 +208,18 @@ namespace ts {
     texts: NamedSourceText[],
     rootNames: string[],
     options: CompilerOptions,
-    useGetSourceFileByPath?: boolean
+    useGetSourceFileByPath?: boolean,
   ): ProgramWithSourceTexts {
     const host = createTestCompilerHost(
       texts,
       options.target!,
       /*oldProgram*/ undefined,
-      useGetSourceFileByPath
+      useGetSourceFileByPath,
     );
     const program = createProgram(
       rootNames,
       options,
-      host
+      host,
     ) as ProgramWithSourceTexts;
     program.sourceTexts = texts;
     program.host = host;
@@ -233,7 +232,7 @@ namespace ts {
     options: CompilerOptions,
     updater: (files: NamedSourceText[]) => void,
     newTexts?: NamedSourceText[],
-    useGetSourceFileByPath?: boolean
+    useGetSourceFileByPath?: boolean,
   ) {
     if (!newTexts) {
       newTexts = oldProgram.sourceTexts!.slice(0);
@@ -243,13 +242,13 @@ namespace ts {
       newTexts,
       options.target!,
       oldProgram,
-      useGetSourceFileByPath
+      useGetSourceFileByPath,
     );
     const program = createProgram(
       rootNames,
       options,
       host,
-      oldProgram
+      oldProgram,
     ) as ProgramWithSourceTexts;
     program.sourceTexts = newTexts;
     program.host = host;
@@ -259,7 +258,7 @@ namespace ts {
   export function updateProgramText(
     files: readonly NamedSourceText[],
     fileName: string,
-    newProgramText: string
+    newProgramText: string,
   ) {
     const file = find(files, (f) => f.name === fileName)!;
     file.text = file.text.updateProgram(newProgramText);
@@ -267,17 +266,17 @@ namespace ts {
 
   function checkResolvedTypeDirective(
     actual: ResolvedTypeReferenceDirective,
-    expected: ResolvedTypeReferenceDirective
+    expected: ResolvedTypeReferenceDirective,
   ) {
     assert.equal(
       actual.resolvedFileName,
       expected.resolvedFileName,
-      `'resolvedFileName': expected '${actual.resolvedFileName}' to be equal to '${expected.resolvedFileName}'`
+      `'resolvedFileName': expected '${actual.resolvedFileName}' to be equal to '${expected.resolvedFileName}'`,
     );
     assert.equal(
       actual.primary,
       expected.primary,
-      `'primary': expected '${actual.primary}' to be equal to '${expected.primary}'`
+      `'primary': expected '${actual.primary}' to be equal to '${expected.primary}'`,
     );
     return true;
   }
@@ -288,7 +287,7 @@ namespace ts {
     fileName: string,
     expectedContent: ESMap<string, T> | undefined,
     getCache: (f: SourceFile) => ModeAwareCache<T> | undefined,
-    entryChecker: (expected: T, original: T) => boolean
+    entryChecker: (expected: T, original: T) => boolean,
   ): void {
     const file = program.getSourceFile(fileName);
     assert.isTrue(file !== undefined, `cannot find file ${fileName}`);
@@ -299,7 +298,7 @@ namespace ts {
       assert.isTrue(cache !== undefined, `expected ${caption} to be set`);
       assert.isTrue(
         mapEqualToCache(expectedContent, cache!, entryChecker),
-        `contents of ${caption} did not match the expected contents.`
+        `contents of ${caption} did not match the expected contents.`,
       );
     }
   }
@@ -308,7 +307,7 @@ namespace ts {
   function mapEqualToCache<T>(
     left: ESMap<string, T>,
     right: ModeAwareCache<T>,
-    valuesAreEqual?: (left: T, right: T) => boolean
+    valuesAreEqual?: (left: T, right: T) => boolean,
   ): boolean {
     if ((left as any) === right) return true; // given the type mismatch (the tests never pass a cache), this'll never be true
     if (!left || !right) return false;
@@ -322,8 +321,7 @@ namespace ts {
     if (someInLeftHasNoMatch) return false;
     let someInRightHasNoMatch = false;
     right.forEach(
-      (_, rightKey) =>
-        (someInRightHasNoMatch = someInRightHasNoMatch || !left.has(rightKey))
+      (_, rightKey) => (someInRightHasNoMatch = someInRightHasNoMatch || !left.has(rightKey)),
     );
     return !someInRightHasNoMatch;
   }
@@ -331,7 +329,7 @@ namespace ts {
   function checkResolvedModulesCache(
     program: Program,
     fileName: string,
-    expectedContent: ESMap<string, ResolvedModule | undefined> | undefined
+    expectedContent: ESMap<string, ResolvedModule | undefined> | undefined,
   ): void {
     checkCache(
       "resolved modules",
@@ -339,14 +337,14 @@ namespace ts {
       fileName,
       expectedContent,
       (f) => f.resolvedModules,
-      checkResolvedModule
+      checkResolvedModule,
     );
   }
 
   function checkResolvedTypeDirectivesCache(
     program: Program,
     fileName: string,
-    expectedContent: ESMap<string, ResolvedTypeReferenceDirective> | undefined
+    expectedContent: ESMap<string, ResolvedTypeReferenceDirective> | undefined,
   ): void {
     checkCache(
       "resolved type directives",
@@ -354,7 +352,7 @@ namespace ts {
       fileName,
       expectedContent,
       (f) => f.resolvedTypeReferenceDirectiveNames,
-      checkResolvedTypeDirective
+      checkResolvedTypeDirective,
     );
   }
 
@@ -370,7 +368,7 @@ namespace ts {
 /// <reference types="typerefs" />
 `,
           "",
-          `var x = 1`
+          `var x = 1`,
         ),
       },
       {
@@ -392,14 +390,14 @@ namespace ts {
         { target },
         (files) => {
           files[0].text = files[0].text.updateProgram("var x = 100");
-        }
+        },
       );
       assert.equal(program2.structureIsReused, StructureIsReused.Completely);
       const program1Diagnostics = program1.getSemanticDiagnostics(
-        program1.getSourceFile("a.ts")
+        program1.getSourceFile("a.ts"),
       );
       const program2Diagnostics = program2.getSemanticDiagnostics(
-        program2.getSourceFile("a.ts")
+        program2.getSourceFile("a.ts"),
       );
       assert.equal(program1Diagnostics.length, program2Diagnostics.length);
     });
@@ -412,14 +410,14 @@ namespace ts {
         { target },
         (files) => {
           files[0].text = files[0].text.updateProgram("var x = 100");
-        }
+        },
       );
       assert.equal(program2.structureIsReused, StructureIsReused.Completely);
       const program1Diagnostics = program1.getSemanticDiagnostics(
-        program1.getSourceFile("a.ts")
+        program1.getSourceFile("a.ts"),
       );
       const program2Diagnostics = program2.getSemanticDiagnostics(
-        program2.getSourceFile("a.ts")
+        program2.getSourceFile("a.ts"),
       );
       assert.equal(program1Diagnostics.length, program2Diagnostics.length);
     });
@@ -443,7 +441,7 @@ namespace ts {
           text: SourceText.New(
             "",
             "",
-            JSON.stringify({ name: "b", version: "1.2.3" })
+            JSON.stringify({ name: "b", version: "1.2.3" }),
           ),
         },
       ];
@@ -458,10 +456,10 @@ namespace ts {
       });
       assert.equal(program2.structureIsReused, StructureIsReused.Completely);
       const program1Diagnostics = program1.getSemanticDiagnostics(
-        program1.getSourceFile("a.ts")
+        program1.getSourceFile("a.ts"),
       );
       const program2Diagnostics = program2.getSemanticDiagnostics(
-        program2.getSourceFile("a.ts")
+        program2.getSourceFile("a.ts"),
       );
       assert.equal(program1Diagnostics.length, program2Diagnostics.length);
     });
@@ -477,7 +475,7 @@ namespace ts {
                 /// <reference path='c.ts'/>
                 `;
           files[0].text = files[0].text.updateReferences(newReferences);
-        }
+        },
       );
       assert.equal(program2.structureIsReused, StructureIsReused.SafeModules);
     });
@@ -488,7 +486,7 @@ namespace ts {
         program1,
         ["a.ts"],
         { types: ["b"] },
-        noop
+        noop,
       );
       assert.equal(program2.structureIsReused, StructureIsReused.SafeModules);
     });
@@ -499,7 +497,7 @@ namespace ts {
         program1,
         ["a.ts"],
         { types: ["a"] },
-        noop
+        noop,
       );
       assert.equal(program2.structureIsReused, StructureIsReused.Completely);
     });
@@ -511,9 +509,8 @@ namespace ts {
         ["a.ts"],
         { target },
         (files) => {
-          files[2].text =
-            files[2].text.updateImportsAndExports("import x from 'b'");
-        }
+          files[2].text = files[2].text.updateImportsAndExports("import x from 'b'");
+        },
       );
       assert.equal(program2.structureIsReused, StructureIsReused.SafeModules);
     });
@@ -530,7 +527,7 @@ namespace ts {
 /// <reference path='non-existing-file.ts'/>
 /// <reference types="typerefs1" />`;
           files[0].text = files[0].text.updateReferences(newReferences);
-        }
+        },
       );
       assert.equal(program2.structureIsReused, StructureIsReused.SafeModules);
     });
@@ -544,7 +541,7 @@ namespace ts {
         program1,
         ["a.ts"],
         { target, module: ModuleKind.AMD },
-        noop
+        noop,
       );
       assert.equal(program2.structureIsReused, StructureIsReused.Not);
     });
@@ -559,7 +556,7 @@ namespace ts {
         program1,
         ["a.ts"],
         { target, module: ModuleKind.CommonJS, rootDir: "/a/c" },
-        noop
+        noop,
       );
       assert.equal(program2.structureIsReused, StructureIsReused.Completely);
     });
@@ -578,7 +575,7 @@ namespace ts {
           module: ModuleKind.CommonJS,
           configFilePath: "/a/c/tsconfig.json",
         },
-        noop
+        noop,
       );
       assert.equal(program2.structureIsReused, StructureIsReused.Not);
     });
@@ -592,7 +589,7 @@ namespace ts {
       const program2 = updateProgram(program1, ["a.ts"], options, noop);
       assert.deepEqual(
         program1.getMissingFilePaths(),
-        program2.getMissingFilePaths()
+        program2.getMissingFilePaths(),
       );
 
       assert.equal(program2.structureIsReused, StructureIsReused.Completely);
@@ -615,7 +612,7 @@ namespace ts {
         ["a.ts"],
         options,
         noop,
-        newTexts
+        newTexts,
       );
       assert.lengthOf(program2.getMissingFilePaths(), 0);
 
@@ -638,12 +635,12 @@ namespace ts {
       checkResolvedModulesCache(
         program1,
         "a.ts",
-        new Map(getEntries({ b: createResolvedModule("b.ts") }))
+        new Map(getEntries({ b: createResolvedModule("b.ts") })),
       );
       checkResolvedModulesCache(
         program1,
         "b.ts",
-        /*expectedContent*/ undefined
+        /*expectedContent*/ undefined,
       );
 
       const program2 = updateProgram(program1, ["a.ts"], options, (files) => {
@@ -655,12 +652,12 @@ namespace ts {
       checkResolvedModulesCache(
         program1,
         "a.ts",
-        new Map(getEntries({ b: createResolvedModule("b.ts") }))
+        new Map(getEntries({ b: createResolvedModule("b.ts") })),
       );
       checkResolvedModulesCache(
         program1,
         "b.ts",
-        /*expectedContent*/ undefined
+        /*expectedContent*/ undefined,
       );
 
       // imports has changed - program is not reused
@@ -671,7 +668,7 @@ namespace ts {
       checkResolvedModulesCache(
         program3,
         "a.ts",
-        /*expectedContent*/ undefined
+        /*expectedContent*/ undefined,
       );
 
       const program4 = updateProgram(program3, ["a.ts"], options, (files) => {
@@ -684,7 +681,7 @@ namespace ts {
       checkResolvedModulesCache(
         program4,
         "a.ts",
-        new Map(getEntries({ b: createResolvedModule("b.ts"), c: undefined }))
+        new Map(getEntries({ b: createResolvedModule("b.ts"), c: undefined })),
       );
     });
 
@@ -692,23 +689,23 @@ namespace ts {
       const files = [
         {
           name: "/a.ts",
-          text: SourceText.New("", "", 'import * as a from "a";'),
+          text: SourceText.New("", "", "import * as a from \"a\";"),
         },
         {
           name: "/types/zzz/index.d.ts",
-          text: SourceText.New("", "", 'declare module "a" { }'),
+          text: SourceText.New("", "", "declare module \"a\" { }"),
         },
       ];
       const options: CompilerOptions = { target, typeRoots: ["/types"] };
       const program1 = newProgram(files, ["/a.ts"], options);
       const program2 = updateProgram(program1, ["/a.ts"], options, (files) => {
-        files[0].text = files[0].text.updateProgram('import * as aa from "a";');
+        files[0].text = files[0].text.updateProgram("import * as aa from \"a\";");
       });
       assert.isDefined(
         program2
           .getSourceFile("/a.ts")!
           .resolvedModules!.get("a", /*mode*/ undefined),
-        "'a' is not an unresolved module after re-use"
+        "'a' is not an unresolved module after re-use",
       );
     });
 
@@ -717,11 +714,11 @@ namespace ts {
       const files = [
         {
           name: "/a.ts",
-          text: SourceText.New("", "", 'import * as a from "a";a;'),
+          text: SourceText.New("", "", "import * as a from \"a\";a;"),
         },
         {
           name: "/types/zzz/index.d.ts",
-          text: SourceText.New("", "", 'declare module "a" { }'),
+          text: SourceText.New("", "", "declare module \"a\" { }"),
         },
       ];
       const host = createTestCompilerHost(files, target);
@@ -735,12 +732,12 @@ namespace ts {
         {
           newLength: "'use strict';".length,
           span: { start: 0, length: 0 },
-        }
+        },
       );
       assert.strictEqual(
         sourceFile.statements[2].getSourceFile(),
         sourceFile,
-        "parent pointers are updated"
+        "parent pointers are updated",
       );
       const updateHost: TestCompilerHost = {
         ...host,
@@ -755,12 +752,12 @@ namespace ts {
         program2
           .getSourceFile("/a.ts")!
           .resolvedModules!.get("a", /*mode*/ undefined),
-        "'a' is not an unresolved module after re-use"
+        "'a' is not an unresolved module after re-use",
       );
       assert.strictEqual(
         sourceFile.statements[2].getSourceFile(),
         sourceFile,
-        "parent pointers are not altered"
+        "parent pointers are not altered",
       );
     });
 
@@ -771,7 +768,7 @@ namespace ts {
           text: SourceText.New(
             "/// <reference types='typedefs'/>",
             "",
-            "var x = $"
+            "var x = $",
           ),
         },
         {
@@ -791,13 +788,13 @@ namespace ts {
               resolvedFileName: "/types/typedefs/index.d.ts",
               primary: true,
             },
-          })
-        )
+          }),
+        ),
       );
       checkResolvedTypeDirectivesCache(
         program1,
         "/types/typedefs/index.d.ts",
-        /*expectedContent*/ undefined
+        /*expectedContent*/ undefined,
       );
 
       const program2 = updateProgram(program1, ["/a.ts"], options, (files) => {
@@ -815,13 +812,13 @@ namespace ts {
               resolvedFileName: "/types/typedefs/index.d.ts",
               primary: true,
             },
-          })
-        )
+          }),
+        ),
       );
       checkResolvedTypeDirectivesCache(
         program1,
         "/types/typedefs/index.d.ts",
-        /*expectedContent*/ undefined
+        /*expectedContent*/ undefined,
       );
 
       // type reference directives has changed - program is not reused
@@ -833,7 +830,7 @@ namespace ts {
       checkResolvedTypeDirectivesCache(
         program3,
         "/a.ts",
-        /*expectedContent*/ undefined
+        /*expectedContent*/ undefined,
       );
 
       const program4 = updateProgram(program3, ["/a.ts"], options, (files) => {
@@ -852,8 +849,8 @@ namespace ts {
               resolvedFileName: "/types/typedefs/index.d.ts",
               primary: true,
             },
-          })
-        )
+          }),
+        ),
       );
     });
 
@@ -863,7 +860,7 @@ namespace ts {
         text: SourceText.New(
           "",
           `import * as a from "a";`,
-          "const myX: number = a.x;"
+          "const myX: number = a.x;",
         ),
       };
       const file2Ts = { name: "file2.ts", text: SourceText.New("", "", "") };
@@ -882,7 +879,7 @@ namespace ts {
       const initialProgram = newProgram(
         rootFiles,
         rootFiles.map((f) => f.name),
-        options
+        options,
       );
       {
         assert.deepEqual(
@@ -909,16 +906,16 @@ namespace ts {
             "File 'node_modules/a/index.jsx' does not exist.",
             "======== Module name 'a' was not resolved. ========",
           ],
-          "initialProgram: execute module resolution normally."
+          "initialProgram: execute module resolution normally.",
         );
 
         const initialProgramDiagnostics = initialProgram.getSemanticDiagnostics(
-          initialProgram.getSourceFile("file1.ts")
+          initialProgram.getSourceFile("file1.ts"),
         );
         assert.lengthOf(
           initialProgramDiagnostics,
           1,
-          `initialProgram: import should fail.`
+          `initialProgram: import should fail.`,
         );
       }
 
@@ -928,10 +925,10 @@ namespace ts {
         options,
         (f) => {
           f[1].text = f[1].text.updateReferences(
-            `/// <reference no-default-lib="true"/>`
+            `/// <reference no-default-lib="true"/>`,
           );
         },
-        filesAfterNpmInstall
+        filesAfterNpmInstall,
       );
       {
         assert.deepEqual(
@@ -949,17 +946,16 @@ namespace ts {
             "File 'node_modules/a/index.d.ts' exist - use it as a name resolution result.",
             "======== Module name 'a' was successfully resolved to 'node_modules/a/index.d.ts'. ========",
           ],
-          "afterNpmInstallProgram: execute module resolution normally."
+          "afterNpmInstallProgram: execute module resolution normally.",
         );
 
-        const afterNpmInstallProgramDiagnostics =
-          afterNpmInstallProgram.getSemanticDiagnostics(
-            afterNpmInstallProgram.getSourceFile("file1.ts")
-          );
+        const afterNpmInstallProgramDiagnostics = afterNpmInstallProgram.getSemanticDiagnostics(
+          afterNpmInstallProgram.getSourceFile("file1.ts"),
+        );
         assert.lengthOf(
           afterNpmInstallProgramDiagnostics,
           0,
-          `afterNpmInstallProgram: program is well-formed with import.`
+          `afterNpmInstallProgram: program is well-formed with import.`,
         );
       }
     });
@@ -979,7 +975,7 @@ namespace ts {
       const program = newProgram(
         files,
         files.map((f) => f.name),
-        options
+        options,
       );
       assert.deepEqual(
         program.host.getTrace(),
@@ -1012,7 +1008,7 @@ namespace ts {
           "File '/fs.jsx' does not exist.",
           "======== Module name 'fs' was not resolved. ========",
         ],
-        "should look for 'fs'"
+        "should look for 'fs'",
       );
 
       const program2 = updateProgram(
@@ -1021,14 +1017,14 @@ namespace ts {
         options,
         (f) => {
           f[0].text = f[0].text.updateProgram("var x = 1;");
-        }
+        },
       );
       assert.deepEqual(
         program2.host.getTrace(),
         [
           "Module 'fs' was resolved as ambient module declared in '/a/b/node.d.ts' since this file was not modified.",
         ],
-        "should reuse 'fs' since node.d.ts was not changed"
+        "should reuse 'fs' since node.d.ts was not changed",
       );
 
       const program3 = updateProgram(
@@ -1038,7 +1034,7 @@ namespace ts {
         (f) => {
           f[0].text = f[0].text.updateProgram("var y = 1;");
           f[1].text = f[1].text.updateProgram("declare var process: any");
-        }
+        },
       );
       assert.deepEqual(
         program3.host.getTrace(),
@@ -1071,7 +1067,7 @@ namespace ts {
           "File '/fs.jsx' does not exist.",
           "======== Module name 'fs' was not resolved. ========",
         ],
-        "should look for 'fs' again since node.d.ts was changed"
+        "should look for 'fs' again since node.d.ts was changed",
       );
     });
 
@@ -1100,7 +1096,7 @@ namespace ts {
           text: SourceText.New(
             `/// <reference path="a1.ts"/>${newLine}/// <reference types="typerefs1"/>${newLine}/// <reference no-default-lib="true"/>`,
             `import { B } from './b1';${newLine}export let BB = B;`,
-            "declare module './b1' { interface B { y: string; } }"
+            "declare module './b1' { interface B { y: string; } }",
           ),
         },
         {
@@ -1108,7 +1104,7 @@ namespace ts {
           text: SourceText.New(
             `/// <reference path="a2.ts"/>${newLine}/// <reference types="typerefs2"/>`,
             `import { B } from './b2';${newLine}import { BB } from './f1';`,
-            "(new BB).x; (new BB).y;"
+            "(new BB).x; (new BB).y;",
           ),
         },
       ];
@@ -1121,7 +1117,7 @@ namespace ts {
       const program1 = newProgram(
         files,
         files.map((f) => f.name),
-        options
+        options,
       );
       let expectedErrors = 0;
       {
@@ -1151,16 +1147,16 @@ namespace ts {
             "File 'f1.ts' exist - use it as a name resolution result.",
             "======== Module name './f1' was successfully resolved to 'f1.ts'. ========",
           ],
-          "program1: execute module resolution normally."
+          "program1: execute module resolution normally.",
         );
 
         const program1Diagnostics = program1.getSemanticDiagnostics(
-          program1.getSourceFile("f2.ts")
+          program1.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program1Diagnostics,
           expectedErrors,
-          `initial program should be well-formed`
+          `initial program should be well-formed`,
         );
       }
       const indexOfF1 = 6;
@@ -1170,20 +1166,20 @@ namespace ts {
         options,
         (f) => {
           const newSourceText = f[indexOfF1].text.updateReferences(
-            `/// <reference path="a1.ts"/>${newLine}/// <reference types="typerefs1"/>`
+            `/// <reference path="a1.ts"/>${newLine}/// <reference types="typerefs1"/>`,
           );
           f[indexOfF1] = { name: "f1.ts", text: newSourceText };
-        }
+        },
       );
 
       {
         const program2Diagnostics = program2.getSemanticDiagnostics(
-          program2.getSourceFile("f2.ts")
+          program2.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program2Diagnostics,
           expectedErrors,
-          `removing no-default-lib shouldn't affect any types used.`
+          `removing no-default-lib shouldn't affect any types used.`,
         );
 
         assert.deepEqual(
@@ -1206,7 +1202,7 @@ namespace ts {
             "Reusing resolution of module './b2' from 'f2.ts' of old program, it was successfully resolved to 'b2.ts'.",
             "Reusing resolution of module './f1' from 'f2.ts' of old program, it was successfully resolved to 'f1.ts'.",
           ],
-          "program2: reuse module resolutions in f2 since it is unchanged"
+          "program2: reuse module resolutions in f2 since it is unchanged",
         );
       }
 
@@ -1216,20 +1212,20 @@ namespace ts {
         options,
         (f) => {
           const newSourceText = f[indexOfF1].text.updateReferences(
-            `/// <reference path="a1.ts"/>`
+            `/// <reference path="a1.ts"/>`,
           );
           f[indexOfF1] = { name: "f1.ts", text: newSourceText };
-        }
+        },
       );
 
       {
         const program3Diagnostics = program3.getSemanticDiagnostics(
-          program3.getSourceFile("f2.ts")
+          program3.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program3Diagnostics,
           expectedErrors,
-          `typerefs2 was unused, so diagnostics should be unaffected.`
+          `typerefs2 was unused, so diagnostics should be unaffected.`,
         );
 
         assert.deepEqual(
@@ -1247,7 +1243,7 @@ namespace ts {
             "Reusing resolution of module './b2' from 'f2.ts' of old program, it was successfully resolved to 'b2.ts'.",
             "Reusing resolution of module './f1' from 'f2.ts' of old program, it was successfully resolved to 'f1.ts'.",
           ],
-          "program3: reuse module resolutions in f2 since it is unchanged"
+          "program3: reuse module resolutions in f2 since it is unchanged",
         );
       }
 
@@ -1258,17 +1254,17 @@ namespace ts {
         (f) => {
           const newSourceText = f[indexOfF1].text.updateReferences("");
           f[indexOfF1] = { name: "f1.ts", text: newSourceText };
-        }
+        },
       );
 
       {
         const program4Diagnostics = program4.getSemanticDiagnostics(
-          program4.getSourceFile("f2.ts")
+          program4.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program4Diagnostics,
           expectedErrors,
-          `a1.ts was unused, so diagnostics should be unaffected.`
+          `a1.ts was unused, so diagnostics should be unaffected.`,
         );
 
         assert.deepEqual(
@@ -1286,7 +1282,7 @@ namespace ts {
             "Reusing resolution of module './b2' from 'f2.ts' of old program, it was successfully resolved to 'b2.ts'.",
             "Reusing resolution of module './f1' from 'f2.ts' of old program, it was successfully resolved to 'f1.ts'.",
           ],
-          "program_4: reuse module resolutions in f2 since it is unchanged"
+          "program_4: reuse module resolutions in f2 since it is unchanged",
         );
       }
 
@@ -1296,20 +1292,20 @@ namespace ts {
         options,
         (f) => {
           const newSourceText = f[indexOfF1].text.updateImportsAndExports(
-            `import { B } from './b1';`
+            `import { B } from './b1';`,
           );
           f[indexOfF1] = { name: "f1.ts", text: newSourceText };
-        }
+        },
       );
 
       {
         const program5Diagnostics = program5.getSemanticDiagnostics(
-          program5.getSourceFile("f2.ts")
+          program5.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program5Diagnostics,
           ++expectedErrors,
-          `import of BB in f1 fails. BB is of type any. Add one error`
+          `import of BB in f1 fails. BB is of type any. Add one error`,
         );
 
         assert.deepEqual(
@@ -1320,7 +1316,7 @@ namespace ts {
             "File 'b1.ts' exist - use it as a name resolution result.",
             "======== Module name './b1' was successfully resolved to 'b1.ts'. ========",
           ],
-          "program_5: exports do not affect program structure, so f2's resolutions are silently reused."
+          "program_5: exports do not affect program structure, so f2's resolutions are silently reused.",
         );
       }
 
@@ -1331,17 +1327,17 @@ namespace ts {
         (f) => {
           const newSourceText = f[indexOfF1].text.updateProgram("");
           f[indexOfF1] = { name: "f1.ts", text: newSourceText };
-        }
+        },
       );
 
       {
         const program6Diagnostics = program6.getSemanticDiagnostics(
-          program6.getSourceFile("f2.ts")
+          program6.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program6Diagnostics,
           expectedErrors,
-          `import of BB in f1 fails.`
+          `import of BB in f1 fails.`,
         );
 
         assert.deepEqual(
@@ -1359,7 +1355,7 @@ namespace ts {
             "Reusing resolution of module './b2' from 'f2.ts' of old program, it was successfully resolved to 'b2.ts'.",
             "Reusing resolution of module './f1' from 'f2.ts' of old program, it was successfully resolved to 'f1.ts'.",
           ],
-          "program_6: reuse module resolutions in f2 since it is unchanged"
+          "program_6: reuse module resolutions in f2 since it is unchanged",
         );
       }
 
@@ -1370,17 +1366,17 @@ namespace ts {
         (f) => {
           const newSourceText = f[indexOfF1].text.updateImportsAndExports("");
           f[indexOfF1] = { name: "f1.ts", text: newSourceText };
-        }
+        },
       );
 
       {
         const program7Diagnostics = program7.getSemanticDiagnostics(
-          program7.getSourceFile("f2.ts")
+          program7.getSourceFile("f2.ts"),
         );
         assert.lengthOf(
           program7Diagnostics,
           expectedErrors,
-          `removing import is noop with respect to program, so no change in diagnostics.`
+          `removing import is noop with respect to program, so no change in diagnostics.`,
         );
 
         assert.deepEqual(
@@ -1394,7 +1390,7 @@ namespace ts {
             "Reusing resolution of module './b2' from 'f2.ts' of old program, it was successfully resolved to 'b2.ts'.",
             "Reusing resolution of module './f1' from 'f2.ts' of old program, it was successfully resolved to 'f1.ts'.",
           ],
-          "program_7 should reuse module resolutions in f2 since it is unchanged"
+          "program_7 should reuse module resolutions in f2 since it is unchanged",
         );
       }
     });
@@ -1412,15 +1408,15 @@ namespace ts {
 
       function createRedirectProgram(
         useGetSourceFileByPath: boolean,
-        options?: { bText: string; bVersion: string }
+        options?: { bText: string; bVersion: string },
       ): ProgramWithSourceTexts {
         const files: NamedSourceText[] = [
           {
             name: "/node_modules/a/index.d.ts",
             text: SourceText.New(
               "",
-              'import X from "x";',
-              "export function a(x: X): void;"
+              "import X from \"x\";",
+              "export function a(x: X): void;",
             ),
           },
           {
@@ -1428,7 +1424,7 @@ namespace ts {
             text: SourceText.New(
               "",
               "",
-              "export default class X { private x: number; }"
+              "export default class X { private x: number; }",
             ),
           },
           {
@@ -1436,15 +1432,15 @@ namespace ts {
             text: SourceText.New(
               "",
               "",
-              JSON.stringify({ name: "x", version: "1.2.3" })
+              JSON.stringify({ name: "x", version: "1.2.3" }),
             ),
           },
           {
             name: "/node_modules/b/index.d.ts",
             text: SourceText.New(
               "",
-              'import X from "x";',
-              "export const b: X;"
+              "import X from \"x\";",
+              "export const b: X;",
             ),
           },
           {
@@ -1454,7 +1450,7 @@ namespace ts {
               "",
               options
                 ? options.bText
-                : "export default class X { private x: number; }"
+                : "export default class X { private x: number; }",
             ),
           },
           {
@@ -1465,15 +1461,15 @@ namespace ts {
               JSON.stringify({
                 name: "x",
                 version: options ? options.bVersion : "1.2.3",
-              })
+              }),
             ),
           },
           {
             name: root,
             text: SourceText.New(
               "",
-              'import { a } from "a"; import { b } from "b";',
-              "a(b)"
+              "import { a } from \"a\"; import { b } from \"b\";",
+              "a(b)",
             ),
           },
         ];
@@ -1482,14 +1478,14 @@ namespace ts {
           files,
           [root],
           compilerOptions,
-          useGetSourceFileByPath
+          useGetSourceFileByPath,
         );
       }
 
       function updateRedirectProgram(
         program: ProgramWithSourceTexts,
         updater: (files: NamedSourceText[]) => void,
-        useGetSourceFileByPath: boolean
+        useGetSourceFileByPath: boolean,
       ): ProgramWithSourceTexts {
         return updateProgram(
           program,
@@ -1497,7 +1493,7 @@ namespace ts {
           compilerOptions,
           updater,
           /*newTexts*/ undefined,
-          useGetSourceFileByPath
+          useGetSourceFileByPath,
         );
       }
 
@@ -1510,11 +1506,11 @@ namespace ts {
             (files) => {
               updateProgramText(files, root, "const x = 1;");
             },
-            useGetSourceFileByPath
+            useGetSourceFileByPath,
           );
           assert.equal(
             program2.structureIsReused,
-            StructureIsReused.Completely
+            StructureIsReused.Completely,
           );
           assert.lengthOf(program2.getSemanticDiagnostics(), 0);
         });
@@ -1529,15 +1525,15 @@ namespace ts {
               updateProgramText(
                 files,
                 axIndex,
-                "export default class X { private x: number; private y: number; }"
+                "export default class X { private x: number; private y: number; }",
               );
               updateProgramText(
                 files,
                 axPackage,
-                JSON.stringify('{ name: "x", version: "1.2.4" }')
+                JSON.stringify("{ name: \"x\", version: \"1.2.4\" }"),
               );
             },
-            useGetSourceFileByPath
+            useGetSourceFileByPath,
           );
           assert.equal(program2.structureIsReused, StructureIsReused.Not);
           assert.lengthOf(program2.getSemanticDiagnostics(), 1);
@@ -1552,15 +1548,15 @@ namespace ts {
               updateProgramText(
                 files,
                 bxIndex,
-                "export default class X { private x: number; private y: number; }"
+                "export default class X { private x: number; private y: number; }",
               );
               updateProgramText(
                 files,
                 bxPackage,
-                JSON.stringify({ name: "x", version: "1.2.4" })
+                JSON.stringify({ name: "x", version: "1.2.4" }),
               );
             },
-            useGetSourceFileByPath
+            useGetSourceFileByPath,
           );
           assert.equal(program2.structureIsReused, StructureIsReused.Not);
           assert.lengthOf(program2.getSemanticDiagnostics(), 1);
@@ -1578,15 +1574,15 @@ namespace ts {
               updateProgramText(
                 files,
                 bxIndex,
-                "export default class X { private x: number; }"
+                "export default class X { private x: number; }",
               );
               updateProgramText(
                 files,
                 bxPackage,
-                JSON.stringify({ name: "x", version: "1.2.3" })
+                JSON.stringify({ name: "x", version: "1.2.3" }),
               );
             },
-            useGetSourceFileByPath
+            useGetSourceFileByPath,
           );
           assert.equal(program2.structureIsReused, StructureIsReused.Not);
           assert.deepEqual(program2.getSemanticDiagnostics(), []);
@@ -1616,7 +1612,7 @@ namespace ts {
     function getWhetherProgramIsUptoDate(
       program: Program,
       newRootFileNames: string[],
-      newOptions: CompilerOptions
+      newOptions: CompilerOptions,
     ) {
       return isProgramUptoDate(
         program,
@@ -1627,7 +1623,7 @@ namespace ts {
         /*hasInvalidatedResolution*/ returnFalse,
         /*hasChangedAutomaticTypeDirectiveNames*/ undefined,
         /*getParsedCommandLine*/ returnUndefined,
-        /*projectReferences*/ undefined
+        /*projectReferences*/ undefined,
       );
     }
 
@@ -1641,12 +1637,12 @@ namespace ts {
       function verifyProgramIsUptoDate(
         program: Program,
         newRootFileNames: string[],
-        newOptions: CompilerOptions
+        newOptions: CompilerOptions,
       ) {
         const actual = getWhetherProgramIsUptoDate(
           program,
           newRootFileNames,
-          newOptions
+          newOptions,
         );
         assert.isTrue(actual);
       }
@@ -1654,7 +1650,7 @@ namespace ts {
       function verifyProgramWithoutConfigFile(
         system: System,
         rootFiles: string[],
-        options: CompilerOptions
+        options: CompilerOptions,
       ) {
         const program = createWatchProgram(
           createWatchCompilerHostOfFilesAndCompilerOptions({
@@ -1662,26 +1658,26 @@ namespace ts {
             options,
             watchOptions: undefined,
             system,
-          })
+          }),
         )
           .getCurrentProgram()
           .getProgram();
         verifyProgramIsUptoDate(
           program,
           duplicate(rootFiles),
-          duplicate(options)
+          duplicate(options),
         );
       }
 
       function verifyProgramWithConfigFile(
         system: System,
-        configFileName: string
+        configFileName: string,
       ) {
         const program = createWatchProgram(
           createWatchCompilerHostOfConfigFile({
             configFileName,
             system,
-          })
+          }),
         )
           .getCurrentProgram()
           .getProgram();
@@ -1691,7 +1687,7 @@ namespace ts {
           /*extendedConfigCache*/ undefined,
           /*watchOptionsToExtend*/ undefined,
           system,
-          notImplemented
+          notImplemented,
         )!; // TODO: GH#18217
         verifyProgramIsUptoDate(program, fileNames, options);
       }
@@ -1700,7 +1696,7 @@ namespace ts {
         files: File[],
         rootFiles: string[],
         options: CompilerOptions,
-        configFile: string
+        configFile: string,
       ) {
         const system = createTestSystem(files);
         verifyProgramWithoutConfigFile(system, rootFiles, options);
@@ -1724,7 +1720,7 @@ namespace ts {
           [file1, file2, libFile, configFile],
           [file1.path, file2.path],
           {},
-          configFile.path
+          configFile.path,
         );
       });
 
@@ -1753,7 +1749,7 @@ namespace ts {
           [app, configFile, es5Lib, es2015Promise],
           [app.path],
           compilerOptions,
-          configFile.path
+          configFile.path,
         );
       });
 
@@ -1766,25 +1762,22 @@ namespace ts {
         };
         const app: File = {
           path: "/src/packages/framework/app.ts",
-          content:
-            'import classc from "module1/lib/file1";\
-                              import classD from "module3/file3";\
+          content: "import classc from \"module1/lib/file1\";\
+                              import classD from \"module3/file3\";\
                               let x = new classc();\
-                              let y = new classD();',
+                              let y = new classD();",
         };
         const module1: File = {
           path: "/src/packages/mail/data/module1/lib/file1.ts",
-          content: 'import classc from "module2/file2";export default classc;',
+          content: "import classc from \"module2/file2\";export default classc;",
         };
         const module2: File = {
           path: "/src/packages/mail/data/module1/lib/module2/file2.ts",
-          content:
-            'class classc { method2() { return "hello"; } }\nexport default classc',
+          content: "class classc { method2() { return \"hello\"; } }\nexport default classc",
         };
         const module3: File = {
           path: "/src/packages/styles/module3/file3.ts",
-          content:
-            "class classD { method() { return 10; } }\nexport default classD;",
+          content: "class classD { method() { return 10; } }\nexport default classD;",
         };
         const configFile: File = {
           path: "/src/tsconfig.json",
@@ -1795,7 +1788,7 @@ namespace ts {
           [app, module1, module2, module3, libFile, configFile],
           [app.path],
           compilerOptions,
-          configFile.path
+          configFile.path,
         );
       });
 
@@ -1808,25 +1801,22 @@ namespace ts {
         };
         const app: File = {
           path: "/src/packages/framework/app.ts",
-          content:
-            'import classc from "module1/lib/file1";\
-                              import classD from "module3/file3";\
+          content: "import classc from \"module1/lib/file1\";\
+                              import classD from \"module3/file3\";\
                               let x = new classc();\
-                              let y = new classD();',
+                              let y = new classD();",
         };
         const module1: File = {
           path: "/src/packages/mail/data/module1/lib/file1.ts",
-          content: 'import classc from "module2/file2";export default classc;',
+          content: "import classc from \"module2/file2\";export default classc;",
         };
         const module2: File = {
           path: "/src/packages/mail/data/module1/lib/module2/file2.ts",
-          content:
-            'class classc { method2() { return "hello"; } }\nexport default classc',
+          content: "class classc { method2() { return \"hello\"; } }\nexport default classc",
         };
         const module3: File = {
           path: "/src/packages/styles/module3/file3.ts",
-          content:
-            "class classD { method() { return 10; } }\nexport default classD;",
+          content: "class classD { method() { return 10; } }\nexport default classD;",
         };
         const configFile: File = {
           path: "/src/tsconfig.json",
@@ -1844,23 +1834,21 @@ namespace ts {
             libFile,
             configFile,
           ]),
-          configFile.path
+          configFile.path,
         );
       });
       it("has the same root file names", () => {
         const module1: File = {
           path: "/src/packages/mail/data/module1/lib/file1.ts",
-          content: 'import classc from "module2/file2";export default classc;',
+          content: "import classc from \"module2/file2\";export default classc;",
         };
         const module2: File = {
           path: "/src/packages/mail/data/module1/lib/module2/file2.ts",
-          content:
-            'class classc { method2() { return "hello"; } }\nexport default classc',
+          content: "class classc { method2() { return \"hello\"; } }\nexport default classc",
         };
         const module3: File = {
           path: "/src/packages/styles/module3/file3.ts",
-          content:
-            "class classD { method() { return 10; } }\nexport default classD;",
+          content: "class classD { method() { return 10; } }\nexport default classD;",
         };
         const rootFiles = [module1.path, module2.path, module3.path];
         const system = createTestSystem([module1, module2, module3]);
@@ -1871,14 +1859,14 @@ namespace ts {
             options,
             watchOptions: undefined,
             system,
-          })
+          }),
         )
           .getCurrentProgram()
           .getProgram();
         verifyProgramIsUptoDate(
           program,
           duplicate(rootFiles),
-          duplicate(options)
+          duplicate(options),
         );
       });
     });
@@ -1886,29 +1874,27 @@ namespace ts {
       function verifyProgramIsNotUptoDate(
         program: Program,
         newRootFileNames: string[],
-        newOptions: CompilerOptions
+        newOptions: CompilerOptions,
       ) {
         const actual = getWhetherProgramIsUptoDate(
           program,
           newRootFileNames,
-          newOptions
+          newOptions,
         );
         assert.isFalse(actual);
       }
       it("has more root file names", () => {
         const module1: File = {
           path: "/src/packages/mail/data/module1/lib/file1.ts",
-          content: 'import classc from "module2/file2";export default classc;',
+          content: "import classc from \"module2/file2\";export default classc;",
         };
         const module2: File = {
           path: "/src/packages/mail/data/module1/lib/module2/file2.ts",
-          content:
-            'class classc { method2() { return "hello"; } }\nexport default classc',
+          content: "class classc { method2() { return \"hello\"; } }\nexport default classc",
         };
         const module3: File = {
           path: "/src/packages/styles/module3/file3.ts",
-          content:
-            "class classD { method() { return 10; } }\nexport default classD;",
+          content: "class classD { method() { return 10; } }\nexport default classD;",
         };
         const rootFiles = [module1.path, module2.path];
         const newRootFiles = [module1.path, module2.path, module3.path];
@@ -1920,30 +1906,28 @@ namespace ts {
             options,
             watchOptions: undefined,
             system,
-          })
+          }),
         )
           .getCurrentProgram()
           .getProgram();
         verifyProgramIsNotUptoDate(
           program,
           duplicate(newRootFiles),
-          duplicate(options)
+          duplicate(options),
         );
       });
       it("has one root file replaced by another", () => {
         const module1: File = {
           path: "/src/packages/mail/data/module1/lib/file1.ts",
-          content: 'import classc from "module2/file2";export default classc;',
+          content: "import classc from \"module2/file2\";export default classc;",
         };
         const module2: File = {
           path: "/src/packages/mail/data/module1/lib/module2/file2.ts",
-          content:
-            'class classc { method2() { return "hello"; } }\nexport default classc',
+          content: "class classc { method2() { return \"hello\"; } }\nexport default classc",
         };
         const module3: File = {
           path: "/src/packages/styles/module3/file3.ts",
-          content:
-            "class classD { method() { return 10; } }\nexport default classD;",
+          content: "class classD { method() { return 10; } }\nexport default classD;",
         };
         const rootFiles = [module1.path, module2.path];
         const newRootFiles = [module2.path, module3.path];
@@ -1955,14 +1939,14 @@ namespace ts {
             options,
             watchOptions: undefined,
             system,
-          })
+          }),
         )
           .getCurrentProgram()
           .getProgram();
         verifyProgramIsNotUptoDate(
           program,
           duplicate(newRootFiles),
-          duplicate(options)
+          duplicate(options),
         );
       });
     });

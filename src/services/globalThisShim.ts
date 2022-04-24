@@ -17,22 +17,22 @@ declare var window: {};
       },
       configurable: true,
     });
-    //@ts-ignore
+    // @ts-ignore
     __magic__.globalThis = __magic__;
     // The previous line should have made `globalThis` globally
     // available, but it fails in Internet Explorer 10 and older.
     // Detect this failure and fall back.
     if (typeof globalThis === "undefined") {
       // Assume `window` exists.
-      //@ts-ignore
+      // @ts-ignore
       window.globalThis = window;
     }
-    //@ts-ignore
+    // @ts-ignore
     delete Object.prototype.__magic__;
   } catch (error) {
     // In IE8, Object.defineProperty only works on DOM objects.
     // If we hit this code path, assume `window` exists.
-    //@ts-ignore
+    // @ts-ignore
     window.globalThis = window;
   }
 })();
@@ -43,17 +43,16 @@ declare var window: {};
 if (typeof process === "undefined" || process.browser) {
   /// TODO: this is used by VS, clean this up on both sides of the interface
 
-  //@ts-ignore
+  // @ts-ignore
   globalThis.TypeScript = globalThis.TypeScript || {};
-  //@ts-ignore
+  // @ts-ignore
   globalThis.TypeScript.Services = globalThis.TypeScript.Services || {};
-  //@ts-ignore
-  globalThis.TypeScript.Services.TypeScriptServicesFactory =
-    ts.TypeScriptServicesFactory;
+  // @ts-ignore
+  globalThis.TypeScript.Services.TypeScriptServicesFactory = ts.TypeScriptServicesFactory;
 
   // 'toolsVersion' gets consumed by the managed side, so it's not unused.
   // TODO: it should be moved into a namespace though.
 
-  //@ts-ignore
+  // @ts-ignore
   globalThis.toolsVersion = ts.versionMajorMinor;
 }

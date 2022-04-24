@@ -53,7 +53,7 @@ declare class TestLib {
       const project = service.configuredProjects.get(testConfig.path)!;
       checkProjectActualFiles(
         project,
-        files.map((f) => f.path)
+        files.map((f) => f.path),
       );
       host.writeFile(appLib.path, appLib.content.replace("test()", "test2()"));
       host.checkTimeoutQueueLengthAndRun(2);

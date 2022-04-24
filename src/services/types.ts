@@ -10,7 +10,7 @@ namespace ts {
     /* @internal */
     getStart(
       sourceFile?: SourceFileLike,
-      includeJsDocComment?: boolean
+      includeJsDocComment?: boolean,
     ): number; // eslint-disable-line @typescript-eslint/unified-signatures
     getFullStart(): number;
     getEnd(): number;
@@ -28,7 +28,7 @@ namespace ts {
     // See ts.forEachChild for documentation.
     forEachChild<T>(
       cbNode: (node: Node) => T | undefined,
-      cbNodeArray?: (nodes: NodeArray<Node>) => T | undefined
+      cbNodeArray?: (nodes: NodeArray<Node>) => T | undefined,
     ): T | undefined;
   }
 
@@ -47,18 +47,18 @@ namespace ts {
     getName(): string;
     getDeclarations(): Declaration[] | undefined;
     getDocumentationComment(
-      typeChecker: TypeChecker | undefined
+      typeChecker: TypeChecker | undefined,
     ): SymbolDisplayPart[];
     /* @internal */
     getContextualDocumentationComment(
       context: Node | undefined,
-      checker: TypeChecker | undefined
+      checker: TypeChecker | undefined,
     ): SymbolDisplayPart[];
     getJsDocTags(checker?: TypeChecker): JSDocTagInfo[];
     /* @internal */
     getContextualJsDocTags(
       context: Node | undefined,
-      checker: TypeChecker | undefined
+      checker: TypeChecker | undefined,
     ): JSDocTagInfo[];
   }
 
@@ -102,7 +102,7 @@ namespace ts {
     getTypeParameterAtPosition(pos: number): Type;
     getReturnType(): Type;
     getDocumentationComment(
-      typeChecker: TypeChecker | undefined
+      typeChecker: TypeChecker | undefined,
     ): SymbolDisplayPart[];
     getJsDocTags(): JSDocTagInfo[];
   }
@@ -210,10 +210,10 @@ namespace ts {
     DevDependencies = 1 << 1,
     PeerDependencies = 1 << 2,
     OptionalDependencies = 1 << 3,
-    All = Dependencies |
-      DevDependencies |
-      PeerDependencies |
-      OptionalDependencies,
+    All = Dependencies
+      | DevDependencies
+      | PeerDependencies
+      | OptionalDependencies,
   }
 
   /* @internal */
@@ -226,7 +226,7 @@ namespace ts {
     optionalDependencies?: ESMap<string, string>;
     get(
       dependencyName: string,
-      inGroups?: PackageJsonDependencyGroup
+      inGroups?: PackageJsonDependencyGroup,
     ): string | undefined;
     has(dependencyName: string, inGroups?: PackageJsonDependencyGroup): boolean;
   }
@@ -263,9 +263,7 @@ namespace ts {
   //
   // Public interface of the host of a language service instance.
   //
-  export interface LanguageServiceHost
-    extends GetEffectiveTypeRootsHost,
-      MinimalResolutionCacheHost {
+  export interface LanguageServiceHost extends GetEffectiveTypeRootsHost, MinimalResolutionCacheHost {
     getCompilationSettings(): CompilerOptions;
     getNewLine?(): string;
     getProjectVersion?(): string;
@@ -292,7 +290,7 @@ namespace ts {
       extensions?: readonly string[],
       exclude?: readonly string[],
       include?: readonly string[],
-      depth?: number
+      depth?: number,
     ): string[];
     realpath?(path: string): string;
 
@@ -321,25 +319,25 @@ namespace ts {
       reusedNames: string[] | undefined,
       redirectedReference: ResolvedProjectReference | undefined,
       options: CompilerOptions,
-      containingSourceFile?: SourceFile
+      containingSourceFile?: SourceFile,
     ): (ResolvedModule | undefined)[];
     getResolvedModuleWithFailedLookupLocationsFromCache?(
       modulename: string,
       containingFile: string,
-      resolutionMode?: ModuleKind.CommonJS | ModuleKind.ESNext
+      resolutionMode?: ModuleKind.CommonJS | ModuleKind.ESNext,
     ): ResolvedModuleWithFailedLookupLocations | undefined;
     resolveTypeReferenceDirectives?(
       typeDirectiveNames: string[] | FileReference[],
       containingFile: string,
       redirectedReference: ResolvedProjectReference | undefined,
       options: CompilerOptions,
-      containingFileMode?: SourceFile["impliedNodeFormat"] | undefined
+      containingFileMode?: SourceFile["impliedNodeFormat"] | undefined,
     ): (ResolvedTypeReferenceDirective | undefined)[];
     /* @internal */ hasInvalidatedResolution?: HasInvalidatedResolution;
     /* @internal */ hasChangedAutomaticTypeDirectiveNames?: HasChangedAutomaticTypeDirectiveNames;
     /* @internal */ getGlobalTypingsCacheLocation?(): string | undefined;
     /* @internal */ getSymlinkCache?(
-      files?: readonly SourceFile[]
+      files?: readonly SourceFile[],
     ): SymlinkCache;
     /* Lets the Program from a AutoImportProviderProject use its host project's ModuleResolutionCache */
     /* @internal */ getModuleResolutionCache?():
@@ -359,26 +357,26 @@ namespace ts {
 
     isKnownTypesPackageName?(name: string): boolean;
     installPackage?(
-      options: InstallPackageOptions
+      options: InstallPackageOptions,
     ): Promise<ApplyCodeActionCommandResult>;
     writeFile?(fileName: string, content: string): void;
 
     /* @internal */ getDocumentPositionMapper?(
       generatedFileName: string,
-      sourceFileName?: string
+      sourceFileName?: string,
     ): DocumentPositionMapper | undefined;
     /* @internal */ getSourceFileLike?(
-      fileName: string
+      fileName: string,
     ): SourceFileLike | undefined;
     /* @internal */ getPackageJsonsVisibleToFile?(
       fileName: string,
-      rootDir?: string
+      rootDir?: string,
     ): readonly PackageJsonInfo[];
     /* @internal */ getNearestAncestorDirectoryWithPackageJson?(
-      fileName: string
+      fileName: string,
     ): string | undefined;
     /* @internal */ getPackageJsonsForAutoImport?(
-      rootDir?: string
+      rootDir?: string,
     ): readonly PackageJsonInfo[];
     /* @internal */ getCachedExportInfoMap?(): ExportInfoMap;
     /* @internal */ getModuleSpecifierCache?(): ModuleSpecifierCache;
@@ -387,13 +385,13 @@ namespace ts {
     /* @internal */ getPackageJsonAutoImportProvider?(): Program | undefined;
     /* @internal */ sendPerformanceEvent?(
       kind: PerformanceEvent["kind"],
-      durationMs: number
+      durationMs: number,
     ): void;
     getParsedCommandLine?(fileName: string): ParsedCommandLine | undefined;
     /* @internal */ onReleaseParsedCommandLine?(
       configFileName: string,
       oldResolvedRef: ResolvedProjectReference | undefined,
-      optionOptions: CompilerOptions
+      optionOptions: CompilerOptions,
     ): void;
     /* @internal */ getIncompleteCompletionsCache?(): IncompleteCompletionsCache;
   }
@@ -472,29 +470,29 @@ namespace ts {
     /** @deprecated Use getEncodedSyntacticClassifications instead. */
     getSyntacticClassifications(
       fileName: string,
-      span: TextSpan
+      span: TextSpan,
     ): ClassifiedSpan[];
     getSyntacticClassifications(
       fileName: string,
       span: TextSpan,
-      format: SemanticClassificationFormat
+      format: SemanticClassificationFormat,
     ): ClassifiedSpan[] | ClassifiedSpan2020[];
 
     /** @deprecated Use getEncodedSemanticClassifications instead. */
     getSemanticClassifications(
       fileName: string,
-      span: TextSpan
+      span: TextSpan,
     ): ClassifiedSpan[];
     getSemanticClassifications(
       fileName: string,
       span: TextSpan,
-      format: SemanticClassificationFormat
+      format: SemanticClassificationFormat,
     ): ClassifiedSpan[] | ClassifiedSpan2020[];
 
     /** Encoded as triples of [start, length, ClassificationType]. */
     getEncodedSyntacticClassifications(
       fileName: string,
-      span: TextSpan
+      span: TextSpan,
     ): Classifications;
 
     /**
@@ -509,7 +507,7 @@ namespace ts {
     getEncodedSemanticClassifications(
       fileName: string,
       span: TextSpan,
-      format?: SemanticClassificationFormat
+      format?: SemanticClassificationFormat,
     ): Classifications;
 
     /**
@@ -525,7 +523,7 @@ namespace ts {
       fileName: string,
       position: number,
       options: GetCompletionsAtPositionOptions | undefined,
-      formattingSettings?: FormatCodeSettings
+      formattingSettings?: FormatCodeSettings,
     ): WithMetadata<CompletionInfo> | undefined;
 
     /**
@@ -546,14 +544,14 @@ namespace ts {
       formatOptions: FormatCodeOptions | FormatCodeSettings | undefined,
       source: string | undefined,
       preferences: UserPreferences | undefined,
-      data: CompletionEntryData | undefined
+      data: CompletionEntryData | undefined,
     ): CompletionEntryDetails | undefined;
 
     getCompletionEntrySymbol(
       fileName: string,
       position: number,
       name: string,
-      source: string | undefined
+      source: string | undefined,
     ): Symbol | undefined;
 
     /**
@@ -565,146 +563,146 @@ namespace ts {
      */
     getQuickInfoAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): QuickInfo | undefined;
 
     getNameOrDottedNameSpan(
       fileName: string,
       startPos: number,
-      endPos: number
+      endPos: number,
     ): TextSpan | undefined;
 
     getBreakpointStatementAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): TextSpan | undefined;
 
     getSignatureHelpItems(
       fileName: string,
       position: number,
-      options: SignatureHelpItemsOptions | undefined
+      options: SignatureHelpItemsOptions | undefined,
     ): SignatureHelpItems | undefined;
 
     getRenameInfo(
       fileName: string,
       position: number,
-      options?: RenameInfoOptions
+      options?: RenameInfoOptions,
     ): RenameInfo;
     findRenameLocations(
       fileName: string,
       position: number,
       findInStrings: boolean,
       findInComments: boolean,
-      providePrefixAndSuffixTextForRename?: boolean
+      providePrefixAndSuffixTextForRename?: boolean,
     ): readonly RenameLocation[] | undefined;
 
     getSmartSelectionRange(fileName: string, position: number): SelectionRange;
 
     getDefinitionAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): readonly DefinitionInfo[] | undefined;
     getDefinitionAndBoundSpan(
       fileName: string,
-      position: number
+      position: number,
     ): DefinitionInfoAndBoundSpan | undefined;
     getTypeDefinitionAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): readonly DefinitionInfo[] | undefined;
     getImplementationAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): readonly ImplementationLocation[] | undefined;
 
     getReferencesAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): ReferenceEntry[] | undefined;
     findReferences(
       fileName: string,
-      position: number
+      position: number,
     ): ReferencedSymbol[] | undefined;
     getDocumentHighlights(
       fileName: string,
       position: number,
-      filesToSearch: string[]
+      filesToSearch: string[],
     ): DocumentHighlights[] | undefined;
     getFileReferences(fileName: string): ReferenceEntry[];
 
     /** @deprecated */
     getOccurrencesAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): readonly ReferenceEntry[] | undefined;
 
     getNavigateToItems(
       searchValue: string,
       maxResultCount?: number,
       fileName?: string,
-      excludeDtsFiles?: boolean
+      excludeDtsFiles?: boolean,
     ): NavigateToItem[];
     getNavigationBarItems(fileName: string): NavigationBarItem[];
     getNavigationTree(fileName: string): NavigationTree;
 
     prepareCallHierarchy(
       fileName: string,
-      position: number
+      position: number,
     ): CallHierarchyItem | CallHierarchyItem[] | undefined;
     provideCallHierarchyIncomingCalls(
       fileName: string,
-      position: number
+      position: number,
     ): CallHierarchyIncomingCall[];
     provideCallHierarchyOutgoingCalls(
       fileName: string,
-      position: number
+      position: number,
     ): CallHierarchyOutgoingCall[];
 
     provideInlayHints(
       fileName: string,
       span: TextSpan,
-      preferences: UserPreferences | undefined
+      preferences: UserPreferences | undefined,
     ): InlayHint[];
 
     getOutliningSpans(fileName: string): OutliningSpan[];
     getTodoComments(
       fileName: string,
-      descriptors: TodoCommentDescriptor[]
+      descriptors: TodoCommentDescriptor[],
     ): TodoComment[];
     getBraceMatchingAtPosition(fileName: string, position: number): TextSpan[];
     getIndentationAtPosition(
       fileName: string,
       position: number,
-      options: EditorOptions | EditorSettings
+      options: EditorOptions | EditorSettings,
     ): number;
 
     getFormattingEditsForRange(
       fileName: string,
       start: number,
       end: number,
-      options: FormatCodeOptions | FormatCodeSettings
+      options: FormatCodeOptions | FormatCodeSettings,
     ): TextChange[];
     getFormattingEditsForDocument(
       fileName: string,
-      options: FormatCodeOptions | FormatCodeSettings
+      options: FormatCodeOptions | FormatCodeSettings,
     ): TextChange[];
     getFormattingEditsAfterKeystroke(
       fileName: string,
       position: number,
       key: string,
-      options: FormatCodeOptions | FormatCodeSettings
+      options: FormatCodeOptions | FormatCodeSettings,
     ): TextChange[];
 
     getDocCommentTemplateAtPosition(
       fileName: string,
       position: number,
-      options?: DocCommentTemplateOptions
+      options?: DocCommentTemplateOptions,
     ): TextInsertion | undefined;
 
     isValidBraceCompletionAtPosition(
       fileName: string,
       position: number,
-      openingBrace: number
+      openingBrace: number,
     ): boolean;
     /**
      * This will return a defined result if the position is after the `>` of the opening tag, or somewhere in the text, of a JSXElement with no closing tag.
@@ -712,13 +710,13 @@ namespace ts {
      */
     getJsxClosingTagAtPosition(
       fileName: string,
-      position: number
+      position: number,
     ): JsxClosingTagInfo | undefined;
 
     getSpanOfEnclosingComment(
       fileName: string,
       position: number,
-      onlyMultiLine: boolean
+      onlyMultiLine: boolean,
     ): TextSpan | undefined;
 
     toLineColumnOffset?(fileName: string, position: number): LineAndCharacter;
@@ -733,41 +731,41 @@ namespace ts {
       end: number,
       errorCodes: readonly number[],
       formatOptions: FormatCodeSettings,
-      preferences: UserPreferences
+      preferences: UserPreferences,
     ): readonly CodeFixAction[];
     getCombinedCodeFix(
       scope: CombinedCodeFixScope,
       fixId: {},
       formatOptions: FormatCodeSettings,
-      preferences: UserPreferences
+      preferences: UserPreferences,
     ): CombinedCodeActions;
 
     applyCodeActionCommand(
       action: CodeActionCommand,
-      formatSettings?: FormatCodeSettings
+      formatSettings?: FormatCodeSettings,
     ): Promise<ApplyCodeActionCommandResult>;
     applyCodeActionCommand(
       action: CodeActionCommand[],
-      formatSettings?: FormatCodeSettings
+      formatSettings?: FormatCodeSettings,
     ): Promise<ApplyCodeActionCommandResult[]>;
     applyCodeActionCommand(
       action: CodeActionCommand | CodeActionCommand[],
-      formatSettings?: FormatCodeSettings
+      formatSettings?: FormatCodeSettings,
     ): Promise<ApplyCodeActionCommandResult | ApplyCodeActionCommandResult[]>;
     /** @deprecated `fileName` will be ignored */
     applyCodeActionCommand(
       fileName: string,
-      action: CodeActionCommand
+      action: CodeActionCommand,
     ): Promise<ApplyCodeActionCommandResult>;
     /** @deprecated `fileName` will be ignored */
     applyCodeActionCommand(
       fileName: string,
-      action: CodeActionCommand[]
+      action: CodeActionCommand[],
     ): Promise<ApplyCodeActionCommandResult[]>;
     /** @deprecated `fileName` will be ignored */
     applyCodeActionCommand(
       fileName: string,
-      action: CodeActionCommand | CodeActionCommand[]
+      action: CodeActionCommand | CodeActionCommand[],
     ): Promise<ApplyCodeActionCommandResult | ApplyCodeActionCommandResult[]>;
 
     getApplicableRefactors(
@@ -775,7 +773,7 @@ namespace ts {
       positionOrRange: number | TextRange,
       preferences: UserPreferences | undefined,
       triggerReason?: RefactorTriggerReason,
-      kind?: string
+      kind?: string,
     ): ApplicableRefactorInfo[];
     getEditsForRefactor(
       fileName: string,
@@ -783,24 +781,24 @@ namespace ts {
       positionOrRange: number | TextRange,
       refactorName: string,
       actionName: string,
-      preferences: UserPreferences | undefined
+      preferences: UserPreferences | undefined,
     ): RefactorEditInfo | undefined;
     organizeImports(
       args: OrganizeImportsArgs,
       formatOptions: FormatCodeSettings,
-      preferences: UserPreferences | undefined
+      preferences: UserPreferences | undefined,
     ): readonly FileTextChanges[];
     getEditsForFileRename(
       oldFilePath: string,
       newFilePath: string,
       formatOptions: FormatCodeSettings,
-      preferences: UserPreferences | undefined
+      preferences: UserPreferences | undefined,
     ): readonly FileTextChanges[];
 
     getEmitOutput(
       fileName: string,
       emitOnlyDtsFiles?: boolean,
-      forceDtsEmit?: boolean
+      forceDtsEmit?: boolean,
     ): EmitOutput;
 
     getProgram(): Program | undefined;
@@ -811,7 +809,7 @@ namespace ts {
     toggleLineComment(fileName: string, textRange: TextRange): TextChange[];
     toggleMultilineComment(
       fileName: string,
-      textRange: TextRange
+      textRange: TextRange,
     ): TextChange[];
     commentSelection(fileName: string, textRange: TextRange): TextChange[];
     uncommentSelection(fileName: string, textRange: TextRange): TextChange[];
@@ -834,7 +832,7 @@ namespace ts {
 
   export type CompletionsTriggerCharacter =
     | "."
-    | '"'
+    | "\""
     | "'"
     | "`"
     | "/"
@@ -1277,7 +1275,7 @@ namespace ts {
   }
 
   export function getDefaultFormatCodeSettings(
-    newLineCharacter?: string
+    newLineCharacter?: string,
   ): FormatCodeSettings {
     return {
       indentSize: 4,
@@ -1485,14 +1483,12 @@ namespace ts {
     isPackageJsonImport?: true;
   }
 
-  export interface CompletionEntryDataUnresolved
-    extends CompletionEntryDataAutoImport {
+  export interface CompletionEntryDataUnresolved extends CompletionEntryDataAutoImport {
     /** The key in the `ExportMapCache` where the completion entry's `SymbolExportInfo[]` is found */
     exportMapKey: string;
   }
 
-  export interface CompletionEntryDataResolved
-    extends CompletionEntryDataAutoImport {
+  export interface CompletionEntryDataResolved extends CompletionEntryDataAutoImport {
     moduleSpecifier: string;
   }
 
@@ -1644,12 +1640,12 @@ namespace ts {
     getClassificationsForLine(
       text: string,
       lexState: EndOfLineState,
-      syntacticClassifierAbsent: boolean
+      syntacticClassifierAbsent: boolean,
     ): ClassificationResult;
     getEncodedLexicalClassifications(
       text: string,
       endOfLineState: EndOfLineState,
-      syntacticClassifierAbsent: boolean
+      syntacticClassifierAbsent: boolean,
     ): Classifications;
   }
 
@@ -1886,12 +1882,12 @@ namespace ts {
     /** Compute the associated code actions */
     getEditsForAction(
       context: RefactorContext,
-      actionName: string
+      actionName: string,
     ): RefactorEditInfo | undefined;
 
     /** Compute (quickly) which actions are available here */
     getAvailableActions(
-      context: RefactorContext
+      context: RefactorContext,
     ): readonly ApplicableRefactorInfo[];
   }
 

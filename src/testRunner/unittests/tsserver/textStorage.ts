@@ -19,11 +19,11 @@ namespace ts.textStorage {
       // Since script info is not used in these tests, just cheat by passing undefined
       const ts1 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(f.path))
+        getDummyScriptInfo(server.asNormalizedPath(f.path)),
       );
       const ts2 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(f.path))
+        getDummyScriptInfo(server.asNormalizedPath(f.path)),
       );
 
       ts1.useScriptVersionCache_TestOnly();
@@ -33,8 +33,7 @@ namespace ts.textStorage {
 
       for (let line = 0; line < lineMap.length; line++) {
         const start = lineMap[line];
-        const end =
-          line === lineMap.length - 1 ? f.path.length : lineMap[line + 1];
+        const end = line === lineMap.length - 1 ? f.path.length : lineMap[line + 1];
 
         for (let offset = 0; offset < end - start; offset++) {
           const pos1 = ts1.lineOffsetToPosition(line + 1, offset + 1);
@@ -42,9 +41,7 @@ namespace ts.textStorage {
           assert.strictEqual(
             pos1,
             pos2,
-            `lineOffsetToPosition ${line + 1}-${
-              offset + 1
-            }: expected ${pos1} to equal ${pos2}`
+            `lineOffsetToPosition ${line + 1}-${offset + 1}: expected ${pos1} to equal ${pos2}`,
           );
         }
 
@@ -53,12 +50,12 @@ namespace ts.textStorage {
         assert.strictEqual(
           start1,
           start2,
-          `lineToTextSpan ${line}::start:: expected ${start1} to equal ${start2}`
+          `lineToTextSpan ${line}::start:: expected ${start1} to equal ${start2}`,
         );
         assert.strictEqual(
           length1,
           length2,
-          `lineToTextSpan ${line}::length:: expected ${length1} to equal ${length2}`
+          `lineToTextSpan ${line}::length:: expected ${length1} to equal ${length2}`,
         );
       }
 
@@ -68,12 +65,12 @@ namespace ts.textStorage {
         assert.strictEqual(
           line1,
           line2,
-          `positionToLineOffset ${pos}::line:: expected ${line1} to equal ${line2}`
+          `positionToLineOffset ${pos}::line:: expected ${line1} to equal ${line2}`,
         );
         assert.strictEqual(
           offset1,
           offset2,
-          `positionToLineOffset ${pos}::offset:: expected ${offset1} to equal ${offset2}`
+          `positionToLineOffset ${pos}::offset:: expected ${offset1} to equal ${offset2}`,
         );
       }
     });
@@ -83,31 +80,31 @@ namespace ts.textStorage {
       // Since script info is not used in these tests, just cheat by passing undefined
       const ts1 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(f.path))
+        getDummyScriptInfo(server.asNormalizedPath(f.path)),
       );
 
       ts1.getSnapshot();
       assert.isFalse(
         ts1.hasScriptVersionCache_TestOnly(),
-        "should not have script version cache - 1"
+        "should not have script version cache - 1",
       );
 
       ts1.edit(0, 5, "   ");
       assert.isTrue(
         ts1.hasScriptVersionCache_TestOnly(),
-        "have script version cache - 1"
+        "have script version cache - 1",
       );
 
       ts1.useText();
       assert.isFalse(
         ts1.hasScriptVersionCache_TestOnly(),
-        "should not have script version cache - 2"
+        "should not have script version cache - 2",
       );
 
       ts1.getAbsolutePositionAndLineText(0);
       assert.isTrue(
         ts1.hasScriptVersionCache_TestOnly(),
-        "have script version cache - 2"
+        "have script version cache - 2",
       );
     });
 
@@ -116,7 +113,7 @@ namespace ts.textStorage {
       // Since script info is not used in these tests, just cheat by passing undefined
       const ts1 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(f.path))
+        getDummyScriptInfo(server.asNormalizedPath(f.path)),
       );
 
       assert.strictEqual(f.content.length, ts1.getTelemetryFileSize());
@@ -127,7 +124,7 @@ namespace ts.textStorage {
       // Since script info is not used in these tests, just cheat by passing undefined
       const ts1 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(f.path))
+        getDummyScriptInfo(server.asNormalizedPath(f.path)),
       );
 
       ts1.useText(f.content);
@@ -141,7 +138,7 @@ namespace ts.textStorage {
       // Since script info is not used in these tests, just cheat by passing undefined
       const ts1 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(f.path))
+        getDummyScriptInfo(server.asNormalizedPath(f.path)),
       );
 
       ts1.useScriptVersionCache_TestOnly();
@@ -184,7 +181,7 @@ namespace ts.textStorage {
       // Since script info is not used in these tests, just cheat by passing undefined
       const ts1 = new server.TextStorage(
         host,
-        getDummyScriptInfo(server.asNormalizedPath(changingFile.path))
+        getDummyScriptInfo(server.asNormalizedPath(changingFile.path)),
       );
 
       assert.isTrue(ts1.reloadFromDisk());

@@ -58,7 +58,7 @@ namespace ts {
                 outDir: "outDir",
               },
               references: [{ path: "../core" }],
-            })
+            }),
           ),
       });
 
@@ -78,18 +78,16 @@ namespace ts {
                 declarationDir: "out/decls",
               },
               references: [{ path: "../core" }],
-            })
+            }),
           ),
       });
 
       verifyTsc({
         scenario: "sample1",
-        subScenario:
-          "builds correctly when project is not composite or doesnt have any references",
+        subScenario: "builds correctly when project is not composite or doesnt have any references",
         fs: () => projFs,
         commandLineArgs: ["--b", "/src/core", "--verbose"],
-        modifyFs: (fs) =>
-          replaceText(fs, "/src/core/tsconfig.json", `"composite": true,`, ""),
+        modifyFs: (fs) => replaceText(fs, "/src/core/tsconfig.json", `"composite": true,`, ""),
       });
     });
 
@@ -172,8 +170,7 @@ namespace ts {
           {
             subScenario: "Only builds the leaf node project",
             buildKind: BuildKind.IncrementalDtsUnchanged,
-            modifyFs: (fs) =>
-              fs.writeFileSync("/src/tests/index.ts", "const m = 10;"),
+            modifyFs: (fs) => fs.writeFileSync("/src/tests/index.ts", "const m = 10;"),
           },
           // Update a file in the parent (without affecting types), should get fast downstream builds
           {
@@ -184,12 +181,11 @@ namespace ts {
                 fs,
                 "/src/core/index.ts",
                 "HELLO WORLD",
-                "WELCOME PLANET"
+                "WELCOME PLANET",
               ),
           },
           {
-            subScenario:
-              "indicates that it would skip builds during a dry build",
+            subScenario: "indicates that it would skip builds during a dry build",
             buildKind: BuildKind.IncrementalDtsUnchanged,
             modifyFs: noop,
             commandLineArgs: ["--b", "/src/tests", "--dry"],
@@ -208,7 +204,7 @@ namespace ts {
                 fs,
                 "/src/tests/tsconfig.json",
                 `"composite": true`,
-                `"composite": true, "target": "es3"`
+                `"composite": true, "target": "es3"`,
               ),
           },
         ],
@@ -222,29 +218,32 @@ namespace ts {
           getExpectedDiagnosticForProjectsInBuild(
             "src/core/tsconfig.json",
             "src/logic/tsconfig.json",
-            "src/tests/tsconfig.json"
+            "src/tests/tsconfig.json",
           ),
           [
-            Diagnostics.Project_0_is_out_of_date_because_output_for_it_was_generated_with_version_1_that_differs_with_current_version_2,
+            Diagnostics
+              .Project_0_is_out_of_date_because_output_for_it_was_generated_with_version_1_that_differs_with_current_version_2,
             "src/core/tsconfig.json",
             fakes.version,
             version,
           ],
           [Diagnostics.Building_project_0, "/src/core/tsconfig.json"],
           [
-            Diagnostics.Project_0_is_out_of_date_because_output_for_it_was_generated_with_version_1_that_differs_with_current_version_2,
+            Diagnostics
+              .Project_0_is_out_of_date_because_output_for_it_was_generated_with_version_1_that_differs_with_current_version_2,
             "src/logic/tsconfig.json",
             fakes.version,
             version,
           ],
           [Diagnostics.Building_project_0, "/src/logic/tsconfig.json"],
           [
-            Diagnostics.Project_0_is_out_of_date_because_output_for_it_was_generated_with_version_1_that_differs_with_current_version_2,
+            Diagnostics
+              .Project_0_is_out_of_date_because_output_for_it_was_generated_with_version_1_that_differs_with_current_version_2,
             "src/tests/tsconfig.json",
             fakes.version,
             version,
           ],
-          [Diagnostics.Building_project_0, "/src/tests/tsconfig.json"]
+          [Diagnostics.Building_project_0, "/src/tests/tsconfig.json"],
         );
       });
 
@@ -254,7 +253,7 @@ namespace ts {
           fs,
           /*options*/ undefined,
           /*setParentNodes*/ undefined,
-          createAbstractBuilder
+          createAbstractBuilder,
         );
         let builder = createSolutionBuilder(host, ["/src/tests"], {
           verbose: true,
@@ -264,7 +263,7 @@ namespace ts {
           getExpectedDiagnosticForProjectsInBuild(
             "src/core/tsconfig.json",
             "src/logic/tsconfig.json",
-            "src/tests/tsconfig.json"
+            "src/tests/tsconfig.json",
           ),
           [
             Diagnostics.Project_0_is_out_of_date_because_output_file_1_does_not_exist,
@@ -283,7 +282,7 @@ namespace ts {
             "src/tests/tsconfig.json",
             "src/tests/index.js",
           ],
-          [Diagnostics.Building_project_0, "/src/tests/tsconfig.json"]
+          [Diagnostics.Building_project_0, "/src/tests/tsconfig.json"],
         );
         verifyOutputsPresent(fs, allExpectedOutputs);
 
@@ -298,7 +297,7 @@ namespace ts {
           getExpectedDiagnosticForProjectsInBuild(
             "src/core/tsconfig.json",
             "src/logic/tsconfig.json",
-            "src/tests/tsconfig.json"
+            "src/tests/tsconfig.json",
           ),
           [
             Diagnostics.Project_0_is_up_to_date_because_newest_input_1_is_older_than_oldest_output_2,
@@ -317,7 +316,7 @@ namespace ts {
             "src/tests/tsconfig.json",
             "src/tests/index.ts",
             "src/tests/index.js",
-          ]
+          ],
         );
       });
 
@@ -329,13 +328,13 @@ namespace ts {
         modifyFs: (fs) => {
           fs.writeFileSync(
             "/src/tests/tsconfig.base.json",
-            JSON.stringify({ compilerOptions: { target: "es3" } })
+            JSON.stringify({ compilerOptions: { target: "es3" } }),
           );
           replaceText(
             fs,
             "/src/tests/tsconfig.json",
             `"references": [`,
-            `"extends": "./tsconfig.base.json", "references": [`
+            `"extends": "./tsconfig.base.json", "references": [`,
           );
         },
         incrementalScenarios: [
@@ -344,7 +343,7 @@ namespace ts {
             modifyFs: (fs) =>
               fs.writeFileSync(
                 "/src/tests/tsconfig.base.json",
-                JSON.stringify({ compilerOptions: {} })
+                JSON.stringify({ compilerOptions: {} }),
               ),
           },
         ],
@@ -386,7 +385,7 @@ namespace ts {
             result: ExitStatus.Success,
           },
           coreOutputs,
-          [...logicOutputs, ...testsOutputs]
+          [...logicOutputs, ...testsOutputs],
         );
 
         verifyBuildNextResult(
@@ -395,7 +394,7 @@ namespace ts {
             result: ExitStatus.Success,
           },
           [...coreOutputs, ...logicOutputs],
-          testsOutputs
+          testsOutputs,
         );
 
         verifyBuildNextResult(
@@ -404,25 +403,25 @@ namespace ts {
             result: ExitStatus.Success,
           },
           allExpectedOutputs,
-          emptyArray
+          emptyArray,
         );
 
         verifyBuildNextResult(
           /*expected*/ undefined,
           allExpectedOutputs,
-          emptyArray
+          emptyArray,
         );
 
         function verifyBuildNextResult(
           expected: SolutionBuilderResult<ExitStatus> | undefined,
           presentOutputs: readonly string[],
-          absentOutputs: readonly string[]
+          absentOutputs: readonly string[],
         ) {
           const project = builder.getNextInvalidatedProject();
           const result = project && project.done();
           assert.deepEqual(
             project && { project: project.project, result },
-            expected
+            expected,
           );
           verifyOutputsPresent(fs, presentOutputs);
           verifyOutputsAbsent(fs, absentOutputs);
@@ -439,7 +438,7 @@ namespace ts {
         host.assertDiagnosticMessages(
           getExpectedDiagnosticForProjectsInBuild(
             "src/core/tsconfig.json",
-            "src/logic/tsconfig.json"
+            "src/logic/tsconfig.json",
           ),
           [
             Diagnostics.Project_0_is_out_of_date_because_output_file_1_does_not_exist,
@@ -452,7 +451,7 @@ namespace ts {
             "src/logic/tsconfig.json",
             "src/logic/index.js",
           ],
-          [Diagnostics.Building_project_0, "/src/logic/tsconfig.json"]
+          [Diagnostics.Building_project_0, "/src/logic/tsconfig.json"],
         );
         verifyOutputsPresent(fs, [...coreOutputs, ...logicOutputs]);
         verifyOutputsAbsent(fs, testsOutputs);
@@ -462,8 +461,7 @@ namespace ts {
     describe("downstream-blocked compilations", () => {
       verifyTsc({
         scenario: "sample1",
-        subScenario:
-          "does not build downstream projects if upstream projects have errors",
+        subScenario: "does not build downstream projects if upstream projects have errors",
         fs: () => projFs,
         commandLineArgs: ["--b", "/src/tests", "--verbose"],
         modifyFs: (fs) =>
@@ -471,7 +469,7 @@ namespace ts {
             fs,
             "/src/logic/index.ts",
             "c.multiply(10, 15)",
-            `c.muitply()`
+            `c.muitply()`,
           ),
       });
     });
@@ -503,7 +501,7 @@ namespace ts {
         assert.equal(
           status.type,
           UpToDateStatusType.UpToDate,
-          "Project should be assumed to be up-to-date"
+          "Project should be assumed to be up-to-date",
         );
         verifyInvalidation(/*expectedToWriteTests*/ false);
 
@@ -511,7 +509,7 @@ namespace ts {
         fs.writeFileSync(
           "/src/logic/index.ts",
           `${fs.readFileSync("/src/logic/index.ts")}
-export class cNew {}`
+export class cNew {}`,
         );
         verifyInvalidation(/*expectedToWriteTests*/ true);
 
@@ -519,27 +517,27 @@ export class cNew {}`
           // Rebuild this project
           tick();
           builder.invalidateProject(
-            "/src/logic/tsconfig.json" as ResolvedConfigFilePath
+            "/src/logic/tsconfig.json" as ResolvedConfigFilePath,
           );
           builder.buildNextInvalidatedProject();
           // The file should be updated
           assert.isTrue(
             writtenFiles.has("/src/logic/index.js"),
-            "JS file should have been rebuilt"
+            "JS file should have been rebuilt",
           );
           assert.equal(
             fs.statSync("/src/logic/index.js").mtimeMs,
             time(),
-            "JS file should have been rebuilt"
+            "JS file should have been rebuilt",
           );
           assert.isFalse(
             writtenFiles.has("/src/tests/index.js"),
-            "Downstream JS file should *not* have been rebuilt"
+            "Downstream JS file should *not* have been rebuilt",
           );
           assert.isBelow(
             fs.statSync("/src/tests/index.js").mtimeMs,
             time(),
-            "Downstream JS file should *not* have been rebuilt"
+            "Downstream JS file should *not* have been rebuilt",
           );
           writtenFiles.clear();
 
@@ -549,24 +547,24 @@ export class cNew {}`
           if (expectedToWriteTests) {
             assert.isTrue(
               writtenFiles.has("/src/tests/index.js"),
-              "Downstream JS file should have been rebuilt"
+              "Downstream JS file should have been rebuilt",
             );
           } else {
             assert.equal(
               writtenFiles.size,
               0,
-              "Should not write any new files"
+              "Should not write any new files",
             );
           }
           assert.equal(
             fs.statSync("/src/tests/index.js").mtimeMs,
             time(),
-            "Downstream JS file should have new timestamp"
+            "Downstream JS file should have new timestamp",
           );
           assert.isBelow(
             fs.statSync("/src/core/index.js").mtimeMs,
             time(),
-            "Upstream JS file should not have been rebuilt"
+            "Upstream JS file should not have been rebuilt",
           );
         }
       });
@@ -580,7 +578,7 @@ export class cNew {}`
             fs,
             "/src/core/index.ts",
             `
-export class someClass { }`
+export class someClass { }`,
           ),
       },
       {
@@ -590,7 +588,7 @@ export class someClass { }`
             fs,
             "/src/core/index.ts",
             `
-class someClass2 { }`
+class someClass2 { }`,
           ),
       },
     ];
@@ -638,7 +636,7 @@ class someClass2 { }`
                 "/src/logic/tsconfig.json",
                 `"declaration": true,`,
                 `"declaration": true,
-        "declarationDir": "decls",`
+        "declarationDir": "decls",`,
               ),
           },
           noChangeRun,
@@ -655,7 +653,7 @@ class someClass2 { }`
             "/src/logic/tsconfig.json",
             `"composite": true,`,
             `"composite": true,
-        "tsBuildInfoFile": "ownFile.tsbuildinfo",`
+        "tsBuildInfoFile": "ownFile.tsbuildinfo",`,
           ),
         commandLineArgs: ["--b", "/src/tests", "--verbose"],
         baselineSourceMap: true,
@@ -675,7 +673,7 @@ class someClass2 { }`
         "incremental": true,
         "skipDefaultLibCheck": true
     }
-}`
+}`,
           ),
         incrementalScenarios: [
           {
@@ -685,7 +683,7 @@ class someClass2 { }`
                 fs,
                 "/src/core/tsconfig.json",
                 `"incremental": true,`,
-                `"incremental": true, "declaration": true,`
+                `"incremental": true, "declaration": true,`,
               ),
           },
         ],
@@ -700,13 +698,13 @@ class someClass2 { }`
           fs.writeFileSync(
             "/lib/lib.esnext.full.d.ts",
             `/// <reference no-default-lib="true"/>
-/// <reference lib="esnext" />`
+/// <reference lib="esnext" />`,
           );
           fs.writeFileSync("/lib/lib.esnext.d.ts", libContent);
           fs.writeFileSync(
             "/lib/lib.d.ts",
             `/// <reference no-default-lib="true"/>
-/// <reference lib="esnext" />`
+/// <reference lib="esnext" />`,
           );
           fs.writeFileSync(
             "/src/core/tsconfig.json",
@@ -717,14 +715,13 @@ class someClass2 { }`
 "listEmittedFiles": true,
         "target": "esnext",
     }
-}`
+}`,
           );
         },
         incrementalScenarios: [
           {
             buildKind: BuildKind.IncrementalDtsChange,
-            modifyFs: (fs) =>
-              replaceText(fs, "/src/core/tsconfig.json", "esnext", "es5"),
+            modifyFs: (fs) => replaceText(fs, "/src/core/tsconfig.json", "esnext", "es5"),
           },
         ],
       });
@@ -742,7 +739,7 @@ class someClass2 { }`
         "incremental": true,
         "module": "commonjs"
     }
-}`
+}`,
           ),
         incrementalScenarios: [
           {
@@ -752,7 +749,7 @@ class someClass2 { }`
                 fs,
                 "/src/core/tsconfig.json",
                 `"module": "commonjs"`,
-                `"module": "amd"`
+                `"module": "amd"`,
               ),
           },
         ],
@@ -779,7 +776,7 @@ class someClass2 { }`
         "skipDefaultLibCheck": true,
         "esModuleInterop": false
     }
-}`
+}`,
           ),
         incrementalScenarios: [
           {
@@ -789,7 +786,7 @@ class someClass2 { }`
                 fs,
                 "/src/tests/tsconfig.json",
                 `"esModuleInterop": false`,
-                `"esModuleInterop": true`
+                `"esModuleInterop": true`,
               ),
           },
         ],

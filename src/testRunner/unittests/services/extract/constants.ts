@@ -6,14 +6,14 @@ namespace ts {
       "extractConstant_Namespace",
       `namespace N {
     let x = [#|1|];
-}`
+}`,
     );
 
     testExtractConstant(
       "extractConstant_Class",
       `class C {
     x = [#|1|];
-}`
+}`,
     );
 
     testExtractConstant(
@@ -22,21 +22,21 @@ namespace ts {
     M() {
         let x = [#|1|];
     }
-}`
+}`,
     );
 
     testExtractConstant(
       "extractConstant_Function",
       `function F() {
     let x = [#|1|];
-}`
+}`,
     );
 
     testExtractConstant("extractConstant_ExpressionStatement", `[#|"hello";|]`);
 
     testExtractConstant(
       "extractConstant_ExpressionStatementExpression",
-      `[#|"hello"|];`
+      `[#|"hello"|];`,
     );
 
     testExtractConstant(
@@ -46,7 +46,7 @@ let i = 0;
 function F() {
     [#|i++|];
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -56,7 +56,7 @@ function F() {
     let i = 0;
     [#|i++|];
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -65,7 +65,7 @@ function F() {
     for (let j = 0; j < 10; j++) {
         let x = [#|1|];
     }
-}`
+}`,
     );
 
     testExtractConstant(
@@ -78,7 +78,7 @@ function F() {
     M3() {
         let x = [#|1|];
     }
-}`
+}`,
     );
 
     testExtractConstant(
@@ -91,7 +91,7 @@ function F() {
     M3() {
         let x = [#|1|];
     }
-}`
+}`,
     );
 
     testExtractConstant(
@@ -104,7 +104,7 @@ function F() {
     M3() {
         let x = [#|1|];
     }
-}`
+}`,
     );
 
     testExtractConstant(
@@ -112,14 +112,14 @@ function F() {
       `function F() {
     let w = 1;
     let x = [#|w + 1|];
-}`
+}`,
     );
 
     testExtractConstant(
       "extractConstant_TypeParameters",
       `function F<T>(t: T) {
     let x = [#|t + 1|];
-}`
+}`,
     );
 
     testExtractConstant(
@@ -127,25 +127,25 @@ function F() {
       `namespace X {
     export const j = 10;
     export const y = [#|j * j|];
-}`
+}`,
     );
 
     testExtractConstant(
       "extractConstant_VariableList_const",
-      `const a = 1, b = [#|a + 1|];`
+      `const a = 1, b = [#|a + 1|];`,
     );
 
     // NOTE: this test isn't normative - it just documents our sub-optimal behavior.
     testExtractConstant(
       "extractConstant_VariableList_let",
-      `let a = 1, b = [#|a + 1|];`
+      `let a = 1, b = [#|a + 1|];`,
     );
 
     // NOTE: this test isn't normative - it just documents our sub-optimal behavior.
     testExtractConstant(
       "extractConstant_VariableList_MultipleLines",
       `const /*About A*/a = 1,
-    /*About B*/b = [#|a + 1|];`
+    /*About B*/b = [#|a + 1|];`,
     );
 
     testExtractConstant(
@@ -156,7 +156,7 @@ for (let i = 0; i < 10; i++) {
         const x = [#|i + 1|];
     }
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -166,7 +166,7 @@ const i = 0;
 for (let j = 0; j < 10; j++) {
     const x = [#|i + 1|];
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -178,7 +178,7 @@ function F() {
         const x = [#|i + 1|];
     }
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -187,7 +187,7 @@ function F() {
 for (let j = 0; j < 10; j++) {
     const x = [#|2 + 1|];
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -198,7 +198,7 @@ function F() {
         const x = [#|2 + 1|];
     }
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -210,7 +210,7 @@ function F0() {
         }
     }
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -219,7 +219,7 @@ function F0() {
 class C {
     x = [#|2 + 1|];
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -233,7 +233,7 @@ class C {
         }
     }
 }
-        `
+        `,
     );
 
     testExtractConstant(
@@ -242,7 +242,7 @@ class C {
 /// <reference path="path.js"/>
 
 const x = [#|2 + 1|];
-        `
+        `,
     );
 
     testExtractConstant(
@@ -251,7 +251,7 @@ const x = [#|2 + 1|];
 /*! Copyright */
 
 const x = [#|2 + 1|];
-        `
+        `,
     );
 
     testExtractConstant(
@@ -260,7 +260,7 @@ const x = [#|2 + 1|];
 "strict";
 
 const x = [#|2 + 1|];
-        `
+        `,
     );
 
     testExtractConstant(
@@ -273,7 +273,7 @@ const x = [#|2 + 1|];
 "strict";
 
 const x = [#|2 + 1|];
-        `
+        `,
     );
 
     testExtractConstant(
@@ -283,7 +283,7 @@ const x = [#|2 + 1|];
 
 /* About x */
 const x = [#|2 + 1|];
-        `
+        `,
     );
 
     testExtractConstant(
@@ -291,12 +291,12 @@ const x = [#|2 + 1|];
       `
 const f = () => {
     return [#|2 + 1|];
-};`
+};`,
     );
 
     testExtractConstant(
       "extractConstant_ArrowFunction_Expression",
-      `const f = () => [#|2 + 1|];`
+      `const f = () => [#|2 + 1|];`,
     );
 
     testExtractConstant(
@@ -307,21 +307,21 @@ var q = /*b*/ //c
     /*d*/ [#|1 /*e*/ //f
     /*g*/ + /*h*/ //i
     /*j*/ 2|] /*k*/ //l
-    /*m*/; /*n*/ //o`
+    /*m*/; /*n*/ //o`,
     );
 
     testExtractConstantFailed(
       "extractConstant_Void",
       `
 function f(): void { }
-[#|f();|]`
+[#|f();|]`,
     );
 
     testExtractConstantFailed(
       "extractConstant_Never",
       `
 function f(): never { }
-[#|f();|]`
+[#|f();|]`,
     );
 
     testExtractConstant(
@@ -332,7 +332,7 @@ class C {
         [#|this.m2()|];
     }
     m2() { return 1; }
-}`
+}`,
     );
 
     testExtractConstant(
@@ -343,7 +343,7 @@ class C {
         [#|this.m2()|];
     }
     m2() { return 1; }
-}`
+}`,
     );
 
     testExtractConstant(
@@ -354,7 +354,7 @@ namespace N { // Force this test to be TS-only
         x = 1;
         y = [#|this.x|];
     }
-}`
+}`,
     );
 
     // TODO (https://github.com/Microsoft/TypeScript/issues/20727): the extracted constant should have a type annotation.
@@ -363,7 +363,7 @@ namespace N { // Force this test to be TS-only
       `
 interface I { a: 1 | 2 | 3 }
 let i: I = [#|{ a: 1 }|];
-`
+`,
     );
 
     testExtractConstant(
@@ -372,7 +372,7 @@ let i: I = [#|{ a: 1 }|];
 const myObj: { member(x: number, y: string): void } = {
     member: [#|(x, y) => x + y|],
 }
-`
+`,
     );
 
     testExtractConstant(
@@ -382,7 +382,7 @@ switch (1) {
     case [#|1|]:
         break;
 }
-`
+`,
     );
 
     testExtractConstant("extractConstant_PropertyName", `[#|x.y|].z();`);
@@ -390,17 +390,17 @@ switch (1) {
     testExtractConstant(
       "extractConstant_PropertyName_ExistingName",
       `let y;
-[#|x.y|].z();`
+[#|x.y|].z();`,
     );
 
     testExtractConstant(
       "extractConstant_PropertyName_Keyword",
-      `[#|x.if|].z();`
+      `[#|x.if|].z();`,
     );
 
     testExtractConstant(
       "extractConstant_PropertyName_PrivateIdentifierKeyword",
-      `[#|this.#if|].z();`
+      `[#|this.#if|].z();`,
     );
   });
 
@@ -409,7 +409,7 @@ switch (1) {
       caption,
       text,
       "extractConstant",
-      Diagnostics.Extract_constant
+      Diagnostics.Extract_constant,
     );
   }
 

@@ -6,16 +6,16 @@ namespace ts {
       context.onSubstituteNode = (hint, node) => {
         node = previousOnSubstituteNode(hint, node);
         if (
-          hint === EmitHint.Expression &&
-          isIdentifier(node) &&
-          node.escapedText === "undefined"
+          hint === EmitHint.Expression
+          && isIdentifier(node)
+          && node.escapedText === "undefined"
         ) {
           node = factory.createPartiallyEmittedExpression(
             addSyntheticTrailingComment(
               setTextRange(factory.createVoidZero(), node),
               SyntaxKind.MultiLineCommentTrivia,
-              "undefined"
-            )
+              "undefined",
+            ),
           );
         }
         return node;
@@ -33,7 +33,7 @@ namespace ts {
     }
 
     function replaceIdentifiersNamedOldNameWithNewName(
-      context: TransformationContext
+      context: TransformationContext,
     ) {
       const previousOnSubstituteNode = context.onSubstituteNode;
       context.enableSubstitution(SyntaxKind.Identifier);
@@ -48,7 +48,7 @@ namespace ts {
     }
 
     function replaceIdentifiersNamedOldNameWithNewName2(
-      context: TransformationContext
+      context: TransformationContext,
     ) {
       const visitor: Visitor = (node) => {
         if (isIdentifier(node) && node.text === "oldName") {
@@ -66,29 +66,29 @@ namespace ts {
             factory.createTaggedTemplateExpression(
               factory.createIdentifier("$tpl"),
               /*typeArguments*/ undefined,
-              factory.createNoSubstitutionTemplateLiteral("foo", "foo")
-            )
+              factory.createNoSubstitutionTemplateLiteral("foo", "foo"),
+            ),
           ),
         ]);
     }
 
     function transformSourceFile(
       sourceText: string,
-      transformers: TransformerFactory<SourceFile>[]
+      transformers: TransformerFactory<SourceFile>[],
     ) {
       const transformed = transform(
         createSourceFile("source.ts", sourceText, ScriptTarget.ES2015),
-        transformers
+        transformers,
       );
       const printer = createPrinter(
         { newLine: NewLineKind.CarriageReturnLineFeed },
         {
           onEmitNode: transformed.emitNodeWithNotification,
           substituteNode: transformed.substituteNode,
-        }
+        },
       );
       const result = printer.printBundle(
-        factory.createBundle(transformed.transformed)
+        factory.createBundle(transformed.transformed),
       );
       transformed.dispose();
       return result;
@@ -98,7 +98,7 @@ namespace ts {
       it(testName, () => {
         Harness.Baseline.runBaseline(
           `transformApi/transformsCorrectly.${testName}.js`,
-          test()
+          test(),
         );
       });
     }
@@ -106,7 +106,7 @@ namespace ts {
     function testBaselineAndEvaluate(
       testName: string,
       test: () => string,
-      onEvaluate: (exports: any) => void
+      onEvaluate: (exports: any) => void,
     ) {
       describe(testName, () => {
         let sourceText!: string;
@@ -119,7 +119,7 @@ namespace ts {
         it("compare baselines", () => {
           Harness.Baseline.runBaseline(
             `transformApi/transformsCorrectly.${testName}.js`,
-            sourceText
+            sourceText,
           );
         });
         it("evaluate", () => {
@@ -136,22 +136,24 @@ namespace ts {
 
     testBaseline("types", () => {
       return transformSourceFile(`let a: () => void`, [
-        (context) => (file) =>
-          visitNode(file, function visitor(node: Node): VisitResult<Node> {
-            return visitEachChild(node, visitor, context);
-          }),
+        (context) =>
+          (file) =>
+            visitNode(file, function visitor(node: Node): VisitResult<Node> {
+              return visitEachChild(node, visitor, context);
+            }),
       ]);
     });
 
     testBaseline("transformDefiniteAssignmentAssertions", () => {
       return transformSourceFile(`let a!: () => void`, [
-        (context) => (file) =>
-          visitNode(file, function visitor(node: Node): VisitResult<Node> {
-            if (node.kind === SyntaxKind.VoidKeyword) {
-              return factory.createKeywordTypeNode(SyntaxKind.UndefinedKeyword);
-            }
-            return visitEachChild(node, visitor, context);
-          }),
+        (context) =>
+          (file) =>
+            visitNode(file, function visitor(node: Node): VisitResult<Node> {
+              if (node.kind === SyntaxKind.VoidKeyword) {
+                return factory.createKeywordTypeNode(SyntaxKind.UndefinedKeyword);
+              }
+              return visitEachChild(node, visitor, context);
+            }),
       ]);
     });
 
@@ -198,25 +200,26 @@ namespace ts {
                 const SecondVar = null;
             `,
         [
-          (context) => (file) => {
-            const firstVarName = (file.statements[0] as VariableStatement)
-              .declarationList.declarations[0].name as Identifier;
-            const secondVarName = (file.statements[0] as VariableStatement)
-              .declarationList.declarations[0].name as Identifier;
+          (context) =>
+            (file) => {
+              const firstVarName = (file.statements[0] as VariableStatement)
+                .declarationList.declarations[0].name as Identifier;
+              const secondVarName = (file.statements[0] as VariableStatement)
+                .declarationList.declarations[0].name as Identifier;
 
-            return context.factory.updateSourceFile(
-              file,
-              file.statements.concat([
-                context.factory.createExpressionStatement(
-                  context.factory.createArrayLiteralExpression([
-                    firstVarName,
-                    secondVarName,
-                  ])
-                ),
-              ])
-            );
-          },
-        ]
+              return context.factory.updateSourceFile(
+                file,
+                file.statements.concat([
+                  context.factory.createExpressionStatement(
+                    context.factory.createArrayLiteralExpression([
+                      firstVarName,
+                      secondVarName,
+                    ]),
+                  ),
+                ]),
+              );
+            },
+        ],
       );
     });
 
@@ -246,7 +249,7 @@ namespace ts {
             newLine: NewLineKind.CarriageReturnLineFeed,
             useDefineForClassFields: false,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -263,7 +266,7 @@ namespace ts {
             target: ScriptTarget.ESNext,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -290,15 +293,15 @@ namespace ts {
                 "Foo",
                 /*typeParameters*/ undefined,
                 /*heritageClauses*/ undefined,
-                /*members*/ undefined!
+                /*members*/ undefined!,
               ), // TODO: GH#18217
               factory.createModuleDeclaration(
                 /*decorators*/ undefined,
                 /*modifiers*/ undefined,
                 factory.createIdentifier("Foo"),
-                factory.createModuleBlock([factory.createEmptyStatement()])
+                factory.createModuleBlock([factory.createEmptyStatement()]),
               ),
-            ])
+            ]),
           );
           return result;
         };
@@ -343,7 +346,7 @@ namespace ts {
                 factory.createExportSpecifier(
                   /*isTypeOnly*/ false,
                   e.name,
-                  e.name
+                  e.name,
                 )
               );
               const exportClause = factory.createNamedExports(exportSpecifiers);
@@ -354,7 +357,7 @@ namespace ts {
                 ed.isTypeOnly,
                 exportClause,
                 ed.moduleSpecifier,
-                ed.assertClause
+                ed.assertClause,
               );
 
               return newEd as Node as T;
@@ -390,10 +393,10 @@ namespace ts {
             /*importClause*/ factory.createImportClause(
               /*isTypeOnly*/ false,
               /*name*/ undefined,
-              factory.createNamespaceImport(factory.createIdentifier("i0"))
+              factory.createNamespaceImport(factory.createIdentifier("i0")),
             ),
             /*moduleSpecifier*/ factory.createStringLiteral("./comp1"),
-            /*assertClause*/ undefined
+            /*assertClause*/ undefined,
           );
           return factory.updateSourceFile(sf, [importStar]);
         }
@@ -434,9 +437,9 @@ namespace ts {
                 /**/ undefined,
                 [],
                 /**/ undefined,
-                factory.createBlock([])
+                factory.createBlock([]),
               ),
-            ]
+            ],
           );
           return factory.updateSourceFile(sf, [classDecl]);
         }
@@ -493,12 +496,12 @@ namespace ts {
                       factory.createModifier(SyntaxKind.PrivateKeyword),
                     ],
                     /*dotDotDotToken*/ undefined,
-                    "x"
+                    "x",
                   ),
                 ],
-                factory.createBlock([])
+                factory.createBlock([]),
               ),
-            ]
+            ],
           );
           return factory.updateSourceFile(sf, [classDecl]);
         }
@@ -507,7 +510,7 @@ namespace ts {
 
     function baselineDeclarationTransform(
       text: string,
-      opts: TranspileOptions
+      opts: TranspileOptions,
     ) {
       const fs = vfs.createFromFileSystem(Harness.IO, /*caseSensitive*/ true, {
         documents: [new documents.TextDocument("/.src/index.ts", text)],
@@ -516,14 +519,14 @@ namespace ts {
       const program = createProgram(
         ["/.src/index.ts"],
         opts.compilerOptions!,
-        host
+        host,
       );
       program.emit(
         program.getSourceFile("/.src/index.ts"),
         (p, s, bom) => host.writeFile(p, s, bom),
         /*cancellationToken*/ undefined,
         /*onlyDts*/ true,
-        opts.transformers
+        opts.transformers,
       );
       return fs.readFileSync("/.src/index.d.ts").toString();
     }
@@ -565,7 +568,7 @@ namespace ts {
             target: ScriptTarget.ES5,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -584,7 +587,7 @@ export {exportedSeparately};
             target: ScriptTarget.ES5,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -605,10 +608,10 @@ export {Value};
             before: [
               addSyntheticComment(
                 (n) =>
-                  isImportDeclaration(n) ||
-                  isExportDeclaration(n) ||
-                  isImportSpecifier(n) ||
-                  isExportSpecifier(n)
+                  isImportDeclaration(n)
+                  || isExportDeclaration(n)
+                  || isImportSpecifier(n)
+                  || isExportSpecifier(n),
               ),
             ],
           },
@@ -616,7 +619,7 @@ export {Value};
             target: ScriptTarget.ES5,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -639,10 +642,10 @@ class Clazz {
             before: [
               addSyntheticComment(
                 (n) =>
-                  isPropertyDeclaration(n) ||
-                  isParameterPropertyDeclaration(n, n.parent) ||
-                  isClassDeclaration(n) ||
-                  isConstructorDeclaration(n)
+                  isPropertyDeclaration(n)
+                  || isParameterPropertyDeclaration(n, n.parent)
+                  || isClassDeclaration(n)
+                  || isConstructorDeclaration(n),
               ),
             ],
           },
@@ -650,7 +653,7 @@ class Clazz {
             target: ScriptTarget.ES2015,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -674,7 +677,7 @@ namespace Foo {
             target: ScriptTarget.ES2015,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
     });
 
@@ -694,7 +697,7 @@ module MyModule {
             target: ScriptTarget.ES2015,
             newLine: NewLineKind.CarriageReturnLineFeed,
           },
-        }
+        },
       ).outputText;
 
       function renameVariable(context: TransformationContext) {
@@ -708,7 +711,7 @@ module MyModule {
               factory.createIdentifier("newName"),
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              node.initializer
+              node.initializer,
             );
           }
           return visitEachChild(node, rootTransform, context);
@@ -723,9 +726,9 @@ module MyModule {
         createSourceFile(
           "source.ts",
           "class X { echo(x: string) { return x; } }",
-          ScriptTarget.ES3
+          ScriptTarget.ES3,
         ),
-        [transformSourceFile]
+        [transformSourceFile],
       );
       const transformedSourceFile = transformed.transformed[0];
       transformed.dispose();
@@ -738,11 +741,9 @@ module MyModule {
           module: ModuleKind.None,
           noLib: true,
         },
-        host
+        host,
       );
-      program.emit(transformedSourceFile, (_p, s, b) =>
-        host.writeFile("source.js", s, b)
-      );
+      program.emit(transformedSourceFile, (_p, s, b) => host.writeFile("source.js", s, b));
       return host.readFile("source.js")!.toString();
 
       function transformSourceFile(context: TransformationContext) {
@@ -758,7 +759,7 @@ module MyModule {
               node.typeParameters,
               node.parameters,
               node.type,
-              node.body
+              node.body,
             );
           }
           return visitEachChild(node, visitor, context);
@@ -780,17 +781,17 @@ module MyModule {
             transformers: {
               before: [transformSourceFile],
             },
-          }
+          },
         ).outputText;
 
         function transformSourceFile(
-          context: TransformationContext
+          context: TransformationContext,
         ): Transformer<SourceFile> {
           function visitor(node: Node): VisitResult<Node> {
             if (isNoSubstitutionTemplateLiteral(node)) {
               return factory.createNoSubstitutionTemplateLiteral(
                 node.text,
-                node.rawText
+                node.rawText,
               );
             } else {
               return visitEachChild(node, visitor, context);
@@ -801,7 +802,7 @@ module MyModule {
       },
       (exports) => {
         assert.equal(exports.stringLength, 5);
-      }
+      },
     );
 
     function addStaticFieldWithComment(context: TransformationContext) {
@@ -817,7 +818,7 @@ module MyModule {
               "newField",
               /* questionOrExclamationToken */ undefined,
               /* type */ undefined,
-              factory.createStringLiteral("x")
+              factory.createStringLiteral("x"),
             ),
           ];
           setSyntheticLeadingComments(newMembers[0], [
@@ -831,23 +832,23 @@ module MyModule {
           ]);
           return isClassDeclaration(node)
             ? factory.updateClassDeclaration(
-                node,
-                node.decorators,
-                /* modifierFlags */ undefined,
-                node.name,
-                node.typeParameters,
-                node.heritageClauses,
-                newMembers
-              )
+              node,
+              node.decorators,
+              /* modifierFlags */ undefined,
+              node.name,
+              node.typeParameters,
+              node.heritageClauses,
+              newMembers,
+            )
             : factory.updateClassExpression(
-                node,
-                node.decorators,
-                /* modifierFlags */ undefined,
-                node.name,
-                node.typeParameters,
-                node.heritageClauses,
-                newMembers
-              );
+              node,
+              node.decorators,
+              /* modifierFlags */ undefined,
+              node.name,
+              node.typeParameters,
+              node.heritageClauses,
+              newMembers,
+            );
         }
         return visitEachChild(node, rootTransform, context);
       }
@@ -871,9 +872,9 @@ class MyClass {
               target: ScriptTarget.ES2015,
               newLine: NewLineKind.CarriageReturnLineFeed,
             },
-          }
+          },
         ).outputText;
-      }
+      },
     );
 
     testBaseline(
@@ -892,9 +893,9 @@ const MyClass = class {
               target: ScriptTarget.ES2015,
               newLine: NewLineKind.CarriageReturnLineFeed,
             },
-          }
+          },
         ).outputText;
-      }
+      },
     );
   });
 }

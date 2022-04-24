@@ -6,18 +6,17 @@ namespace ts {
     emitOnlyDtsFiles: boolean,
     cancellationToken?: CancellationToken,
     customTransformers?: CustomTransformers,
-    forceDtsEmit?: boolean
+    forceDtsEmit?: boolean,
   ): EmitOutput {
     const outputFiles: OutputFile[] = [];
-    const { emitSkipped, diagnostics, exportedModulesFromDeclarationEmit } =
-      program.emit(
-        sourceFile,
-        writeFile,
-        cancellationToken,
-        emitOnlyDtsFiles,
-        customTransformers,
-        forceDtsEmit
-      );
+    const { emitSkipped, diagnostics, exportedModulesFromDeclarationEmit } = program.emit(
+      sourceFile,
+      writeFile,
+      cancellationToken,
+      emitOnlyDtsFiles,
+      customTransformers,
+      forceDtsEmit,
+    );
     return {
       outputFiles,
       emitSkipped,
@@ -28,7 +27,7 @@ namespace ts {
     function writeFile(
       fileName: string,
       text: string,
-      writeByteOrderMark: boolean
+      writeByteOrderMark: boolean,
     ) {
       outputFiles.push({ name: fileName, writeByteOrderMark, text });
     }
@@ -138,7 +137,7 @@ namespace ts {
       function create(
         forward: ESMap<Path, ReadonlySet<Path>>,
         reverse: ESMap<Path, Set<Path>>,
-        deleted: Set<Path> | undefined
+        deleted: Set<Path> | undefined,
       ): ManyToManyPathMap {
         let version = 0;
         const map: ManyToManyPathMap = {
@@ -148,7 +147,7 @@ namespace ts {
             create(
               new Map(forward),
               new Map(reverse),
-              deleted && new Set(deleted)
+              deleted && new Set(deleted),
             ),
           forEach: (fn) => forward.forEach(fn),
           getKeys: (v) => reverse.get(v),
@@ -204,7 +203,7 @@ namespace ts {
       return create(
         new Map<Path, Set<Path>>(),
         new Map<Path, Set<Path>>(),
-        /*deleted*/ undefined
+        /*deleted*/ undefined,
       );
     }
 
@@ -221,7 +220,7 @@ namespace ts {
       map: ESMap<K, Set<V>>,
       k: K,
       v: V,
-      removeEmpty = true
+      removeEmpty = true,
     ): boolean {
       const set = map.get(k);
 
@@ -241,11 +240,11 @@ namespace ts {
     export type ComputeHash = ((data: string) => string) | undefined;
 
     function getReferencedFilesFromImportedModuleSymbol(
-      symbol: Symbol
+      symbol: Symbol,
     ): Path[] {
       return mapDefined(
         symbol.declarations,
-        (declaration) => getSourceFileOfNode(declaration)?.resolvedPath
+        (declaration) => getSourceFileOfNode(declaration)?.resolvedPath,
       );
     }
 
@@ -254,7 +253,7 @@ namespace ts {
      */
     function getReferencedFilesFromImportLiteral(
       checker: TypeChecker,
-      importName: StringLiteralLike
+      importName: StringLiteralLike,
     ): Path[] | undefined {
       const symbol = checker.getSymbolAtLocation(importName);
       return symbol && getReferencedFilesFromImportedModuleSymbol(symbol);
@@ -267,12 +266,12 @@ namespace ts {
       program: Program,
       fileName: string,
       sourceFileDirectory: Path,
-      getCanonicalFileName: GetCanonicalFileName
+      getCanonicalFileName: GetCanonicalFileName,
     ): Path {
       return toPath(
         program.getProjectReferenceRedirect(fileName) || fileName,
         sourceFileDirectory,
-        getCanonicalFileName
+        getCanonicalFileName,
       );
     }
 
@@ -282,7 +281,7 @@ namespace ts {
     function getReferencedFiles(
       program: Program,
       sourceFile: SourceFile,
-      getCanonicalFileName: GetCanonicalFileName
+      getCanonicalFileName: GetCanonicalFileName,
     ): Set<Path> | undefined {
       let referencedFiles: Set<Path> | undefined;
 
@@ -292,8 +291,7 @@ namespace ts {
       if (sourceFile.imports && sourceFile.imports.length > 0) {
         const checker: TypeChecker = program.getTypeChecker();
         for (const importName of sourceFile.imports) {
-          const declarationSourceFilePaths =
-            getReferencedFilesFromImportLiteral(checker, importName);
+          const declarationSourceFilePaths = getReferencedFilesFromImportLiteral(checker, importName);
           declarationSourceFilePaths?.forEach(addReferencedFile);
         }
       }
@@ -306,7 +304,7 @@ namespace ts {
             program,
             referencedFile.fileName,
             sourceFileDirectory,
-            getCanonicalFileName
+            getCanonicalFileName,
           );
           addReferencedFile(referencedPath);
         }
@@ -325,10 +323,10 @@ namespace ts {
               program,
               fileName,
               sourceFileDirectory,
-              getCanonicalFileName
+              getCanonicalFileName,
             );
             addReferencedFile(typeFilePath);
-          }
+          },
         );
       }
 
@@ -346,12 +344,14 @@ namespace ts {
       }
 
       // From ambient modules
-      for (const ambientModule of program
-        .getTypeChecker()
-        .getAmbientModules()) {
+      for (
+        const ambientModule of program
+          .getTypeChecker()
+          .getAmbientModules()
+      ) {
         if (
-          ambientModule.declarations &&
-          ambientModule.declarations.length > 1
+          ambientModule.declarations
+          && ambientModule.declarations.length > 1
         ) {
           addReferenceFromAmbientModule(ambientModule);
         }
@@ -382,7 +382,7 @@ namespace ts {
      */
     export function canReuseOldState(
       newReferencedMap: ReadonlyManyToManyPathMap | undefined,
-      oldState: Readonly<ReusableBuilderState> | undefined
+      oldState: Readonly<ReusableBuilderState> | undefined,
     ) {
       return oldState && !oldState.referencedMap === !newReferencedMap;
     }
@@ -394,13 +394,12 @@ namespace ts {
       newProgram: Program,
       getCanonicalFileName: GetCanonicalFileName,
       oldState?: Readonly<ReusableBuilderState>,
-      disableUseFileVersionAsSignature?: boolean
+      disableUseFileVersionAsSignature?: boolean,
     ): BuilderState {
       const fileInfos = new Map<Path, FileInfo>();
-      const referencedMap =
-        newProgram.getCompilerOptions().module !== ModuleKind.None
-          ? createManyToManyPathMap()
-          : undefined;
+      const referencedMap = newProgram.getCompilerOptions().module !== ModuleKind.None
+        ? createManyToManyPathMap()
+        : undefined;
       const exportedModulesMap = referencedMap
         ? createManyToManyPathMap()
         : undefined;
@@ -414,7 +413,7 @@ namespace ts {
       for (const sourceFile of newProgram.getSourceFiles()) {
         const version = Debug.checkDefined(
           sourceFile.version,
-          "Program intended to be used with Builder should have source files with versions set"
+          "Program intended to be used with Builder should have source files with versions set",
         );
         const oldInfo = useOldState
           ? oldState!.fileInfos.get(sourceFile.resolvedPath)
@@ -423,7 +422,7 @@ namespace ts {
           const newReferences = getReferencedFiles(
             newProgram,
             sourceFile,
-            getCanonicalFileName
+            getCanonicalFileName,
           );
           if (newReferences) {
             referencedMap.set(sourceFile.resolvedPath, newReferences);
@@ -431,7 +430,7 @@ namespace ts {
           // Copy old visible to outside files map
           if (useOldState) {
             const exportedModules = oldState!.exportedModulesMap!.getValues(
-              sourceFile.resolvedPath
+              sourceFile.resolvedPath,
             );
             if (exportedModules) {
               exportedModulesMap!.set(sourceFile.resolvedPath, exportedModules);
@@ -441,8 +440,7 @@ namespace ts {
         fileInfos.set(sourceFile.resolvedPath, {
           version,
           signature: oldInfo && oldInfo.signature,
-          affectsGlobalScope:
-            isFileAffectingGlobalScope(sourceFile) || undefined,
+          affectsGlobalScope: isFileAffectingGlobalScope(sourceFile) || undefined,
           impliedFormat: sourceFile.impliedNodeFormat,
         });
       }
@@ -452,8 +450,7 @@ namespace ts {
         referencedMap,
         exportedModulesMap,
         hasCalledUpdateShapeSignature,
-        useFileVersionAsSignature:
-          !disableUseFileVersionAsSignature && !useOldState,
+        useFileVersionAsSignature: !disableUseFileVersionAsSignature && !useOldState,
       };
     }
 
@@ -475,7 +472,7 @@ namespace ts {
         referencedMap: state.referencedMap?.clone(),
         exportedModulesMap: state.exportedModulesMap?.clone(),
         hasCalledUpdateShapeSignature: new Set(
-          state.hasCalledUpdateShapeSignature
+          state.hasCalledUpdateShapeSignature,
         ),
         useFileVersionAsSignature: state.useFileVersionAsSignature,
       };
@@ -491,7 +488,7 @@ namespace ts {
       cancellationToken: CancellationToken | undefined,
       computeHash: ComputeHash,
       cacheToUpdateSignature?: ESMap<Path, string>,
-      exportedModulesMapCache?: ManyToManyPathMap
+      exportedModulesMapCache?: ManyToManyPathMap,
     ): readonly SourceFile[] {
       // Since the operation could be cancelled, the signatures are always stored in the cache
       // They will be committed once it is safe to use them
@@ -511,7 +508,7 @@ namespace ts {
           signatureCache,
           cancellationToken,
           computeHash,
-          exportedModulesMapCache
+          exportedModulesMapCache,
         )
       ) {
         return [sourceFile];
@@ -528,7 +525,7 @@ namespace ts {
         signatureCache,
         cancellationToken,
         computeHash,
-        exportedModulesMapCache
+        exportedModulesMapCache,
       );
       if (!cacheToUpdateSignature) {
         // Commit all the signatures in the signature cache
@@ -543,17 +540,15 @@ namespace ts {
      */
     export function updateSignaturesFromCache(
       state: BuilderState,
-      signatureCache: ESMap<Path, string>
+      signatureCache: ESMap<Path, string>,
     ) {
-      signatureCache.forEach((signature, path) =>
-        updateSignatureOfFile(state, signature, path)
-      );
+      signatureCache.forEach((signature, path) => updateSignatureOfFile(state, signature, path));
     }
 
     export function updateSignatureOfFile(
       state: BuilderState,
       signature: string | undefined,
-      path: Path
+      path: Path,
     ) {
       state.fileInfos.get(path)!.signature = signature;
       state.hasCalledUpdateShapeSignature.add(path);
@@ -570,18 +565,18 @@ namespace ts {
       cancellationToken: CancellationToken | undefined,
       computeHash: ComputeHash,
       exportedModulesMapCache?: ManyToManyPathMap,
-      useFileVersionAsSignature: boolean = state.useFileVersionAsSignature
+      useFileVersionAsSignature: boolean = state.useFileVersionAsSignature,
     ) {
       Debug.assert(!!sourceFile);
       Debug.assert(
         !exportedModulesMapCache || !!state.exportedModulesMap,
-        "Compute visible to outside map only if visibleToOutsideReferencedMap present in the state"
+        "Compute visible to outside map only if visibleToOutsideReferencedMap present in the state",
       );
 
       // If we have cached the result for this file, that means hence forth we should assume file shape is uptodate
       if (
-        state.hasCalledUpdateShapeSignature.has(sourceFile.resolvedPath) ||
-        cacheToUpdateSignature.has(sourceFile.resolvedPath)
+        state.hasCalledUpdateShapeSignature.has(sourceFile.resolvedPath)
+        || cacheToUpdateSignature.has(sourceFile.resolvedPath)
       ) {
         return false;
       }
@@ -598,7 +593,7 @@ namespace ts {
           /*emitOnlyDtsFiles*/ true,
           cancellationToken,
           /*customTransformers*/ undefined,
-          /*forceDtsEmit*/ true
+          /*forceDtsEmit*/ true,
         );
         const firstDts = firstOrUndefined(emitOutput.outputFiles);
         if (firstDts) {
@@ -610,18 +605,18 @@ namespace ts {
             ]),
             "File extension for signature expected to be dts",
             () =>
-              `Found: ${getAnyExtensionFromPath(firstDts.name)} for ${
-                firstDts.name
-              }:: All output files: ${JSON.stringify(
-                emitOutput.outputFiles.map((f) => f.name)
-              )}`
+              `Found: ${getAnyExtensionFromPath(firstDts.name)} for ${firstDts.name}:: All output files: ${
+                JSON.stringify(
+                  emitOutput.outputFiles.map((f) => f.name),
+                )
+              }`,
           );
           latestSignature = (computeHash || generateDjb2Hash)(firstDts.text);
           if (exportedModulesMapCache && latestSignature !== prevSignature) {
             updateExportedModules(
               sourceFile,
               emitOutput.exportedModulesFromDeclarationEmit,
-              exportedModulesMapCache
+              exportedModulesMapCache,
             );
           }
         }
@@ -653,7 +648,7 @@ namespace ts {
       exportedModulesFromDeclarationEmit:
         | ExportedModulesFromDeclarationEmit
         | undefined,
-      exportedModulesMapCache: ManyToManyPathMap
+      exportedModulesMapCache: ManyToManyPathMap,
     ) {
       if (!exportedModulesFromDeclarationEmit) {
         exportedModulesMapCache.deleteKey(sourceFile.resolvedPath);
@@ -686,7 +681,7 @@ namespace ts {
      */
     export function updateExportedFilesMapFromCache(
       state: BuilderState,
-      exportedModulesMapCache: ManyToManyPathMap | undefined
+      exportedModulesMapCache: ManyToManyPathMap | undefined,
     ) {
       if (exportedModulesMapCache) {
         Debug.assert(!!state.exportedModulesMap);
@@ -695,8 +690,8 @@ namespace ts {
         const cacheVersion = exportedModulesMapCache.version();
         if (state.previousCache) {
           if (
-            state.previousCache.id === cacheId &&
-            state.previousCache.version === cacheVersion
+            state.previousCache.id === cacheId
+            && state.previousCache.version === cacheVersion
           ) {
             // If this is the same cache at the same version as last time this BuilderState
             // was updated, there's no need to update again
@@ -723,7 +718,7 @@ namespace ts {
     export function getAllDependencies(
       state: BuilderState,
       programOfThisState: Program,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): readonly string[] {
       const compilerOptions = programOfThisState.getCompilerOptions();
       // With --out or --outFile all outputs go into single file, all files depend on each other
@@ -760,9 +755,8 @@ namespace ts {
       return arrayFrom(
         mapDefinedIterator(
           seenMap.keys(),
-          (path) =>
-            programOfThisState.getSourceFileByPath(path)?.fileName ?? path
-        )
+          (path) => programOfThisState.getSourceFileByPath(path)?.fileName ?? path,
+        ),
       );
     }
 
@@ -771,14 +765,13 @@ namespace ts {
      */
     function getAllFileNames(
       state: BuilderState,
-      programOfThisState: Program
+      programOfThisState: Program,
     ): readonly string[] {
       if (!state.allFileNames) {
         const sourceFiles = programOfThisState.getSourceFiles();
-        state.allFileNames =
-          sourceFiles === emptyArray
-            ? emptyArray
-            : sourceFiles.map((file) => file.fileName);
+        state.allFileNames = sourceFiles === emptyArray
+          ? emptyArray
+          : sourceFiles.map((file) => file.fileName);
       }
       return state.allFileNames;
     }
@@ -788,7 +781,7 @@ namespace ts {
      */
     export function getReferencedByPaths(
       state: Readonly<BuilderState>,
-      referencedFilePath: Path
+      referencedFilePath: Path,
     ) {
       const keys = state.referencedMap!.getKeys(referencedFilePath);
       return keys ? arrayFrom(keys.keys()) : [];
@@ -814,8 +807,9 @@ namespace ts {
      * they are global files as well as module
      */
     function containsGlobalScopeAugmentation(sourceFile: SourceFile) {
-      return some(sourceFile.moduleAugmentations, (augmentation) =>
-        isGlobalScopeAugmentation(augmentation.parent as ModuleDeclaration)
+      return some(
+        sourceFile.moduleAugmentations,
+        (augmentation) => isGlobalScopeAugmentation(augmentation.parent as ModuleDeclaration),
       );
     }
 
@@ -824,10 +818,10 @@ namespace ts {
      */
     function isFileAffectingGlobalScope(sourceFile: SourceFile) {
       return (
-        containsGlobalScopeAugmentation(sourceFile) ||
-        (!isExternalOrCommonJsModule(sourceFile) &&
-          !isJsonSourceFile(sourceFile) &&
-          !containsOnlyAmbientModules(sourceFile))
+        containsGlobalScopeAugmentation(sourceFile)
+        || (!isExternalOrCommonJsModule(sourceFile)
+          && !isJsonSourceFile(sourceFile)
+          && !containsOnlyAmbientModules(sourceFile))
       );
     }
 
@@ -837,7 +831,7 @@ namespace ts {
     export function getAllFilesExcludingDefaultLibraryFile(
       state: BuilderState,
       programOfThisState: Program,
-      firstSourceFile: SourceFile | undefined
+      firstSourceFile: SourceFile | undefined,
     ): readonly SourceFile[] {
       // Use cached result
       if (state.allFilesExcludingDefaultLibraryFile) {
@@ -867,7 +861,7 @@ namespace ts {
     function getFilesAffectedByUpdatedShapeWhenNonModuleEmit(
       state: BuilderState,
       programOfThisState: Program,
-      sourceFileWithUpdatedShape: SourceFile
+      sourceFileWithUpdatedShape: SourceFile,
     ) {
       const compilerOptions = programOfThisState.getCompilerOptions();
       // If `--out` or `--outFile` is specified, any new emit will result in re-emitting the entire project,
@@ -878,7 +872,7 @@ namespace ts {
       return getAllFilesExcludingDefaultLibraryFile(
         state,
         programOfThisState,
-        sourceFileWithUpdatedShape
+        sourceFileWithUpdatedShape,
       );
     }
 
@@ -892,20 +886,20 @@ namespace ts {
       cacheToUpdateSignature: ESMap<Path, string>,
       cancellationToken: CancellationToken | undefined,
       computeHash: ComputeHash,
-      exportedModulesMapCache: ManyToManyPathMap | undefined
+      exportedModulesMapCache: ManyToManyPathMap | undefined,
     ) {
       if (isFileAffectingGlobalScope(sourceFileWithUpdatedShape)) {
         return getAllFilesExcludingDefaultLibraryFile(
           state,
           programOfThisState,
-          sourceFileWithUpdatedShape
+          sourceFileWithUpdatedShape,
         );
       }
 
       const compilerOptions = programOfThisState.getCompilerOptions();
       if (
-        compilerOptions &&
-        (compilerOptions.isolatedModules || outFile(compilerOptions))
+        compilerOptions
+        && (compilerOptions.isolatedModules || outFile(compilerOptions))
       ) {
         return [sourceFileWithUpdatedShape];
       }
@@ -918,32 +912,31 @@ namespace ts {
       // Start with the paths this file was referenced by
       seenFileNamesMap.set(
         sourceFileWithUpdatedShape.resolvedPath,
-        sourceFileWithUpdatedShape
+        sourceFileWithUpdatedShape,
       );
       const queue = getReferencedByPaths(
         state,
-        sourceFileWithUpdatedShape.resolvedPath
+        sourceFileWithUpdatedShape.resolvedPath,
       );
       while (queue.length > 0) {
         const currentPath = queue.pop()!;
         if (!seenFileNamesMap.has(currentPath)) {
-          const currentSourceFile =
-            programOfThisState.getSourceFileByPath(currentPath)!;
+          const currentSourceFile = programOfThisState.getSourceFileByPath(currentPath)!;
           seenFileNamesMap.set(currentPath, currentSourceFile);
           if (
-            currentSourceFile &&
-            updateShapeSignature(
+            currentSourceFile
+            && updateShapeSignature(
               state,
               programOfThisState,
               currentSourceFile,
               cacheToUpdateSignature,
               cancellationToken,
               computeHash,
-              exportedModulesMapCache
+              exportedModulesMapCache,
             )
           ) {
             queue.push(
-              ...getReferencedByPaths(state, currentSourceFile.resolvedPath)
+              ...getReferencedByPaths(state, currentSourceFile.resolvedPath),
             );
           }
         }
@@ -951,7 +944,7 @@ namespace ts {
 
       // Return array of values that needs emit
       return arrayFrom(
-        mapDefinedIterator(seenFileNamesMap.values(), (value) => value)
+        mapDefinedIterator(seenFileNamesMap.values(), (value) => value),
       );
     }
   }

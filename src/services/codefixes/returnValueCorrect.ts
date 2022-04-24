@@ -2,8 +2,7 @@
 namespace ts.codefix {
   const fixId = "returnValueCorrect";
   const fixIdAddReturnStatement = "fixAddReturnStatement";
-  const fixRemoveBracesFromArrowFunctionBody =
-    "fixRemoveBracesFromArrowFunctionBody";
+  const fixRemoveBracesFromArrowFunctionBody = "fixRemoveBracesFromArrowFunctionBody";
   const fixIdWrapTheBlockWithParen = "fixWrapTheBlockWithParen";
   const errorCodes = [
     Diagnostics
@@ -55,7 +54,7 @@ namespace ts.codefix {
         program.getTypeChecker(),
         sourceFile,
         start,
-        errorCode
+        errorCode,
       );
       if (!info) return undefined;
 
@@ -65,24 +64,24 @@ namespace ts.codefix {
             getActionForfixAddReturnStatement(
               context,
               info.expression,
-              info.statement
+              info.statement,
             ),
           ],
           isArrowFunction(info.declaration)
             ? getActionForFixRemoveBracesFromArrowFunctionBody(
-                context,
-                info.declaration,
-                info.expression,
-                info.commentSource
-              )
-            : undefined
+              context,
+              info.declaration,
+              info.expression,
+              info.commentSource,
+            )
+            : undefined,
         );
       } else {
         return [
           getActionForfixWrapTheBlockWithParen(
             context,
             info.declaration,
-            info.expression
+            info.expression,
           ),
         ];
       }
@@ -93,7 +92,7 @@ namespace ts.codefix {
           context.program.getTypeChecker(),
           diag.file,
           diag.start,
-          diag.code
+          diag.code,
         );
         if (!info) return undefined;
 
@@ -103,7 +102,7 @@ namespace ts.codefix {
               changes,
               diag.file,
               info.expression,
-              info.statement
+              info.statement,
             );
             break;
           case fixRemoveBracesFromArrowFunctionBody:
@@ -114,7 +113,7 @@ namespace ts.codefix {
               info.declaration,
               info.expression,
               info.commentSource,
-              /* withParen */ false
+              /* withParen */ false,
             );
             break;
           case fixIdWrapTheBlockWithParen:
@@ -123,7 +122,7 @@ namespace ts.codefix {
               changes,
               diag.file,
               info.declaration,
-              info.expression
+              info.expression,
             );
             break;
           default:
@@ -135,11 +134,11 @@ namespace ts.codefix {
   function createObjectTypeFromLabeledExpression(
     checker: TypeChecker,
     label: Identifier,
-    expression: Expression
+    expression: Expression,
   ) {
     const member = checker.createSymbol(
       SymbolFlags.Property,
-      label.escapedText
+      label.escapedText,
     );
     member.type = checker.getTypeAtLocation(expression);
     const members = createSymbolTable([member]);
@@ -148,7 +147,7 @@ namespace ts.codefix {
       members,
       [],
       [],
-      []
+      [],
     );
   }
 
@@ -156,24 +155,25 @@ namespace ts.codefix {
     checker: TypeChecker,
     declaration: FunctionLikeDeclaration,
     expectType: Type,
-    isFunctionType: boolean
+    isFunctionType: boolean,
   ): Info | undefined {
     if (
-      !declaration.body ||
-      !isBlock(declaration.body) ||
-      length(declaration.body.statements) !== 1
-    )
+      !declaration.body
+      || !isBlock(declaration.body)
+      || length(declaration.body.statements) !== 1
+    ) {
       return undefined;
+    }
 
     const firstStatement = first(declaration.body.statements);
     if (
-      isExpressionStatement(firstStatement) &&
-      checkFixedAssignableTo(
+      isExpressionStatement(firstStatement)
+      && checkFixedAssignableTo(
         checker,
         declaration,
         checker.getTypeAtLocation(firstStatement.expression),
         expectType,
-        isFunctionType
+        isFunctionType,
       )
     ) {
       return {
@@ -184,19 +184,19 @@ namespace ts.codefix {
         commentSource: firstStatement.expression,
       };
     } else if (
-      isLabeledStatement(firstStatement) &&
-      isExpressionStatement(firstStatement.statement)
+      isLabeledStatement(firstStatement)
+      && isExpressionStatement(firstStatement.statement)
     ) {
       const node = factory.createObjectLiteralExpression([
         factory.createPropertyAssignment(
           firstStatement.label,
-          firstStatement.statement.expression
+          firstStatement.statement.expression,
         ),
       ]);
       const nodeType = createObjectTypeFromLabeledExpression(
         checker,
         firstStatement.label,
-        firstStatement.statement.expression
+        firstStatement.statement.expression,
       );
       if (
         checkFixedAssignableTo(
@@ -204,44 +204,44 @@ namespace ts.codefix {
           declaration,
           nodeType,
           expectType,
-          isFunctionType
+          isFunctionType,
         )
       ) {
         return isArrowFunction(declaration)
           ? {
-              declaration,
-              kind: ProblemKind.MissingParentheses,
-              expression: node,
-              statement: firstStatement,
-              commentSource: firstStatement.statement.expression,
-            }
+            declaration,
+            kind: ProblemKind.MissingParentheses,
+            expression: node,
+            statement: firstStatement,
+            commentSource: firstStatement.statement.expression,
+          }
           : {
-              declaration,
-              kind: ProblemKind.MissingReturnStatement,
-              expression: node,
-              statement: firstStatement,
-              commentSource: firstStatement.statement.expression,
-            };
+            declaration,
+            kind: ProblemKind.MissingReturnStatement,
+            expression: node,
+            statement: firstStatement,
+            commentSource: firstStatement.statement.expression,
+          };
       }
     } else if (
-      isBlock(firstStatement) &&
-      length(firstStatement.statements) === 1
+      isBlock(firstStatement)
+      && length(firstStatement.statements) === 1
     ) {
       const firstBlockStatement = first(firstStatement.statements);
       if (
-        isLabeledStatement(firstBlockStatement) &&
-        isExpressionStatement(firstBlockStatement.statement)
+        isLabeledStatement(firstBlockStatement)
+        && isExpressionStatement(firstBlockStatement.statement)
       ) {
         const node = factory.createObjectLiteralExpression([
           factory.createPropertyAssignment(
             firstBlockStatement.label,
-            firstBlockStatement.statement.expression
+            firstBlockStatement.statement.expression,
           ),
         ]);
         const nodeType = createObjectTypeFromLabeledExpression(
           checker,
           firstBlockStatement.label,
-          firstBlockStatement.statement.expression
+          firstBlockStatement.statement.expression,
         );
         if (
           checkFixedAssignableTo(
@@ -249,7 +249,7 @@ namespace ts.codefix {
             declaration,
             nodeType,
             expectType,
-            isFunctionType
+            isFunctionType,
           )
         ) {
           return {
@@ -271,7 +271,7 @@ namespace ts.codefix {
     declaration: FunctionLikeDeclaration,
     exprType: Type,
     type: Type,
-    isFunctionType: boolean
+    isFunctionType: boolean,
   ) {
     if (isFunctionType) {
       const sig = checker.getSignatureFromDeclaration(declaration);
@@ -287,14 +287,14 @@ namespace ts.codefix {
           exprType,
           /*typePredicate*/ undefined,
           sig.minArgumentCount,
-          sig.flags
+          sig.flags,
         );
         exprType = checker.createAnonymousType(
           /*symbol*/ undefined,
           createSymbolTable(),
           [newSig],
           [],
-          []
+          [],
         );
       } else {
         exprType = checker.getAnyType();
@@ -307,7 +307,7 @@ namespace ts.codefix {
     checker: TypeChecker,
     sourceFile: SourceFile,
     position: number,
-    errorCode: number
+    errorCode: number,
   ): Info | undefined {
     const node = getTokenAtPosition(sourceFile, position);
     if (!node.parent) return undefined;
@@ -318,65 +318,69 @@ namespace ts.codefix {
         .A_function_whose_declared_type_is_neither_void_nor_any_must_return_a_value
         .code:
         if (
-          !declaration ||
-          !declaration.body ||
-          !declaration.type ||
-          !rangeContainsRange(declaration.type, node)
-        )
+          !declaration
+          || !declaration.body
+          || !declaration.type
+          || !rangeContainsRange(declaration.type, node)
+        ) {
           return undefined;
+        }
         return getFixInfo(
           checker,
           declaration,
           checker.getTypeFromTypeNode(declaration.type),
-          /* isFunctionType */ false
+          /* isFunctionType */ false,
         );
       case Diagnostics
         .Argument_of_type_0_is_not_assignable_to_parameter_of_type_1.code:
         if (
-          !declaration ||
-          !isCallExpression(declaration.parent) ||
-          !declaration.body
-        )
+          !declaration
+          || !isCallExpression(declaration.parent)
+          || !declaration.body
+        ) {
           return undefined;
+        }
         const pos = declaration.parent.arguments.indexOf(
-          declaration as Expression
+          declaration as Expression,
         );
         const type = checker.getContextualTypeForArgumentAtIndex(
           declaration.parent,
-          pos
+          pos,
         );
         if (!type) return undefined;
         return getFixInfo(
           checker,
           declaration,
           type,
-          /* isFunctionType */ true
+          /* isFunctionType */ true,
         );
       case Diagnostics.Type_0_is_not_assignable_to_type_1.code:
         if (
-          !isDeclarationName(node) ||
-          (!isVariableLike(node.parent) && !isJsxAttribute(node.parent))
-        )
+          !isDeclarationName(node)
+          || (!isVariableLike(node.parent) && !isJsxAttribute(node.parent))
+        ) {
           return undefined;
+        }
         const initializer = getVariableLikeInitializer(node.parent);
         if (
-          !initializer ||
-          !isFunctionLikeDeclaration(initializer) ||
-          !initializer.body
-        )
+          !initializer
+          || !isFunctionLikeDeclaration(initializer)
+          || !initializer.body
+        ) {
           return undefined;
+        }
         return getFixInfo(
           checker,
           initializer,
           checker.getTypeAtLocation(node.parent),
-          /* isFunctionType */ true
+          /* isFunctionType */ true,
         );
     }
     return undefined;
   }
 
   function getVariableLikeInitializer(
-    declaration: VariableLikeDeclaration
+    declaration: VariableLikeDeclaration,
   ): Expression | undefined {
     switch (declaration.kind) {
       case SyntaxKind.VariableDeclaration:
@@ -387,8 +391,8 @@ namespace ts.codefix {
         return declaration.initializer;
       case SyntaxKind.JsxAttribute:
         return (
-          declaration.initializer &&
-          (isJsxExpression(declaration.initializer)
+          declaration.initializer
+          && (isJsxExpression(declaration.initializer)
             ? declaration.initializer.expression
             : undefined)
         );
@@ -405,7 +409,7 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     expression: Expression,
-    statement: Statement
+    statement: Statement,
   ) {
     suppressLeadingAndTrailingTrivia(expression);
     const probablyNeedSemi = probablyUsesSemicolons(sourceFile);
@@ -417,7 +421,7 @@ namespace ts.codefix {
         leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
         trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
         suffix: probablyNeedSemi ? ";" : undefined,
-      }
+      },
     );
   }
 
@@ -427,12 +431,11 @@ namespace ts.codefix {
     declaration: ArrowFunction,
     expression: Expression,
     commentSource: Node,
-    withParen: boolean
+    withParen: boolean,
   ) {
-    const newBody =
-      withParen || needsParentheses(expression)
-        ? factory.createParenthesizedExpression(expression)
-        : expression;
+    const newBody = withParen || needsParentheses(expression)
+      ? factory.createParenthesizedExpression(expression)
+      : expression;
     suppressLeadingAndTrailingTrivia(commentSource);
     copyComments(commentSource, newBody);
 
@@ -443,29 +446,30 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     declaration: ArrowFunction,
-    expression: Expression
+    expression: Expression,
   ) {
     changes.replaceNode(
       sourceFile,
       declaration.body,
-      factory.createParenthesizedExpression(expression)
+      factory.createParenthesizedExpression(expression),
     );
   }
 
   function getActionForfixAddReturnStatement(
     context: CodeFixContext,
     expression: Expression,
-    statement: Statement
+    statement: Statement,
   ) {
-    const changes = textChanges.ChangeTracker.with(context, (t) =>
-      addReturnStatement(t, context.sourceFile, expression, statement)
+    const changes = textChanges.ChangeTracker.with(
+      context,
+      (t) => addReturnStatement(t, context.sourceFile, expression, statement),
     );
     return createCodeFixAction(
       fixId,
       changes,
       Diagnostics.Add_a_return_statement,
       fixIdAddReturnStatement,
-      Diagnostics.Add_all_missing_return_statement
+      Diagnostics.Add_all_missing_return_statement,
     );
   }
 
@@ -473,7 +477,7 @@ namespace ts.codefix {
     context: CodeFixContext,
     declaration: ArrowFunction,
     expression: Expression,
-    commentSource: Node
+    commentSource: Node,
   ) {
     const changes = textChanges.ChangeTracker.with(context, (t) =>
       removeBlockBodyBrace(
@@ -482,32 +486,32 @@ namespace ts.codefix {
         declaration,
         expression,
         commentSource,
-        /* withParen */ false
-      )
-    );
+        /* withParen */ false,
+      ));
     return createCodeFixAction(
       fixId,
       changes,
       Diagnostics.Remove_braces_from_arrow_function_body,
       fixRemoveBracesFromArrowFunctionBody,
-      Diagnostics.Remove_braces_from_all_arrow_function_bodies_with_relevant_issues
+      Diagnostics.Remove_braces_from_all_arrow_function_bodies_with_relevant_issues,
     );
   }
 
   function getActionForfixWrapTheBlockWithParen(
     context: CodeFixContext,
     declaration: ArrowFunction,
-    expression: Expression
+    expression: Expression,
   ) {
-    const changes = textChanges.ChangeTracker.with(context, (t) =>
-      wrapBlockWithParen(t, context.sourceFile, declaration, expression)
+    const changes = textChanges.ChangeTracker.with(
+      context,
+      (t) => wrapBlockWithParen(t, context.sourceFile, declaration, expression),
     );
     return createCodeFixAction(
       fixId,
       changes,
       Diagnostics.Wrap_the_following_body_with_parentheses_which_should_be_an_object_literal,
       fixIdWrapTheBlockWithParen,
-      Diagnostics.Wrap_all_object_literal_with_parentheses
+      Diagnostics.Wrap_all_object_literal_with_parentheses,
     );
   }
 }

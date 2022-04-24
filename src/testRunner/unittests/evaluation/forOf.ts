@@ -12,7 +12,7 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
                 }
             }
         `,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     result.main();
@@ -35,7 +35,7 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
                 }
             }
         `,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     result.main();
@@ -58,7 +58,7 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
             }
         }
         `,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     assert.throws(() => result.main(), "Symbol.iterator is not defined");
@@ -74,12 +74,12 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
             }
         }
         `,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     assert.throws(
       () => result.main(),
-      /cannot read property.*Symbol\(Symbol\.iterator\).*/i
+      /cannot read property.*Symbol\(Symbol\.iterator\).*/i,
     );
   });
 
@@ -94,7 +94,7 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
             }
         }
         `,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     assert.throws(() => result.main(), "Symbol.iterator is not defined");
@@ -110,7 +110,7 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
             }
         }
         `,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     assert.throws(() => result.main(), "Object is not iterable");
@@ -133,7 +133,7 @@ describe("unittests:: evaluation:: forOfEvaluation", () => {
                 }
 
             }`,
-      { downlevelIteration: true, target: ts.ScriptTarget.ES5 }
+      { downlevelIteration: true, target: ts.ScriptTarget.ES5 },
     );
 
     result.main();

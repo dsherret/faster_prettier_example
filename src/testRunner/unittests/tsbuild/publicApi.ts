@@ -30,7 +30,7 @@ export class c2 { }
 export enum e2 { }
 // leading
 export function f22() { } // trailing`,
-        })
+        }),
       ).fs.makeReadonly();
       const inputFs = initialFs.shadow();
       inputFs.makeReadonly();
@@ -54,13 +54,13 @@ export function f22() { } // trailing`,
           sys,
           fileName,
           content,
-          writeByteOrderMark
+          writeByteOrderMark,
         );
       };
       const { cb, getPrograms } = commandLineCallbacks(
         sys,
         /*originalReadCall*/ undefined,
-        originalWriteFile
+        originalWriteFile,
       );
       const buildHost = createSolutionBuilderHost(
         sys,
@@ -69,8 +69,8 @@ export function f22() { } // trailing`,
         createBuilderStatusReporter(sys, /*pretty*/ true),
         (errorCount, filesInError) =>
           sys.write(
-            getErrorSummaryText(errorCount, filesInError, sys.newLine, sys)
-          )
+            getErrorSummaryText(errorCount, filesInError, sys.newLine, sys),
+          ),
       );
       buildHost.afterProgramEmitAndDiagnostics = cb;
       buildHost.afterEmitBundle = cb;
@@ -81,18 +81,18 @@ export function f22() { } // trailing`,
         /*project*/ undefined,
         /*cancellationToken*/ undefined,
         /*writeFile*/ undefined,
-        getCustomTransformers
+        getCustomTransformers,
       );
       sys.exit(exitStatus);
       sys.write(
-        `exitCode:: ExitStatus.${ExitStatus[sys.exitCode as ExitStatus]}\n`
+        `exitCode:: ExitStatus.${ExitStatus[sys.exitCode as ExitStatus]}\n`,
       );
       const baseline: string[] = [];
       tscWatch.baselinePrograms(
         baseline,
         getPrograms,
         emptyArray,
-        /*baselineDependencies*/ false
+        /*baselineDependencies*/ false,
       );
       sys.write(baseline.join("\n"));
       fs.makeReadonly();
@@ -104,9 +104,7 @@ export function f22() { } // trailing`,
           includeChangedFileWithSameContent: true,
         });
         return {
-          file: `tsbuild/$publicAPI/${
-            BuildKind.Initial
-          }/${"build with custom transformers".split(" ").join("-")}.js`,
+          file: `tsbuild/$publicAPI/${BuildKind.Initial}/${"build with custom transformers".split(" ").join("-")}.js`,
           text: `Input::
 ${baseFsPatch ? vfs.formatPatch(baseFsPatch) : ""}
 
@@ -133,7 +131,7 @@ ${patch ? vfs.formatPatch(patch) : ""}`,
               node,
               SyntaxKind.MultiLineCommentTrivia,
               `@before${project}`,
-              /*hasTrailingNewLine*/ true
+              /*hasTrailingNewLine*/ true,
             );
             return node;
           }
@@ -153,7 +151,7 @@ ${patch ? vfs.formatPatch(patch) : ""}`,
             addSyntheticLeadingComment(
               node,
               SyntaxKind.SingleLineCommentTrivia,
-              `@after${project}`
+              `@after${project}`,
             );
             return node;
           }

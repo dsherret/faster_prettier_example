@@ -46,7 +46,7 @@ namespace ts {
     function onEmitNode(
       hint: EmitHint,
       node: Node,
-      emitCallback: (hint: EmitHint, node: Node) => void
+      emitCallback: (hint: EmitHint, node: Node) => void,
     ): void {
       if (isSourceFile(node)) {
         currentSourceFile = node;
@@ -87,7 +87,7 @@ namespace ts {
     function transformBundle(node: Bundle) {
       return context.factory.createBundle(
         map(node.sourceFiles, transformSourceFile),
-        node.prepends
+        node.prepends,
       );
     }
   }

@@ -35,11 +35,11 @@ namespace ts {
     observe(options: { entryTypes: readonly ("mark" | "measure")[] }): void;
   }
 
-  export type PerformanceObserverConstructor = new (
+  export type PerformanceObserverConstructor = new(
     callback: (
       list: PerformanceObserverEntryList,
-      observer: PerformanceObserver
-    ) => void
+      observer: PerformanceObserver,
+    ) => void,
   ) => PerformanceObserver;
   export type PerformanceEntryList = PerformanceEntry[];
 
@@ -51,23 +51,23 @@ namespace ts {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   function hasRequiredAPI(
     performance: Performance | undefined,
-    PerformanceObserver: PerformanceObserverConstructor | undefined
+    PerformanceObserver: PerformanceObserverConstructor | undefined,
   ) {
     return (
-      typeof performance === "object" &&
-      typeof performance.timeOrigin === "number" &&
-      typeof performance.mark === "function" &&
-      typeof performance.measure === "function" &&
-      typeof performance.now === "function" &&
-      typeof PerformanceObserver === "function"
+      typeof performance === "object"
+      && typeof performance.timeOrigin === "number"
+      && typeof performance.mark === "function"
+      && typeof performance.measure === "function"
+      && typeof performance.now === "function"
+      && typeof PerformanceObserver === "function"
     );
   }
 
   function tryGetWebPerformanceHooks(): PerformanceHooks | undefined {
     if (
-      typeof performance === "object" &&
-      typeof PerformanceObserver === "function" &&
-      hasRequiredAPI(performance, PerformanceObserver)
+      typeof performance === "object"
+      && typeof PerformanceObserver === "function"
+      && hasRequiredAPI(performance, PerformanceObserver)
     ) {
       return {
         // For now we always write native performance events when running in the browser. We may
@@ -82,16 +82,17 @@ namespace ts {
 
   function tryGetNodePerformanceHooks(): PerformanceHooks | undefined {
     if (
-      typeof process !== "undefined" &&
-      process.nextTick &&
-      !process.browser &&
-      typeof module === "object" &&
-      typeof require === "function"
+      typeof process !== "undefined"
+      && process.nextTick
+      && !process.browser
+      && typeof module === "object"
+      && typeof require === "function"
     ) {
       try {
         let performance: Performance;
-        const { performance: nodePerformance, PerformanceObserver } =
-          require("perf_hooks") as typeof import("perf_hooks");
+        const { performance: nodePerformance, PerformanceObserver } = require(
+          "perf_hooks",
+        ) as typeof import("perf_hooks");
         if (hasRequiredAPI(nodePerformance, PerformanceObserver)) {
           performance = nodePerformance;
           // There is a bug in Node's performance.measure prior to 12.16.3/13.13.0 that does not
@@ -138,8 +139,7 @@ namespace ts {
 
   // Unlike with the native Map/Set 'tryGet' functions in corePublic.ts, we eagerly evaluate these
   // since we will need them for `timestamp`, below.
-  const nativePerformanceHooks =
-    tryGetWebPerformanceHooks() || tryGetNodePerformanceHooks();
+  const nativePerformanceHooks = tryGetWebPerformanceHooks() || tryGetNodePerformanceHooks();
   const nativePerformance = nativePerformanceHooks?.performance;
 
   export function tryGetNativePerformanceHooks() {

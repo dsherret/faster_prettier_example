@@ -21,18 +21,17 @@ namespace ts.projectSystem {
       const session = createSession(host);
       openFilesForSession([file1, file2], session);
 
-      const file2GetErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: file2.path }
-        );
+      const file2GetErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: file2.path },
+      );
       let errorResult = session.executeCommand(file2GetErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(errorResult.length === 0);
 
       const closeFileRequest = makeSessionRequest<protocol.FileRequestArgs>(
         CommandNames.Close,
-        { file: file1.path }
+        { file: file1.path },
       );
       session.executeCommand(closeFileRequest);
       errorResult = session.executeCommand(file2GetErrRequest)
@@ -63,22 +62,20 @@ namespace ts.projectSystem {
       const host = createServerHost([jsFile, dTsFile]);
       const session = createSession(host);
 
-      const openExternalProjectRequest =
-        makeSessionRequest<protocol.OpenExternalProjectArgs>(
-          CommandNames.OpenExternalProject,
-          {
-            projectFileName: "project1",
-            rootFiles: toExternalFiles([jsFile.path, dTsFile.path]),
-            options: {},
-          }
-        );
+      const openExternalProjectRequest = makeSessionRequest<protocol.OpenExternalProjectArgs>(
+        CommandNames.OpenExternalProject,
+        {
+          projectFileName: "project1",
+          rootFiles: toExternalFiles([jsFile.path, dTsFile.path]),
+          options: {},
+        },
+      );
       session.executeCommand(openExternalProjectRequest);
 
-      const dTsFileGetErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: dTsFile.path }
-        );
+      const dTsFileGetErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: dTsFile.path },
+      );
       const errorResult = session.executeCommand(dTsFileGetErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(errorResult.length === 0);
@@ -102,22 +99,20 @@ namespace ts.projectSystem {
       const host = createServerHost([jsFile, dTsFile]);
       const session = createSession(host);
 
-      const openExternalProjectRequest =
-        makeSessionRequest<protocol.OpenExternalProjectArgs>(
-          CommandNames.OpenExternalProject,
-          {
-            projectFileName: "project1",
-            rootFiles: toExternalFiles([jsFile.path, dTsFile.path]),
-            options: { skipLibCheck: false },
-          }
-        );
+      const openExternalProjectRequest = makeSessionRequest<protocol.OpenExternalProjectArgs>(
+        CommandNames.OpenExternalProject,
+        {
+          projectFileName: "project1",
+          rootFiles: toExternalFiles([jsFile.path, dTsFile.path]),
+          options: { skipLibCheck: false },
+        },
+      );
       session.executeCommand(openExternalProjectRequest);
 
-      const dTsFileGetErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: dTsFile.path }
-        );
+      const dTsFileGetErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: dTsFile.path },
+      );
       const errorResult = session.executeCommand(dTsFileGetErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(errorResult.length === 0);
@@ -146,20 +141,18 @@ namespace ts.projectSystem {
       const session = createSession(host);
       openFilesForSession([jsFile], session);
 
-      const dTsFile1GetErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: dTsFile1.path }
-        );
+      const dTsFile1GetErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: dTsFile1.path },
+      );
       const error1Result = session.executeCommand(dTsFile1GetErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(error1Result.length === 0);
 
-      const dTsFile2GetErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: dTsFile2.path }
-        );
+      const dTsFile2GetErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: dTsFile2.path },
+      );
       const error2Result = session.executeCommand(dTsFile2GetErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(error2Result.length === 0);
@@ -178,11 +171,10 @@ namespace ts.projectSystem {
       const session = createSession(host);
       openFilesForSession([jsFile], session);
 
-      const getErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: jsFile.path }
-        );
+      const getErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: jsFile.path },
+      );
       const errorResult = session.executeCommand(getErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(errorResult.length === 1);
@@ -190,7 +182,7 @@ namespace ts.projectSystem {
         errorResult[0].code,
         Diagnostics
           .This_condition_will_always_return_0_since_the_types_1_and_2_have_no_overlap
-          .code
+          .code,
       );
     });
 
@@ -212,11 +204,10 @@ namespace ts.projectSystem {
       const session = createSession(host);
       openFilesForSession([jsFile], session);
 
-      const getErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: jsFile.path }
-        );
+      const getErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: jsFile.path },
+      );
       const errorResult = session.executeCommand(getErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(errorResult.length === 1);
@@ -224,7 +215,7 @@ namespace ts.projectSystem {
         errorResult[0].code,
         Diagnostics
           .This_condition_will_always_return_0_since_the_types_1_and_2_have_no_overlap
-          .code
+          .code,
       );
     });
 
@@ -248,11 +239,10 @@ namespace ts.projectSystem {
       const session = createSession(host);
       openFilesForSession([jsFile], session);
 
-      const getErrRequest =
-        makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
-          CommandNames.SemanticDiagnosticsSync,
-          { file: jsFile.path }
-        );
+      const getErrRequest = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
+        CommandNames.SemanticDiagnosticsSync,
+        { file: jsFile.path },
+      );
       const errorResult = session.executeCommand(getErrRequest)
         .response as protocol.Diagnostic[];
       assert.isTrue(errorResult.length === 1);
@@ -260,7 +250,7 @@ namespace ts.projectSystem {
         errorResult[0].code,
         Diagnostics
           .This_condition_will_always_return_0_since_the_types_1_and_2_have_no_overlap
-          .code
+          .code,
       );
     });
   });

@@ -6,14 +6,14 @@ namespace ts.codefix {
   export function createCodeFixActionWithoutFixAll(
     fixName: string,
     changes: FileTextChanges[],
-    description: DiagnosticAndArguments
+    description: DiagnosticAndArguments,
   ) {
     return createCodeFixActionWorker(
       fixName,
       diagnosticToString(description),
       changes,
       /*fixId*/ undefined,
-      /*fixAllDescription*/ undefined
+      /*fixAllDescription*/ undefined,
     );
   }
 
@@ -23,7 +23,7 @@ namespace ts.codefix {
     description: DiagnosticAndArguments,
     fixId: {},
     fixAllDescription: DiagnosticAndArguments,
-    command?: CodeActionCommand
+    command?: CodeActionCommand,
   ): CodeFixAction {
     return createCodeFixActionWorker(
       fixName,
@@ -31,7 +31,7 @@ namespace ts.codefix {
       changes,
       fixId,
       diagnosticToString(fixAllDescription),
-      command
+      command,
     );
   }
 
@@ -41,7 +41,7 @@ namespace ts.codefix {
     description: DiagnosticAndArguments,
     fixId?: {},
     fixAllDescription?: DiagnosticAndArguments,
-    command?: CodeActionCommand
+    command?: CodeActionCommand,
   ) {
     return createCodeFixActionWorker(
       fixName,
@@ -49,7 +49,7 @@ namespace ts.codefix {
       changes,
       fixId,
       fixAllDescription && diagnosticToString(fixAllDescription),
-      command
+      command,
     );
   }
 
@@ -59,7 +59,7 @@ namespace ts.codefix {
     changes: FileTextChanges[],
     fixId?: {},
     fixAllDescription?: string,
-    command?: CodeActionCommand
+    command?: CodeActionCommand,
   ): CodeFixAction {
     return {
       fixName,
@@ -89,7 +89,7 @@ namespace ts.codefix {
 
   function removeFixIdIfFixAllUnavailable(
     registration: CodeFixRegistration,
-    diagnostics: Diagnostic[]
+    diagnostics: Diagnostic[],
   ) {
     const { errorCodes } = registration;
     let maybeFixableDiagnostics = 0;
@@ -116,9 +116,8 @@ namespace ts.codefix {
     return flatMap(registrations, (f) =>
       map(
         f.getCodeActions(context),
-        removeFixIdIfFixAllUnavailable(f, diagnostics)
-      )
-    );
+        removeFixIdIfFixAllUnavailable(f, diagnostics),
+      ));
   }
 
   export function getAllFixes(context: CodeFixAllContext): CombinedCodeActions {
@@ -129,14 +128,14 @@ namespace ts.codefix {
 
   export function createCombinedCodeActions(
     changes: FileTextChanges[],
-    commands?: CodeActionCommand[]
+    commands?: CodeActionCommand[],
   ): CombinedCodeActions {
     return { changes, commands };
   }
 
   export function createFileTextChanges(
     fileName: string,
-    textChanges: TextChange[]
+    textChanges: TextChange[],
   ): FileTextChanges {
     return { fileName, textChanges };
   }
@@ -147,23 +146,24 @@ namespace ts.codefix {
     use: (
       changes: textChanges.ChangeTracker,
       error: DiagnosticWithLocation,
-      commands: Push<CodeActionCommand>
-    ) => void
+      commands: Push<CodeActionCommand>,
+    ) => void,
   ): CombinedCodeActions {
     const commands: CodeActionCommand[] = [];
-    const changes = textChanges.ChangeTracker.with(context, (t) =>
-      eachDiagnostic(context, errorCodes, (diag) => use(t, diag, commands))
+    const changes = textChanges.ChangeTracker.with(
+      context,
+      (t) => eachDiagnostic(context, errorCodes, (diag) => use(t, diag, commands)),
     );
     return createCombinedCodeActions(
       changes,
-      commands.length === 0 ? undefined : commands
+      commands.length === 0 ? undefined : commands,
     );
   }
 
   export function eachDiagnostic(
     context: CodeFixAllContext,
     errorCodes: readonly number[],
-    cb: (diag: DiagnosticWithLocation) => void
+    cb: (diag: DiagnosticWithLocation) => void,
   ): void {
     for (const diag of getDiagnostics(context)) {
       if (contains(errorCodes, diag.code)) {

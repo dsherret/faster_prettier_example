@@ -1,6 +1,5 @@
 namespace ts.server {
-  export interface InstallPackageOptionsWithProject
-    extends InstallPackageOptions {
+  export interface InstallPackageOptionsWithProject extends InstallPackageOptions {
     projectName: string;
     projectRootPath: Path;
   }
@@ -10,12 +9,12 @@ namespace ts.server {
   export interface ITypingsInstaller {
     isKnownTypesPackageName(name: string): boolean;
     installPackage(
-      options: InstallPackageOptionsWithProject
+      options: InstallPackageOptionsWithProject,
     ): Promise<ApplyCodeActionCommandResult>;
     enqueueInstallTypingsRequest(
       p: Project,
       typeAcquisition: TypeAcquisition,
-      unresolvedImports: SortedReadonlyArray<string> | undefined
+      unresolvedImports: SortedReadonlyArray<string> | undefined,
     ): void;
     attach(projectService: ProjectService): void;
     onProjectClosed(p: Project): void;
@@ -43,14 +42,14 @@ namespace ts.server {
 
   function setIsEqualTo(
     arr1: string[] | undefined,
-    arr2: string[] | undefined
+    arr2: string[] | undefined,
   ): boolean {
     if (arr1 === arr2) {
       return true;
     }
     if (
-      (arr1 || emptyArray).length === 0 &&
-      (arr2 || emptyArray).length === 0
+      (arr1 || emptyArray).length === 0
+      && (arr2 || emptyArray).length === 0
     ) {
       return true;
     }
@@ -78,18 +77,18 @@ namespace ts.server {
 
   function typeAcquisitionChanged(
     opt1: TypeAcquisition,
-    opt2: TypeAcquisition
+    opt2: TypeAcquisition,
   ): boolean {
     return (
-      opt1.enable !== opt2.enable ||
-      !setIsEqualTo(opt1.include, opt2.include) ||
-      !setIsEqualTo(opt1.exclude, opt2.exclude)
+      opt1.enable !== opt2.enable
+      || !setIsEqualTo(opt1.include, opt2.include)
+      || !setIsEqualTo(opt1.exclude, opt2.exclude)
     );
   }
 
   function compilerOptionsChanged(
     opt1: CompilerOptions,
-    opt2: CompilerOptions
+    opt2: CompilerOptions,
   ): boolean {
     // TODO: add more relevant properties
     return getAllowJSCompilerOption(opt1) !== getAllowJSCompilerOption(opt2);
@@ -97,7 +96,7 @@ namespace ts.server {
 
   function unresolvedImportsChanged(
     imports1: SortedReadonlyArray<string> | undefined,
-    imports2: SortedReadonlyArray<string> | undefined
+    imports2: SortedReadonlyArray<string> | undefined,
   ): boolean {
     if (imports1 === imports2) {
       return false;
@@ -116,7 +115,7 @@ namespace ts.server {
     }
 
     installPackage(
-      options: InstallPackageOptionsWithProject
+      options: InstallPackageOptionsWithProject,
     ): Promise<ApplyCodeActionCommandResult> {
       return this.installer.installPackage(options);
     }
@@ -124,7 +123,7 @@ namespace ts.server {
     enqueueInstallTypingsForProject(
       project: Project,
       unresolvedImports: SortedReadonlyArray<string> | undefined,
-      forceRefresh: boolean
+      forceRefresh: boolean,
     ) {
       const typeAcquisition = project.getTypeAcquisition();
 
@@ -134,14 +133,14 @@ namespace ts.server {
 
       const entry = this.perProjectCache.get(project.getProjectName());
       if (
-        forceRefresh ||
-        !entry ||
-        typeAcquisitionChanged(typeAcquisition, entry.typeAcquisition) ||
-        compilerOptionsChanged(
+        forceRefresh
+        || !entry
+        || typeAcquisitionChanged(typeAcquisition, entry.typeAcquisition)
+        || compilerOptionsChanged(
           project.getCompilationSettings(),
-          entry.compilerOptions
-        ) ||
-        unresolvedImportsChanged(unresolvedImports, entry.unresolvedImports)
+          entry.compilerOptions,
+        )
+        || unresolvedImportsChanged(unresolvedImports, entry.unresolvedImports)
       ) {
         // Note: entry is now poisoned since it does not really contain typings for a given combination of compiler options\typings options.
         // instead it acts as a placeholder to prevent issuing multiple requests
@@ -156,7 +155,7 @@ namespace ts.server {
         this.installer.enqueueInstallTypingsRequest(
           project,
           typeAcquisition,
-          unresolvedImports
+          unresolvedImports,
         );
       }
     }
@@ -166,7 +165,7 @@ namespace ts.server {
       compilerOptions: CompilerOptions,
       typeAcquisition: TypeAcquisition,
       unresolvedImports: SortedReadonlyArray<string>,
-      newTypings: string[]
+      newTypings: string[],
     ) {
       const typings = sort(newTypings);
       this.perProjectCache.set(projectName, {

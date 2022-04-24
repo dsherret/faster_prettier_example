@@ -15,7 +15,7 @@ interface WeakRefConstructor {
    * Creates a WeakRef instance for the given target object.
    * @param target The target object for the WeakRef instance.
    */
-  new <T extends object>(target: T): WeakRef<T>;
+  new<T extends object>(target: T): WeakRef<T>;
 }
 
 declare var WeakRef: WeakRefConstructor;
@@ -49,7 +49,7 @@ interface FinalizationRegistryConstructor {
    * Creates a finalization registry with an associated cleanup callback
    * @param cleanupCallback The callback to call after an object in the registry has been reclaimed.
    */
-  new <T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
+  new<T>(cleanupCallback: (heldValue: T) => void): FinalizationRegistry<T>;
 }
 
 declare var FinalizationRegistry: FinalizationRegistryConstructor;

@@ -12,7 +12,7 @@ namespace ts.codefix {
       const changes = textChanges.ChangeTracker.with(context, (t) => {
         const importDeclaration = getImportDeclarationForDiagnosticSpan(
           context.span,
-          context.sourceFile
+          context.sourceFile,
         );
         fixSingleImportDeclaration(t, importDeclaration, context);
       });
@@ -23,19 +23,19 @@ namespace ts.codefix {
             changes,
             Diagnostics.Convert_to_type_only_import,
             fixId,
-            Diagnostics.Convert_all_imports_not_used_as_a_value_to_type_only_imports
+            Diagnostics.Convert_all_imports_not_used_as_a_value_to_type_only_imports,
           ),
         ];
       }
     },
     fixIds: [fixId],
     getAllCodeActions: function getAllCodeActionsToConvertToTypeOnlyImport(
-      context
+      context,
     ) {
       return codeFixAll(context, errorCodes, (changes, diag) => {
         const importDeclaration = getImportDeclarationForDiagnosticSpan(
           diag,
-          context.sourceFile
+          context.sourceFile,
         );
         fixSingleImportDeclaration(changes, importDeclaration, context);
       });
@@ -44,18 +44,18 @@ namespace ts.codefix {
 
   function getImportDeclarationForDiagnosticSpan(
     span: TextSpan,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ) {
     return tryCast(
       getTokenAtPosition(sourceFile, span.start).parent,
-      isImportDeclaration
+      isImportDeclaration,
     );
   }
 
   function fixSingleImportDeclaration(
     changes: textChanges.ChangeTracker,
     importDeclaration: ImportDeclaration | undefined,
-    context: CodeFixContextBase
+    context: CodeFixContextBase,
   ) {
     if (!importDeclaration?.importClause) {
       return;
@@ -66,7 +66,7 @@ namespace ts.codefix {
     changes.insertText(
       context.sourceFile,
       importDeclaration.getStart() + "import".length,
-      " type"
+      " type",
     );
 
     // `import type foo, { Bar }` is not allowed, so move `foo` to new declaration
@@ -74,7 +74,7 @@ namespace ts.codefix {
       changes.deleteNodeRangeExcludingEnd(
         context.sourceFile,
         importClause.name,
-        importDeclaration.importClause.namedBindings
+        importDeclaration.importClause.namedBindings,
       );
       changes.insertNodeBefore(
         context.sourceFile,
@@ -86,11 +86,11 @@ namespace ts.codefix {
           factory.createImportClause(
             /*isTypeOnly*/ true,
             importClause.name,
-            /*namedBindings*/ undefined
+            /*namedBindings*/ undefined,
           ),
           importDeclaration.moduleSpecifier,
-          /*assertClause*/ undefined
-        )
+          /*assertClause*/ undefined,
+        ),
       );
     }
   }

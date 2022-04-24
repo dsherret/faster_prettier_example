@@ -18,28 +18,26 @@ namespace ts.codefix {
 
       const codeFixes: CodeFixAction[] = [];
       const moduleKind = getEmitModuleKind(compilerOptions);
-      const moduleOutOfRange =
-        moduleKind >= ModuleKind.ES2015 && moduleKind < ModuleKind.ESNext;
+      const moduleOutOfRange = moduleKind >= ModuleKind.ES2015 && moduleKind < ModuleKind.ESNext;
       if (moduleOutOfRange) {
         const changes = textChanges.ChangeTracker.with(context, (changes) => {
           setJsonCompilerOptionValue(
             changes,
             configFile,
             "module",
-            factory.createStringLiteral("esnext")
+            factory.createStringLiteral("esnext"),
           );
         });
         codeFixes.push(
           createCodeFixActionWithoutFixAll("fixModuleOption", changes, [
             Diagnostics.Set_the_module_option_in_your_configuration_file_to_0,
             "esnext",
-          ])
+          ]),
         );
       }
 
       const target = getEmitScriptTarget(compilerOptions);
-      const targetOutOfRange =
-        target < ScriptTarget.ES2017 || target > ScriptTarget.ESNext;
+      const targetOutOfRange = target < ScriptTarget.ES2017 || target > ScriptTarget.ESNext;
       if (targetOutOfRange) {
         const changes = textChanges.ChangeTracker.with(context, (tracker) => {
           const configObject = getTsConfigObjectLiteralExpression(configFile);
@@ -60,7 +58,7 @@ namespace ts.codefix {
           createCodeFixActionWithoutFixAll("fixTargetOption", changes, [
             Diagnostics.Set_the_target_option_in_your_configuration_file_to_0,
             "es2017",
-          ])
+          ]),
         );
       }
 

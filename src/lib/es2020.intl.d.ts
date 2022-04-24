@@ -150,7 +150,7 @@ declare namespace Intl {
      */
     formatToParts(
       value: number,
-      unit: RelativeTimeFormatUnit
+      unit: RelativeTimeFormatUnit,
     ): RelativeTimeFormatPart[];
 
     /**
@@ -182,9 +182,9 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/RelativeTimeFormat/RelativeTimeFormat).
      */
-    new (
+    new(
       locales?: UnicodeBCP47LocaleIdentifier | UnicodeBCP47LocaleIdentifier[],
-      options?: RelativeTimeFormatOptions
+      options?: RelativeTimeFormatOptions,
     ): RelativeTimeFormat;
 
     /**
@@ -207,7 +207,7 @@ declare namespace Intl {
      */
     supportedLocalesOf(
       locales?: UnicodeBCP47LocaleIdentifier | UnicodeBCP47LocaleIdentifier[],
-      options?: RelativeTimeFormatOptions
+      options?: RelativeTimeFormatOptions,
     ): UnicodeBCP47LocaleIdentifier[];
   };
 
@@ -300,7 +300,7 @@ declare namespace Intl {
    * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale).
    */
   const Locale: {
-    new (tag: BCP47LanguageTag | Locale, options?: LocaleOptions): Locale;
+    new(tag: BCP47LanguageTag | Locale, options?: LocaleOptions): Locale;
   };
 
   type DisplayNamesFallback = "code" | "none";
@@ -371,9 +371,9 @@ declare namespace Intl {
      *
      * [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames/DisplayNames).
      */
-    new (
+    new(
       locales?: BCP47LanguageTag | BCP47LanguageTag[],
-      options?: Partial<DisplayNamesOptions>
+      options?: Partial<DisplayNamesOptions>,
     ): DisplayNames;
 
     /**
@@ -391,7 +391,7 @@ declare namespace Intl {
      */
     supportedLocalesOf(
       locales: BCP47LanguageTag | BCP47LanguageTag[],
-      options?: { localeMatcher: RelativeTimeFormatLocaleMatcher }
+      options?: { localeMatcher: RelativeTimeFormatLocaleMatcher },
     ): BCP47LanguageTag[];
   };
 }

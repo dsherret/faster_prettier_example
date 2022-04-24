@@ -18,18 +18,17 @@ namespace ts {
         commandLineArgs: ["--b", "/src", "--verbose"],
         modifyFs: disableMap
           ? (fs) =>
-              replaceText(
-                fs,
-                "/src/tsconfig.json",
-                `"declarationMap": true,`,
-                ""
-              )
+            replaceText(
+              fs,
+              "/src/tsconfig.json",
+              `"declarationMap": true,`,
+              "",
+            )
           : undefined,
         incrementalScenarios: [
           {
             buildKind: BuildKind.IncrementalDtsChange,
-            modifyFs: (fs) =>
-              replaceText(fs, "/src/src/a.ts", "b: B;", "b: B; foo: any;"),
+            modifyFs: (fs) => replaceText(fs, "/src/src/a.ts", "b: B;", "b: B; foo: any;"),
           },
         ],
       });
@@ -48,7 +47,7 @@ namespace ts {
           fs,
           "/src/src/a.ts",
           `import { B } from "./b";`,
-          `export class B { prop = "hello"; }`
+          `export class B { prop = "hello"; }`,
         );
       },
       incrementalScenarios: [
@@ -60,13 +59,12 @@ namespace ts {
               "/src/src/a.ts",
               "export interface A {",
               `class C { }
-export interface A {`
+export interface A {`,
             ),
         },
         {
           buildKind: BuildKind.IncrementalDtsChange,
-          modifyFs: (fs) =>
-            replaceText(fs, "/src/src/a.ts", "b: B;", "b: B; foo: any;"),
+          modifyFs: (fs) => replaceText(fs, "/src/src/a.ts", "b: B;", "b: B; foo: any;"),
         },
       ],
     });

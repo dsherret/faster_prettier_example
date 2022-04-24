@@ -7,10 +7,10 @@ namespace ts {
 
       function find(node: Node): Node | undefined {
         if (
-          isDeclaration(node) &&
-          node.name &&
-          isIdentifier(node.name) &&
-          node.name.escapedText === name
+          isDeclaration(node)
+          && node.name
+          && isIdentifier(node.name)
+          && node.name.escapedText === name
         ) {
           return node;
         } else {
@@ -23,13 +23,13 @@ namespace ts {
     const newLineCharacter = getNewLineCharacter(printerOptions);
 
     function getRuleProvider(
-      placeOpenBraceOnNewLineForFunctions: boolean
+      placeOpenBraceOnNewLineForFunctions: boolean,
     ): formatting.FormatContext {
       return formatting.getFormatContext(
         placeOpenBraceOnNewLineForFunctions
           ? { ...testFormatSettings, placeOpenBraceOnNewLineForFunctions: true }
           : testFormatSettings,
-        notImplementedHost
+        notImplementedHost,
       );
     }
 
@@ -62,36 +62,36 @@ namespace ts {
       validateNodes: boolean,
       testBlock: (
         sourceFile: SourceFile,
-        changeTracker: textChanges.ChangeTracker
-      ) => void
+        changeTracker: textChanges.ChangeTracker,
+      ) => void,
     ) {
       it(caption, () => {
         const sourceFile = createSourceFile(
           "source.ts",
           text,
           ScriptTarget.ES2015,
-          /*setParentNodes*/ true
+          /*setParentNodes*/ true,
         );
         const rulesProvider = getRuleProvider(
-          placeOpenBraceOnNewLineForFunctions
+          placeOpenBraceOnNewLineForFunctions,
         );
         const changeTracker = new textChanges.ChangeTracker(
           newLineCharacter,
-          rulesProvider
+          rulesProvider,
         );
         testBlock(sourceFile, changeTracker);
         const changes = changeTracker.getChanges(
-          validateNodes ? verifyPositions : undefined
+          validateNodes ? verifyPositions : undefined,
         );
         assert.equal(changes.length, 1);
         assert.equal(changes[0].fileName, sourceFile.fileName);
         const modified = textChanges.applyChanges(
           sourceFile.text,
-          changes[0].textChanges
+          changes[0].textChanges,
         );
         Harness.Baseline.runBaseline(
           `textChanges/${caption}.js`,
-          `===ORIGINAL===${newLineCharacter}${text}${newLineCharacter}===MODIFIED===${newLineCharacter}${modified}`
+          `===ORIGINAL===${newLineCharacter}${text}${newLineCharacter}===MODIFIED===${newLineCharacter}${modified}`,
         );
       });
     }
@@ -135,13 +135,13 @@ namespace M
             /*typeParameters*/ undefined,
             /*parameters*/ emptyArray,
             /*type*/ factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
-            /*body */ factory.createBlock(statements)
+            /*body */ factory.createBlock(statements),
           );
 
           changeTracker.insertNodeBefore(
             sourceFile,
             /*before*/ findChild("M2", sourceFile),
-            newFunction
+            newFunction,
           );
 
           // replace statements with return statement
@@ -149,8 +149,8 @@ namespace M
             factory.createCallExpression(
               /*expression*/ newFunction.name!,
               /*typeArguments*/ undefined,
-              /*argumentsArray*/ emptyArray
-            )
+              /*argumentsArray*/ emptyArray,
+            ),
           );
           changeTracker.replaceNodeRange(
             sourceFile,
@@ -159,9 +159,9 @@ namespace M
             newStatement,
             {
               suffix: newLineCharacter,
-            }
+            },
           );
-        }
+        },
       );
     }
     {
@@ -184,21 +184,21 @@ function bar() {
             pos: text.indexOf("function foo"),
             end: text.indexOf("function bar"),
           });
-        }
+        },
       );
     }
     function findVariableStatementContaining(
       name: string,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): VariableStatement {
       return cast(
         findVariableDeclarationContaining(name, sourceFile).parent.parent,
-        isVariableStatement
+        isVariableStatement,
       );
     }
     function findVariableDeclarationContaining(
       name: string,
-      sourceFile: SourceFile
+      sourceFile: SourceFile,
     ): VariableDeclaration {
       return cast(findChild(name, sourceFile), isVariableDeclaration);
     }
@@ -221,9 +221,9 @@ var z = 3; // comment 4
           deleteNode(
             changeTracker,
             sourceFile,
-            findVariableStatementContaining("y", sourceFile)
+            findVariableStatementContaining("y", sourceFile),
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNode2",
@@ -237,9 +237,9 @@ var z = 3; // comment 4
             findVariableStatementContaining("y", sourceFile),
             {
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNode3",
@@ -253,9 +253,9 @@ var z = 3; // comment 4
             findVariableStatementContaining("y", sourceFile),
             {
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNode4",
@@ -270,9 +270,9 @@ var z = 3; // comment 4
             {
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNode5",
@@ -283,9 +283,9 @@ var z = 3; // comment 4
           deleteNode(
             changeTracker,
             sourceFile,
-            findVariableStatementContaining("x", sourceFile)
+            findVariableStatementContaining("x", sourceFile),
           );
-        }
+        },
       );
     }
     {
@@ -307,9 +307,9 @@ var a = 4; // comment 7
           changeTracker.deleteNodeRange(
             sourceFile,
             findVariableStatementContaining("y", sourceFile),
-            findVariableStatementContaining("z", sourceFile)
+            findVariableStatementContaining("z", sourceFile),
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeRange2",
@@ -321,9 +321,9 @@ var a = 4; // comment 7
             sourceFile,
             findVariableStatementContaining("y", sourceFile),
             findVariableStatementContaining("z", sourceFile),
-            { leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude }
+            { leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude },
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeRange3",
@@ -335,9 +335,9 @@ var a = 4; // comment 7
             sourceFile,
             findVariableStatementContaining("y", sourceFile),
             findVariableStatementContaining("z", sourceFile),
-            { trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude }
+            { trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude },
           );
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeRange4",
@@ -352,9 +352,9 @@ var a = 4; // comment 7
             {
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
     }
     function createTestVariableDeclaration(name: string) {
@@ -366,11 +366,11 @@ var a = 4; // comment 7
           [
             factory.createPropertyAssignment(
               "p1",
-              factory.createNumericLiteral(1)
+              factory.createNumericLiteral(1),
             ),
           ],
-          /*multiline*/ true
-        )
+          /*multiline*/ true,
+        ),
       );
     }
     function createTestClass() {
@@ -383,7 +383,7 @@ var a = 4; // comment 7
           factory.createHeritageClause(SyntaxKind.ImplementsKeyword, [
             factory.createExpressionWithTypeArguments(
               factory.createIdentifier("interface1"),
-              /*typeArguments*/ undefined
+              /*typeArguments*/ undefined,
             ),
           ]),
         ],
@@ -394,9 +394,9 @@ var a = 4; // comment 7
             "property1",
             /*questionToken*/ undefined,
             factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
-            /*initializer*/ undefined
+            /*initializer*/ undefined,
           ),
-        ]
+        ],
       );
     }
     {
@@ -418,9 +418,9 @@ var a = 4; // comment 7`;
             sourceFile,
             { pos: text.indexOf("var y"), end: text.indexOf("var a") },
             createTestClass(),
-            { suffix: newLineCharacter }
+            { suffix: newLineCharacter },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceRangeWithForcedIndentation",
@@ -432,9 +432,9 @@ var a = 4; // comment 7`;
             sourceFile,
             { pos: text.indexOf("var y"), end: text.indexOf("var a") },
             createTestClass(),
-            { suffix: newLineCharacter, indentation: 8, delta: 0 }
+            { suffix: newLineCharacter, indentation: 8, delta: 0 },
           );
-        }
+        },
       );
 
       runSingleFileTest(
@@ -450,9 +450,9 @@ var a = 4; // comment 7`;
               pos: sourceFile.text.indexOf("y"),
               end: sourceFile.text.indexOf(";"),
             },
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
     {
@@ -471,9 +471,9 @@ namespace A {
           changeTracker.replaceNode(
             sourceFile,
             findChild("y", sourceFile),
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
     {
@@ -497,9 +497,9 @@ var a = 4; // comment 7`;
             createTestClass(),
             {
               suffix: newLineCharacter,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNode2",
@@ -515,9 +515,9 @@ var a = 4; // comment 7`;
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               suffix: newLineCharacter,
               prefix: newLineCharacter,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNode3",
@@ -532,9 +532,9 @@ var a = 4; // comment 7`;
             {
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
               suffix: newLineCharacter,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNode4",
@@ -549,9 +549,9 @@ var a = 4; // comment 7`;
             {
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNode5",
@@ -566,9 +566,9 @@ var a = 4; // comment 7`;
             {
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
     }
     {
@@ -591,9 +591,9 @@ var a = 4; // comment 7`;
             findVariableStatementContaining("y", sourceFile),
             findVariableStatementContaining("z", sourceFile),
             createTestClass(),
-            { suffix: newLineCharacter }
+            { suffix: newLineCharacter },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNodeRange2",
@@ -610,9 +610,9 @@ var a = 4; // comment 7`;
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               suffix: newLineCharacter,
               prefix: newLineCharacter,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNodeRange3",
@@ -628,9 +628,9 @@ var a = 4; // comment 7`;
             {
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
               suffix: newLineCharacter,
-            }
+            },
           );
-        }
+        },
       );
       runSingleFileTest(
         "replaceNodeRange4",
@@ -646,9 +646,9 @@ var a = 4; // comment 7`;
             {
               leadingTriviaOption: textChanges.LeadingTriviaOption.Exclude,
               trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-            }
+            },
           );
-        }
+        },
       );
     }
     {
@@ -669,9 +669,9 @@ var a = 4; // comment 7`;
           changeTracker.insertNodeBefore(
             sourceFile,
             findVariableStatementContaining("y", sourceFile),
-            createTestClass()
+            createTestClass(),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeAfterVariableDeclaration",
@@ -682,9 +682,9 @@ var a = 4; // comment 7`;
           changeTracker.insertNodeAfter(
             sourceFile,
             findVariableDeclarationContaining("y", sourceFile),
-            createTestVariableDeclaration("z1")
+            createTestVariableDeclaration("z1"),
           );
-        }
+        },
       );
     }
     {
@@ -707,9 +707,9 @@ namespace M {
           changeTracker.insertNodeBefore(
             sourceFile,
             findVariableStatementContaining("y", sourceFile),
-            createTestClass()
+            createTestClass(),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeBefore2",
@@ -720,9 +720,9 @@ namespace M {
           changeTracker.insertNodeBefore(
             sourceFile,
             findChild("M", sourceFile),
-            createTestClass()
+            createTestClass(),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeAfter1",
@@ -733,9 +733,9 @@ namespace M {
           changeTracker.insertNodeAfter(
             sourceFile,
             findVariableStatementContaining("y", sourceFile),
-            createTestClass()
+            createTestClass(),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeAfter2",
@@ -746,9 +746,9 @@ namespace M {
           changeTracker.insertNodeAfter(
             sourceFile,
             findChild("M", sourceFile),
-            createTestClass()
+            createTestClass(),
           );
-        }
+        },
       );
     }
 
@@ -756,15 +756,14 @@ namespace M {
       const classDecl = sourceFile.statements[0] as ClassDeclaration;
       return find<ClassElement, ConstructorDeclaration>(
         classDecl.members,
-        (m): m is ConstructorDeclaration =>
-          isConstructorDeclaration(m) && !!m.body
+        (m): m is ConstructorDeclaration => isConstructorDeclaration(m) && !!m.body,
       )!;
     }
     function createTestSuperCall() {
       const superCall = factory.createCallExpression(
         factory.createSuper(),
         /*typeArguments*/ undefined,
-        /*argumentsArray*/ emptyArray
+        /*argumentsArray*/ emptyArray,
       );
       return factory.createExpressionStatement(superCall);
     }
@@ -785,9 +784,9 @@ class A {
           changeTracker.insertNodeAtConstructorStart(
             sourceFile,
             findConstructor(sourceFile),
-            createTestSuperCall()
+            createTestSuperCall(),
           );
-        }
+        },
       );
       const text2 = `
 class A {
@@ -805,9 +804,9 @@ class A {
           changeTracker.insertNodeAfter(
             sourceFile,
             findVariableStatementContaining("x", sourceFile),
-            createTestSuperCall()
+            createTestSuperCall(),
           );
-        }
+        },
       );
       const text3 = `
 class A {
@@ -825,9 +824,9 @@ class A {
           changeTracker.insertNodeAtConstructorStart(
             sourceFile,
             findConstructor(sourceFile),
-            createTestSuperCall()
+            createTestSuperCall(),
           );
-        }
+        },
       );
     }
     {
@@ -839,7 +838,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList2",
@@ -848,7 +847,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList3",
@@ -857,7 +856,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -869,7 +868,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList2_1",
@@ -878,7 +877,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList3_1",
@@ -887,7 +886,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -904,7 +903,7 @@ namespace M {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList5",
@@ -913,7 +912,7 @@ namespace M {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList6",
@@ -922,7 +921,7 @@ namespace M {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -941,7 +940,7 @@ namespace M {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList5_1",
@@ -950,7 +949,7 @@ namespace M {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList6_1",
@@ -959,7 +958,7 @@ namespace M {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -974,7 +973,7 @@ function foo(a: number, b: string, c = true) {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList8",
@@ -983,7 +982,7 @@ function foo(a: number, b: string, c = true) {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList9",
@@ -992,7 +991,7 @@ function foo(a: number, b: string, c = true) {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -1007,7 +1006,7 @@ function foo(a: number,b: string,c = true) {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList11",
@@ -1016,7 +1015,7 @@ function foo(a: number,b: string,c = true) {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList12",
@@ -1025,7 +1024,7 @@ function foo(a: number,b: string,c = true) {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -1043,7 +1042,7 @@ function foo(
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("a", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList14",
@@ -1052,7 +1051,7 @@ function foo(
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("b", sourceFile));
-        }
+        },
       );
       runSingleFileTest(
         "deleteNodeInList15",
@@ -1061,7 +1060,7 @@ function foo(
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           changeTracker.delete(sourceFile, findChild("c", sourceFile));
-        }
+        },
       );
     }
     {
@@ -1080,10 +1079,10 @@ const x = 1, y = 2;`;
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeInListAfter2",
@@ -1098,10 +1097,10 @@ const x = 1, y = 2;`;
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1120,10 +1119,10 @@ const /*x*/ x = 1, /*y*/ y = 2;`;
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeInListAfter4",
@@ -1138,10 +1137,10 @@ const /*x*/ x = 1, /*y*/ y = 2;`;
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1160,10 +1159,10 @@ const x = 1;`;
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1183,10 +1182,10 @@ const x = 1,
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeInListAfter7",
@@ -1201,10 +1200,10 @@ const x = 1,
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1224,10 +1223,10 @@ const /*x*/ x = 1,
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
       runSingleFileTest(
         "insertNodeInListAfter9",
@@ -1242,10 +1241,10 @@ const /*x*/ x = 1,
               "z",
               /*exclamationToken*/ undefined,
               /*type*/ undefined,
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1265,10 +1264,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               factory.createIdentifier("b"),
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1288,10 +1287,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               factory.createIdentifier("b"),
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1312,10 +1311,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               undefined,
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1336,10 +1335,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               undefined,
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1360,10 +1359,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               factory.createIdentifier("b"),
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1384,10 +1383,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               factory.createIdentifier("b"),
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1409,10 +1408,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               undefined,
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1434,10 +1433,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               undefined,
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1458,10 +1457,10 @@ import {
             factory.createImportSpecifier(
               /*isTypeOnly*/ false,
               undefined,
-              factory.createIdentifier("a")
-            )
+              factory.createIdentifier("a"),
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1480,17 +1479,17 @@ import {
                 factory.createImportSpecifier(
                   /*isTypeOnly*/ false,
                   undefined,
-                  factory.createIdentifier(specifier)
-                )
+                  factory.createIdentifier(specifier),
+                ),
               );
             }
-          }
+          },
         );
 
-      const crlfText = 'import {\r\nx1,\r\nx2\r\n} from "bar";';
+      const crlfText = "import {\r\nx1,\r\nx2\r\n} from \"bar\";";
       runTest("insertNodeInListAfter19", crlfText);
 
-      const lfText = 'import {\nx1,\nx2\n} from "bar";';
+      const lfText = "import {\nx1,\nx2\n} from \"bar\";";
       runTest("insertNodeInListAfter20", lfText);
     }
     {
@@ -1518,15 +1517,15 @@ class A {
                 i + "",
                 undefined,
                 undefined,
-                undefined
-              )
+                undefined,
+              ),
             );
           }
           const insertAfter = findChild("x", sourceFile);
           for (const newNode of newNodes) {
             changeTracker.insertNodeAfter(sourceFile, insertAfter, newNode);
           }
-        }
+        },
       );
     }
     {
@@ -1551,10 +1550,10 @@ class A {
               "a",
               undefined,
               factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
-              undefined
-            )
+              undefined,
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1579,10 +1578,10 @@ class A {
               "a",
               undefined,
               factory.createKeywordTypeNode(SyntaxKind.BooleanKeyword),
-              undefined
-            )
+              undefined,
+            ),
           );
-        }
+        },
       );
     }
     {
@@ -1599,7 +1598,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           deleteNode(changeTracker, sourceFile, findChild("x", sourceFile));
-        }
+        },
       );
     }
     {
@@ -1616,7 +1615,7 @@ class A {
         /*validateNodes*/ false,
         (sourceFile, changeTracker) => {
           deleteNode(changeTracker, sourceFile, findChild("x", sourceFile));
-        }
+        },
       );
     }
     {
@@ -1637,14 +1636,14 @@ class A {
             factory.createComputedPropertyName(factory.createNumericLiteral(1)),
             /*questionToken*/ undefined,
             factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
-            /*initializer*/ undefined
+            /*initializer*/ undefined,
           );
           changeTracker.insertNodeAfter(
             sourceFile,
             findChild("x", sourceFile),
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
     {
@@ -1666,14 +1665,14 @@ class A {
             factory.createComputedPropertyName(factory.createNumericLiteral(1)),
             /*questionToken*/ undefined,
             factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
-            /*initializer*/ undefined
+            /*initializer*/ undefined,
           );
           changeTracker.insertNodeAfter(
             sourceFile,
             findChild("x", sourceFile),
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
     {
@@ -1694,14 +1693,14 @@ interface A {
             factory.createComputedPropertyName(factory.createNumericLiteral(1)),
             /*questionToken*/ undefined,
             factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
-            /*initializer*/ undefined
+            /*initializer*/ undefined,
           );
           changeTracker.insertNodeAfter(
             sourceFile,
             findChild("x", sourceFile),
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
     {
@@ -1722,14 +1721,14 @@ interface A {
             factory.createComputedPropertyName(factory.createNumericLiteral(1)),
             /*questionToken*/ undefined,
             factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
-            /*initializer*/ undefined
+            /*initializer*/ undefined,
           );
           changeTracker.insertNodeAfter(
             sourceFile,
             findChild("x", sourceFile),
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
     {
@@ -1744,15 +1743,15 @@ let x = foo
         (sourceFile, changeTracker) => {
           const newNode = factory.createExpressionStatement(
             factory.createParenthesizedExpression(
-              factory.createNumericLiteral(1)
-            )
+              factory.createNumericLiteral(1),
+            ),
           );
           changeTracker.insertNodeAfter(
             sourceFile,
             findVariableStatementContaining("x", sourceFile),
-            newNode
+            newNode,
           );
-        }
+        },
       );
     }
   });

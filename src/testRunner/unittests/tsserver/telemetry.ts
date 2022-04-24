@@ -85,7 +85,7 @@ namespace ts.projectSystem {
           configFileName: "other",
           projectType: "external",
         },
-        "/hunter2/foo.csproj"
+        "/hunter2/foo.csproj",
       );
 
       // Also test that opening an external project only sends an event once.
@@ -234,7 +234,7 @@ namespace ts.projectSystem {
           },
           configFileName: "jsconfig.json",
         },
-        "/jsconfig.json"
+        "/jsconfig.json",
       );
     });
 
@@ -257,7 +257,7 @@ namespace ts.projectSystem {
           },
           configFileName: "jsconfig.json",
         },
-        "/jsconfig.json"
+        "/jsconfig.json",
       );
     });
 
@@ -269,7 +269,7 @@ namespace ts.projectSystem {
       et.host.getFileSize = () => fileSize;
       et.service.openClientFile(file.path);
       et.getEvent<server.ProjectLanguageServiceStateEvent>(
-        server.ProjectLanguageServiceStateEvent
+        server.ProjectLanguageServiceStateEvent,
       );
       et.assertProjectInfoTelemetryEvent(
         {
@@ -283,7 +283,7 @@ namespace ts.projectSystem {
           },
           languageServiceEnabled: false,
         },
-        "/jsconfig.json"
+        "/jsconfig.json",
       );
     });
 

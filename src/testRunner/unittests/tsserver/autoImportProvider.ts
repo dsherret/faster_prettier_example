@@ -42,7 +42,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -59,7 +59,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -89,10 +89,10 @@ namespace ts.projectSystem {
         projectService
           .getDefaultProjectForFile(
             angularFormsDts.path as server.NormalizedPath,
-            /*ensureProject*/ true
+            /*ensureProject*/ true,
           )!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -110,25 +110,25 @@ namespace ts.projectSystem {
       assert.equal(
         projectService.getDefaultProjectForFile(
           angularFormsDts.path as server.NormalizedPath,
-          /*ensureProject*/ true
+          /*ensureProject*/ true,
         )?.projectKind,
-        server.ProjectKind.Inferred
+        server.ProjectKind.Inferred,
       );
 
       updateFile(indexTs.path, "import '@angular/forms'");
       assert.equal(
         projectService.getDefaultProjectForFile(
           angularFormsDts.path as server.NormalizedPath,
-          /*ensureProject*/ true
+          /*ensureProject*/ true,
         )?.projectKind,
-        server.ProjectKind.Configured
+        server.ProjectKind.Configured,
       );
 
       assert.isUndefined(
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -146,7 +146,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
 
       host.writeFile(packageJson.path, packageJson.content);
@@ -154,7 +154,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -180,7 +180,7 @@ namespace ts.projectSystem {
           .get(tsconfig.path)!
           .getLanguageService()
           .getAutoImportProvider(),
-        autoImportProvider
+        autoImportProvider,
       );
     });
 
@@ -201,7 +201,7 @@ namespace ts.projectSystem {
 
       hostProject.close();
       assert.ok(
-        autoImportProviderProject && autoImportProviderProject.isClosed()
+        autoImportProviderProject && autoImportProviderProject.isClosed(),
       );
       assert.isUndefined(hostProject.autoImportProviderHost);
     });
@@ -246,7 +246,7 @@ namespace ts.projectSystem {
           includeCompletionsForModuleExports: true,
         });
       assert.isTrue(
-        completionsBefore?.entries.some((c) => c.name === "PatternValidator")
+        completionsBefore?.entries.some((c) => c.name === "PatternValidator"),
       );
 
       // Directory watchers only fire for add/remove, not change.
@@ -264,10 +264,10 @@ namespace ts.projectSystem {
         });
       assert.equal(
         autoImportProvider!.getSourceFile(angularFormsDts.path)!.getText(),
-        ""
+        "",
       );
       assert.isFalse(
-        completionsAfter?.entries.some((c) => c.name === "PatternValidator")
+        completionsAfter?.entries.some((c) => c.name === "PatternValidator"),
       );
     });
 
@@ -290,7 +290,7 @@ namespace ts.projectSystem {
           includeCompletionsForModuleExports: true,
         });
       assert.isTrue(
-        completionsBefore?.entries.some((c) => c.name === "PatternValidator")
+        completionsBefore?.entries.some((c) => c.name === "PatternValidator"),
       );
 
       updateFile(angularFormsDts.path, "export class ValidatorPattern {}");
@@ -300,10 +300,10 @@ namespace ts.projectSystem {
           includeCompletionsForModuleExports: true,
         });
       assert.isFalse(
-        completionsAfter?.entries.some((c) => c.name === "PatternValidator")
+        completionsAfter?.entries.some((c) => c.name === "PatternValidator"),
       );
       assert.isTrue(
-        completionsAfter?.entries.some((c) => c.name === "ValidatorPattern")
+        completionsAfter?.entries.some((c) => c.name === "ValidatorPattern"),
       );
     });
 
@@ -321,7 +321,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
 
       host.writeFile(packageJson.path, packageJson.content);
@@ -329,7 +329,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get(tsconfig.path)!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -349,7 +349,7 @@ namespace ts.projectSystem {
 
       const dependencies = packages.reduce(
         (hash, p) => ({ ...hash, [JSON.parse(p[0].content).name]: "*" }),
-        {}
+        {},
       );
       const packageJson: File = {
         path: "/package.json",
@@ -403,7 +403,7 @@ namespace ts.projectSystem {
 
       openFilesForSession(
         [files.find((f) => f.path === "/packages/b/index.ts")!],
-        session
+        session,
       );
       checkNumberOfConfiguredProjects(projectService, 2); // Solution (no files), B
       findAllReferences("/packages/b/index.ts", 1, "export class B".length - 1);
@@ -414,7 +414,7 @@ namespace ts.projectSystem {
         projectService.configuredProjects
           .get("/packages/a/tsconfig.json")!
           .getLanguageService()
-          .getAutoImportProvider()
+          .getAutoImportProvider(),
       );
     });
 
@@ -451,12 +451,12 @@ namespace ts.projectSystem {
       assert.isDefined(
         projectService.configuredProjects
           .get("/packages/a/tsconfig.json")!
-          .getPackageJsonAutoImportProvider()
+          .getPackageJsonAutoImportProvider(),
       );
       assert.isDefined(
         projectService.configuredProjects
           .get("/packages/a/tsconfig.json")!
-          .getPackageJsonAutoImportProvider()
+          .getPackageJsonAutoImportProvider(),
       );
     });
 
@@ -465,9 +465,9 @@ namespace ts.projectSystem {
         assert(
           !hasProperty(
             server.AutoImportProviderProject.compilerOptionsOverrides,
-            option.name
+            option.name,
           ),
-          `'${option.name}' may cause AutoImportProviderProject not to share source files with main program`
+          `'${option.name}' may cause AutoImportProviderProject not to share source files with main program`,
         );
       }
     });

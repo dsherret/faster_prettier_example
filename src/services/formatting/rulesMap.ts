@@ -2,7 +2,7 @@
 namespace ts.formatting {
   export function getFormatContext(
     options: FormatCodeSettings,
-    host: FormattingHost
+    host: FormattingHost,
   ): FormatContext {
     return { options, getRules: getRulesMap(), host };
   }
@@ -38,26 +38,25 @@ namespace ts.formatting {
   }
 
   export type RulesMap = (
-    context: FormattingContext
+    context: FormattingContext,
   ) => readonly Rule[] | undefined;
   function createRulesMap(rules: readonly RuleSpec[]): RulesMap {
     const map = buildMap(rules);
     return (context) => {
-      const bucket =
-        map[
-          getRuleBucketIndex(
-            context.currentTokenSpan.kind,
-            context.nextTokenSpan.kind
-          )
-        ];
+      const bucket = map[
+        getRuleBucketIndex(
+          context.currentTokenSpan.kind,
+          context.nextTokenSpan.kind,
+        )
+      ];
       if (bucket) {
         const rules: Rule[] = [];
         let ruleActionMask: RuleAction = 0;
         for (const rule of bucket) {
           const acceptRuleActions = ~getRuleActionExclusion(ruleActionMask);
           if (
-            rule.action & acceptRuleActions &&
-            every(rule.context, (c) => c(context))
+            rule.action & acceptRuleActions
+            && every(rule.context, (c) => c(context))
           ) {
             rules.push(rule);
             ruleActionMask |= rule.action;
@@ -76,8 +75,7 @@ namespace ts.formatting {
     // This array is used only during construction of the rulesbucket in the map
     const rulesBucketConstructionStateList = new Array<number>(map.length);
     for (const rule of rules) {
-      const specificRule =
-        rule.leftTokenRange.isSpecific && rule.rightTokenRange.isSpecific;
+      const specificRule = rule.leftTokenRange.isSpecific && rule.rightTokenRange.isSpecific;
 
       for (const left of rule.leftTokenRange.tokens) {
         for (const right of rule.rightTokenRange.tokens) {
@@ -91,7 +89,7 @@ namespace ts.formatting {
             rule.rule,
             specificRule,
             rulesBucketConstructionStateList,
-            index
+            index,
           );
         }
       }
@@ -102,7 +100,7 @@ namespace ts.formatting {
   function getRuleBucketIndex(row: number, column: number): number {
     Debug.assert(
       row <= SyntaxKind.LastKeyword && column <= SyntaxKind.LastKeyword,
-      "Must compute formatting context from tokens"
+      "Must compute formatting context from tokens",
     );
     return row * mapRowLength + column;
   }
@@ -140,26 +138,25 @@ namespace ts.formatting {
     rule: Rule,
     specificTokens: boolean,
     constructionState: number[],
-    rulesBucketIndex: number
+    rulesBucketIndex: number,
   ): void {
-    const position =
-      rule.action & RuleAction.StopAction
-        ? specificTokens
-          ? RulesPosition.StopRulesSpecific
-          : RulesPosition.StopRulesAny
-        : rule.context !== anyContext
-        ? specificTokens
-          ? RulesPosition.ContextRulesSpecific
-          : RulesPosition.ContextRulesAny
-        : specificTokens
-        ? RulesPosition.NoContextRulesSpecific
-        : RulesPosition.NoContextRulesAny;
+    const position = rule.action & RuleAction.StopAction
+      ? specificTokens
+        ? RulesPosition.StopRulesSpecific
+        : RulesPosition.StopRulesAny
+      : rule.context !== anyContext
+      ? specificTokens
+        ? RulesPosition.ContextRulesSpecific
+        : RulesPosition.ContextRulesAny
+      : specificTokens
+      ? RulesPosition.NoContextRulesSpecific
+      : RulesPosition.NoContextRulesAny;
 
     const state = constructionState[rulesBucketIndex] || 0;
     rules.splice(getInsertionIndex(state, position), 0, rule);
     constructionState[rulesBucketIndex] = increaseInsertionIndex(
       state,
-      position
+      position,
     );
   }
 
@@ -174,12 +171,12 @@ namespace ts.formatting {
 
   function increaseInsertionIndex(
     indexBitmap: number,
-    maskPosition: RulesPosition
+    maskPosition: RulesPosition,
   ): number {
     const value = ((indexBitmap >> maskPosition) & mask) + 1;
     Debug.assert(
       (value & mask) === value,
-      "Adding more rules into the sub-bucket than allowed. Maximum allowed is 32 rules."
+      "Adding more rules into the sub-bucket than allowed. Maximum allowed is 32 rules.",
     );
     return (indexBitmap & ~(mask << maskPosition)) | (value << maskPosition);
   }

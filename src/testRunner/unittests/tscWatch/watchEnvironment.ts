@@ -15,19 +15,17 @@ namespace ts.tscWatch {
         const environmentVariables = new Map<string, string>();
         environmentVariables.set(
           "TSC_WATCHFILE",
-          TestFSWithWatch.Tsc_WatchFile.DynamicPolling
+          TestFSWithWatch.Tsc_WatchFile.DynamicPolling,
         );
         return createWatchedSystem([file1, libFile], { environmentVariables });
       },
       changes: [
         {
-          caption:
-            "Time spent to Transition libFile and file1 to low priority queue",
+          caption: "Time spent to Transition libFile and file1 to low priority queue",
           change: noop,
           timeouts: (sys, programs) => {
             const initialProgram = programs[0][0];
-            const mediumPollingIntervalThreshold =
-              unchangedPollThresholds[PollingInterval.Medium];
+            const mediumPollingIntervalThreshold = unchangedPollThresholds[PollingInterval.Medium];
             for (
               let index = 0;
               index < mediumPollingIntervalThreshold;
@@ -46,30 +44,26 @@ namespace ts.tscWatch {
           change: (sys) =>
             sys.writeFile(
               "/a/username/project/typescript.ts",
-              "var zz30 = 100;"
+              "var zz30 = 100;",
             ),
           // During this timeout the file would be detected as unchanged
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
         {
-          caption:
-            "Callbacks: medium priority + high priority queue and scheduled program update",
+          caption: "Callbacks: medium priority + high priority queue and scheduled program update",
           change: noop,
           // Callbacks: medium priority + high priority queue and scheduled program update
           // This should detect change in the file
           timeouts: (sys) => sys.checkTimeoutQueueLengthAndRun(3),
         },
         {
-          caption:
-            "Polling queues polled and everything is in the high polling queue",
+          caption: "Polling queues polled and everything is in the high polling queue",
           change: noop,
           timeouts: (sys, programs) => {
             const initialProgram = programs[0][0];
-            const mediumPollingIntervalThreshold =
-              unchangedPollThresholds[PollingInterval.Medium];
-            const newThreshold =
-              unchangedPollThresholds[PollingInterval.Low] +
-              mediumPollingIntervalThreshold;
+            const mediumPollingIntervalThreshold = unchangedPollThresholds[PollingInterval.Medium];
+            const newThreshold = unchangedPollThresholds[PollingInterval.Low]
+              + mediumPollingIntervalThreshold;
             for (
               let fileUnchangeDetected = 1;
               fileUnchangeDetected < newThreshold;
@@ -118,8 +112,7 @@ namespace ts.tscWatch {
           },
         },
         {
-          caption:
-            "Make change to file but should detect as changed and schedule program update",
+          caption: "Make change to file but should detect as changed and schedule program update",
           // Make a change to file
           change: (sys) => sys.writeFile(commonFile1.path, "var zz30 = 100;"),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -145,8 +138,7 @@ namespace ts.tscWatch {
 
     verifyTscWatch({
       scenario,
-      subScenario:
-        "watchFile/setting default as fixed chunk size watch file works",
+      subScenario: "watchFile/setting default as fixed chunk size watch file works",
       commandLineArgs: ["-w", "-p", "/a/b/tsconfig.json"],
       sys: () => {
         const configFile: File = {
@@ -160,8 +152,7 @@ namespace ts.tscWatch {
       },
       changes: [
         {
-          caption:
-            "Make change to file but should detect as changed and schedule program update",
+          caption: "Make change to file but should detect as changed and schedule program update",
           // Make a change to file
           change: (sys) => sys.writeFile(commonFile1.path, "var zz30 = 100;"),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -178,7 +169,7 @@ namespace ts.tscWatch {
     describe("tsc-watch when watchDirectories implementation", () => {
       function verifyRenamingFileInSubFolder(
         subScenario: string,
-        tscWatchDirectory: Tsc_WatchDirectory
+        tscWatchDirectory: Tsc_WatchDirectory,
       ) {
         const projectFolder = "/a/username/project";
         const projectSrcFolder = `${projectFolder}/src`;
@@ -211,7 +202,7 @@ namespace ts.tscWatch {
               change: (sys) =>
                 sys.renameFile(
                   file.path,
-                  file.path.replace("file1.ts", "file2.ts")
+                  file.path.replace("file1.ts", "file2.ts"),
                 ),
               timeouts: (sys) => {
                 if (tscWatchDirectory === Tsc_WatchDirectory.DynamicPolling) {
@@ -229,23 +220,22 @@ namespace ts.tscWatch {
 
       verifyRenamingFileInSubFolder(
         "uses watchFile when renaming file in subfolder",
-        Tsc_WatchDirectory.WatchFile
+        Tsc_WatchDirectory.WatchFile,
       );
 
       verifyRenamingFileInSubFolder(
         "uses non recursive watchDirectory when renaming file in subfolder",
-        Tsc_WatchDirectory.NonRecursiveWatchDirectory
+        Tsc_WatchDirectory.NonRecursiveWatchDirectory,
       );
 
       verifyRenamingFileInSubFolder(
         "uses non recursive dynamic polling when renaming file in subfolder",
-        Tsc_WatchDirectory.DynamicPolling
+        Tsc_WatchDirectory.DynamicPolling,
       );
 
       verifyTscWatch({
         scenario,
-        subScenario:
-          "watchDirectories/when there are symlinks to folders in recursive folders",
+        subScenario: "watchDirectories/when there are symlinks to folders in recursive folders",
         commandLineArgs: ["--w"],
         sys: () => {
           const cwd = "/home/user/projects/myproject";
@@ -295,7 +285,7 @@ namespace ts.tscWatch {
           const environmentVariables = new Map<string, string>();
           environmentVariables.set(
             "TSC_WATCHDIRECTORY",
-            Tsc_WatchDirectory.NonRecursiveWatchDirectory
+            Tsc_WatchDirectory.NonRecursiveWatchDirectory,
           );
           return createWatchedSystem(files, {
             environmentVariables,
@@ -342,7 +332,7 @@ namespace ts.tscWatch {
             change: (sys) =>
               sys.deleteFolder(
                 `${projectRoot}/node_modules`,
-                /*recursive*/ true
+                /*recursive*/ true,
               ),
             timeouts: (sys) => {
               sys.checkTimeoutQueueLength(3); // 1. Failed lookup invalidation 2. For updating program and 3. for updating child watches
@@ -367,8 +357,7 @@ namespace ts.tscWatch {
           },
           {
             caption: "npm install folder creation of file2",
-            change: (sys) =>
-              sys.createDirectory(`${projectRoot}/node_modules/file2`),
+            change: (sys) => sys.createDirectory(`${projectRoot}/node_modules/file2`),
             timeouts: (sys) => sys.checkTimeoutQueueLength(1), // To update folder structure
           },
           {
@@ -376,7 +365,7 @@ namespace ts.tscWatch {
             change: (sys) =>
               sys.writeFile(
                 `${projectRoot}/node_modules/file2/index.d.ts`,
-                `export const x = 10;`
+                `export const x = 10;`,
               ),
             timeouts: (sys) => sys.checkTimeoutQueueLength(1), // To update folder structure
           },
@@ -409,8 +398,7 @@ namespace ts.tscWatch {
 
       verifyTscWatch({
         scenario,
-        subScenario:
-          "watchDirectories/with non synchronous watch directory with outDir and declaration enabled",
+        subScenario: "watchDirectories/with non synchronous watch directory with outDir and declaration enabled",
         commandLineArgs: ["--w", "-p", `${projectRoot}/tsconfig.json`],
         sys: () => {
           const configFile: File = {
@@ -435,12 +423,11 @@ namespace ts.tscWatch {
         changes: [
           noopChange,
           {
-            caption:
-              "Add new file, should schedule and run timeout to update directory watcher",
+            caption: "Add new file, should schedule and run timeout to update directory watcher",
             change: (sys) =>
               sys.writeFile(
                 `${projectRoot}/src/file3.ts`,
-                `export const y = 10;`
+                `export const y = 10;`,
               ),
             timeouts: checkSingleTimeoutQueueLengthAndRun, // Update the child watch
           },
@@ -450,8 +437,7 @@ namespace ts.tscWatch {
             timeouts: (sys) => sys.checkTimeoutQueueLengthAndRun(2), // Scheduling failed lookup update and program update
           },
           {
-            caption:
-              "After program emit with new file, should schedule and run timeout to update directory watcher",
+            caption: "After program emit with new file, should schedule and run timeout to update directory watcher",
             change: noop,
             timeouts: checkSingleTimeoutQueueLengthAndRun, // Update the child watch
           },
@@ -461,8 +447,7 @@ namespace ts.tscWatch {
 
       verifyTscWatch({
         scenario,
-        subScenario:
-          "watchDirectories/with non synchronous watch directory renaming a file",
+        subScenario: "watchDirectories/with non synchronous watch directory renaming a file",
         commandLineArgs: ["--w", "-p", `${projectRoot}/tsconfig.json`],
         sys: () => {
           const configFile: File = {
@@ -489,7 +474,7 @@ namespace ts.tscWatch {
             change: (sys) =>
               sys.renameFile(
                 `${projectRoot}/src/file2.ts`,
-                `${projectRoot}/src/renamed.ts`
+                `${projectRoot}/src/renamed.ts`,
               ),
             timeouts: (sys) => {
               sys.checkTimeoutQueueLength(2); // 1. For updating program and 2. for updating child watches
@@ -597,7 +582,7 @@ namespace ts.tscWatch {
       describe("exclude options", () => {
         function sys(
           watchOptions: WatchOptions,
-          runWithoutRecursiveWatches?: boolean
+          runWithoutRecursiveWatches?: boolean,
         ): WatchedSystem {
           const configFile: File = {
             path: `${projectRoot}/tsconfig.json`,
@@ -636,9 +621,11 @@ namespace ts.tscWatch {
         function verifyWorker(...additionalFlags: string[]) {
           verifyTscWatch({
             scenario,
-            subScenario: `watchOptions/with excludeFiles option${additionalFlags.join(
-              ""
-            )}`,
+            subScenario: `watchOptions/with excludeFiles option${
+              additionalFlags.join(
+                "",
+              )
+            }`,
             commandLineArgs: ["-w", ...additionalFlags],
             sys: () => sys({ excludeFiles: ["node_modules/*"] }),
             changes: [
@@ -649,7 +636,7 @@ namespace ts.tscWatch {
                     sys,
                     `${projectRoot}/node_modules/bar/foo.d.ts`,
                     "foo",
-                    "fooBar"
+                    "fooBar",
                   ),
                 timeouts: (sys) => sys.checkTimeoutQueueLength(0),
               },
@@ -658,16 +645,17 @@ namespace ts.tscWatch {
 
           verifyTscWatch({
             scenario,
-            subScenario: `watchOptions/with excludeDirectories option${additionalFlags.join(
-              ""
-            )}`,
+            subScenario: `watchOptions/with excludeDirectories option${
+              additionalFlags.join(
+                "",
+              )
+            }`,
             commandLineArgs: ["-w", ...additionalFlags],
             sys: () => sys({ excludeDirectories: ["node_modules"] }),
             changes: [
               {
                 caption: "delete fooBar",
-                change: (sys) =>
-                  sys.deleteFile(`${projectRoot}/node_modules/bar/fooBar.d.ts`),
+                change: (sys) => sys.deleteFile(`${projectRoot}/node_modules/bar/fooBar.d.ts`),
                 timeouts: (sys) => sys.checkTimeoutQueueLength(0),
               },
             ],
@@ -675,14 +663,16 @@ namespace ts.tscWatch {
 
           verifyTscWatch({
             scenario,
-            subScenario: `watchOptions/with excludeDirectories option with recursive directory watching${additionalFlags.join(
-              ""
-            )}`,
+            subScenario: `watchOptions/with excludeDirectories option with recursive directory watching${
+              additionalFlags.join(
+                "",
+              )
+            }`,
             commandLineArgs: ["-w", ...additionalFlags],
             sys: () =>
               sys(
                 { excludeDirectories: ["**/temp"] },
-                /*runWithoutRecursiveWatches*/ true
+                /*runWithoutRecursiveWatches*/ true,
               ),
             changes: [
               {

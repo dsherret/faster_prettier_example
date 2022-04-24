@@ -10,12 +10,12 @@ namespace ts {
 
     function modifyFsBTsToNonRelativeImport(
       fs: vfs.FileSystem,
-      moduleResolution: "node" | "classic"
+      moduleResolution: "node" | "classic",
     ) {
       fs.writeFileSync(
         "/src/b.ts",
         `import {A} from 'a';
-export const b = new A();`
+export const b = new A();`,
       );
       fs.writeFileSync(
         "/src/tsconfig.b.json",
@@ -26,7 +26,7 @@ export const b = new A();`
           },
           files: ["b.ts"],
           references: [{ path: "tsconfig.a.json" }],
-        })
+        }),
       );
     }
 
@@ -39,8 +39,7 @@ export const b = new A();`
 
     verifyTsc({
       scenario: "transitiveReferences",
-      subScenario:
-        "builds correctly when the referenced project uses different module resolution",
+      subScenario: "builds correctly when the referenced project uses different module resolution",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src/tsconfig.c.json", "--listFiles"],
       modifyFs: (fs) => modifyFsBTsToNonRelativeImport(fs, "classic"),
@@ -48,8 +47,7 @@ export const b = new A();`
 
     verifyTsc({
       scenario: "transitiveReferences",
-      subScenario:
-        "reports error about module not found with node resolution with external module name",
+      subScenario: "reports error about module not found with node resolution with external module name",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src/tsconfig.c.json", "--listFiles"],
       modifyFs: (fs) => modifyFsBTsToNonRelativeImport(fs, "node"),

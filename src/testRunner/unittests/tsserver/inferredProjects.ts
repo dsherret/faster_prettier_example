@@ -19,7 +19,7 @@ namespace ts.projectSystem {
 
       assert(
         !configFileName,
-        `should not find config, got: '${configFileName}`
+        `should not find config, got: '${configFileName}`,
       );
       checkNumberOfConfiguredProjects(projectService, 0);
       checkNumberOfInferredProjects(projectService, 1);
@@ -35,18 +35,18 @@ namespace ts.projectSystem {
         host,
         getConfigFilesToWatch(tscWatch.projectRoot).concat(
           libFile.path,
-          moduleFile.path
-        )
+          moduleFile.path,
+        ),
       );
       checkWatchedDirectories(
         host,
         [tscWatch.projectRoot],
-        /*recursive*/ false
+        /*recursive*/ false,
       );
       checkWatchedDirectories(
         host,
         [combinePaths(tscWatch.projectRoot, nodeModulesAtTypes)],
-        /*recursive*/ true
+        /*recursive*/ true,
       );
     });
 
@@ -150,11 +150,11 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { inferredProjects: 2 });
       assert.strictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[0]
+        inferredProjects[0],
       );
       assert.strictEqual(
         projectService.inferredProjects[1],
-        inferredProjects[1]
+        inferredProjects[1],
       );
       checkProjectActualFiles(inferredProjects[0], [file1.path, modFile.path]);
       assert.isTrue(inferredProjects[1].isOrphan());
@@ -291,32 +291,32 @@ namespace ts.projectSystem {
       checkProjectActualFiles(projectService.inferredProjects[2], [file3.path]);
       assert.equal(
         projectService.inferredProjects[0].getCompilationSettings().target,
-        ScriptTarget.ESNext
+        ScriptTarget.ESNext,
       );
       assert.equal(
         projectService.inferredProjects[1].getCompilationSettings().target,
-        ScriptTarget.ESNext
+        ScriptTarget.ESNext,
       );
       assert.equal(
         projectService.inferredProjects[2].getCompilationSettings().target,
-        ScriptTarget.ES2015
+        ScriptTarget.ES2015,
       );
     });
 
     function checkInferredProject(
       inferredProject: server.InferredProject,
       actualFiles: File[],
-      target: ScriptTarget
+      target: ScriptTarget,
     ) {
       checkProjectActualFiles(
         inferredProject,
-        actualFiles.map((f) => f.path)
+        actualFiles.map((f) => f.path),
       );
       assert.equal(inferredProject.getCompilationSettings().target, target);
     }
 
     function verifyProjectRootWithCaseSensitivity(
-      useCaseSensitiveFileNames: boolean
+      useCaseSensitiveFileNames: boolean,
     ) {
       const files: [File, File, File, File] = [
         { path: "/a/file1.ts", content: "let x = 1;" },
@@ -338,7 +338,7 @@ namespace ts.projectSystem {
           allowJs: true,
           target: ScriptTarget.ES2015,
         },
-        "/a"
+        "/a",
       );
 
       openClientFiles(["/a", "/a", "/b", undefined]);
@@ -371,7 +371,7 @@ namespace ts.projectSystem {
           allowJs: true,
           target: ScriptTarget.ES2017,
         },
-        "/A"
+        "/A",
       );
 
       openClientFiles(["/a", "/a", "/b", undefined]);
@@ -407,15 +407,15 @@ namespace ts.projectSystem {
           string | undefined,
           string | undefined,
           string | undefined,
-          string | undefined
-        ]
+          string | undefined,
+        ],
       ) {
         files.forEach((file, index) => {
           projectService.openClientFile(
             file.path,
             file.content,
             ScriptKind.JS,
-            projectRoots[index]
+            projectRoots[index],
           );
         });
       }
@@ -598,7 +598,7 @@ namespace ts.projectSystem {
       assert.deepEqual(
         inferredProject.getTypeAcquisition(),
         expected,
-        "typeAcquisition should be inferred for inferred projects"
+        "typeAcquisition should be inferred for inferred projects",
       );
     });
 

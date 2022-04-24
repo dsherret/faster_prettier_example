@@ -64,7 +64,7 @@ namespace ts {
             appendText(
               fs,
               "/src/project/src/main.d.ts",
-              "export const xy = 100;"
+              "export const xy = 100;",
             ),
         },
       ],
@@ -101,7 +101,7 @@ namespace ts {
       function verifyNoEmitOnError(
         subScenario: string,
         fixModifyFs: TscIncremental["modifyFs"],
-        modifyFs?: TscIncremental["modifyFs"]
+        modifyFs?: TscIncremental["modifyFs"],
       ) {
         verifyTscSerializedIncrementalEdits({
           scenario: "incremental",
@@ -127,9 +127,8 @@ namespace ts {
 const a = {
     lastName: 'sdsd'
 };`,
-          "utf-8"
-        )
-      );
+          "utf-8",
+        ));
 
       verifyNoEmitOnError(
         "with noEmitOnError semantic errors",
@@ -138,15 +137,15 @@ const a = {
             "/src/src/main.ts",
             `import { A } from "../shared/types/db";
 const a: string = "hello";`,
-            "utf-8"
+            "utf-8",
           ),
         (fs) =>
           fs.writeFileSync(
             "/src/src/main.ts",
             `import { A } from "../shared/types/db";
 const a: string = 10;`,
-            "utf-8"
-          )
+            "utf-8",
+          ),
       );
     });
 
@@ -184,14 +183,12 @@ const a: string = 10;`,
             {
               subScenario: "Introduce error but still noEmit",
               commandLineArgs: ["--p", "src/project", "--noEmit"],
-              modifyFs: (fs) =>
-                replaceText(fs, "/src/project/src/class.ts", "prop", "prop1"),
+              modifyFs: (fs) => replaceText(fs, "/src/project/src/class.ts", "prop", "prop1"),
               buildKind: BuildKind.IncrementalDtsChange,
             },
             {
               subScenario: "Fix error and emit",
-              modifyFs: (fs) =>
-                replaceText(fs, "/src/project/src/class.ts", "prop1", "prop"),
+              modifyFs: (fs) => replaceText(fs, "/src/project/src/class.ts", "prop1", "prop"),
               buildKind: BuildKind.IncrementalDtsChange,
             },
             noChangeRunWithEmit,
@@ -200,8 +197,7 @@ const a: string = 10;`,
             noChangeRunWithEmit,
             {
               subScenario: "Introduce error and emit",
-              modifyFs: (fs) =>
-                replaceText(fs, "/src/project/src/class.ts", "prop", "prop1"),
+              modifyFs: (fs) => replaceText(fs, "/src/project/src/class.ts", "prop", "prop1"),
               buildKind: BuildKind.IncrementalDtsChange,
             },
             noChangeRunWithEmit,
@@ -211,8 +207,7 @@ const a: string = 10;`,
             {
               subScenario: "Fix error and no emit",
               commandLineArgs: ["--p", "src/project", "--noEmit"],
-              modifyFs: (fs) =>
-                replaceText(fs, "/src/project/src/class.ts", "prop1", "prop"),
+              modifyFs: (fs) => replaceText(fs, "/src/project/src/class.ts", "prop1", "prop"),
               buildKind: BuildKind.IncrementalDtsChange,
             },
             noChangeRunWithEmit,
@@ -232,14 +227,12 @@ const a: string = 10;`,
             {
               subScenario: "Introduce error with emit",
               commandLineArgs: ["--p", "src/project"],
-              modifyFs: (fs) =>
-                replaceText(fs, "/src/project/src/class.ts", "prop", "prop1"),
+              modifyFs: (fs) => replaceText(fs, "/src/project/src/class.ts", "prop", "prop1"),
               buildKind: BuildKind.IncrementalDtsChange,
             },
             {
               subScenario: "Fix error and no emit",
-              modifyFs: (fs) =>
-                replaceText(fs, "/src/project/src/class.ts", "prop1", "prop"),
+              modifyFs: (fs) => replaceText(fs, "/src/project/src/class.ts", "prop1", "prop"),
               buildKind: BuildKind.IncrementalDtsChange,
             },
             noChangeRunWithEmit,
@@ -302,14 +295,12 @@ const a: string = 10;`,
         {
           subScenario: "Modify main file",
           buildKind: BuildKind.IncrementalDtsChange,
-          modifyFs: (fs) =>
-            appendText(fs, `/src/project/src/main.ts`, `something();`),
+          modifyFs: (fs) => appendText(fs, `/src/project/src/main.ts`, `something();`),
         },
         {
           subScenario: "Modify main file again",
           buildKind: BuildKind.IncrementalDtsChange,
-          modifyFs: (fs) =>
-            appendText(fs, `/src/project/src/main.ts`, `something();`),
+          modifyFs: (fs) => appendText(fs, `/src/project/src/main.ts`, `something();`),
         },
         {
           subScenario: "Add new file and update main file",
@@ -317,13 +308,13 @@ const a: string = 10;`,
           modifyFs: (fs) => {
             fs.writeFileSync(
               `/src/project/src/newFile.ts`,
-              "function foo() { return 20; }"
+              "function foo() { return 20; }",
             );
             prependText(
               fs,
               `/src/project/src/main.ts`,
               `/// <reference path="./newFile.ts"/>
-`
+`,
             );
             appendText(fs, `/src/project/src/main.ts`, `foo();`);
           },
@@ -334,14 +325,13 @@ const a: string = 10;`,
           modifyFs: (fs) =>
             fs.writeFileSync(
               `/src/project/src/fileNotFound.ts`,
-              "function something2() { return 20; }"
+              "function something2() { return 20; }",
             ),
         },
         {
           subScenario: "Modify main file",
           buildKind: BuildKind.IncrementalDtsChange,
-          modifyFs: (fs) =>
-            appendText(fs, `/src/project/src/main.ts`, `something();`),
+          modifyFs: (fs) => appendText(fs, `/src/project/src/main.ts`, `something();`),
         },
       ],
       baselinePrograms: true,
@@ -369,8 +359,7 @@ declare global {
         fs: () =>
           loadProjectFromFiles({
             "/src/project/node_modules/react/jsx-runtime.js": "export {}", // js needs to be present so there's a resolution result
-            "/src/project/node_modules/@types/react/index.d.ts":
-              getJsxLibraryContent(), // doesn't contain a jsx-runtime definition
+            "/src/project/node_modules/@types/react/index.d.ts": getJsxLibraryContent(), // doesn't contain a jsx-runtime definition
             "/src/project/src/index.tsx": `export const App = () => <div propA={true}></div>;`,
             "/src/project/tsconfig.json": JSON.stringify({
               compilerOptions: {
@@ -390,8 +379,7 @@ declare global {
         fs: () =>
           loadProjectFromFiles({
             "/src/project/node_modules/react/jsx-runtime.js": "export {}", // js needs to be present so there's a resolution result
-            "/src/project/node_modules/@types/react/index.d.ts":
-              getJsxLibraryContent(), // doesn't contain a jsx-runtime definition
+            "/src/project/node_modules/@types/react/index.d.ts": getJsxLibraryContent(), // doesn't contain a jsx-runtime definition
             "/src/project/src/index.tsx": `export const App = () => <div propA={true}></div>;`,
             "/src/project/tsconfig.json": JSON.stringify({
               compilerOptions: {
@@ -438,7 +426,7 @@ declare global {
             fs.writeFileSync(
               "/src/projects/project1/class3.ts",
               `class class3 {}`,
-              "utf-8"
+              "utf-8",
             ),
           cleanBuildDiscrepancies: () =>
             new Map<string, CleanBuildDescrepancy>([
@@ -457,7 +445,7 @@ declare global {
             fs.writeFileSync(
               "/src/projects/project1/class3.d.ts",
               `declare class class3 {}`,
-              "utf-8"
+              "utf-8",
             ),
         },
         {
@@ -468,7 +456,7 @@ declare global {
             fs.writeFileSync(
               "/src/projects/project1/temp/file.d.ts",
               `declare class file {}`,
-              "utf-8"
+              "utf-8",
             );
           },
         },
@@ -493,7 +481,7 @@ declare global {
             fs.writeFileSync(
               "/src/projects/project1/class3.d.ts",
               `declare class class3 {}`,
-              "utf-8"
+              "utf-8",
             ),
         },
       ],
@@ -547,7 +535,7 @@ declare global {
                         <div />
                     </Component>)`,
           },
-          `\ninterface ReadonlyArray<T> { readonly length: number }`
+          `\ninterface ReadonlyArray<T> { readonly length: number }`,
         ),
       incrementalScenarios: noChangeOnlyRuns,
     });

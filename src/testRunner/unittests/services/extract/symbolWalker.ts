@@ -3,7 +3,7 @@ namespace ts {
     function test(
       description: string,
       source: string,
-      verifier: (file: SourceFile, checker: TypeChecker) => void
+      verifier: (file: SourceFile, checker: TypeChecker) => void,
     ) {
       it(description, () => {
         const result = Harness.Compiler.compileFiles(
@@ -16,7 +16,7 @@ namespace ts {
           [],
           {},
           {},
-          "/"
+          "/",
         );
         const file = result.program!.getSourceFile("main.ts")!;
         const checker = result.program!.getTypeChecker();
@@ -63,7 +63,7 @@ export default function foo(a: number, b: Bar): void {}`,
         }
         assert.equal(foundCount, expectedSymbols.length);
         assert.equal(stdLibRefSymbols, 1); // Expect 1 stdlib entry symbol - the implicit Array referenced by Bar.history
-      }
+      },
     );
   });
 }

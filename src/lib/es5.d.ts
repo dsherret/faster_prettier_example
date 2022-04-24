@@ -61,7 +61,7 @@ declare function encodeURI(uri: string): string;
  * @param uriComponent A value representing an encoded URI component.
  */
 declare function encodeURIComponent(
-  uriComponent: string | number | boolean
+  uriComponent: string | number | boolean,
 ): string;
 
 /**
@@ -134,7 +134,7 @@ interface Object {
 }
 
 interface ObjectConstructor {
-  new (value?: any): Object;
+  new(value?: any): Object;
   (): any;
   (value: any): any;
 
@@ -155,7 +155,7 @@ interface ObjectConstructor {
    */
   getOwnPropertyDescriptor(
     o: any,
-    p: PropertyKey
+    p: PropertyKey,
   ): PropertyDescriptor | undefined;
 
   /**
@@ -178,7 +178,7 @@ interface ObjectConstructor {
    */
   create(
     o: object | null,
-    properties: PropertyDescriptorMap & ThisType<any>
+    properties: PropertyDescriptorMap & ThisType<any>,
   ): any;
 
   /**
@@ -190,7 +190,7 @@ interface ObjectConstructor {
   defineProperty<T>(
     o: T,
     p: PropertyKey,
-    attributes: PropertyDescriptor & ThisType<any>
+    attributes: PropertyDescriptor & ThisType<any>,
   ): T;
 
   /**
@@ -200,7 +200,7 @@ interface ObjectConstructor {
    */
   defineProperties<T>(
     o: T,
-    properties: PropertyDescriptorMap & ThisType<any>
+    properties: PropertyDescriptorMap & ThisType<any>,
   ): T;
 
   /**
@@ -227,9 +227,9 @@ interface ObjectConstructor {
    */
   freeze<
     T extends { [idx: string]: U | null | undefined | object },
-    U extends string | bigint | number | boolean | symbol
+    U extends string | bigint | number | boolean | symbol,
   >(
-    o: T
+    o: T,
   ): Readonly<T>;
 
   /**
@@ -316,7 +316,7 @@ interface FunctionConstructor {
    * Creates a new function.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: string[]): Function;
+  new(...args: string[]): Function;
   (...args: string[]): Function;
   readonly prototype: Function;
 }
@@ -326,17 +326,14 @@ declare var Function: FunctionConstructor;
 /**
  * Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter.
  */
-type ThisParameterType<T> = T extends (this: infer U, ...args: never) => any
-  ? U
+type ThisParameterType<T> = T extends (this: infer U, ...args: never) => any ? U
   : unknown;
 
 /**
  * Removes the 'this' parameter from a function type.
  */
-type OmitThisParameter<T> = unknown extends ThisParameterType<T>
-  ? T
-  : T extends (...args: infer A) => infer R
-  ? (...args: A) => R
+type OmitThisParameter<T> = unknown extends ThisParameterType<T> ? T
+  : T extends (...args: infer A) => infer R ? (...args: A) => R
   : T;
 
 interface CallableFunction extends Function {
@@ -349,7 +346,7 @@ interface CallableFunction extends Function {
   apply<T, A extends any[], R>(
     this: (this: T, ...args: A) => R,
     thisArg: T,
-    args: A
+    args: A,
   ): R;
 
   /**
@@ -373,20 +370,20 @@ interface CallableFunction extends Function {
   bind<T, A0, A extends any[], R>(
     this: (this: T, arg0: A0, ...args: A) => R,
     thisArg: T,
-    arg0: A0
+    arg0: A0,
   ): (...args: A) => R;
   bind<T, A0, A1, A extends any[], R>(
     this: (this: T, arg0: A0, arg1: A1, ...args: A) => R,
     thisArg: T,
     arg0: A0,
-    arg1: A1
+    arg1: A1,
   ): (...args: A) => R;
   bind<T, A0, A1, A2, A extends any[], R>(
     this: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
     thisArg: T,
     arg0: A0,
     arg1: A1,
-    arg2: A2
+    arg2: A2,
   ): (...args: A) => R;
   bind<T, A0, A1, A2, A3, A extends any[], R>(
     this: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
@@ -394,7 +391,7 @@ interface CallableFunction extends Function {
     arg0: A0,
     arg1: A1,
     arg2: A2,
-    arg3: A3
+    arg3: A3,
   ): (...args: A) => R;
   bind<T, AX, R>(
     this: (this: T, ...args: AX[]) => R,
@@ -409,11 +406,11 @@ interface NewableFunction extends Function {
    * @param thisArg The object to be used as the this object.
    * @param args An array of argument values to be passed to the function.
    */
-  apply<T>(this: new () => T, thisArg: T): void;
+  apply<T>(this: new() => T, thisArg: T): void;
   apply<T, A extends any[]>(
-    this: new (...args: A) => T,
+    this: new(...args: A) => T,
     thisArg: T,
-    args: A
+    args: A,
   ): void;
 
   /**
@@ -422,7 +419,7 @@ interface NewableFunction extends Function {
    * @param args Argument values to be passed to the function.
    */
   call<T, A extends any[]>(
-    this: new (...args: A) => T,
+    this: new(...args: A) => T,
     thisArg: T,
     ...args: A
   ): void;
@@ -435,36 +432,36 @@ interface NewableFunction extends Function {
    */
   bind<T>(this: T, thisArg: any): T;
   bind<A0, A extends any[], R>(
-    this: new (arg0: A0, ...args: A) => R,
-    thisArg: any,
-    arg0: A0
-  ): new (...args: A) => R;
-  bind<A0, A1, A extends any[], R>(
-    this: new (arg0: A0, arg1: A1, ...args: A) => R,
+    this: new(arg0: A0, ...args: A) => R,
     thisArg: any,
     arg0: A0,
-    arg1: A1
-  ): new (...args: A) => R;
-  bind<A0, A1, A2, A extends any[], R>(
-    this: new (arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
+  ): new(...args: A) => R;
+  bind<A0, A1, A extends any[], R>(
+    this: new(arg0: A0, arg1: A1, ...args: A) => R,
     thisArg: any,
     arg0: A0,
     arg1: A1,
-    arg2: A2
-  ): new (...args: A) => R;
-  bind<A0, A1, A2, A3, A extends any[], R>(
-    this: new (arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
+  ): new(...args: A) => R;
+  bind<A0, A1, A2, A extends any[], R>(
+    this: new(arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
     thisArg: any,
     arg0: A0,
     arg1: A1,
     arg2: A2,
-    arg3: A3
-  ): new (...args: A) => R;
+  ): new(...args: A) => R;
+  bind<A0, A1, A2, A3, A extends any[], R>(
+    this: new(arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
+    thisArg: any,
+    arg0: A0,
+    arg1: A1,
+    arg2: A2,
+    arg3: A3,
+  ): new(...args: A) => R;
   bind<AX, R>(
-    this: new (...args: AX[]) => R,
+    this: new(...args: AX[]) => R,
     thisArg: any,
     ...args: AX[]
-  ): new (...args: AX[]) => R;
+  ): new(...args: AX[]) => R;
 }
 
 interface IArguments {
@@ -535,7 +532,7 @@ interface String {
    */
   replace(
     searchValue: string | RegExp,
-    replacer: (substring: string, ...args: any[]) => string
+    replacer: (substring: string, ...args: any[]) => string,
   ): string;
 
   /**
@@ -601,7 +598,7 @@ interface String {
 }
 
 interface StringConstructor {
-  new (value?: any): String;
+  new(value?: any): String;
   (value?: any): string;
   readonly prototype: String;
   fromCharCode(...codes: number[]): string;
@@ -618,7 +615,7 @@ interface Boolean {
 }
 
 interface BooleanConstructor {
-  new (value?: any): Boolean;
+  new(value?: any): Boolean;
   <T>(value?: T): boolean;
   readonly prototype: Boolean;
 }
@@ -655,7 +652,7 @@ interface Number {
 }
 
 interface NumberConstructor {
-  new (value?: any): Number;
+  new(value?: any): Number;
   (value?: any): number;
   readonly prototype: Number;
 
@@ -982,16 +979,16 @@ interface Date {
 }
 
 interface DateConstructor {
-  new (): Date;
-  new (value: number | string): Date;
-  new (
+  new(): Date;
+  new(value: number | string): Date;
+  new(
     year: number,
     month: number,
     date?: number,
     hours?: number,
     minutes?: number,
     seconds?: number,
-    ms?: number
+    ms?: number,
   ): Date;
   (): string;
   readonly prototype: Date;
@@ -1017,7 +1014,7 @@ interface DateConstructor {
     hours?: number,
     minutes?: number,
     seconds?: number,
-    ms?: number
+    ms?: number,
   ): number;
   now(): number;
 }
@@ -1067,8 +1064,8 @@ interface RegExp {
 }
 
 interface RegExpConstructor {
-  new (pattern: RegExp | string): RegExp;
-  new (pattern: string, flags?: string): RegExp;
+  new(pattern: RegExp | string): RegExp;
+  new(pattern: string, flags?: string): RegExp;
   (pattern: RegExp | string): RegExp;
   (pattern: string, flags?: string): RegExp;
   readonly prototype: RegExp;
@@ -1123,7 +1120,7 @@ interface Error {
 }
 
 interface ErrorConstructor {
-  new (message?: string): Error;
+  new(message?: string): Error;
   (message?: string): Error;
   readonly prototype: Error;
 }
@@ -1133,7 +1130,7 @@ declare var Error: ErrorConstructor;
 interface EvalError extends Error {}
 
 interface EvalErrorConstructor extends ErrorConstructor {
-  new (message?: string): EvalError;
+  new(message?: string): EvalError;
   (message?: string): EvalError;
   readonly prototype: EvalError;
 }
@@ -1143,7 +1140,7 @@ declare var EvalError: EvalErrorConstructor;
 interface RangeError extends Error {}
 
 interface RangeErrorConstructor extends ErrorConstructor {
-  new (message?: string): RangeError;
+  new(message?: string): RangeError;
   (message?: string): RangeError;
   readonly prototype: RangeError;
 }
@@ -1153,7 +1150,7 @@ declare var RangeError: RangeErrorConstructor;
 interface ReferenceError extends Error {}
 
 interface ReferenceErrorConstructor extends ErrorConstructor {
-  new (message?: string): ReferenceError;
+  new(message?: string): ReferenceError;
   (message?: string): ReferenceError;
   readonly prototype: ReferenceError;
 }
@@ -1163,7 +1160,7 @@ declare var ReferenceError: ReferenceErrorConstructor;
 interface SyntaxError extends Error {}
 
 interface SyntaxErrorConstructor extends ErrorConstructor {
-  new (message?: string): SyntaxError;
+  new(message?: string): SyntaxError;
   (message?: string): SyntaxError;
   readonly prototype: SyntaxError;
 }
@@ -1173,7 +1170,7 @@ declare var SyntaxError: SyntaxErrorConstructor;
 interface TypeError extends Error {}
 
 interface TypeErrorConstructor extends ErrorConstructor {
-  new (message?: string): TypeError;
+  new(message?: string): TypeError;
   (message?: string): TypeError;
   readonly prototype: TypeError;
 }
@@ -1183,7 +1180,7 @@ declare var TypeError: TypeErrorConstructor;
 interface URIError extends Error {}
 
 interface URIErrorConstructor extends ErrorConstructor {
-  new (message?: string): URIError;
+  new(message?: string): URIError;
   (message?: string): URIError;
   readonly prototype: URIError;
 }
@@ -1199,7 +1196,7 @@ interface JSON {
    */
   parse(
     text: string,
-    reviver?: (this: any, key: string, value: any) => any
+    reviver?: (this: any, key: string, value: any) => any,
   ): any;
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -1210,7 +1207,7 @@ interface JSON {
   stringify(
     value: any,
     replacer?: (this: any, key: string, value: any) => any,
-    space?: string | number
+    space?: string | number,
   ): string;
   /**
    * Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
@@ -1221,7 +1218,7 @@ interface JSON {
   stringify(
     value: any,
     replacer?: (number | string)[] | null,
-    space?: string | number
+    space?: string | number,
   ): string;
 }
 
@@ -1290,7 +1287,7 @@ interface ReadonlyArray<T> {
    */
   every<S extends T>(
     predicate: (value: T, index: number, array: readonly T[]) => value is S,
-    thisArg?: any
+    thisArg?: any,
   ): this is readonly S[];
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -1302,7 +1299,7 @@ interface ReadonlyArray<T> {
    */
   every(
     predicate: (value: T, index: number, array: readonly T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
   /**
    * Determines whether the specified callback function returns true for any element of an array.
@@ -1314,7 +1311,7 @@ interface ReadonlyArray<T> {
    */
   some(
     predicate: (value: T, index: number, array: readonly T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
   /**
    * Performs the specified action for each element in an array.
@@ -1323,7 +1320,7 @@ interface ReadonlyArray<T> {
    */
   forEach(
     callbackfn: (value: T, index: number, array: readonly T[]) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   /**
    * Calls a defined callback function on each element of an array, and returns an array that contains the results.
@@ -1332,7 +1329,7 @@ interface ReadonlyArray<T> {
    */
   map<U>(
     callbackfn: (value: T, index: number, array: readonly T[]) => U,
-    thisArg?: any
+    thisArg?: any,
   ): U[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1341,7 +1338,7 @@ interface ReadonlyArray<T> {
    */
   filter<S extends T>(
     predicate: (value: T, index: number, array: readonly T[]) => value is S,
-    thisArg?: any
+    thisArg?: any,
   ): S[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1350,7 +1347,7 @@ interface ReadonlyArray<T> {
    */
   filter(
     predicate: (value: T, index: number, array: readonly T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): T[];
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1362,17 +1359,17 @@ interface ReadonlyArray<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: readonly T[]
-    ) => T
+      array: readonly T[],
+    ) => T,
   ): T;
   reduce(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: readonly T[]
+      array: readonly T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1384,9 +1381,9 @@ interface ReadonlyArray<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: number,
-      array: readonly T[]
+      array: readonly T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1398,17 +1395,17 @@ interface ReadonlyArray<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: readonly T[]
-    ) => T
+      array: readonly T[],
+    ) => T,
   ): T;
   reduceRight(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: readonly T[]
+      array: readonly T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1420,9 +1417,9 @@ interface ReadonlyArray<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: number,
-      array: readonly T[]
+      array: readonly T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   readonly [n: number]: T;
@@ -1548,7 +1545,7 @@ interface Array<T> {
    */
   every<S extends T>(
     predicate: (value: T, index: number, array: T[]) => value is S,
-    thisArg?: any
+    thisArg?: any,
   ): this is S[];
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -1560,7 +1557,7 @@ interface Array<T> {
    */
   every(
     predicate: (value: T, index: number, array: T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
   /**
    * Determines whether the specified callback function returns true for any element of an array.
@@ -1572,7 +1569,7 @@ interface Array<T> {
    */
   some(
     predicate: (value: T, index: number, array: T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
   /**
    * Performs the specified action for each element in an array.
@@ -1581,7 +1578,7 @@ interface Array<T> {
    */
   forEach(
     callbackfn: (value: T, index: number, array: T[]) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   /**
    * Calls a defined callback function on each element of an array, and returns an array that contains the results.
@@ -1590,7 +1587,7 @@ interface Array<T> {
    */
   map<U>(
     callbackfn: (value: T, index: number, array: T[]) => U,
-    thisArg?: any
+    thisArg?: any,
   ): U[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1599,7 +1596,7 @@ interface Array<T> {
    */
   filter<S extends T>(
     predicate: (value: T, index: number, array: T[]) => value is S,
-    thisArg?: any
+    thisArg?: any,
   ): S[];
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -1608,7 +1605,7 @@ interface Array<T> {
    */
   filter(
     predicate: (value: T, index: number, array: T[]) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): T[];
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1620,17 +1617,17 @@ interface Array<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: T[]
-    ) => T
+      array: T[],
+    ) => T,
   ): T;
   reduce(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: T[]
+      array: T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1642,9 +1639,9 @@ interface Array<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: number,
-      array: T[]
+      array: T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1656,17 +1653,17 @@ interface Array<T> {
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: T[]
-    ) => T
+      array: T[],
+    ) => T,
   ): T;
   reduceRight(
     callbackfn: (
       previousValue: T,
       currentValue: T,
       currentIndex: number,
-      array: T[]
+      array: T[],
     ) => T,
-    initialValue: T
+    initialValue: T,
   ): T;
   /**
    * Calls the specified callback function for all the elements in an array, in descending order. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -1678,18 +1675,18 @@ interface Array<T> {
       previousValue: U,
       currentValue: T,
       currentIndex: number,
-      array: T[]
+      array: T[],
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   [n: number]: T;
 }
 
 interface ArrayConstructor {
-  new (arrayLength?: number): any[];
-  new <T>(arrayLength: number): T[];
-  new <T>(...items: T[]): T[];
+  new(arrayLength?: number): any[];
+  new<T>(arrayLength: number): T[];
+  new<T>(...items: T[]): T[];
   (arrayLength?: number): any[];
   <T>(arrayLength: number): T[];
   <T>(...items: T[]): T[];
@@ -1709,28 +1706,28 @@ interface TypedPropertyDescriptor<T> {
 }
 
 declare type ClassDecorator = <TFunction extends Function>(
-  target: TFunction
+  target: TFunction,
 ) => TFunction | void;
 declare type PropertyDecorator = (
   target: Object,
-  propertyKey: string | symbol
+  propertyKey: string | symbol,
 ) => void;
 declare type MethodDecorator = <T>(
   target: Object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>
+  descriptor: TypedPropertyDescriptor<T>,
 ) => TypedPropertyDescriptor<T> | void;
 declare type ParameterDecorator = (
   target: Object,
   propertyKey: string | symbol,
-  parameterIndex: number
+  parameterIndex: number,
 ) => void;
 
-declare type PromiseConstructorLike = new <T>(
+declare type PromiseConstructorLike = new<T>(
   executor: (
     resolve: (value: T | PromiseLike<T>) => void,
-    reject: (reason?: any) => void
-  ) => void
+    reject: (reason?: any) => void,
+  ) => void,
 ) => PromiseLike<T>;
 
 interface PromiseLike<T> {
@@ -1748,7 +1745,7 @@ interface PromiseLike<T> {
     onrejected?:
       | ((reason: any) => TResult2 | PromiseLike<TResult2>)
       | undefined
-      | null
+      | null,
   ): PromiseLike<TResult1 | TResult2>;
 }
 
@@ -1770,7 +1767,7 @@ interface Promise<T> {
     onrejected?:
       | ((reason: any) => TResult2 | PromiseLike<TResult2>)
       | undefined
-      | null
+      | null,
   ): Promise<TResult1 | TResult2>;
 
   /**
@@ -1782,18 +1779,17 @@ interface Promise<T> {
     onrejected?:
       | ((reason: any) => TResult | PromiseLike<TResult>)
       | undefined
-      | null
+      | null,
   ): Promise<T | TResult>;
 }
 
 /**
  * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
  */
-type Awaited<T> = T extends null | undefined
-  ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
+type Awaited<T> = T extends null | undefined ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
   : T extends object & { then(onfulfilled: infer F): any } // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
-  ? F extends (value: infer V, ...args: any) => any // if the argument to `then` is callable, extracts the first argument
-    ? Awaited<V> // recursively unwrap the value
+    ? F extends (value: infer V, ...args: any) => any // if the argument to `then` is callable, extracts the first argument
+      ? Awaited<V> // recursively unwrap the value
     : never // the argument to `then` was not callable
   : T; // non-object or non-thenable
 
@@ -1862,30 +1858,28 @@ type NonNullable<T> = T extends null | undefined ? never : T;
  */
 type Parameters<T extends (...args: any) => any> = T extends (
   ...args: infer P
-) => any
-  ? P
+) => any ? P
   : never;
 
 /**
  * Obtain the parameters of a constructor function type in a tuple
  */
-type ConstructorParameters<T extends abstract new (...args: any) => any> =
-  T extends abstract new (...args: infer P) => any ? P : never;
+type ConstructorParameters<T extends abstract new(...args: any) => any> = T extends
+  abstract new(...args: infer P) => any ? P : never;
 
 /**
  * Obtain the return type of a function type
  */
 type ReturnType<T extends (...args: any) => any> = T extends (
   ...args: any
-) => infer R
-  ? R
+) => infer R ? R
   : any;
 
 /**
  * Obtain the return type of a constructor function type
  */
-type InstanceType<T extends abstract new (...args: any) => any> =
-  T extends abstract new (...args: any) => infer R ? R : any;
+type InstanceType<T extends abstract new(...args: any) => any> = T extends abstract new(...args: any) => infer R ? R
+  : any;
 
 /**
  * Convert string literal type to uppercase
@@ -1940,7 +1934,7 @@ type ArrayBufferLike = ArrayBufferTypes[keyof ArrayBufferTypes];
 
 interface ArrayBufferConstructor {
   readonly prototype: ArrayBuffer;
-  new (byteLength: number): ArrayBuffer;
+  new(byteLength: number): ArrayBuffer;
   isView(arg: any): arg is ArrayBufferView;
 }
 declare var ArrayBuffer: ArrayBufferConstructor;
@@ -2092,10 +2086,10 @@ interface DataView {
 
 interface DataViewConstructor {
   readonly prototype: DataView;
-  new (
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    byteLength?: number
+    byteLength?: number,
   ): DataView;
 }
 declare var DataView: DataViewConstructor;
@@ -2146,7 +2140,7 @@ interface Int8Array {
    */
   every(
     predicate: (value: number, index: number, array: Int8Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -2168,7 +2162,7 @@ interface Int8Array {
    */
   filter(
     predicate: (value: number, index: number, array: Int8Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Int8Array;
 
   /**
@@ -2182,7 +2176,7 @@ interface Int8Array {
    */
   find(
     predicate: (value: number, index: number, obj: Int8Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -2196,7 +2190,7 @@ interface Int8Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Int8Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -2208,7 +2202,7 @@ interface Int8Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Int8Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -2249,7 +2243,7 @@ interface Int8Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Int8Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int8Array;
 
   /**
@@ -2267,17 +2261,17 @@ interface Int8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array
-    ) => number
+      array: Int8Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array
+      array: Int8Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -2295,9 +2289,9 @@ interface Int8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array
+      array: Int8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2315,17 +2309,17 @@ interface Int8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array
-    ) => number
+      array: Int8Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array
+      array: Int8Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -2343,9 +2337,9 @@ interface Int8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int8Array
+      array: Int8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2377,7 +2371,7 @@ interface Int8Array {
    */
   some(
     predicate: (value: number, index: number, array: Int8Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -2416,12 +2410,12 @@ interface Int8Array {
 }
 interface Int8ArrayConstructor {
   readonly prototype: Int8Array;
-  new (length: number): Int8Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Int8Array;
-  new (
+  new(length: number): Int8Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Int8Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Int8Array;
 
   /**
@@ -2450,7 +2444,7 @@ interface Int8ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int8Array;
 }
 declare var Int8Array: Int8ArrayConstructor;
@@ -2501,7 +2495,7 @@ interface Uint8Array {
    */
   every(
     predicate: (value: number, index: number, array: Uint8Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -2523,7 +2517,7 @@ interface Uint8Array {
    */
   filter(
     predicate: (value: number, index: number, array: Uint8Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8Array;
 
   /**
@@ -2537,7 +2531,7 @@ interface Uint8Array {
    */
   find(
     predicate: (value: number, index: number, obj: Uint8Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -2551,7 +2545,7 @@ interface Uint8Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Uint8Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -2563,7 +2557,7 @@ interface Uint8Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Uint8Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -2604,7 +2598,7 @@ interface Uint8Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Uint8Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8Array;
 
   /**
@@ -2622,17 +2616,17 @@ interface Uint8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array
-    ) => number
+      array: Uint8Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array
+      array: Uint8Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -2650,9 +2644,9 @@ interface Uint8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array
+      array: Uint8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2670,17 +2664,17 @@ interface Uint8Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array
-    ) => number
+      array: Uint8Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array
+      array: Uint8Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -2698,9 +2692,9 @@ interface Uint8Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8Array
+      array: Uint8Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -2732,7 +2726,7 @@ interface Uint8Array {
    */
   some(
     predicate: (value: number, index: number, array: Uint8Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -2772,12 +2766,12 @@ interface Uint8Array {
 
 interface Uint8ArrayConstructor {
   readonly prototype: Uint8Array;
-  new (length: number): Uint8Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint8Array;
-  new (
+  new(length: number): Uint8Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Uint8Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Uint8Array;
 
   /**
@@ -2806,7 +2800,7 @@ interface Uint8ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8Array;
 }
 declare var Uint8Array: Uint8ArrayConstructor;
@@ -2859,9 +2853,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: number,
       index: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -2883,7 +2877,7 @@ interface Uint8ClampedArray {
    */
   filter(
     predicate: (value: number, index: number, array: Uint8ClampedArray) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8ClampedArray;
 
   /**
@@ -2899,9 +2893,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: number,
       index: number,
-      obj: Uint8ClampedArray
+      obj: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -2917,9 +2911,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: number,
       index: number,
-      obj: Uint8ClampedArray
+      obj: Uint8ClampedArray,
     ) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -2933,9 +2927,9 @@ interface Uint8ClampedArray {
     callbackfn: (
       value: number,
       index: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -2978,9 +2972,9 @@ interface Uint8ClampedArray {
     callbackfn: (
       value: number,
       index: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8ClampedArray;
 
   /**
@@ -2998,17 +2992,17 @@ interface Uint8ClampedArray {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray
-    ) => number
+      array: Uint8ClampedArray,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -3026,9 +3020,9 @@ interface Uint8ClampedArray {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3046,17 +3040,17 @@ interface Uint8ClampedArray {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray
-    ) => number
+      array: Uint8ClampedArray,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -3074,9 +3068,9 @@ interface Uint8ClampedArray {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3110,9 +3104,9 @@ interface Uint8ClampedArray {
     predicate: (
       value: number,
       index: number,
-      array: Uint8ClampedArray
+      array: Uint8ClampedArray,
     ) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -3152,12 +3146,12 @@ interface Uint8ClampedArray {
 
 interface Uint8ClampedArrayConstructor {
   readonly prototype: Uint8ClampedArray;
-  new (length: number): Uint8ClampedArray;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint8ClampedArray;
-  new (
+  new(length: number): Uint8ClampedArray;
+  new(array: ArrayLike<number> | ArrayBufferLike): Uint8ClampedArray;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Uint8ClampedArray;
 
   /**
@@ -3186,7 +3180,7 @@ interface Uint8ClampedArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8ClampedArray;
 }
 declare var Uint8ClampedArray: Uint8ClampedArrayConstructor;
@@ -3237,7 +3231,7 @@ interface Int16Array {
    */
   every(
     predicate: (value: number, index: number, array: Int16Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -3259,7 +3253,7 @@ interface Int16Array {
    */
   filter(
     predicate: (value: number, index: number, array: Int16Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Int16Array;
 
   /**
@@ -3273,7 +3267,7 @@ interface Int16Array {
    */
   find(
     predicate: (value: number, index: number, obj: Int16Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -3287,7 +3281,7 @@ interface Int16Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Int16Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -3299,7 +3293,7 @@ interface Int16Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Int16Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   /**
    * Returns the index of the first occurrence of a value in an array.
@@ -3339,7 +3333,7 @@ interface Int16Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Int16Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int16Array;
 
   /**
@@ -3357,17 +3351,17 @@ interface Int16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array
-    ) => number
+      array: Int16Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array
+      array: Int16Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -3385,9 +3379,9 @@ interface Int16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array
+      array: Int16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3405,17 +3399,17 @@ interface Int16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array
-    ) => number
+      array: Int16Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array
+      array: Int16Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -3433,9 +3427,9 @@ interface Int16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int16Array
+      array: Int16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3467,7 +3461,7 @@ interface Int16Array {
    */
   some(
     predicate: (value: number, index: number, array: Int16Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -3507,12 +3501,12 @@ interface Int16Array {
 
 interface Int16ArrayConstructor {
   readonly prototype: Int16Array;
-  new (length: number): Int16Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Int16Array;
-  new (
+  new(length: number): Int16Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Int16Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Int16Array;
 
   /**
@@ -3541,7 +3535,7 @@ interface Int16ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int16Array;
 }
 declare var Int16Array: Int16ArrayConstructor;
@@ -3592,7 +3586,7 @@ interface Uint16Array {
    */
   every(
     predicate: (value: number, index: number, array: Uint16Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -3614,7 +3608,7 @@ interface Uint16Array {
    */
   filter(
     predicate: (value: number, index: number, array: Uint16Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Uint16Array;
 
   /**
@@ -3628,7 +3622,7 @@ interface Uint16Array {
    */
   find(
     predicate: (value: number, index: number, obj: Uint16Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -3642,7 +3636,7 @@ interface Uint16Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Uint16Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -3654,7 +3648,7 @@ interface Uint16Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Uint16Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -3695,7 +3689,7 @@ interface Uint16Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Uint16Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint16Array;
 
   /**
@@ -3713,17 +3707,17 @@ interface Uint16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array
-    ) => number
+      array: Uint16Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array
+      array: Uint16Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -3741,9 +3735,9 @@ interface Uint16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array
+      array: Uint16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3761,17 +3755,17 @@ interface Uint16Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array
-    ) => number
+      array: Uint16Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array
+      array: Uint16Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -3789,9 +3783,9 @@ interface Uint16Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint16Array
+      array: Uint16Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -3823,7 +3817,7 @@ interface Uint16Array {
    */
   some(
     predicate: (value: number, index: number, array: Uint16Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -3863,12 +3857,12 @@ interface Uint16Array {
 
 interface Uint16ArrayConstructor {
   readonly prototype: Uint16Array;
-  new (length: number): Uint16Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint16Array;
-  new (
+  new(length: number): Uint16Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Uint16Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Uint16Array;
 
   /**
@@ -3897,7 +3891,7 @@ interface Uint16ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint16Array;
 }
 declare var Uint16Array: Uint16ArrayConstructor;
@@ -3947,7 +3941,7 @@ interface Int32Array {
    */
   every(
     predicate: (value: number, index: number, array: Int32Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -3969,7 +3963,7 @@ interface Int32Array {
    */
   filter(
     predicate: (value: number, index: number, array: Int32Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Int32Array;
 
   /**
@@ -3983,7 +3977,7 @@ interface Int32Array {
    */
   find(
     predicate: (value: number, index: number, obj: Int32Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -3997,7 +3991,7 @@ interface Int32Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Int32Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -4009,7 +4003,7 @@ interface Int32Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Int32Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -4050,7 +4044,7 @@ interface Int32Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Int32Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int32Array;
 
   /**
@@ -4068,17 +4062,17 @@ interface Int32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array
-    ) => number
+      array: Int32Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array
+      array: Int32Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -4096,9 +4090,9 @@ interface Int32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array
+      array: Int32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4116,17 +4110,17 @@ interface Int32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array
-    ) => number
+      array: Int32Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array
+      array: Int32Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -4144,9 +4138,9 @@ interface Int32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Int32Array
+      array: Int32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4178,7 +4172,7 @@ interface Int32Array {
    */
   some(
     predicate: (value: number, index: number, array: Int32Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -4218,12 +4212,12 @@ interface Int32Array {
 
 interface Int32ArrayConstructor {
   readonly prototype: Int32Array;
-  new (length: number): Int32Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Int32Array;
-  new (
+  new(length: number): Int32Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Int32Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Int32Array;
 
   /**
@@ -4252,7 +4246,7 @@ interface Int32ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int32Array;
 }
 declare var Int32Array: Int32ArrayConstructor;
@@ -4303,7 +4297,7 @@ interface Uint32Array {
    */
   every(
     predicate: (value: number, index: number, array: Uint32Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -4325,7 +4319,7 @@ interface Uint32Array {
    */
   filter(
     predicate: (value: number, index: number, array: Uint32Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Uint32Array;
 
   /**
@@ -4339,7 +4333,7 @@ interface Uint32Array {
    */
   find(
     predicate: (value: number, index: number, obj: Uint32Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -4353,7 +4347,7 @@ interface Uint32Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Uint32Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -4365,7 +4359,7 @@ interface Uint32Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Uint32Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   /**
    * Returns the index of the first occurrence of a value in an array.
@@ -4405,7 +4399,7 @@ interface Uint32Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Uint32Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint32Array;
 
   /**
@@ -4423,17 +4417,17 @@ interface Uint32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array
-    ) => number
+      array: Uint32Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array
+      array: Uint32Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -4451,9 +4445,9 @@ interface Uint32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array
+      array: Uint32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4471,17 +4465,17 @@ interface Uint32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array
-    ) => number
+      array: Uint32Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array
+      array: Uint32Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -4499,9 +4493,9 @@ interface Uint32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Uint32Array
+      array: Uint32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4533,7 +4527,7 @@ interface Uint32Array {
    */
   some(
     predicate: (value: number, index: number, array: Uint32Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -4573,12 +4567,12 @@ interface Uint32Array {
 
 interface Uint32ArrayConstructor {
   readonly prototype: Uint32Array;
-  new (length: number): Uint32Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Uint32Array;
-  new (
+  new(length: number): Uint32Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Uint32Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Uint32Array;
 
   /**
@@ -4607,7 +4601,7 @@ interface Uint32ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint32Array;
 }
 declare var Uint32Array: Uint32ArrayConstructor;
@@ -4658,7 +4652,7 @@ interface Float32Array {
    */
   every(
     predicate: (value: number, index: number, array: Float32Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -4680,7 +4674,7 @@ interface Float32Array {
    */
   filter(
     predicate: (value: number, index: number, array: Float32Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Float32Array;
 
   /**
@@ -4694,7 +4688,7 @@ interface Float32Array {
    */
   find(
     predicate: (value: number, index: number, obj: Float32Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -4708,7 +4702,7 @@ interface Float32Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Float32Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -4720,7 +4714,7 @@ interface Float32Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Float32Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -4761,7 +4755,7 @@ interface Float32Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Float32Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Float32Array;
 
   /**
@@ -4779,17 +4773,17 @@ interface Float32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array
-    ) => number
+      array: Float32Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array
+      array: Float32Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -4807,9 +4801,9 @@ interface Float32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array
+      array: Float32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4827,17 +4821,17 @@ interface Float32Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array
-    ) => number
+      array: Float32Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array
+      array: Float32Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -4855,9 +4849,9 @@ interface Float32Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float32Array
+      array: Float32Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -4889,7 +4883,7 @@ interface Float32Array {
    */
   some(
     predicate: (value: number, index: number, array: Float32Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -4929,12 +4923,12 @@ interface Float32Array {
 
 interface Float32ArrayConstructor {
   readonly prototype: Float32Array;
-  new (length: number): Float32Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Float32Array;
-  new (
+  new(length: number): Float32Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Float32Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Float32Array;
 
   /**
@@ -4963,7 +4957,7 @@ interface Float32ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Float32Array;
 }
 declare var Float32Array: Float32ArrayConstructor;
@@ -5014,7 +5008,7 @@ interface Float64Array {
    */
   every(
     predicate: (value: number, index: number, array: Float64Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -5036,7 +5030,7 @@ interface Float64Array {
    */
   filter(
     predicate: (value: number, index: number, array: Float64Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): Float64Array;
 
   /**
@@ -5050,7 +5044,7 @@ interface Float64Array {
    */
   find(
     predicate: (value: number, index: number, obj: Float64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number | undefined;
 
   /**
@@ -5064,7 +5058,7 @@ interface Float64Array {
    */
   findIndex(
     predicate: (value: number, index: number, obj: Float64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -5076,7 +5070,7 @@ interface Float64Array {
    */
   forEach(
     callbackfn: (value: number, index: number, array: Float64Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -5117,7 +5111,7 @@ interface Float64Array {
    */
   map(
     callbackfn: (value: number, index: number, array: Float64Array) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Float64Array;
 
   /**
@@ -5135,17 +5129,17 @@ interface Float64Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array
-    ) => number
+      array: Float64Array,
+    ) => number,
   ): number;
   reduce(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array
+      array: Float64Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -5163,9 +5157,9 @@ interface Float64Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array
+      array: Float64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -5183,17 +5177,17 @@ interface Float64Array {
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array
-    ) => number
+      array: Float64Array,
+    ) => number,
   ): number;
   reduceRight(
     callbackfn: (
       previousValue: number,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array
+      array: Float64Array,
     ) => number,
-    initialValue: number
+    initialValue: number,
   ): number;
 
   /**
@@ -5211,9 +5205,9 @@ interface Float64Array {
       previousValue: U,
       currentValue: number,
       currentIndex: number,
-      array: Float64Array
+      array: Float64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -5245,7 +5239,7 @@ interface Float64Array {
    */
   some(
     predicate: (value: number, index: number, array: Float64Array) => unknown,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -5276,12 +5270,12 @@ interface Float64Array {
 
 interface Float64ArrayConstructor {
   readonly prototype: Float64Array;
-  new (length: number): Float64Array;
-  new (array: ArrayLike<number> | ArrayBufferLike): Float64Array;
-  new (
+  new(length: number): Float64Array;
+  new(array: ArrayLike<number> | ArrayBufferLike): Float64Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): Float64Array;
 
   /**
@@ -5310,7 +5304,7 @@ interface Float64ArrayConstructor {
   from<T>(
     arrayLike: ArrayLike<T>,
     mapfn: (v: T, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Float64Array;
 }
 declare var Float64Array: Float64ArrayConstructor;
@@ -5344,11 +5338,11 @@ declare namespace Intl {
     resolvedOptions(): ResolvedCollatorOptions;
   }
   var Collator: {
-    new (locales?: string | string[], options?: CollatorOptions): Collator;
+    new(locales?: string | string[], options?: CollatorOptions): Collator;
     (locales?: string | string[], options?: CollatorOptions): Collator;
     supportedLocalesOf(
       locales: string | string[],
-      options?: CollatorOptions
+      options?: CollatorOptions,
     ): string[];
   };
 
@@ -5383,14 +5377,14 @@ declare namespace Intl {
     resolvedOptions(): ResolvedNumberFormatOptions;
   }
   var NumberFormat: {
-    new (
+    new(
       locales?: string | string[],
-      options?: NumberFormatOptions
+      options?: NumberFormatOptions,
     ): NumberFormat;
     (locales?: string | string[], options?: NumberFormatOptions): NumberFormat;
     supportedLocalesOf(
       locales: string | string[],
-      options?: NumberFormatOptions
+      options?: NumberFormatOptions,
     ): string[];
     readonly prototype: NumberFormat;
   };
@@ -5433,17 +5427,17 @@ declare namespace Intl {
     resolvedOptions(): ResolvedDateTimeFormatOptions;
   }
   var DateTimeFormat: {
-    new (
+    new(
       locales?: string | string[],
-      options?: DateTimeFormatOptions
+      options?: DateTimeFormatOptions,
     ): DateTimeFormat;
     (
       locales?: string | string[],
-      options?: DateTimeFormatOptions
+      options?: DateTimeFormatOptions,
     ): DateTimeFormat;
     supportedLocalesOf(
       locales: string | string[],
-      options?: DateTimeFormatOptions
+      options?: DateTimeFormatOptions,
     ): string[];
     readonly prototype: DateTimeFormat;
   };
@@ -5459,7 +5453,7 @@ interface String {
   localeCompare(
     that: string,
     locales?: string | string[],
-    options?: Intl.CollatorOptions
+    options?: Intl.CollatorOptions,
   ): number;
 }
 
@@ -5471,7 +5465,7 @@ interface Number {
    */
   toLocaleString(
     locales?: string | string[],
-    options?: Intl.NumberFormatOptions
+    options?: Intl.NumberFormatOptions,
   ): string;
 }
 
@@ -5483,7 +5477,7 @@ interface Date {
    */
   toLocaleString(
     locales?: string | string[],
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
   /**
    * Converts a date to a string by using the current or specified locale.
@@ -5492,7 +5486,7 @@ interface Date {
    */
   toLocaleDateString(
     locales?: string | string[],
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 
   /**
@@ -5502,6 +5496,6 @@ interface Date {
    */
   toLocaleTimeString(
     locales?: string | string[],
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ): string;
 }

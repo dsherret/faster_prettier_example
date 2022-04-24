@@ -8,27 +8,27 @@ namespace ts.projectSystem {
     function sendAffectedFileRequestAndCheckResult(
       session: server.Session,
       request: server.protocol.Request,
-      expectedFileList: { projectFileName: string; files: File[] }[]
+      expectedFileList: { projectFileName: string; files: File[] }[],
     ) {
       const response = session.executeCommand(request)
         .response as server.protocol.CompileOnSaveAffectedFileListSingleProject[];
       const actualResult = response.sort((list1, list2) =>
         compareStringsCaseSensitive(
           list1.projectFileName,
-          list2.projectFileName
+          list2.projectFileName,
         )
       );
       expectedFileList = expectedFileList.sort((list1, list2) =>
         compareStringsCaseSensitive(
           list1.projectFileName,
-          list2.projectFileName
+          list2.projectFileName,
         )
       );
 
       assert.equal(
         actualResult.length,
         expectedFileList.length,
-        `Actual result project number is different from the expected project number`
+        `Actual result project number is different from the expected project number`,
       );
 
       for (let i = 0; i < actualResult.length; i++) {
@@ -37,21 +37,20 @@ namespace ts.projectSystem {
         assert.equal(
           actualResultSingleProject.projectFileName,
           expectedResultSingleProject.projectFileName,
-          `Actual result contains different projects than the expected result`
+          `Actual result contains different projects than the expected result`,
         );
 
-        const actualResultSingleProjectFileNameList =
-          actualResultSingleProject.fileNames.sort();
+        const actualResultSingleProjectFileNameList = actualResultSingleProject.fileNames.sort();
         const expectedResultSingleProjectFileNameList = map(
           expectedResultSingleProject.files,
-          (f) => f.path
+          (f) => f.path,
         ).sort();
         assert.isTrue(
           arrayIsEqualTo(
             actualResultSingleProjectFileNameList,
-            expectedResultSingleProjectFileNameList
+            expectedResultSingleProjectFileNameList,
           ),
-          `For project ${actualResultSingleProject.projectFileName}, the actual result is ${actualResultSingleProjectFileNameList}, while expected ${expectedResultSingleProjectFileNameList}`
+          `For project ${actualResultSingleProject.projectFileName}, the actual result is ${actualResultSingleProjectFileNameList}, while expected ${expectedResultSingleProjectFileNameList}`,
         );
       }
     }
@@ -102,38 +101,35 @@ namespace ts.projectSystem {
         };
 
         // Change the content of file1 to `export var T: number;export function Foo() { };`
-        changeModuleFile1ShapeRequest1 =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: moduleFile1.path,
-              line: 1,
-              offset: 1,
-              endLine: 1,
-              endOffset: 1,
-              insertString: `export var T: number;`,
-            }
-          );
+        changeModuleFile1ShapeRequest1 = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: moduleFile1.path,
+            line: 1,
+            offset: 1,
+            endLine: 1,
+            endOffset: 1,
+            insertString: `export var T: number;`,
+          },
+        );
 
         // Change the content of file1 to `export var T: number;export function Foo() { };`
-        changeModuleFile1InternalRequest1 =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: moduleFile1.path,
-              line: 1,
-              offset: 1,
-              endLine: 1,
-              endOffset: 1,
-              insertString: `var T1: number;`,
-            }
-          );
+        changeModuleFile1InternalRequest1 = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: moduleFile1.path,
+            line: 1,
+            offset: 1,
+            endLine: 1,
+            endOffset: 1,
+            insertString: `var T1: number;`,
+          },
+        );
 
-        moduleFile1FileListRequest =
-          makeSessionRequest<server.protocol.FileRequestArgs>(
-            CommandNames.CompileOnSaveAffectedFileList,
-            { file: moduleFile1.path, projectFileName: configFile.path }
-          );
+        moduleFile1FileListRequest = makeSessionRequest<server.protocol.FileRequestArgs>(
+          CommandNames.CompileOnSaveAffectedFileList,
+          { file: moduleFile1.path, projectFileName: configFile.path },
+        );
       });
 
       it("should contains only itself if a module file's shape didn't change, and all files referencing it if its shape changed", () => {
@@ -160,7 +156,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
         session.executeCommand(changeModuleFile1ShapeRequest1);
         sendAffectedFileRequestAndCheckResult(
@@ -171,27 +167,26 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
 
         // Change the content of file1 to `export var T: number;export function Foo() { console.log('hi'); };`
-        const changeFile1InternalRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: moduleFile1.path,
-              line: 1,
-              offset: 46,
-              endLine: 1,
-              endOffset: 46,
-              insertString: `console.log('hi');`,
-            }
-          );
+        const changeFile1InternalRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: moduleFile1.path,
+            line: 1,
+            offset: 46,
+            endLine: 1,
+            endOffset: 46,
+            insertString: `console.log('hi');`,
+          },
+        );
         session.executeCommand(changeFile1InternalRequest);
         sendAffectedFileRequestAndCheckResult(
           session,
           moduleFile1FileListRequest,
-          [{ projectFileName: configFile.path, files: [moduleFile1] }]
+          [{ projectFileName: configFile.path, files: [moduleFile1] }],
         );
       });
 
@@ -219,22 +214,21 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
 
         // Change file2 content to `let y = Foo();`
-        const removeFile1Consumer1ImportRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: file1Consumer1.path,
-              line: 1,
-              offset: 1,
-              endLine: 1,
-              endOffset: 28,
-              insertString: "",
-            }
-          );
+        const removeFile1Consumer1ImportRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: file1Consumer1.path,
+            line: 1,
+            offset: 1,
+            endLine: 1,
+            endOffset: 28,
+            insertString: "",
+          },
+        );
         session.executeCommand(removeFile1Consumer1ImportRequest);
         session.executeCommand(changeModuleFile1ShapeRequest1);
         sendAffectedFileRequestAndCheckResult(
@@ -245,37 +239,35 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer2],
             },
-          ]
+          ],
         );
 
         // Add the import statements back to file2
-        const addFile2ImportRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: file1Consumer1.path,
-              line: 1,
-              offset: 1,
-              endLine: 1,
-              endOffset: 1,
-              insertString: `import {Foo} from "./moduleFile1";`,
-            }
-          );
+        const addFile2ImportRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: file1Consumer1.path,
+            line: 1,
+            offset: 1,
+            endLine: 1,
+            endOffset: 1,
+            insertString: `import {Foo} from "./moduleFile1";`,
+          },
+        );
         session.executeCommand(addFile2ImportRequest);
 
         // Change the content of file1 to `export var T2: string;export var T: number;export function Foo() { };`
-        const changeModuleFile1ShapeRequest2 =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: moduleFile1.path,
-              line: 1,
-              offset: 1,
-              endLine: 1,
-              endOffset: 1,
-              insertString: `export var T2: string;`,
-            }
-          );
+        const changeModuleFile1ShapeRequest2 = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: moduleFile1.path,
+            line: 1,
+            offset: 1,
+            endLine: 1,
+            endOffset: 1,
+            insertString: `export var T2: string;`,
+          },
+        );
         session.executeCommand(changeModuleFile1ShapeRequest2);
         sendAffectedFileRequestAndCheckResult(
           session,
@@ -285,7 +277,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
       });
 
@@ -313,7 +305,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
 
         host.writeFile(file1Consumer1.path, `let y = 10;`);
@@ -327,7 +319,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer2],
             },
-          ]
+          ],
         );
       });
 
@@ -353,7 +345,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
 
         session.executeCommand(changeModuleFile1ShapeRequest1);
@@ -367,7 +359,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1],
             },
-          ]
+          ],
         );
       });
 
@@ -393,7 +385,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
 
         const file1Consumer3: File = {
@@ -416,7 +408,7 @@ namespace ts.projectSystem {
                 file1Consumer3,
               ],
             },
-          ]
+          ],
         );
       });
 
@@ -457,7 +449,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1],
             },
-          ]
+          ],
         );
 
         // change file1 shape now, and verify both files are affected
@@ -470,7 +462,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1],
             },
-          ]
+          ],
         );
 
         // change file1 internal, and verify only file1 is affected
@@ -478,7 +470,7 @@ namespace ts.projectSystem {
         sendAffectedFileRequestAndCheckResult(
           session,
           moduleFile1FileListRequest,
-          [{ projectFileName: configFile.path, files: [moduleFile1] }]
+          [{ projectFileName: configFile.path, files: [moduleFile1] }],
         );
       });
 
@@ -496,26 +488,24 @@ namespace ts.projectSystem {
         const session = createSession(host, { typingsInstaller });
 
         openFilesForSession([globalFile3], session);
-        const changeGlobalFile3ShapeRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: globalFile3.path,
-              line: 1,
-              offset: 1,
-              endLine: 1,
-              endOffset: 1,
-              insertString: `var T2: string;`,
-            }
-          );
+        const changeGlobalFile3ShapeRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: globalFile3.path,
+            line: 1,
+            offset: 1,
+            endLine: 1,
+            endOffset: 1,
+            insertString: `var T2: string;`,
+          },
+        );
 
         // check after file1 shape changes
         session.executeCommand(changeGlobalFile3ShapeRequest);
-        const globalFile3FileListRequest =
-          makeSessionRequest<server.protocol.FileRequestArgs>(
-            CommandNames.CompileOnSaveAffectedFileList,
-            { file: globalFile3.path }
-          );
+        const globalFile3FileListRequest = makeSessionRequest<server.protocol.FileRequestArgs>(
+          CommandNames.CompileOnSaveAffectedFileList,
+          { file: globalFile3.path },
+        );
         sendAffectedFileRequestAndCheckResult(
           session,
           globalFile3FileListRequest,
@@ -530,7 +520,7 @@ namespace ts.projectSystem {
                 moduleFile2,
               ],
             },
-          ]
+          ],
         );
       });
 
@@ -553,7 +543,7 @@ namespace ts.projectSystem {
         sendAffectedFileRequestAndCheckResult(
           session,
           moduleFile1FileListRequest,
-          []
+          [],
         );
       });
 
@@ -581,7 +571,7 @@ namespace ts.projectSystem {
         sendAffectedFileRequestAndCheckResult(
           session,
           moduleFile1FileListRequest,
-          []
+          [],
         );
       });
 
@@ -620,7 +610,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer2],
             },
-          ]
+          ],
         );
       });
 
@@ -645,23 +635,22 @@ namespace ts.projectSystem {
         const session = createSession(host, { typingsInstaller });
         openFilesForSession([moduleFile1], session);
 
-        const file1ChangeShapeRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: moduleFile1.path,
-              line: 1,
-              offset: 27,
-              endLine: 1,
-              endOffset: 27,
-              insertString: `Point,`,
-            }
-          );
+        const file1ChangeShapeRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: moduleFile1.path,
+            line: 1,
+            offset: 27,
+            endLine: 1,
+            endOffset: 27,
+            insertString: `Point,`,
+          },
+        );
         session.executeCommand(file1ChangeShapeRequest);
         sendAffectedFileRequestAndCheckResult(
           session,
           moduleFile1FileListRequest,
-          [{ projectFileName: configFile.path, files: [moduleFile1] }]
+          [{ projectFileName: configFile.path, files: [moduleFile1] }],
         );
       });
 
@@ -687,23 +676,22 @@ namespace ts.projectSystem {
         const session = createSession(host, { typingsInstaller });
         openFilesForSession([moduleFile1], session);
 
-        const file1ChangeShapeRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: moduleFile1.path,
-              line: 1,
-              offset: 27,
-              endLine: 1,
-              endOffset: 27,
-              insertString: `Point,`,
-            }
-          );
+        const file1ChangeShapeRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: moduleFile1.path,
+            line: 1,
+            offset: 27,
+            endLine: 1,
+            endOffset: 27,
+            insertString: `Point,`,
+          },
+        );
         session.executeCommand(file1ChangeShapeRequest);
         sendAffectedFileRequestAndCheckResult(
           session,
           moduleFile1FileListRequest,
-          [{ projectFileName: configFile.path, files: [moduleFile1] }]
+          [{ projectFileName: configFile.path, files: [moduleFile1] }],
         );
       });
 
@@ -732,21 +720,20 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer1Consumer1],
             },
-          ]
+          ],
         );
 
-        const changeFile1Consumer1ShapeRequest =
-          makeSessionRequest<server.protocol.ChangeRequestArgs>(
-            CommandNames.Change,
-            {
-              file: file1Consumer1.path,
-              line: 2,
-              offset: 1,
-              endLine: 2,
-              endOffset: 1,
-              insertString: `export var T: number;`,
-            }
-          );
+        const changeFile1Consumer1ShapeRequest = makeSessionRequest<server.protocol.ChangeRequestArgs>(
+          CommandNames.Change,
+          {
+            file: file1Consumer1.path,
+            line: 2,
+            offset: 1,
+            endLine: 2,
+            endOffset: 1,
+            insertString: `export var T: number;`,
+          },
+        );
         session.executeCommand(changeModuleFile1ShapeRequest1);
         session.executeCommand(changeFile1Consumer1ShapeRequest);
         sendAffectedFileRequestAndCheckResult(
@@ -757,7 +744,7 @@ namespace ts.projectSystem {
               projectFileName: configFile.path,
               files: [moduleFile1, file1Consumer1, file1Consumer1Consumer1],
             },
-          ]
+          ],
         );
       });
 
@@ -779,15 +766,14 @@ namespace ts.projectSystem {
         const session = createSession(host, { typingsInstaller });
 
         openFilesForSession([file1, file2], session);
-        const file1AffectedListRequest =
-          makeSessionRequest<server.protocol.FileRequestArgs>(
-            CommandNames.CompileOnSaveAffectedFileList,
-            { file: file1.path }
-          );
+        const file1AffectedListRequest = makeSessionRequest<server.protocol.FileRequestArgs>(
+          CommandNames.CompileOnSaveAffectedFileList,
+          { file: file1.path },
+        );
         sendAffectedFileRequestAndCheckResult(
           session,
           file1AffectedListRequest,
-          [{ projectFileName: configFile.path, files: [file1, file2] }]
+          [{ projectFileName: configFile.path, files: [file1, file2] }],
         );
       });
 
@@ -823,11 +809,10 @@ namespace ts.projectSystem {
         const session = createSession(host);
 
         openFilesForSession([file1, file2, file3], session);
-        const file1AffectedListRequest =
-          makeSessionRequest<server.protocol.FileRequestArgs>(
-            CommandNames.CompileOnSaveAffectedFileList,
-            { file: file1.path }
-          );
+        const file1AffectedListRequest = makeSessionRequest<server.protocol.FileRequestArgs>(
+          CommandNames.CompileOnSaveAffectedFileList,
+          { file: file1.path },
+        );
 
         sendAffectedFileRequestAndCheckResult(
           session,
@@ -835,7 +820,7 @@ namespace ts.projectSystem {
           [
             { projectFileName: configFile1.path, files: [file1, file2] },
             { projectFileName: configFile2.path, files: [file1, file3] },
-          ]
+          ],
         );
       });
 
@@ -858,20 +843,19 @@ namespace ts.projectSystem {
 
         const request = makeSessionRequest<server.protocol.FileRequestArgs>(
           CommandNames.CompileOnSaveAffectedFileList,
-          { file: referenceFile1.path }
+          { file: referenceFile1.path },
         );
         sendAffectedFileRequestAndCheckResult(session, request, [
           { projectFileName: configFile.path, files: [referenceFile1] },
         ]);
-        const requestForMissingFile =
-          makeSessionRequest<server.protocol.FileRequestArgs>(
-            CommandNames.CompileOnSaveAffectedFileList,
-            { file: moduleFile1.path }
-          );
+        const requestForMissingFile = makeSessionRequest<server.protocol.FileRequestArgs>(
+          CommandNames.CompileOnSaveAffectedFileList,
+          { file: moduleFile1.path },
+        );
         sendAffectedFileRequestAndCheckResult(
           session,
           requestForMissingFile,
-          []
+          [],
         );
       });
 
@@ -888,7 +872,7 @@ namespace ts.projectSystem {
         openFilesForSession([referenceFile1], session);
         const request = makeSessionRequest<server.protocol.FileRequestArgs>(
           CommandNames.CompileOnSaveAffectedFileList,
-          { file: referenceFile1.path }
+          { file: referenceFile1.path },
         );
         sendAffectedFileRequestAndCheckResult(session, request, [
           { projectFileName: configFile.path, files: [referenceFile1] },
@@ -901,7 +885,7 @@ namespace ts.projectSystem {
         dtsFileContents: string,
         tsFileContents: string,
         opts: CompilerOptions,
-        expectDTSEmit: boolean
+        expectDTSEmit: boolean,
       ) {
         const dtsFile = {
           path: "/a/runtime/a.d.ts",
@@ -950,21 +934,21 @@ namespace ts.projectSystem {
             (response as protocol.CompileOnSaveAffectedFileListSingleProject[])
               .length,
             1,
-            "expected output from 1 project"
+            "expected output from 1 project",
           );
           assert.equal(
             (
               response as protocol.CompileOnSaveAffectedFileListSingleProject[]
             )[0].fileNames.length,
             2,
-            "expected to affect 2 files"
+            "expected to affect 2 files",
           );
         } else {
           assert.equal(
             (response as protocol.CompileOnSaveAffectedFileListSingleProject[])
               .length,
             0,
-            "expected no output"
+            "expected no output",
           );
         }
 
@@ -978,7 +962,7 @@ namespace ts.projectSystem {
           (response2 as protocol.CompileOnSaveAffectedFileListSingleProject[])
             .length,
           1,
-          "expected output from 1 project"
+          "expected output from 1 project",
         );
       }
 
@@ -987,7 +971,7 @@ namespace ts.projectSystem {
           /*dtsFileContents*/ "declare const x: string;",
           /*tsFileContents*/ "var y = 1;",
           /*opts*/ {},
-          /*expectDTSEmit*/ false
+          /*expectDTSEmit*/ false,
         );
       });
 
@@ -996,7 +980,7 @@ namespace ts.projectSystem {
           /*dtsFileContents*/ "export const x: string;",
           /*tsFileContents*/ "import { x } from './runtime/a;",
           /*opts*/ {},
-          /*expectDTSEmit*/ false
+          /*expectDTSEmit*/ false,
         );
       });
 
@@ -1005,7 +989,7 @@ namespace ts.projectSystem {
           /*dtsFileContents*/ "declare const x: string;",
           /*tsFileContents*/ "var y = 1;",
           /*opts*/ { declaration: true },
-          /*expectDTSEmit*/ true
+          /*expectDTSEmit*/ true,
         );
       });
 
@@ -1014,7 +998,7 @@ namespace ts.projectSystem {
           /*dtsFileContents*/ "declare const x: string;",
           /*tsFileContents*/ "var y = 1;",
           /*opts*/ { composite: true },
-          /*expectDTSEmit*/ true
+          /*expectDTSEmit*/ true,
         );
       });
 
@@ -1026,7 +1010,7 @@ namespace ts.projectSystem {
             experimentalDecorators: true,
             emitDecoratorMetadata: true,
           },
-          /*expectDTSEmit*/ true
+          /*expectDTSEmit*/ true,
         );
       });
     });
@@ -1069,19 +1053,19 @@ namespace ts.projectSystem {
           (response as protocol.CompileOnSaveAffectedFileListSingleProject[])
             .length,
           1,
-          "expected output for 1 project"
+          "expected output for 1 project",
         );
         assert.equal(
           (response as protocol.CompileOnSaveAffectedFileListSingleProject[])[0]
             .fileNames.length,
           2,
-          "expected output for 1 project"
+          "expected output for 1 project",
         );
         assert.equal(
           (response as protocol.CompileOnSaveAffectedFileListSingleProject[])[0]
             .projectUsesOutFile,
           expectedUsesOutFile,
-          "usesOutFile"
+          "usesOutFile",
         );
       }
 
@@ -1129,7 +1113,7 @@ namespace ts.projectSystem {
         assert.equal(
           emitOutput,
           f.content + newLine,
-          "content of emit output should be identical with the input + newline"
+          "content of emit output should be identical with the input + newline",
         );
       }
     });
@@ -1154,18 +1138,17 @@ namespace ts.projectSystem {
       const session = createSession(host, { typingsInstaller });
 
       openFilesForSession([file1, file2], session);
-      const compileFileRequest =
-        makeSessionRequest<server.protocol.CompileOnSaveEmitFileRequestArgs>(
-          CommandNames.CompileOnSaveEmitFile,
-          { file: file1.path, projectFileName: configFile.path }
-        );
+      const compileFileRequest = makeSessionRequest<server.protocol.CompileOnSaveEmitFileRequestArgs>(
+        CommandNames.CompileOnSaveEmitFile,
+        { file: file1.path, projectFileName: configFile.path },
+      );
       session.executeCommand(compileFileRequest);
 
       const expectedEmittedFileName = "/a/b/f1.js";
       assert.isTrue(host.fileExists(expectedEmittedFileName));
       assert.equal(
         host.readFile(expectedEmittedFileName),
-        `"use strict";\r\nexports.__esModule = true;\r\nexports.Foo = void 0;\r\nfunction Foo() { return 10; }\r\nexports.Foo = Foo;\r\n`
+        `"use strict";\r\nexports.__esModule = true;\r\nexports.Foo = void 0;\r\nfunction Foo() { return 10; }\r\nexports.Foo = Foo;\r\n`,
       );
     });
 
@@ -1198,11 +1181,10 @@ namespace ts.projectSystem {
         projectFileName: externalProjectName,
       });
 
-      const emitRequest =
-        makeSessionRequest<server.protocol.CompileOnSaveEmitFileRequestArgs>(
-          CommandNames.CompileOnSaveEmitFile,
-          { file: file1.path }
-        );
+      const emitRequest = makeSessionRequest<server.protocol.CompileOnSaveEmitFileRequestArgs>(
+        CommandNames.CompileOnSaveEmitFile,
+        { file: file1.path },
+      );
       session.executeCommand(emitRequest);
 
       const expectedOutFileName = "/a/b/dist.js";
@@ -1219,8 +1201,7 @@ namespace ts.projectSystem {
         path: `/root/TypeScriptProject3/TypeScriptProject3/${inputFileName}`,
         content: "consonle.log('file1');",
       };
-      const externalProjectName =
-        "/root/TypeScriptProject3/TypeScriptProject3/TypeScriptProject3.csproj";
+      const externalProjectName = "/root/TypeScriptProject3/TypeScriptProject3/TypeScriptProject3.csproj";
       const host = createServerHost([file1, libFile]);
       const session = createSession(host);
       const projectService = session.getProjectService();
@@ -1236,22 +1217,20 @@ namespace ts.projectSystem {
         projectFileName: externalProjectName,
       });
 
-      const emitRequest =
-        makeSessionRequest<server.protocol.CompileOnSaveEmitFileRequestArgs>(
-          CommandNames.CompileOnSaveEmitFile,
-          { file: file1.path }
-        );
+      const emitRequest = makeSessionRequest<server.protocol.CompileOnSaveEmitFileRequestArgs>(
+        CommandNames.CompileOnSaveEmitFile,
+        { file: file1.path },
+      );
       session.executeCommand(emitRequest);
 
       // Verify js file
-      const expectedOutFileName =
-        "/root/TypeScriptProject3/TypeScriptProject3/" + outFileName;
+      const expectedOutFileName = "/root/TypeScriptProject3/TypeScriptProject3/" + outFileName;
       assert.isTrue(host.fileExists(expectedOutFileName));
       const outFileContent = host.readFile(expectedOutFileName)!;
       verifyContentHasString(outFileContent, file1.content);
       verifyContentHasString(
         outFileContent,
-        `//# ${"sourceMappingURL"}=${outFileName}.map`
+        `//# ${"sourceMappingURL"}=${outFileName}.map`,
       ); // Sometimes tools can sometimes see this line as a source mapping url comment, so we obfuscate it a little
 
       // Verify map file
@@ -1263,7 +1242,7 @@ namespace ts.projectSystem {
       function verifyContentHasString(content: string, str: string) {
         assert.isTrue(
           stringContains(content, str),
-          `Expected "${content}" to have "${str}"`
+          `Expected "${content}" to have "${str}"`,
         );
       }
     });
@@ -1304,13 +1283,12 @@ namespace ts.projectSystem {
         const session = createSession(host);
         openFilesForSession([file1], session);
 
-        const affectedFileResponse =
-          session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-            {
-              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-              arguments: { file: file1.path },
-            }
-          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+        const affectedFileResponse = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+          {
+            command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+            arguments: { file: file1.path },
+          },
+        ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
         assert.deepEqual(affectedFileResponse, [
           {
             fileNames: [file1.path, file2.path],
@@ -1318,11 +1296,10 @@ namespace ts.projectSystem {
             projectUsesOutFile: false,
           },
         ]);
-        const file1SaveResponse =
-          session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-            command: protocol.CommandTypes.CompileOnSaveEmitFile,
-            arguments: { file: file1.path, richResponse },
-          }).response;
+        const file1SaveResponse = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+          command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          arguments: { file: file1.path, richResponse },
+        }).response;
         if (richResponse) {
           assert.deepEqual(file1SaveResponse, {
             emitSkipped: false,
@@ -1333,13 +1310,12 @@ namespace ts.projectSystem {
         }
         assert.strictEqual(
           host.readFile(`${tscWatch.projectRoot}/test/file1.d.ts`),
-          "declare const x = 1;\n"
+          "declare const x = 1;\n",
         );
-        const file2SaveResponse =
-          session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-            command: protocol.CommandTypes.CompileOnSaveEmitFile,
-            arguments: { file: file2.path, richResponse },
-          }).response;
+        const file2SaveResponse = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+          command: protocol.CommandTypes.CompileOnSaveEmitFile,
+          arguments: { file: file2.path, richResponse },
+        }).response;
         if (richResponse) {
           assert.deepEqual(file2SaveResponse, {
             emitSkipped: true,
@@ -1352,13 +1328,13 @@ namespace ts.projectSystem {
                   Diagnostics
                     .Cannot_write_file_0_because_it_would_overwrite_input_file
                     .message,
-                  [`${tscWatch.projectRoot}/test/file1.d.ts`]
+                  [`${tscWatch.projectRoot}/test/file1.d.ts`],
                 ),
                 code: Diagnostics
                   .Cannot_write_file_0_because_it_would_overwrite_input_file
                   .code,
                 category: diagnosticCategoryName(
-                  Diagnostics.Cannot_write_file_0_because_it_would_overwrite_input_file
+                  Diagnostics.Cannot_write_file_0_because_it_would_overwrite_input_file,
                 ),
                 reportsUnnecessary: undefined,
                 reportsDeprecated: undefined,
@@ -1371,7 +1347,7 @@ namespace ts.projectSystem {
           assert.isFalse(file2SaveResponse);
         }
         assert.isFalse(
-          host.fileExists(`${tscWatch.projectRoot}/test/file2.d.ts`)
+          host.fileExists(`${tscWatch.projectRoot}/test/file2.d.ts`),
         );
       }
     });
@@ -1436,13 +1412,12 @@ function bar() {
         const session = createSession(host);
         openFilesForSession([file1, file2], session);
 
-        const affectedFileResponse =
-          session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-            {
-              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-              arguments: { file: file1.path },
-            }
-          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+        const affectedFileResponse = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+          {
+            command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+            arguments: { file: file1.path },
+          },
+        ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
         assert.deepEqual(affectedFileResponse, [
           {
             fileNames: files.map((f) => f.path),
@@ -1465,21 +1440,20 @@ function bar() {
           file2,
           "world",
           "hello",
-          /*returnsAllFilesAsAffected*/ !declaration
+          /*returnsAllFilesAsAffected*/ !declaration,
         );
 
         function verifyFileSave(file: File) {
-          const response =
-            session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
-              command: protocol.CommandTypes.CompileOnSaveEmitFile,
-              arguments: { file: file.path },
-            }).response;
+          const response = session.executeCommandSeq<protocol.CompileOnSaveEmitFileRequest>({
+            command: protocol.CommandTypes.CompileOnSaveEmitFile,
+            arguments: { file: file.path },
+          }).response;
           assert.isTrue(response);
           assert.strictEqual(
             host.readFile(changeExtension(file.path, ".js")),
             file === module
               ? `"use strict";\nexports.__esModule = true;\nexports.xyz = void 0;\nexports.xyz = 4;\n`
-              : `${file.content.replace("const", "var")}\n`
+              : `${file.content.replace("const", "var")}\n`,
           );
           if (declaration) {
             assert.strictEqual(
@@ -1489,11 +1463,11 @@ function bar() {
                   0,
                   file.content.indexOf(" {") === -1
                     ? file.content.length
-                    : file.content.indexOf(" {")
+                    : file.content.indexOf(" {"),
                 )
                 .replace("const ", "declare const ")
                 .replace("function ", "declare function ")
-                .replace(")", "): string;") + "\n"
+                .replace(")", "): string;") + "\n",
             );
           }
         }
@@ -1502,7 +1476,7 @@ function bar() {
           file: File,
           oldText: string,
           newText: string,
-          returnsAllFilesAsAffected?: boolean
+          returnsAllFilesAsAffected?: boolean,
         ) {
           // Change file1 get affected file list
           session.executeCommandSeq<protocol.UpdateOpenRequest>({
@@ -1521,13 +1495,12 @@ function bar() {
               ],
             },
           });
-          const affectedFileResponse =
-            session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-              {
-                command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-                arguments: { file: file.path },
-              }
-            ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
+          const affectedFileResponse = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+            {
+              command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+              arguments: { file: file.path },
+            },
+          ).response as protocol.CompileOnSaveAffectedFileListSingleProject[];
           assert.deepEqual(affectedFileResponse, [
             {
               fileNames: [
@@ -1623,16 +1596,15 @@ function bar() {
 
     it("when projectFile is specified", () => {
       const session = getSession();
-      const response =
-        session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-          {
-            command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-            arguments: {
-              file: core.path,
-              projectFileName: app1Config.path,
-            },
-          }
-        ).response;
+      const response = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+        {
+          command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+          arguments: {
+            file: core.path,
+            projectFileName: app1Config.path,
+          },
+        },
+      ).response;
       assert.deepEqual(response, [
         {
           projectFileName: app1Config.path,
@@ -1643,26 +1615,25 @@ function bar() {
       assert.equal(
         session.getProjectService().configuredProjects.get(app1Config.path)!
           .dirty,
-        false
+        false,
       );
       assert.equal(
         session.getProjectService().configuredProjects.get(app2Config.path)!
           .dirty,
-        true
+        true,
       );
     });
 
     it("when projectFile is not specified", () => {
       const session = getSession();
-      const response =
-        session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
-          {
-            command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
-            arguments: {
-              file: core.path,
-            },
-          }
-        ).response;
+      const response = session.executeCommandSeq<protocol.CompileOnSaveAffectedFileListRequest>(
+        {
+          command: protocol.CommandTypes.CompileOnSaveAffectedFileList,
+          arguments: {
+            file: core.path,
+          },
+        },
+      ).response;
       assert.deepEqual(response, [
         {
           projectFileName: app1Config.path,
@@ -1678,12 +1649,12 @@ function bar() {
       assert.equal(
         session.getProjectService().configuredProjects.get(app1Config.path)!
           .dirty,
-        false
+        false,
       );
       assert.equal(
         session.getProjectService().configuredProjects.get(app2Config.path)!
           .dirty,
-        false
+        false,
       );
     });
   });

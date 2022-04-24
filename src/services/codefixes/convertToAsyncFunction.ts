@@ -14,19 +14,18 @@ namespace ts.codefix {
           t,
           context.sourceFile,
           context.span.start,
-          context.program.getTypeChecker()
-        )
-      );
+          context.program.getTypeChecker(),
+        ));
       return codeActionSucceeded
         ? [
-            createCodeFixAction(
-              fixId,
-              changes,
-              Diagnostics.Convert_to_async_function,
-              fixId,
-              Diagnostics.Convert_all_to_async_functions
-            ),
-          ]
+          createCodeFixAction(
+            fixId,
+            changes,
+            Diagnostics.Convert_to_async_function,
+            fixId,
+            Diagnostics.Convert_all_to_async_functions,
+          ),
+        ]
         : [];
     },
     fixIds: [fixId],
@@ -36,9 +35,8 @@ namespace ts.codefix {
           changes,
           err.file,
           err.start,
-          context.program.getTypeChecker()
-        )
-      ),
+          context.program.getTypeChecker(),
+        )),
   });
 
   const enum SynthBindingNameKind {
@@ -71,8 +69,7 @@ namespace ts.codefix {
     readonly isInJSFile: boolean;
   }
 
-  interface PromiseReturningCallExpression<Name extends string>
-    extends CallExpression {
+  interface PromiseReturningCallExpression<Name extends string> extends CallExpression {
     readonly expression: PropertyAccessExpression & {
       readonly escapedText: Name;
     };
@@ -82,7 +79,7 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     position: number,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): void {
     // get the function declaration - returns a promise
     const tokenAtPosition = getTokenAtPosition(sourceFile, position);
@@ -90,16 +87,16 @@ namespace ts.codefix {
 
     // if the parent of a FunctionLikeDeclaration is a variable declaration, the convertToAsync diagnostic will be reported on the variable name
     if (
-      isIdentifier(tokenAtPosition) &&
-      isVariableDeclaration(tokenAtPosition.parent) &&
-      tokenAtPosition.parent.initializer &&
-      isFunctionLikeDeclaration(tokenAtPosition.parent.initializer)
+      isIdentifier(tokenAtPosition)
+      && isVariableDeclaration(tokenAtPosition.parent)
+      && tokenAtPosition.parent.initializer
+      && isFunctionLikeDeclaration(tokenAtPosition.parent.initializer)
     ) {
       functionToConvert = tokenAtPosition.parent.initializer;
     } else {
       functionToConvert = tryCast(
         getContainingFunction(getTokenAtPosition(sourceFile, position)),
-        canBeConvertedToAsync
+        canBeConvertedToAsync,
       );
     }
 
@@ -111,24 +108,23 @@ namespace ts.codefix {
     const isInJavascript = isInJSFile(functionToConvert);
     const setOfExpressionsToReturn = getAllPromiseExpressionsToReturn(
       functionToConvert,
-      checker
+      checker,
     );
     const functionToConvertRenamed = renameCollidingVarNames(
       functionToConvert,
       checker,
-      synthNamesMap
+      synthNamesMap,
     );
     if (!returnsPromise(functionToConvertRenamed, checker)) {
       return;
     }
 
-    const returnStatements =
-      functionToConvertRenamed.body && isBlock(functionToConvertRenamed.body)
-        ? getReturnStatementsWithPromiseHandlers(
-            functionToConvertRenamed.body,
-            checker
-          )
-        : emptyArray;
+    const returnStatements = functionToConvertRenamed.body && isBlock(functionToConvertRenamed.body)
+      ? getReturnStatementsWithPromiseHandlers(
+        functionToConvertRenamed.body,
+        checker,
+      )
+      : emptyArray;
     const transformer: Transformer = {
       checker,
       synthNamesMap,
@@ -156,7 +152,7 @@ namespace ts.codefix {
             node,
             node,
             transformer,
-            /*hasContinuation*/ false
+            /*hasContinuation*/ false,
           );
           if (hasFailed()) {
             return true; // return something truthy to shortcut out of more work
@@ -177,12 +173,13 @@ namespace ts.codefix {
 
   function getReturnStatementsWithPromiseHandlers(
     body: Block,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): readonly ReturnStatement[] {
     const res: ReturnStatement[] = [];
     forEachReturnStatement(body, (ret) => {
-      if (isReturnStatementWithFixablePromiseHandler(ret, checker))
+      if (isReturnStatementWithFixablePromiseHandler(ret, checker)) {
         res.push(ret);
+      }
     });
     return res;
   }
@@ -192,7 +189,7 @@ namespace ts.codefix {
     */
   function getAllPromiseExpressionsToReturn(
     func: FunctionLikeDeclaration,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): Set<number> {
     if (!func.body) {
       return new Set();
@@ -204,8 +201,8 @@ namespace ts.codefix {
         setOfExpressionsToReturn.add(getNodeId(node));
         forEach(node.arguments, visit);
       } else if (
-        isPromiseReturningCallExpression(node, checker, "catch") ||
-        isPromiseReturningCallExpression(node, checker, "finally")
+        isPromiseReturningCallExpression(node, checker, "catch")
+        || isPromiseReturningCallExpression(node, checker, "finally")
       ) {
         setOfExpressionsToReturn.add(getNodeId(node));
         // if .catch() or .finally() is the last call in the chain, move leftward in the chain until we hit something else that should be returned
@@ -224,7 +221,7 @@ namespace ts.codefix {
   function isPromiseReturningCallExpression<Name extends string>(
     node: Node,
     checker: TypeChecker,
-    name: Name
+    name: Name,
   ): node is PromiseReturningCallExpression<Name> {
     if (!isCallExpression(node)) return false;
     const isExpressionOfName = hasPropertyAccessExpressionWithName(node, name);
@@ -236,15 +233,15 @@ namespace ts.codefix {
   // `isReferenceToType` in checker local to the checker to avoid the cost of a property lookup on `ts`.
   function isReferenceToType(type: Type, target: Type) {
     return (
-      (getObjectFlags(type) & ObjectFlags.Reference) !== 0 &&
-      (type as TypeReference).target === target
+      (getObjectFlags(type) & ObjectFlags.Reference) !== 0
+      && (type as TypeReference).target === target
     );
   }
 
   function getExplicitPromisedTypeOfPromiseReturningCallExpression(
     node: PromiseReturningCallExpression<"then" | "catch" | "finally">,
     callback: Expression,
-    checker: TypeChecker
+    checker: TypeChecker,
   ) {
     if (node.expression.name.escapedText === "finally") {
       // for a `finally`, there's no type argument
@@ -256,8 +253,8 @@ namespace ts.codefix {
     // which type argument is safe to use as an annotation.
     const promiseType = checker.getTypeAtLocation(node.expression.expression);
     if (
-      isReferenceToType(promiseType, checker.getPromiseType()) ||
-      isReferenceToType(promiseType, checker.getPromiseLikeType())
+      isReferenceToType(promiseType, checker.getPromiseType())
+      || isReferenceToType(promiseType, checker.getPromiseLikeType())
     ) {
       if (node.expression.name.escapedText === "then") {
         if (callback === elementAt(node.arguments, 0)) {
@@ -275,7 +272,7 @@ namespace ts.codefix {
 
   function isPromiseTypedExpression(
     node: Node,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): node is Expression {
     if (!isExpression(node)) return false;
     return !!checker.getPromisedTypeOfPromise(checker.getTypeAtLocation(node));
@@ -289,7 +286,7 @@ namespace ts.codefix {
   function renameCollidingVarNames(
     nodeToRename: FunctionLikeDeclaration,
     checker: TypeChecker,
-    synthNamesMap: ESMap<string, SynthIdentifier>
+    synthNamesMap: ESMap<string, SynthIdentifier>,
   ): FunctionLikeDeclaration {
     const identsToRenameMap = new Map<string, Identifier>(); // key is the symbol id
     const collidingSymbolMap = createMultiMap<Symbol>();
@@ -311,38 +308,36 @@ namespace ts.codefix {
         //   const response = await fetch('...')
         // so we push an entry for 'response'.
         if (
-          lastCallSignature &&
-          !isParameter(node.parent) &&
-          !isFunctionLikeDeclaration(node.parent) &&
-          !synthNamesMap.has(symbolIdString)
+          lastCallSignature
+          && !isParameter(node.parent)
+          && !isFunctionLikeDeclaration(node.parent)
+          && !synthNamesMap.has(symbolIdString)
         ) {
           const firstParameter = firstOrUndefined(lastCallSignature.parameters);
-          const ident =
-            (firstParameter?.valueDeclaration &&
-              isParameter(firstParameter.valueDeclaration) &&
-              tryCast(firstParameter.valueDeclaration.name, isIdentifier)) ||
-            factory.createUniqueName(
+          const ident = (firstParameter?.valueDeclaration
+            && isParameter(firstParameter.valueDeclaration)
+            && tryCast(firstParameter.valueDeclaration.name, isIdentifier))
+            || factory.createUniqueName(
               "result",
-              GeneratedIdentifierFlags.Optimistic
+              GeneratedIdentifierFlags.Optimistic,
             );
           const synthName = getNewNameIfConflict(ident, collidingSymbolMap);
           synthNamesMap.set(symbolIdString, synthName);
           collidingSymbolMap.add(ident.text, symbol);
-        }
-        // We only care about identifiers that are parameters, variable declarations, or binding elements
+        } // We only care about identifiers that are parameters, variable declarations, or binding elements
         else if (
-          node.parent &&
-          (isParameter(node.parent) ||
-            isVariableDeclaration(node.parent) ||
-            isBindingElement(node.parent))
+          node.parent
+          && (isParameter(node.parent)
+            || isVariableDeclaration(node.parent)
+            || isBindingElement(node.parent))
         ) {
           const originalName = node.text;
           const collidingSymbols = collidingSymbolMap.get(originalName);
 
           // if the identifier name conflicts with a different identifier that we've already seen
           if (
-            collidingSymbols &&
-            collidingSymbols.some((prevSymbol) => prevSymbol !== symbol)
+            collidingSymbols
+            && collidingSymbols.some((prevSymbol) => prevSymbol !== symbol)
           ) {
             const newName = getNewNameIfConflict(node, collidingSymbolMap);
             identsToRenameMap.set(symbolIdString, newName.identifier);
@@ -352,7 +347,7 @@ namespace ts.codefix {
             const identifier = getSynthesizedDeepClone(node);
             synthNamesMap.set(
               symbolIdString,
-              createSynthIdentifier(identifier)
+              createSynthIdentifier(identifier),
             );
             collidingSymbolMap.add(originalName, symbol);
           }
@@ -365,46 +360,43 @@ namespace ts.codefix {
       /*includeTrivia*/ true,
       (original) => {
         if (
-          isBindingElement(original) &&
-          isIdentifier(original.name) &&
-          isObjectBindingPattern(original.parent)
+          isBindingElement(original)
+          && isIdentifier(original.name)
+          && isObjectBindingPattern(original.parent)
         ) {
           const symbol = checker.getSymbolAtLocation(original.name);
-          const renameInfo =
-            symbol && identsToRenameMap.get(String(getSymbolId(symbol)));
+          const renameInfo = symbol && identsToRenameMap.get(String(getSymbolId(symbol)));
           if (
-            renameInfo &&
-            renameInfo.text !==
-              (original.name || original.propertyName).getText()
+            renameInfo
+            && renameInfo.text
+              !== (original.name || original.propertyName).getText()
           ) {
             return factory.createBindingElement(
               original.dotDotDotToken,
               original.propertyName || original.name,
               renameInfo,
-              original.initializer
+              original.initializer,
             );
           }
         } else if (isIdentifier(original)) {
           const symbol = checker.getSymbolAtLocation(original);
-          const renameInfo =
-            symbol && identsToRenameMap.get(String(getSymbolId(symbol)));
+          const renameInfo = symbol && identsToRenameMap.get(String(getSymbolId(symbol)));
           if (renameInfo) {
             return factory.createIdentifier(renameInfo.text);
           }
         }
-      }
+      },
     );
   }
 
   function getNewNameIfConflict(
     name: Identifier,
-    originalNames: ReadonlyESMap<string, Symbol[]>
+    originalNames: ReadonlyESMap<string, Symbol[]>,
   ): SynthIdentifier {
     const numVarsSameName = (originalNames.get(name.text) || emptyArray).length;
-    const identifier =
-      numVarsSameName === 0
-        ? name
-        : factory.createIdentifier(name.text + "_" + numVarsSameName);
+    const identifier = numVarsSameName === 0
+      ? name
+      : factory.createIdentifier(name.text + "_" + numVarsSameName);
     return createSynthIdentifier(identifier);
   }
 
@@ -428,7 +420,7 @@ namespace ts.codefix {
     node: Expression,
     transformer: Transformer,
     hasContinuation: boolean,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ): readonly Statement[] {
     if (isPromiseReturningCallExpression(node, transformer.checker, "then")) {
       return transformThen(
@@ -437,7 +429,7 @@ namespace ts.codefix {
         elementAt(node.arguments, 1),
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
     if (isPromiseReturningCallExpression(node, transformer.checker, "catch")) {
@@ -446,7 +438,7 @@ namespace ts.codefix {
         elementAt(node.arguments, 0),
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
     if (
@@ -457,7 +449,7 @@ namespace ts.codefix {
         elementAt(node.arguments, 0),
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
     if (isPropertyAccessExpression(node)) {
@@ -466,7 +458,7 @@ namespace ts.codefix {
         node.expression,
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
 
@@ -474,14 +466,14 @@ namespace ts.codefix {
     if (nodeType && transformer.checker.getPromisedTypeOfPromise(nodeType)) {
       Debug.assertNode(
         getOriginalNode(node).parent,
-        isPropertyAccessExpression
+        isPropertyAccessExpression,
       );
       return transformPromiseExpressionOfPropertyAccess(
         returnContextNode,
         node,
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
 
@@ -491,9 +483,9 @@ namespace ts.codefix {
   function isNullOrUndefined({ checker }: Transformer, node: Expression) {
     if (node.kind === SyntaxKind.NullKeyword) return true;
     if (
-      isIdentifier(node) &&
-      !isGeneratedIdentifier(node) &&
-      idText(node) === "undefined"
+      isIdentifier(node)
+      && !isGeneratedIdentifier(node)
+      && idText(node) === "undefined"
     ) {
       const symbol = checker.getSymbolAtLocation(node);
       return !symbol || checker.isUndefinedSymbol(symbol);
@@ -502,11 +494,11 @@ namespace ts.codefix {
   }
 
   function createUniqueSynthName(
-    prevArgName: SynthIdentifier
+    prevArgName: SynthIdentifier,
   ): SynthIdentifier {
     const renamedPrevArg = factory.createUniqueName(
       prevArgName.identifier.text,
-      GeneratedIdentifierFlags.Optimistic
+      GeneratedIdentifierFlags.Optimistic,
     );
     return createSynthIdentifier(renamedPrevArg);
   }
@@ -514,7 +506,7 @@ namespace ts.codefix {
   function getPossibleNameForVarDecl(
     node: PromiseReturningCallExpression<"then" | "catch" | "finally">,
     transformer: Transformer,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ) {
     let possibleNameForVarDecl: SynthIdentifier | undefined;
 
@@ -536,9 +528,9 @@ namespace ts.codefix {
         possibleNameForVarDecl = createSynthIdentifier(
           factory.createUniqueName(
             "result",
-            GeneratedIdentifierFlags.Optimistic
+            GeneratedIdentifierFlags.Optimistic,
           ),
-          continuationArgName.types
+          continuationArgName.types,
         );
       }
 
@@ -556,7 +548,7 @@ namespace ts.codefix {
     transformer: Transformer,
     tryStatement: TryStatement,
     possibleNameForVarDecl: SynthIdentifier | undefined,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ) {
     const statements: Statement[] = [];
 
@@ -565,30 +557,30 @@ namespace ts.codefix {
 
     if (possibleNameForVarDecl && !shouldReturn(node, transformer)) {
       varDeclIdentifier = getSynthesizedDeepClone(
-        declareSynthIdentifier(possibleNameForVarDecl)
+        declareSynthIdentifier(possibleNameForVarDecl),
       );
       const typeArray: Type[] = possibleNameForVarDecl.types;
       const unionType = transformer.checker.getUnionType(
         typeArray,
-        UnionReduction.Subtype
+        UnionReduction.Subtype,
       );
       const unionTypeNode = transformer.isInJSFile
         ? undefined
         : transformer.checker.typeToTypeNode(
-            unionType,
-            /*enclosingDeclaration*/ undefined,
-            /*flags*/ undefined
-          );
+          unionType,
+          /*enclosingDeclaration*/ undefined,
+          /*flags*/ undefined,
+        );
       const varDecl = [
         factory.createVariableDeclaration(
           varDeclIdentifier,
           /*exclamationToken*/ undefined,
-          unionTypeNode
+          unionTypeNode,
         ),
       ];
       const varDeclList = factory.createVariableStatement(
         /*modifiers*/ undefined,
-        factory.createVariableDeclarationList(varDecl, NodeFlags.Let)
+        factory.createVariableDeclarationList(varDecl, NodeFlags.Let),
       );
       statements.push(varDeclList);
     }
@@ -596,9 +588,9 @@ namespace ts.codefix {
     statements.push(tryStatement);
 
     if (
-      continuationArgName &&
-      varDeclIdentifier &&
-      isSynthBindingPattern(continuationArgName)
+      continuationArgName
+      && varDeclIdentifier
+      && isSynthBindingPattern(continuationArgName)
     ) {
       statements.push(
         factory.createVariableStatement(
@@ -607,16 +599,16 @@ namespace ts.codefix {
             [
               factory.createVariableDeclaration(
                 getSynthesizedDeepClone(
-                  declareSynthBindingPattern(continuationArgName)
+                  declareSynthBindingPattern(continuationArgName),
                 ),
                 /*exclamationToken*/ undefined,
                 /*type*/ undefined,
-                varDeclIdentifier
+                varDeclIdentifier,
               ),
             ],
-            NodeFlags.Const
-          )
-        )
+            NodeFlags.Const,
+          ),
+        ),
       );
     }
 
@@ -632,7 +624,7 @@ namespace ts.codefix {
     onFinally: Expression | undefined,
     transformer: Transformer,
     hasContinuation: boolean,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ): readonly Statement[] {
     if (!onFinally || isNullOrUndefined(transformer, onFinally)) {
       // Ignore this call as it has no effect on the result
@@ -641,14 +633,14 @@ namespace ts.codefix {
         node.expression.expression,
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
 
     const possibleNameForVarDecl = getPossibleNameForVarDecl(
       node,
       transformer,
-      continuationArgName
+      continuationArgName,
     );
 
     // Transform the left-hand-side of `.finally` into an array of inlined statements. We pass `true` for hasContinuation as `node` is the outer continuation.
@@ -657,7 +649,7 @@ namespace ts.codefix {
       node.expression.expression,
       transformer,
       /*hasContinuation*/ true,
-      possibleNameForVarDecl
+      possibleNameForVarDecl,
     );
     if (hasFailed()) return silentFail(); // shortcut out of more work
 
@@ -669,7 +661,7 @@ namespace ts.codefix {
       /*continuationArgName*/ undefined,
       /*argName*/ undefined,
       node,
-      transformer
+      transformer,
     );
     if (hasFailed()) return silentFail(); // shortcut out of more work
 
@@ -678,14 +670,14 @@ namespace ts.codefix {
     const tryStatement = factory.createTryStatement(
       tryBlock,
       /*catchClause*/ undefined,
-      finallyBlock
+      finallyBlock,
     );
     return finishCatchOrFinallyTransform(
       node,
       transformer,
       tryStatement,
       possibleNameForVarDecl,
-      continuationArgName
+      continuationArgName,
     );
   }
 
@@ -698,7 +690,7 @@ namespace ts.codefix {
     onRejected: Expression | undefined,
     transformer: Transformer,
     hasContinuation: boolean,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ): readonly Statement[] {
     if (!onRejected || isNullOrUndefined(transformer, onRejected)) {
       // Ignore this call as it has no effect on the result
@@ -707,7 +699,7 @@ namespace ts.codefix {
         node.expression.expression,
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
 
@@ -715,7 +707,7 @@ namespace ts.codefix {
     const possibleNameForVarDecl = getPossibleNameForVarDecl(
       node,
       transformer,
-      continuationArgName
+      continuationArgName,
     );
 
     // Transform the left-hand-side of `.then`/`.catch` into an array of inlined statements. We pass `true` for hasContinuation as `node` is the outer continuation.
@@ -724,7 +716,7 @@ namespace ts.codefix {
       node.expression.expression,
       transformer,
       /*hasContinuation*/ true,
-      possibleNameForVarDecl
+      possibleNameForVarDecl,
     );
     if (hasFailed()) return silentFail(); // shortcut out of more work
 
@@ -736,27 +728,27 @@ namespace ts.codefix {
       possibleNameForVarDecl,
       inputArgName,
       node,
-      transformer
+      transformer,
     );
     if (hasFailed()) return silentFail(); // shortcut out of more work
 
     const tryBlock = factory.createBlock(inlinedLeftHandSide);
     const catchClause = factory.createCatchClause(
-      inputArgName &&
-        getSynthesizedDeepClone(declareSynthBindingName(inputArgName)),
-      factory.createBlock(inlinedCallback)
+      inputArgName
+        && getSynthesizedDeepClone(declareSynthBindingName(inputArgName)),
+      factory.createBlock(inlinedCallback),
     );
     const tryStatement = factory.createTryStatement(
       tryBlock,
       catchClause,
-      /*finallyBlock*/ undefined
+      /*finallyBlock*/ undefined,
     );
     return finishCatchOrFinallyTransform(
       node,
       transformer,
       tryStatement,
       possibleNameForVarDecl,
-      continuationArgName
+      continuationArgName,
     );
   }
 
@@ -770,7 +762,7 @@ namespace ts.codefix {
     onRejected: Expression | undefined,
     transformer: Transformer,
     hasContinuation: boolean,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ): readonly Statement[] {
     if (!onFulfilled || isNullOrUndefined(transformer, onFulfilled)) {
       // If we don't have an `onfulfilled` callback, try treating this as a `.catch`.
@@ -779,7 +771,7 @@ namespace ts.codefix {
         onRejected,
         transformer,
         hasContinuation,
-        continuationArgName
+        continuationArgName,
       );
     }
 
@@ -796,7 +788,7 @@ namespace ts.codefix {
       node.expression.expression,
       transformer,
       /*hasContinuation*/ true,
-      inputArgName
+      inputArgName,
     );
     if (hasFailed()) return silentFail(); // shortcut out of more work
 
@@ -808,7 +800,7 @@ namespace ts.codefix {
       continuationArgName,
       inputArgName,
       node,
-      transformer
+      transformer,
     );
     if (hasFailed()) return silentFail(); // shortcut out of more work
 
@@ -823,7 +815,7 @@ namespace ts.codefix {
     node: Expression,
     transformer: Transformer,
     hasContinuation: boolean,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ): readonly Statement[] {
     if (shouldReturn(returnContextNode, transformer)) {
       let returnValue = getSynthesizedDeepClone(node);
@@ -836,14 +828,14 @@ namespace ts.codefix {
     return createVariableOrAssignmentOrExpressionStatement(
       continuationArgName,
       factory.createAwaitExpression(node),
-      /*typeAnnotation*/ undefined
+      /*typeAnnotation*/ undefined,
     );
   }
 
   function createVariableOrAssignmentOrExpressionStatement(
     variableName: SynthBindingName | undefined,
     rightHandSide: Expression,
-    typeAnnotation: TypeNode | undefined
+    typeAnnotation: TypeNode | undefined,
   ): readonly Statement[] {
     if (!variableName || isEmptyBindingName(variableName)) {
       // if there's no argName to assign to, there still might be side effects
@@ -856,8 +848,8 @@ namespace ts.codefix {
         factory.createExpressionStatement(
           factory.createAssignment(
             getSynthesizedDeepClone(referenceSynthIdentifier(variableName)),
-            rightHandSide
-          )
+            rightHandSide,
+          ),
         ),
       ];
     }
@@ -871,29 +863,29 @@ namespace ts.codefix {
               getSynthesizedDeepClone(declareSynthBindingName(variableName)),
               /*exclamationToken*/ undefined,
               typeAnnotation,
-              rightHandSide
+              rightHandSide,
             ),
           ],
-          NodeFlags.Const
-        )
+          NodeFlags.Const,
+        ),
       ),
     ];
   }
 
   function maybeAnnotateAndReturn(
     expressionToReturn: Expression | undefined,
-    typeAnnotation: TypeNode | undefined
+    typeAnnotation: TypeNode | undefined,
   ): Statement[] {
     if (typeAnnotation && expressionToReturn) {
       const name = factory.createUniqueName(
         "result",
-        GeneratedIdentifierFlags.Optimistic
+        GeneratedIdentifierFlags.Optimistic,
       );
       return [
         ...createVariableOrAssignmentOrExpressionStatement(
           createSynthIdentifier(name),
           expressionToReturn,
-          typeAnnotation
+          typeAnnotation,
         ),
         factory.createReturnStatement(name),
       ];
@@ -913,7 +905,7 @@ namespace ts.codefix {
     continuationArgName: SynthBindingName | undefined,
     inputArgName: SynthBindingName | undefined,
     parent: PromiseReturningCallExpression<"then" | "catch" | "finally">,
-    transformer: Transformer
+    transformer: Transformer,
   ): readonly Statement[] {
     switch (func.kind) {
       case SyntaxKind.NullKeyword:
@@ -928,12 +920,12 @@ namespace ts.codefix {
 
         const synthCall = factory.createCallExpression(
           getSynthesizedDeepClone(
-            func as Identifier | PropertyAccessExpression
+            func as Identifier | PropertyAccessExpression,
           ),
           /*typeArguments*/ undefined,
           isSynthIdentifier(inputArgName)
             ? [referenceSynthIdentifier(inputArgName)]
-            : []
+            : [],
         );
 
         if (shouldReturn(parent, transformer)) {
@@ -942,34 +934,33 @@ namespace ts.codefix {
             getExplicitPromisedTypeOfPromiseReturningCallExpression(
               parent,
               func,
-              transformer.checker
-            )
+              transformer.checker,
+            ),
           );
         }
 
         const type = transformer.checker.getTypeAtLocation(func);
         const callSignatures = transformer.checker.getSignaturesOfType(
           type,
-          SignatureKind.Call
+          SignatureKind.Call,
         );
         if (!callSignatures.length) {
           // if identifier in handler has no call signatures, it's invalid
           return silentFail();
         }
         const returnType = callSignatures[0].getReturnType();
-        const varDeclOrAssignment =
-          createVariableOrAssignmentOrExpressionStatement(
-            continuationArgName,
-            factory.createAwaitExpression(synthCall),
-            getExplicitPromisedTypeOfPromiseReturningCallExpression(
-              parent,
-              func,
-              transformer.checker
-            )
-          );
+        const varDeclOrAssignment = createVariableOrAssignmentOrExpressionStatement(
+          continuationArgName,
+          factory.createAwaitExpression(synthCall),
+          getExplicitPromisedTypeOfPromiseReturningCallExpression(
+            parent,
+            func,
+            transformer.checker,
+          ),
+        );
         if (continuationArgName) {
           continuationArgName.types.push(
-            transformer.checker.getAwaitedType(returnType) || returnType
+            transformer.checker.getAwaitedType(returnType) || returnType,
           );
         }
         return varDeclOrAssignment;
@@ -979,7 +970,7 @@ namespace ts.codefix {
         const funcBody = (func as FunctionExpression | ArrowFunction).body;
         const returnType = getLastCallSignature(
           transformer.checker.getTypeAtLocation(func),
-          transformer.checker
+          transformer.checker,
         )?.getReturnType();
 
         // Arrow functions with block bodies { } will enter this control flow
@@ -992,7 +983,7 @@ namespace ts.codefix {
               if (
                 isReturnStatementWithFixablePromiseHandler(
                   statement,
-                  transformer.checker
+                  transformer.checker,
                 )
               ) {
                 refactoredStmts = refactoredStmts.concat(
@@ -1000,32 +991,31 @@ namespace ts.codefix {
                     transformer,
                     statement,
                     hasContinuation,
-                    continuationArgName
-                  )
+                    continuationArgName,
+                  ),
                 );
               } else {
-                const possiblyAwaitedRightHandSide =
-                  returnType && statement.expression
-                    ? getPossiblyAwaitedRightHandSide(
-                        transformer.checker,
-                        returnType,
-                        statement.expression
-                      )
-                    : statement.expression;
+                const possiblyAwaitedRightHandSide = returnType && statement.expression
+                  ? getPossiblyAwaitedRightHandSide(
+                    transformer.checker,
+                    returnType,
+                    statement.expression,
+                  )
+                  : statement.expression;
                 refactoredStmts.push(
                   ...maybeAnnotateAndReturn(
                     possiblyAwaitedRightHandSide,
                     getExplicitPromisedTypeOfPromiseReturningCallExpression(
                       parent,
                       func,
-                      transformer.checker
-                    )
-                  )
+                      transformer.checker,
+                    ),
+                  ),
                 );
               }
             } else if (
-              hasContinuation &&
-              forEachReturnStatement(statement, returnTrue)
+              hasContinuation
+              && forEachReturnStatement(statement, returnTrue)
             ) {
               // If there is a nested `return` in a callback that has a trailing continuation, we don't transform it as the resulting complexity is too great. For example:
               //
@@ -1045,7 +1035,7 @@ namespace ts.codefix {
               // However, branching returns in the outermost continuation are acceptable as no other continuation follows it:
               //
               // source                               | result
-              //--------------------------------------|---------------------------------------
+              // --------------------------------------|---------------------------------------
               // function f() {                       | async function f() {
               //     return foo().then(res => {       |     const res = await foo();
               //       if (res.ok) {                  |     if (res.ok) {
@@ -1073,22 +1063,22 @@ namespace ts.codefix {
           return shouldReturn(parent, transformer)
             ? refactoredStmts.map((s) => getSynthesizedDeepClone(s))
             : removeReturns(
-                refactoredStmts,
-                continuationArgName,
-                transformer,
-                seenReturnStatement
-              );
+              refactoredStmts,
+              continuationArgName,
+              transformer,
+              seenReturnStatement,
+            );
         } else {
           const inlinedStatements = isFixablePromiseHandler(
-            funcBody,
-            transformer.checker
-          )
+              funcBody,
+              transformer.checker,
+            )
             ? transformReturnStatementWithFixablePromiseHandler(
-                transformer,
-                factory.createReturnStatement(funcBody),
-                hasContinuation,
-                continuationArgName
-              )
+              transformer,
+              factory.createReturnStatement(funcBody),
+              hasContinuation,
+              continuationArgName,
+            )
             : emptyArray;
 
           if (inlinedStatements.length > 0) {
@@ -1096,23 +1086,21 @@ namespace ts.codefix {
           }
 
           if (returnType) {
-            const possiblyAwaitedRightHandSide =
-              getPossiblyAwaitedRightHandSide(
-                transformer.checker,
-                returnType,
-                funcBody
-              );
+            const possiblyAwaitedRightHandSide = getPossiblyAwaitedRightHandSide(
+              transformer.checker,
+              returnType,
+              funcBody,
+            );
 
             if (!shouldReturn(parent, transformer)) {
-              const transformedStatement =
-                createVariableOrAssignmentOrExpressionStatement(
-                  continuationArgName,
-                  possiblyAwaitedRightHandSide,
-                  /*typeAnnotation*/ undefined
-                );
+              const transformedStatement = createVariableOrAssignmentOrExpressionStatement(
+                continuationArgName,
+                possiblyAwaitedRightHandSide,
+                /*typeAnnotation*/ undefined,
+              );
               if (continuationArgName) {
                 continuationArgName.types.push(
-                  transformer.checker.getAwaitedType(returnType) || returnType
+                  transformer.checker.getAwaitedType(returnType) || returnType,
                 );
               }
               return transformedStatement;
@@ -1122,8 +1110,8 @@ namespace ts.codefix {
                 getExplicitPromisedTypeOfPromiseReturningCallExpression(
                   parent,
                   func,
-                  transformer.checker
-                )
+                  transformer.checker,
+                ),
               );
             }
           } else {
@@ -1141,7 +1129,7 @@ namespace ts.codefix {
   function getPossiblyAwaitedRightHandSide(
     checker: TypeChecker,
     type: Type,
-    expr: Expression
+    expr: Expression,
   ): AwaitExpression | Expression {
     const rightHandSide = getSynthesizedDeepClone(expr);
     return !!checker.getPromisedTypeOfPromise(type)
@@ -1151,11 +1139,11 @@ namespace ts.codefix {
 
   function getLastCallSignature(
     type: Type,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): Signature | undefined {
     const callSignatures = checker.getSignaturesOfType(
       type,
-      SignatureKind.Call
+      SignatureKind.Call,
     );
     return lastOrUndefined(callSignatures);
   }
@@ -1164,33 +1152,33 @@ namespace ts.codefix {
     stmts: readonly Statement[],
     prevArgName: SynthBindingName | undefined,
     transformer: Transformer,
-    seenReturnStatement: boolean
+    seenReturnStatement: boolean,
   ): readonly Statement[] {
     const ret: Statement[] = [];
     for (const stmt of stmts) {
       if (isReturnStatement(stmt)) {
         if (stmt.expression) {
           const possiblyAwaitedExpression = isPromiseTypedExpression(
-            stmt.expression,
-            transformer.checker
-          )
+              stmt.expression,
+              transformer.checker,
+            )
             ? factory.createAwaitExpression(stmt.expression)
             : stmt.expression;
           if (prevArgName === undefined) {
             ret.push(
-              factory.createExpressionStatement(possiblyAwaitedExpression)
+              factory.createExpressionStatement(possiblyAwaitedExpression),
             );
           } else if (
-            isSynthIdentifier(prevArgName) &&
-            prevArgName.hasBeenDeclared
+            isSynthIdentifier(prevArgName)
+            && prevArgName.hasBeenDeclared
           ) {
             ret.push(
               factory.createExpressionStatement(
                 factory.createAssignment(
                   referenceSynthIdentifier(prevArgName),
-                  possiblyAwaitedExpression
-                )
-              )
+                  possiblyAwaitedExpression,
+                ),
+              ),
             );
           } else {
             ret.push(
@@ -1202,12 +1190,12 @@ namespace ts.codefix {
                       declareSynthBindingName(prevArgName),
                       /*exclamationToken*/ undefined,
                       /*type*/ undefined,
-                      possiblyAwaitedExpression
+                      possiblyAwaitedExpression,
                     ),
                   ],
-                  NodeFlags.Const
-                )
-              )
+                  NodeFlags.Const,
+                ),
+              ),
             );
           }
         }
@@ -1227,12 +1215,12 @@ namespace ts.codefix {
                 declareSynthBindingName(prevArgName),
                 /*exclamationToken*/ undefined,
                 /*type*/ undefined,
-                factory.createIdentifier("undefined")
+                factory.createIdentifier("undefined"),
               ),
             ],
-            NodeFlags.Const
-          )
-        )
+            NodeFlags.Const,
+          ),
+        ),
       );
     }
 
@@ -1247,7 +1235,7 @@ namespace ts.codefix {
     transformer: Transformer,
     innerRetStmt: ReturnStatement,
     hasContinuation: boolean,
-    continuationArgName?: SynthBindingName
+    continuationArgName?: SynthBindingName,
   ) {
     let innerCbBody: Statement[] = [];
     forEachChild(innerRetStmt, function visit(node) {
@@ -1257,7 +1245,7 @@ namespace ts.codefix {
           node,
           transformer,
           hasContinuation,
-          continuationArgName
+          continuationArgName,
         );
         innerCbBody = innerCbBody.concat(temp);
         if (innerCbBody.length > 0) {
@@ -1272,7 +1260,7 @@ namespace ts.codefix {
 
   function getArgBindingName(
     funcNode: Expression,
-    transformer: Transformer
+    transformer: Transformer,
   ): SynthBindingName | undefined {
     const types: Type[] = [];
     let name: SynthBindingName | undefined;
@@ -1285,8 +1273,8 @@ namespace ts.codefix {
     } else if (isIdentifier(funcNode)) {
       name = getMapEntryOrDefault(funcNode);
     } else if (
-      isPropertyAccessExpression(funcNode) &&
-      isIdentifier(funcNode.name)
+      isPropertyAccessExpression(funcNode)
+      && isIdentifier(funcNode.name)
     ) {
       name = getMapEntryOrDefault(funcNode.name);
     }
@@ -1294,8 +1282,8 @@ namespace ts.codefix {
     // return undefined argName when arg is null or undefined
     // eslint-disable-next-line no-in-operator
     if (
-      !name ||
-      ("identifier" in name && name.identifier.text === "undefined")
+      !name
+      || ("identifier" in name && name.identifier.text === "undefined")
     ) {
       return undefined;
     }
@@ -1303,7 +1291,7 @@ namespace ts.codefix {
     return name;
 
     function getMappedBindingNameOrDefault(
-      bindingName: BindingName
+      bindingName: BindingName,
     ): SynthBindingName {
       if (isIdentifier(bindingName)) return getMapEntryOrDefault(bindingName);
       const elements = flatMap(bindingName.elements, (element) => {
@@ -1323,7 +1311,7 @@ namespace ts.codefix {
       }
 
       const mapEntry = transformer.synthNamesMap.get(
-        getSymbolId(symbol).toString()
+        getSymbolId(symbol).toString(),
       );
       return mapEntry || createSynthIdentifier(identifier, types);
     }
@@ -1340,7 +1328,7 @@ namespace ts.codefix {
   }
 
   function isEmptyBindingName(
-    bindingName: SynthBindingName | undefined
+    bindingName: SynthBindingName | undefined,
   ): boolean {
     if (!bindingName) {
       return true;
@@ -1353,7 +1341,7 @@ namespace ts.codefix {
 
   function createSynthIdentifier(
     identifier: Identifier,
-    types: Type[] = []
+    types: Type[] = [],
   ): SynthIdentifier {
     return {
       kind: SynthBindingNameKind.Identifier,
@@ -1367,7 +1355,7 @@ namespace ts.codefix {
   function createSynthBindingPattern(
     bindingPattern: BindingPattern,
     elements: readonly SynthBindingName[] = emptyArray,
-    types: Type[] = []
+    types: Type[] = [],
   ): SynthBindingPattern {
     return {
       kind: SynthBindingNameKind.BindingPattern,
@@ -1401,24 +1389,24 @@ namespace ts.codefix {
   }
 
   function isSynthIdentifier(
-    bindingName: SynthBindingName
+    bindingName: SynthBindingName,
   ): bindingName is SynthIdentifier {
     return bindingName.kind === SynthBindingNameKind.Identifier;
   }
 
   function isSynthBindingPattern(
-    bindingName: SynthBindingName
+    bindingName: SynthBindingName,
   ): bindingName is SynthBindingPattern {
     return bindingName.kind === SynthBindingNameKind.BindingPattern;
   }
 
   function shouldReturn(
     expression: Expression,
-    transformer: Transformer
+    transformer: Transformer,
   ): boolean {
     return (
-      !!expression.original &&
-      transformer.setOfExpressionsToReturn.has(getNodeId(expression.original))
+      !!expression.original
+      && transformer.setOfExpressionsToReturn.has(getNodeId(expression.original))
     );
   }
 }

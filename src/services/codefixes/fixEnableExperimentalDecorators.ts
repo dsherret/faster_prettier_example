@@ -9,21 +9,19 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToEnableExperimentalDecorators(
-      context
+      context,
     ) {
       const { configFile } = context.program.getCompilerOptions();
       if (configFile === undefined) {
         return undefined;
       }
 
-      const changes = textChanges.ChangeTracker.with(context, (changeTracker) =>
-        doChange(changeTracker, configFile)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (changeTracker) => doChange(changeTracker, configFile));
       return [
         createCodeFixActionWithoutFixAll(
           fixId,
           changes,
-          Diagnostics.Enable_the_experimentalDecorators_option_in_your_configuration_file
+          Diagnostics.Enable_the_experimentalDecorators_option_in_your_configuration_file,
         ),
       ];
     },
@@ -40,13 +38,13 @@ namespace ts.codefix {
 
   function doChange(
     changeTracker: textChanges.ChangeTracker,
-    configFile: TsConfigSourceFile
+    configFile: TsConfigSourceFile,
   ) {
     setJsonCompilerOptionValue(
       changeTracker,
       configFile,
       "experimentalDecorators",
-      factory.createTrue()
+      factory.createTrue(),
     );
   }
 }

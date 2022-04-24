@@ -49,7 +49,7 @@ namespace ts.server {
     constructor(
       private readonly host: ServerHost,
       private readonly info: ScriptInfo,
-      initialVersion?: ScriptInfoVersion
+      initialVersion?: ScriptInfoVersion,
     ) {
       this.version = initialVersion || { svc: 0, text: 0 };
     }
@@ -172,10 +172,10 @@ namespace ts.server {
     }
 
     public getAbsolutePositionAndLineText(
-      line: number
+      line: number,
     ): AbsolutePositionAndLineText {
       return this.switchToScriptVersionCache().getAbsolutePositionAndLineText(
-        line
+        line,
       );
     }
     /**
@@ -185,8 +185,7 @@ namespace ts.server {
       if (!this.useScriptVersionCacheIfValidOrOpen()) {
         const lineMap = this.getLineMap();
         const start = lineMap[line]; // -1 since line is 1-based
-        const end =
-          line + 1 < lineMap.length ? lineMap[line + 1] : this.text!.length;
+        const end = line + 1 < lineMap.length ? lineMap[line + 1] : this.text!.length;
         return createTextSpanFromBounds(start, end);
       }
       return this.svc!.lineToTextSpan(line);
@@ -199,7 +198,7 @@ namespace ts.server {
     lineOffsetToPosition(
       line: number,
       offset: number,
-      allowEdits?: true
+      allowEdits?: true,
     ): number {
       if (!this.useScriptVersionCacheIfValidOrOpen()) {
         return computePositionOfLineAndCharacter(
@@ -207,7 +206,7 @@ namespace ts.server {
           line - 1,
           offset - 1,
           this.text,
-          allowEdits
+          allowEdits,
         );
       }
 
@@ -219,7 +218,7 @@ namespace ts.server {
       if (!this.useScriptVersionCacheIfValidOrOpen()) {
         const { line, character } = computeLineAndCharacterOfPosition(
           this.getLineMap(),
-          position
+          position,
         );
         return { line: line + 1, offset: character + 1 };
       }
@@ -232,8 +231,7 @@ namespace ts.server {
     } {
       let text: string;
       const fileName = tempFileName || this.info.fileName;
-      const getText = () =>
-        text === undefined ? (text = this.host.readFile(fileName) || "") : text;
+      const getText = () => text === undefined ? (text = this.host.readFile(fileName) || "") : text;
       // Only non typescript files have size limitation
       if (!hasTSFileExtension(this.info.fileName)) {
         const fileSize = this.host.getFileSize
@@ -243,11 +241,11 @@ namespace ts.server {
           Debug.assert(!!this.info.containingProjects.length);
           const service = this.info.containingProjects[0].projectService;
           service.logger.info(
-            `Skipped loading contents of large file ${fileName} for info ${this.info.fileName}: fileSize: ${fileSize}`
+            `Skipped loading contents of large file ${fileName} for info ${this.info.fileName}: fileSize: ${fileSize}`,
           );
           this.info.containingProjects[0].projectService.sendLargeFileReferencedEvent(
             fileName,
-            fileSize
+            fileSize,
           );
           return { text: "", fileSize };
         }
@@ -265,7 +263,8 @@ namespace ts.server {
 
     private useScriptVersionCacheIfValidOrOpen():
       | ScriptVersionCache
-      | undefined {
+      | undefined
+    {
       // If this is open script, use the cache
       if (this.isOpen) {
         return this.switchToScriptVersionCache();
@@ -284,7 +283,7 @@ namespace ts.server {
       if (this.text === undefined || this.pendingReloadFromDisk) {
         Debug.assert(
           !this.svc || this.pendingReloadFromDisk,
-          "ScriptVersionCache should not be set when reloading from disk"
+          "ScriptVersionCache should not be set when reloading from disk",
         );
         this.reloadWithFileText();
       }
@@ -302,8 +301,7 @@ namespace ts.server {
       if (this.svc) {
         return {
           getLineCount: () => this.svc!.getLineCount(),
-          getLineText: (line) =>
-            this.svc!.getAbsolutePositionAndLineText(line + 1).lineText!,
+          getLineText: (line) => this.svc!.getAbsolutePositionAndLineText(line + 1).lineText!,
         };
       }
       const lineMap = this.getLineMap();
@@ -313,12 +311,12 @@ namespace ts.server {
 
   export function isDynamicFileName(fileName: NormalizedPath) {
     return (
-      fileName[0] === "^" ||
-      ((stringContains(fileName, "walkThroughSnippet:/") ||
-        stringContains(fileName, "untitled:/")) &&
-        getBaseFileName(fileName)[0] === "^") ||
-      (stringContains(fileName, ":^") &&
-        !stringContains(fileName, directorySeparator))
+      fileName[0] === "^"
+      || ((stringContains(fileName, "walkThroughSnippet:/")
+        || stringContains(fileName, "untitled:/"))
+        && getBaseFileName(fileName)[0] === "^")
+      || (stringContains(fileName, ":^")
+        && !stringContains(fileName, directorySeparator))
     );
   }
 
@@ -379,7 +377,7 @@ namespace ts.server {
       readonly scriptKind: ScriptKind,
       public readonly hasMixedContent: boolean,
       readonly path: Path,
-      initialVersion?: ScriptInfoVersion
+      initialVersion?: ScriptInfoVersion,
     ) {
       this.isDynamic = isDynamicFileName(fileName);
 
@@ -449,7 +447,7 @@ namespace ts.server {
             if (this.realpath !== this.path) {
               project.projectService.realpathToScriptInfos!.add(
                 this.realpath,
-                this
+                this,
               ); // TODO: GH#18217
             }
           }
@@ -501,8 +499,8 @@ namespace ts.server {
           return this.containingProjects[0] === project;
         case 2:
           return (
-            this.containingProjects[0] === project ||
-            this.containingProjects[1] === project
+            this.containingProjects[0] === project
+            || this.containingProjects[1] === project
           );
         default:
           return contains(this.containingProjects, project);
@@ -543,7 +541,7 @@ namespace ts.server {
           p.getCachedDirectoryStructureHost().addOrDeleteFile(
             this.fileName,
             this.path,
-            FileWatcherEventKind.Deleted
+            FileWatcherEventKind.Deleted,
           );
         }
         const existingRoot = p.getRootFilesMap().get(this.path);
@@ -586,16 +584,16 @@ namespace ts.server {
                 // If we havent found default configuredProject and
                 // its not the last one, find it and use that one if there
                 if (
-                  defaultConfiguredProject === undefined &&
-                  index !== this.containingProjects.length - 1
+                  defaultConfiguredProject === undefined
+                  && index !== this.containingProjects.length - 1
                 ) {
-                  defaultConfiguredProject =
-                    project.projectService.findDefaultConfiguredProject(this) ||
-                    false;
+                  defaultConfiguredProject = project.projectService.findDefaultConfiguredProject(this)
+                    || false;
                 }
                 if (defaultConfiguredProject === project) return project;
-                if (!firstNonSourceOfProjectReferenceRedirect)
+                if (!firstNonSourceOfProjectReferenceRedirect) {
                   firstNonSourceOfProjectReferenceRedirect = project;
+                }
               }
               if (!firstConfiguredProject) firstConfiguredProject = project;
             } else if (!firstExternalProject && isExternalProject(project)) {
@@ -605,11 +603,11 @@ namespace ts.server {
             }
           }
           return ensureNotAutoImportProvider(
-            defaultConfiguredProject ||
-              firstNonSourceOfProjectReferenceRedirect ||
-              firstConfiguredProject ||
-              firstExternalProject ||
-              firstInferredProject
+            defaultConfiguredProject
+              || firstNonSourceOfProjectReferenceRedirect
+              || firstConfiguredProject
+              || firstExternalProject
+              || firstInferredProject,
           );
       }
     }
@@ -622,7 +620,7 @@ namespace ts.server {
 
     setOptions(
       formatSettings: FormatCodeSettings,
-      preferences: protocol.UserPreferences | undefined
+      preferences: protocol.UserPreferences | undefined,
     ): void {
       if (formatSettings) {
         if (!this.formatSettings) {
@@ -650,7 +648,7 @@ namespace ts.server {
     saveTo(fileName: string) {
       this.host.writeFile(
         fileName,
-        getSnapshotText(this.textStorage.getSnapshot())
+        getSnapshotText(this.textStorage.getSnapshot()),
       );
     }
 
@@ -699,7 +697,7 @@ namespace ts.server {
     isContainedByAutoImportProvider() {
       return some(
         this.containingProjects,
-        (p) => p.projectKind === ProjectKind.AutoImportProvider
+        (p) => p.projectKind === ProjectKind.AutoImportProvider,
       );
     }
 
@@ -719,12 +717,12 @@ namespace ts.server {
     lineOffsetToPosition(
       line: number,
       offset: number,
-      allowEdits?: true
+      allowEdits?: true,
     ): number; // eslint-disable-line @typescript-eslint/unified-signatures
     lineOffsetToPosition(
       line: number,
       offset: number,
-      allowEdits?: true
+      allowEdits?: true,
     ): number {
       return this.textStorage.lineOffsetToPosition(line, offset, allowEdits);
     }
@@ -766,7 +764,7 @@ namespace ts.server {
   function failIfInvalidPosition(position: number) {
     Debug.assert(
       typeof position === "number",
-      `Expected position ${position} to be a number.`
+      `Expected position ${position} to be a number.`,
     );
     Debug.assert(position >= 0, `Expected position to be non-negative.`);
   }
@@ -774,20 +772,20 @@ namespace ts.server {
   function failIfInvalidLocation(location: protocol.Location) {
     Debug.assert(
       typeof location.line === "number",
-      `Expected line ${location.line} to be a number.`
+      `Expected line ${location.line} to be a number.`,
     );
     Debug.assert(
       typeof location.offset === "number",
-      `Expected offset ${location.offset} to be a number.`
+      `Expected offset ${location.offset} to be a number.`,
     );
 
     Debug.assert(
       location.line > 0,
-      `Expected line to be non-${location.line === 0 ? "zero" : "negative"}`
+      `Expected line to be non-${location.line === 0 ? "zero" : "negative"}`,
     );
     Debug.assert(
       location.offset > 0,
-      `Expected offset to be non-${location.offset === 0 ? "zero" : "negative"}`
+      `Expected offset to be non-${location.offset === 0 ? "zero" : "negative"}`,
     );
   }
 }

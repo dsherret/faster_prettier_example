@@ -26,7 +26,7 @@ namespace fakes {
 
     constructor(
       vfs: vfs.FileSystem,
-      { executingFilePath, newLine = "\r\n", env }: SystemOptions = {}
+      { executingFilePath, newLine = "\r\n", env }: SystemOptions = {},
     ) {
       this.vfs = vfs.isReadonly ? vfs.shadow() : vfs;
       this.useCaseSensitiveFileNames = !this.vfs.ignoreCase;
@@ -36,7 +36,7 @@ namespace fakes {
     }
 
     private testTerminalWidth = Number.parseInt(
-      this.getEnvironmentVariable("TS_TEST_TERMINAL_WIDTH")
+      this.getEnvironmentVariable("TS_TEST_TERMINAL_WIDTH"),
     );
     getWidthOfTerminal = Number.isNaN(this.testTerminalWidth)
       ? undefined
@@ -65,12 +65,12 @@ namespace fakes {
     public writeFile(
       path: string,
       data: string,
-      writeByteOrderMark?: boolean
+      writeByteOrderMark?: boolean,
     ): void {
       this.vfs.mkdirpSync(vpath.dirname(path));
       this.vfs.writeFileSync(
         path,
-        writeByteOrderMark ? Utils.addUTF8ByteOrderMark(data) : data
+        writeByteOrderMark ? Utils.addUTF8ByteOrderMark(data) : data,
       );
     }
 
@@ -115,7 +115,7 @@ namespace fakes {
       extensions?: readonly string[],
       exclude?: readonly string[],
       include?: readonly string[],
-      depth?: number
+      depth?: number,
     ): string[] {
       return ts.matchFiles(
         path,
@@ -126,7 +126,7 @@ namespace fakes {
         this.getCurrentDirectory(),
         depth,
         (path) => this.getAccessibleFileSystemEntries(path),
-        (path) => this.realpath(path)
+        (path) => this.realpath(path),
       );
     }
 
@@ -245,14 +245,14 @@ namespace fakes {
       extensions: string[],
       excludes: string[],
       includes: string[],
-      depth: number
+      depth: number,
     ): string[] {
       return this.sys.readDirectory(
         path,
         extensions,
         excludes,
         includes,
-        depth
+        depth,
       );
     }
   }
@@ -276,7 +276,7 @@ namespace fakes {
     constructor(
       sys: System | vfs.FileSystem,
       options = ts.getDefaultCompilerOptions(),
-      setParentNodes = false
+      setParentNodes = false,
     ) {
       if (sys instanceof vfs.FileSystem) sys = new System(sys);
       this.sys = sys;
@@ -296,8 +296,8 @@ namespace fakes {
 
     public get parseConfigHost() {
       return (
-        this._parseConfigHost ||
-        (this._parseConfigHost = new ParseConfigHost(this.sys))
+        this._parseConfigHost
+        || (this._parseConfigHost = new ParseConfigHost(this.sys))
       );
     }
 
@@ -348,7 +348,7 @@ namespace fakes {
       extensions?: readonly string[],
       exclude?: readonly string[],
       include?: readonly string[],
-      depth?: number
+      depth?: number,
     ): string[] {
       return this.sys.readDirectory(path, extensions, exclude, include, depth);
     }
@@ -360,7 +360,7 @@ namespace fakes {
     public writeFile(
       fileName: string,
       content: string,
-      writeByteOrderMark: boolean
+      writeByteOrderMark: boolean,
     ) {
       if (writeByteOrderMark) content = Utils.addUTF8ByteOrderMark(content);
       this.sys.writeFile(fileName, content);
@@ -390,16 +390,16 @@ namespace fakes {
     public getDefaultLibFileName(options: ts.CompilerOptions): string {
       return vpath.resolve(
         this.getDefaultLibLocation(),
-        ts.getDefaultLibFileName(options)
+        ts.getDefaultLibFileName(options),
       );
     }
 
     public getSourceFile(
       fileName: string,
-      languageVersion: number
+      languageVersion: number,
     ): ts.SourceFile | undefined {
       const canonicalFileName = this.getCanonicalFileName(
-        vpath.resolve(this.getCurrentDirectory(), fileName)
+        vpath.resolve(this.getCurrentDirectory(), fileName),
       );
       const existing = this._sourceFiles.get(canonicalFileName);
       if (existing) return existing;
@@ -413,17 +413,16 @@ namespace fakes {
       // reused across multiple tests. In that case, we cache the SourceFile we parse
       // so that it can be reused across multiple tests to avoid the cost of
       // repeatedly parsing the same file over and over (such as lib.d.ts).
-      const cacheKey =
-        this.vfs.shadowRoot &&
-        `SourceFile[languageVersion=${languageVersion},setParentNodes=${this._setParentNodes}]`;
+      const cacheKey = this.vfs.shadowRoot
+        && `SourceFile[languageVersion=${languageVersion},setParentNodes=${this._setParentNodes}]`;
       if (cacheKey) {
         const meta = this.vfs.filemeta(canonicalFileName);
         const sourceFileFromMetadata = meta.get(cacheKey) as
           | ts.SourceFile
           | undefined;
         if (
-          sourceFileFromMetadata &&
-          sourceFileFromMetadata.getFullText() === content
+          sourceFileFromMetadata
+          && sourceFileFromMetadata.getFullText() === content
         ) {
           this._sourceFiles.set(canonicalFileName, sourceFileFromMetadata);
           return sourceFileFromMetadata;
@@ -434,7 +433,7 @@ namespace fakes {
         fileName,
         content,
         languageVersion,
-        this._setParentNodes || this.shouldAssertInvariants
+        this._setParentNodes || this.shouldAssertInvariants,
       );
       if (this.shouldAssertInvariants) {
         Utils.assertInvariants(parsed, /*parent*/ undefined);
@@ -453,9 +452,9 @@ namespace fakes {
               ? fs.shadowRoot.statSync(canonicalFileName)
               : undefined!; // TODO: GH#18217
             if (
-              shadowRootStats.dev !== stats.dev ||
-              shadowRootStats.ino !== stats.ino ||
-              shadowRootStats.mtimeMs !== stats.mtimeMs
+              shadowRootStats.dev !== stats.dev
+              || shadowRootStats.ino !== stats.ino
+              || shadowRootStats.mtimeMs !== stats.mtimeMs
             ) {
               break;
             }
@@ -477,7 +476,7 @@ namespace fakes {
 
   export type ExpectedDiagnosticMessage = [
     ts.DiagnosticMessage,
-    ...(string | number)[]
+    ...(string | number)[],
   ];
   export interface ExpectedDiagnosticMessageChain {
     message: ExpectedDiagnosticMessage;
@@ -489,8 +488,7 @@ namespace fakes {
     start: number;
     length: number;
   }
-  export interface ExpectedDiagnosticRelatedInformation
-    extends ExpectedDiagnosticMessageChain {
+  export interface ExpectedDiagnosticRelatedInformation extends ExpectedDiagnosticMessageChain {
     location?: ExpectedDiagnosticLocation;
   }
 
@@ -498,8 +496,7 @@ namespace fakes {
     Error = "Error",
     Status = "Status",
   }
-  export interface ExpectedErrorDiagnostic
-    extends ExpectedDiagnosticRelatedInformation {
+  export interface ExpectedErrorDiagnostic extends ExpectedDiagnosticRelatedInformation {
     relatedInformation?: ExpectedDiagnosticRelatedInformation[];
   }
 
@@ -535,13 +532,13 @@ ${indentText}${text}`;
 
   function expectedDiagnosticMessageChainToText(
     { message, next }: ExpectedDiagnosticMessageChain,
-    indent = 0
+    indent = 0,
   ) {
     let text = indentedText(indent, expectedDiagnosticMessageToText(message));
     if (next) {
       indent++;
       next.forEach(
-        (kid) => (text += expectedDiagnosticMessageChainToText(kid, indent))
+        (kid) => (text += expectedDiagnosticMessageChainToText(kid, indent)),
       );
     }
     return text;
@@ -563,11 +560,11 @@ ${indentText}${text}`;
     relatedInformation,
     ...diagnosticRelatedInformation
   }: ExpectedErrorDiagnostic) {
-    let text = `${
-      DiagnosticKind.Error
-    }!: ${expectedDiagnosticRelatedInformationToText(
-      diagnosticRelatedInformation
-    )}`;
+    let text = `${DiagnosticKind.Error}!: ${
+      expectedDiagnosticRelatedInformationToText(
+        diagnosticRelatedInformation,
+      )
+    }`;
     if (relatedInformation) {
       for (const kid of relatedInformation) {
         text += `
@@ -579,21 +576,23 @@ ${indentText}${text}`;
 
   function expectedDiagnosticToText(errorOrStatus: ExpectedDiagnostic) {
     return ts.isArray(errorOrStatus)
-      ? `${DiagnosticKind.Status}!: ${expectedDiagnosticMessageToText(
-          errorOrStatus
-        )}`
+      ? `${DiagnosticKind.Status}!: ${
+        expectedDiagnosticMessageToText(
+          errorOrStatus,
+        )
+      }`
       : expectedErrorDiagnosticToText(errorOrStatus);
   }
 
   function diagnosticMessageChainToText(
     { messageText, next }: ts.DiagnosticMessageChain,
-    indent = 0
+    indent = 0,
   ) {
     let text = indentedText(indent, messageText);
     if (next) {
       indent++;
       next.forEach(
-        (kid) => (text += diagnosticMessageChainToText(kid, indent))
+        (kid) => (text += diagnosticMessageChainToText(kid, indent)),
       );
     }
     return text;
@@ -605,10 +604,9 @@ ${indentText}${text}`;
     length,
     messageText,
   }: ts.DiagnosticRelatedInformation) {
-    const text =
-      typeof messageText === "string"
-        ? messageText
-        : diagnosticMessageChainToText(messageText);
+    const text = typeof messageText === "string"
+      ? messageText
+      : diagnosticMessageChainToText(messageText);
     return file ? `${file.fileName}(${start}:${length}):: ${text}` : text;
   }
 
@@ -616,9 +614,11 @@ ${indentText}${text}`;
     kind,
     diagnostic: { relatedInformation, ...diagnosticRelatedInformation },
   }: SolutionBuilderDiagnostic) {
-    let text = `${kind}!: ${diagnosticRelatedInformationToText(
-      diagnosticRelatedInformation
-    )}`;
+    let text = `${kind}!: ${
+      diagnosticRelatedInformationToText(
+        diagnosticRelatedInformation,
+      )
+    }`;
     if (relatedInformation) {
       for (const kid of relatedInformation) {
         text += `
@@ -641,64 +641,60 @@ ${indentText}${text}`;
       return ts.getBuildInfoText(buildInfo);
     };
     const originalWrite = sys.write;
-    sys.write = (msg) =>
-      originalWrite.call(sys, msg.replace(ts.version, version));
+    sys.write = (msg) => originalWrite.call(sys, msg.replace(ts.version, version));
 
     if (sys.writeFile) {
       const originalWriteFile = sys.writeFile;
       sys.writeFile = (
         fileName: string,
         content: string,
-        writeByteOrderMark: boolean
+        writeByteOrderMark: boolean,
       ) => {
-        if (!ts.isBuildInfoFile(fileName))
+        if (!ts.isBuildInfoFile(fileName)) {
           return originalWriteFile.call(
             sys,
             fileName,
             content,
-            writeByteOrderMark
+            writeByteOrderMark,
           );
+        }
         const buildInfo = ts.getBuildInfo(content);
         buildInfo.version = version;
         originalWriteFile.call(
           sys,
           fileName,
           ts.getBuildInfoText(buildInfo),
-          writeByteOrderMark
+          writeByteOrderMark,
         );
       };
     }
     return sys;
   }
 
-  export class SolutionBuilderHost
-    extends CompilerHost
-    implements ts.SolutionBuilderHost<ts.BuilderProgram>
-  {
+  export class SolutionBuilderHost extends CompilerHost implements ts.SolutionBuilderHost<ts.BuilderProgram> {
     createProgram: ts.CreateProgram<ts.BuilderProgram>;
 
     private constructor(
       sys: System | vfs.FileSystem,
       options?: ts.CompilerOptions,
       setParentNodes?: boolean,
-      createProgram?: ts.CreateProgram<ts.BuilderProgram>
+      createProgram?: ts.CreateProgram<ts.BuilderProgram>,
     ) {
       super(sys, options, setParentNodes);
-      this.createProgram =
-        createProgram || ts.createEmitAndSemanticDiagnosticsBuilderProgram;
+      this.createProgram = createProgram || ts.createEmitAndSemanticDiagnosticsBuilderProgram;
     }
 
     static create(
       sys: System | vfs.FileSystem,
       options?: ts.CompilerOptions,
       setParentNodes?: boolean,
-      createProgram?: ts.CreateProgram<ts.BuilderProgram>
+      createProgram?: ts.CreateProgram<ts.BuilderProgram>,
     ) {
       const host = new SolutionBuilderHost(
         sys,
         options,
         setParentNodes,
-        createProgram
+        createProgram,
       );
       patchHostForBuildInfoReadWrite(host.sys);
       return host;
@@ -730,7 +726,7 @@ ${indentText}${text}`;
         expected,
         `Diagnostic arrays did not match:
 Actual: ${JSON.stringify(actual, /*replacer*/ undefined, " ")}
-Expected: ${JSON.stringify(expected, /*replacer*/ undefined, " ")}`
+Expected: ${JSON.stringify(expected, /*replacer*/ undefined, " ")}`,
       );
     }
 
@@ -745,11 +741,13 @@ Expected: ${JSON.stringify(expected, /*replacer*/ undefined, " ")}`
         `Diagnostics arrays did not match:
 Actual: ${JSON.stringify(actual, /*replacer*/ undefined, " ")}
 Expected: ${JSON.stringify(expected, /*replacer*/ undefined, " ")}
-Actual All:: ${JSON.stringify(
-          this.diagnostics.slice().map(diagnosticToText),
-          /*replacer*/ undefined,
-          " "
-        )}`
+Actual All:: ${
+          JSON.stringify(
+            this.diagnostics.slice().map(diagnosticToText),
+            /*replacer*/ undefined,
+            " ",
+          )
+        }`,
       );
     }
 

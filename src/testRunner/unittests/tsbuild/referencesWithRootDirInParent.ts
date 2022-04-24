@@ -3,7 +3,7 @@ namespace ts {
     let projFs: vfs.FileSystem;
     before(() => {
       projFs = loadProjectFromDisk(
-        "tests/projects/projectReferenceWithRootDirInParent"
+        "tests/projects/projectReferenceWithRootDirInParent",
       );
     });
 
@@ -20,12 +20,10 @@ namespace ts {
 
     verifyTsc({
       scenario: "projectReferenceWithRootDirInParent",
-      subScenario:
-        "reports error for same tsbuildinfo file because no rootDir in the base",
+      subScenario: "reports error for same tsbuildinfo file because no rootDir in the base",
       fs: () => projFs,
       commandLineArgs: ["--b", "/src/src/main", "--verbose"],
-      modifyFs: (fs) =>
-        replaceText(fs, "/src/tsconfig.base.json", `"rootDir": "./src/",`, ""),
+      modifyFs: (fs) => replaceText(fs, "/src/tsconfig.base.json", `"rootDir": "./src/",`, ""),
     });
 
     verifyTsc({
@@ -39,13 +37,13 @@ namespace ts {
           JSON.stringify({
             compilerOptions: { composite: true, outDir: "../../dist/" },
             references: [{ path: "../other" }],
-          })
+          }),
         );
         fs.writeFileSync(
           "/src/src/other/tsconfig.json",
           JSON.stringify({
             compilerOptions: { composite: true, outDir: "../../dist/" },
-          })
+          }),
         );
       },
     });
@@ -58,24 +56,24 @@ namespace ts {
       modifyFs: (fs) => {
         fs.renameSync(
           "/src/src/main/tsconfig.json",
-          "/src/src/main/tsconfig.main.json"
+          "/src/src/main/tsconfig.main.json",
         );
         fs.renameSync(
           "/src/src/other/tsconfig.json",
-          "/src/src/other/tsconfig.other.json"
+          "/src/src/other/tsconfig.other.json",
         );
         fs.writeFileSync(
           "/src/src/main/tsconfig.main.json",
           JSON.stringify({
             compilerOptions: { composite: true, outDir: "../../dist/" },
             references: [{ path: "../other/tsconfig.other.json" }],
-          })
+          }),
         );
         fs.writeFileSync(
           "/src/src/other/tsconfig.other.json",
           JSON.stringify({
             compilerOptions: { composite: true, outDir: "../../dist/" },
-          })
+          }),
         );
       },
     });

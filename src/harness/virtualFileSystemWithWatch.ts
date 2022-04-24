@@ -43,19 +43,19 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
   export function createWatchedSystem(
     fileOrFolderList: readonly FileOrFolderOrSymLink[],
-    params?: TestServerHostCreationParameters
+    params?: TestServerHostCreationParameters,
   ): TestServerHost {
     return new TestServerHost(/*withSafelist*/ false, fileOrFolderList, params);
   }
 
   export function createServerHost(
     fileOrFolderList: readonly FileOrFolderOrSymLink[],
-    params?: TestServerHostCreationParameters
+    params?: TestServerHostCreationParameters,
   ): TestServerHost {
     const host = new TestServerHost(
       /*withSafelist*/ true,
       fileOrFolderList,
-      params
+      params,
     );
     // Just like sys, patch the host to use writeFile
     patchWriteFileEnsuringDirectory(host);
@@ -81,13 +81,13 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
   export type FileOrFolderOrSymLink = File | Folder | SymLink;
   export function isFile(
-    fileOrFolderOrSymLink: FileOrFolderOrSymLink
+    fileOrFolderOrSymLink: FileOrFolderOrSymLink,
   ): fileOrFolderOrSymLink is File {
     return isString((fileOrFolderOrSymLink as File).content);
   }
 
   export function isSymLink(
-    fileOrFolderOrSymLink: FileOrFolderOrSymLink
+    fileOrFolderOrSymLink: FileOrFolderOrSymLink,
   ): fileOrFolderOrSymLink is SymLink {
     return isString((fileOrFolderOrSymLink as SymLink).symLink);
   }
@@ -127,7 +127,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
   function invokeWatcherCallbacks<T>(
     callbacks: readonly T[] | undefined,
-    invokeCallback: (cb: T) => void
+    invokeCallback: (cb: T) => void,
   ): void {
     if (callbacks) {
       // The array copy is made to ensure that even if one of the callback removes the callbacks,
@@ -142,7 +142,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
   function createWatcher<T>(
     map: MultiMap<Path, T>,
     path: Path,
-    callback: T
+    callback: T,
   ): FileWatcher {
     map.add(path, callback);
     return { close: () => map.remove(path, callback) };
@@ -150,7 +150,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
   export function getDiffInKeys<T>(
     map: ESMap<string, T>,
-    expectedKeys: readonly string[]
+    expectedKeys: readonly string[],
   ) {
     if (map.size === expectedKeys.length) {
       return "";
@@ -181,61 +181,63 @@ interface Array<T> { length: number; [n: number]: T; }`,
   export function verifyMapSize(
     caption: string,
     map: ESMap<string, any>,
-    expectedKeys: readonly string[]
+    expectedKeys: readonly string[],
   ) {
     assert.equal(
       map.size,
       expectedKeys.length,
-      `${caption}: incorrect size of map: Actual keys: ${arrayFrom(
-        map.keys()
-      )} Expected: ${expectedKeys}${getDiffInKeys(map, expectedKeys)}`
+      `${caption}: incorrect size of map: Actual keys: ${
+        arrayFrom(
+          map.keys(),
+        )
+      } Expected: ${expectedKeys}${getDiffInKeys(map, expectedKeys)}`,
     );
   }
 
   export type MapValueTester<T, U> = [
     ESMap<string, U[]> | undefined,
-    (value: T) => U
+    (value: T) => U,
   ];
 
   export function checkMap<T, U = undefined>(
     caption: string,
     actual: MultiMap<string, T>,
     expectedKeys: ReadonlyESMap<string, number>,
-    valueTester?: MapValueTester<T, U>
+    valueTester?: MapValueTester<T, U>,
   ): void;
   export function checkMap<T, U = undefined>(
     caption: string,
     actual: MultiMap<string, T>,
     expectedKeys: readonly string[],
     eachKeyCount: number,
-    valueTester?: MapValueTester<T, U>
+    valueTester?: MapValueTester<T, U>,
   ): void;
   export function checkMap<T>(
     caption: string,
     actual: ESMap<string, T> | MultiMap<string, T>,
     expectedKeys: readonly string[],
-    eachKeyCount: undefined
+    eachKeyCount: undefined,
   ): void;
   export function checkMap<T, U = undefined>(
     caption: string,
     actual: ESMap<string, T> | MultiMap<string, T>,
     expectedKeysMapOrArray: ReadonlyESMap<string, number> | readonly string[],
     eachKeyCountOrValueTester?: number | MapValueTester<T, U>,
-    valueTester?: MapValueTester<T, U>
+    valueTester?: MapValueTester<T, U>,
   ) {
     const expectedKeys = isArray(expectedKeysMapOrArray)
       ? arrayToMap(
-          expectedKeysMapOrArray,
-          (s) => s,
-          () => eachKeyCountOrValueTester as number
-        )
+        expectedKeysMapOrArray,
+        (s) => s,
+        () => eachKeyCountOrValueTester as number,
+      )
       : expectedKeysMapOrArray;
     verifyMapSize(
       caption,
       actual,
       isArray(expectedKeysMapOrArray)
         ? expectedKeysMapOrArray
-        : arrayFrom(expectedKeys.keys())
+        : arrayFrom(expectedKeys.keys()),
     );
     if (!isNumber(eachKeyCountOrValueTester)) {
       valueTester = eachKeyCountOrValueTester;
@@ -247,27 +249,31 @@ interface Array<T> { length: number; [n: number]: T; }`,
     expectedKeys.forEach((count, name) => {
       assert.isTrue(
         actual.has(name),
-        `${caption}: expected to contain ${name}, actual keys: ${arrayFrom(
-          actual.keys()
-        )}`
+        `${caption}: expected to contain ${name}, actual keys: ${
+          arrayFrom(
+            actual.keys(),
+          )
+        }`,
       );
       // Check key information only if eachKeyCount is provided
       if (
-        !isArray(expectedKeysMapOrArray) ||
-        eachKeyCountOrValueTester !== undefined
+        !isArray(expectedKeysMapOrArray)
+        || eachKeyCountOrValueTester !== undefined
       ) {
         assert.equal(
           (actual as MultiMap<string, T>).get(name)!.length,
           count,
-          `${caption}: Expected to be have ${count} entries for ${name}. Actual entry: ${JSON.stringify(
-            actual.get(name)
-          )}`
+          `${caption}: Expected to be have ${count} entries for ${name}. Actual entry: ${
+            JSON.stringify(
+              actual.get(name),
+            )
+          }`,
         );
         if (expectedValues) {
           assert.deepEqual(
             (actual as MultiMap<string, T>).get(name)!.map(valueMapper),
             expectedValues.get(name),
-            `${caption}:: expected values mismatch for ${name}`
+            `${caption}:: expected values mismatch for ${name}`,
           );
         }
       }
@@ -277,26 +283,26 @@ interface Array<T> { length: number; [n: number]: T; }`,
   export function checkArray(
     caption: string,
     actual: readonly string[],
-    expected: readonly string[]
+    expected: readonly string[],
   ) {
     checkMap(
       caption,
       arrayToMap(actual, identity),
       expected,
-      /*eachKeyCount*/ undefined
+      /*eachKeyCount*/ undefined,
     );
   }
 
   export function checkWatchedFiles(
     host: TestServerHost,
     expectedFiles: readonly string[],
-    additionalInfo?: string
+    additionalInfo?: string,
   ) {
     checkMap(
       `watchedFiles:: ${additionalInfo || ""}::`,
       host.watchedFiles,
       expectedFiles,
-      /*eachKeyCount*/ undefined
+      /*eachKeyCount*/ undefined,
     );
   }
 
@@ -307,13 +313,13 @@ interface Array<T> { length: number; [n: number]: T; }`,
   export function checkWatchedFilesDetailed(
     host: TestServerHost,
     expectedFiles: ReadonlyESMap<string, number>,
-    expectedDetails?: ESMap<string, WatchFileDetails[]>
+    expectedDetails?: ESMap<string, WatchFileDetails[]>,
   ): void;
   export function checkWatchedFilesDetailed(
     host: TestServerHost,
     expectedFiles: readonly string[],
     eachFileWatchCount: number,
-    expectedDetails?: ESMap<string, WatchFileDetails[]>
+    expectedDetails?: ESMap<string, WatchFileDetails[]>,
   ): void;
   export function checkWatchedFilesDetailed(
     host: TestServerHost,
@@ -321,10 +327,11 @@ interface Array<T> { length: number; [n: number]: T; }`,
     eachFileWatchCountOrExpectedDetails?:
       | number
       | ESMap<string, WatchFileDetails[]>,
-    expectedDetails?: ESMap<string, WatchFileDetails[]>
+    expectedDetails?: ESMap<string, WatchFileDetails[]>,
   ) {
-    if (!isNumber(eachFileWatchCountOrExpectedDetails))
+    if (!isNumber(eachFileWatchCountOrExpectedDetails)) {
       expectedDetails = eachFileWatchCountOrExpectedDetails;
+    }
     if (isArray(expectedFiles)) {
       checkMap(
         "watchedFiles",
@@ -334,7 +341,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         [
           expectedDetails,
           ({ fileName, pollingInterval }) => ({ fileName, pollingInterval }),
-        ]
+        ],
       );
     } else {
       checkMap("watchedFiles", host.watchedFiles, expectedFiles, [
@@ -347,13 +354,13 @@ interface Array<T> { length: number; [n: number]: T; }`,
   export function checkWatchedDirectories(
     host: TestServerHost,
     expectedDirectories: string[],
-    recursive: boolean
+    recursive: boolean,
   ) {
     checkMap(
       `watchedDirectories${recursive ? " recursive" : ""}`,
       recursive ? host.fsWatchesRecursive : host.fsWatches,
       expectedDirectories,
-      /*eachKeyCount*/ undefined
+      /*eachKeyCount*/ undefined,
     );
   }
 
@@ -366,14 +373,14 @@ interface Array<T> { length: number; [n: number]: T; }`,
     host: TestServerHost,
     expectedDirectories: ReadonlyESMap<string, number>,
     recursive: boolean,
-    expectedDetails?: ESMap<string, WatchDirectoryDetails[]>
+    expectedDetails?: ESMap<string, WatchDirectoryDetails[]>,
   ): void;
   export function checkWatchedDirectoriesDetailed(
     host: TestServerHost,
     expectedDirectories: readonly string[],
     eachDirectoryWatchCount: number,
     recursive: boolean,
-    expectedDetails?: ESMap<string, WatchDirectoryDetails[]>
+    expectedDetails?: ESMap<string, WatchDirectoryDetails[]>,
   ): void;
   export function checkWatchedDirectoriesDetailed(
     host: TestServerHost,
@@ -382,10 +389,11 @@ interface Array<T> { length: number; [n: number]: T; }`,
     recursiveOrExpectedDetails?:
       | boolean
       | ESMap<string, WatchDirectoryDetails[]>,
-    expectedDetails?: ESMap<string, WatchDirectoryDetails[]>
+    expectedDetails?: ESMap<string, WatchDirectoryDetails[]>,
   ) {
-    if (typeof recursiveOrExpectedDetails !== "boolean")
+    if (typeof recursiveOrExpectedDetails !== "boolean") {
       expectedDetails = recursiveOrExpectedDetails;
+    }
     if (isArray(expectedDirectories)) {
       checkMap(
         `fsWatches${recursiveOrExpectedDetails ? " recursive" : ""}`,
@@ -401,11 +409,10 @@ interface Array<T> { length: number; [n: number]: T; }`,
             fallbackPollingInterval,
             fallbackOptions,
           }),
-        ]
+        ],
       );
     } else {
-      recursiveOrExpectedDetails =
-        recursiveOrEachDirectoryWatchCount as boolean;
+      recursiveOrExpectedDetails = recursiveOrEachDirectoryWatchCount as boolean;
       checkMap(
         `fsWatches${recursiveOrExpectedDetails ? " recursive" : ""}`,
         recursiveOrExpectedDetails ? host.fsWatchesRecursive : host.fsWatches,
@@ -417,21 +424,21 @@ interface Array<T> { length: number; [n: number]: T; }`,
             fallbackPollingInterval,
             fallbackOptions,
           }),
-        ]
+        ],
       );
     }
   }
 
   export function checkOutputContains(
     host: TestServerHost,
-    expected: readonly string[]
+    expected: readonly string[],
   ) {
     const mapExpected = new Set(expected);
     const mapSeen = new Set<string>();
     for (const f of host.getOutput()) {
       assert.isFalse(
         mapSeen.has(f),
-        `Already found ${f} in ${JSON.stringify(host.getOutput())}`
+        `Already found ${f} in ${JSON.stringify(host.getOutput())}`,
       );
       if (mapExpected.has(f)) {
         mapExpected.delete(f);
@@ -441,21 +448,23 @@ interface Array<T> { length: number; [n: number]: T; }`,
     assert.equal(
       mapExpected.size,
       0,
-      `Output has missing ${JSON.stringify(
-        arrayFrom(mapExpected.keys())
-      )} in ${JSON.stringify(host.getOutput())}`
+      `Output has missing ${
+        JSON.stringify(
+          arrayFrom(mapExpected.keys()),
+        )
+      } in ${JSON.stringify(host.getOutput())}`,
     );
   }
 
   export function checkOutputDoesNotContain(
     host: TestServerHost,
-    expectedToBeAbsent: string[] | readonly string[]
+    expectedToBeAbsent: string[] | readonly string[],
   ) {
     const mapExpectedToBeAbsent = new Set(expectedToBeAbsent);
     for (const f of host.getOutput()) {
       assert.isFalse(
         mapExpectedToBeAbsent.has(f),
-        `Contains ${f} in ${JSON.stringify(host.getOutput())}`
+        `Contains ${f} in ${JSON.stringify(host.getOutput())}`,
       );
     }
   }
@@ -552,9 +561,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     environmentVariables?: ESMap<string, string>;
   }
 
-  export class TestServerHost
-    implements server.ServerHost, FormatDiagnosticsHost, ModuleResolutionHost
-  {
+  export class TestServerHost implements server.ServerHost, FormatDiagnosticsHost, ModuleResolutionHost {
     args: string[] = [];
 
     private readonly output: string[] = [];
@@ -595,7 +602,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         environmentVariables,
         runWithoutRecursiveWatches,
         runWithFallbackPolling,
-      }: TestServerHostCreationParameters = {}
+      }: TestServerHostCreationParameters = {},
     ) {
       this.useCaseSensitiveFileNames = !!useCaseSensitiveFileNames;
       this.newLine = newLine || "\n";
@@ -603,32 +610,28 @@ interface Array<T> { length: number; [n: number]: T; }`,
       this.environmentVariables = environmentVariables;
       currentDirectory = currentDirectory || "/";
       this.getCanonicalFileName = createGetCanonicalFileName(
-        !!useCaseSensitiveFileNames
+        !!useCaseSensitiveFileNames,
       );
-      this.toPath = (s) =>
-        toPath(s, currentDirectory, this.getCanonicalFileName);
+      this.toPath = (s) => toPath(s, currentDirectory, this.getCanonicalFileName);
       this.executingFilePath = this.getHostSpecificPath(
-        executingFilePath || getExecutingFilePathFromLibFile()
+        executingFilePath || getExecutingFilePathFromLibFile(),
       );
       this.currentDirectory = this.getHostSpecificPath(currentDirectory);
       this.runWithFallbackPolling = !!runWithFallbackPolling;
-      const tscWatchFile =
-        this.environmentVariables &&
-        this.environmentVariables.get("TSC_WATCHFILE");
-      const tscWatchDirectory =
-        this.environmentVariables &&
-        this.environmentVariables.get("TSC_WATCHDIRECTORY");
+      const tscWatchFile = this.environmentVariables
+        && this.environmentVariables.get("TSC_WATCHFILE");
+      const tscWatchDirectory = this.environmentVariables
+        && this.environmentVariables.get("TSC_WATCHDIRECTORY");
       const { watchFile, watchDirectory } = createSystemWatchFunctions({
         // We dont have polling watch file
         // it is essentially fsWatch but lets get that separate from fsWatch and
         // into watchedFiles for easier testing
-        pollingWatchFile:
-          tscWatchFile === Tsc_WatchFile.SingleFileWatcherPerName
-            ? createSingleFileWatcherPerName(
-                this.watchFileWorker.bind(this),
-                this.useCaseSensitiveFileNames
-              )
-            : this.watchFileWorker.bind(this),
+        pollingWatchFile: tscWatchFile === Tsc_WatchFile.SingleFileWatcherPerName
+          ? createSingleFileWatcherPerName(
+            this.watchFileWorker.bind(this),
+            this.useCaseSensitiveFileNames,
+          )
+          : this.watchFileWorker.bind(this),
         getModifiedTime: this.getModifiedTime.bind(this),
         setTimeout: this.setTimeout.bind(this),
         clearTimeout: this.clearTimeout.bind(this),
@@ -640,8 +643,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
           ? false
           : !runWithoutRecursiveWatches,
         directoryExists: this.directoryExists.bind(this),
-        getAccessibleSortedChildDirectories: (path) =>
-          this.getDirectories(path),
+        getAccessibleSortedChildDirectories: (path) => this.getDirectories(path),
         realpath: this.realpath.bind(this),
         tscWatchFile,
         tscWatchDirectory,
@@ -683,20 +685,20 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
     private reloadFS(
       fileOrFolderOrSymLinkList: readonly FileOrFolderOrSymLink[],
-      options?: Partial<ReloadWatchInvokeOptions>
+      options?: Partial<ReloadWatchInvokeOptions>,
     ) {
       Debug.assert(this.fs.size === 0);
       fileOrFolderOrSymLinkList = fileOrFolderOrSymLinkList.concat(
-        this.withSafeList ? safeList : []
+        this.withSafeList ? safeList : [],
       );
       const filesOrFoldersToLoad: readonly FileOrFolderOrSymLink[] = !this
-        .windowsStyleRoot
+          .windowsStyleRoot
         ? fileOrFolderOrSymLinkList
         : fileOrFolderOrSymLinkList.map<FileOrFolderOrSymLink>((f) => {
-            const result = clone(f);
-            result.path = this.getHostSpecificPath(f.path);
-            return result;
-          });
+          const result = clone(f);
+          result.path = this.getHostSpecificPath(f.path);
+          return result;
+        });
       for (const fileOrDirectory of filesOrFoldersToLoad) {
         const path = this.toFullPath(fileOrDirectory.path);
         // If its a change
@@ -709,7 +711,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
                 this.modifyFile(
                   fileOrDirectory.path,
                   fileOrDirectory.content,
-                  options
+                  options,
                 );
               }
             } else {
@@ -730,7 +732,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         } else {
           this.ensureFileOrFolder(
             fileOrDirectory,
-            options && options.ignoreWatchInvokedWithTriggerAsFileCreate
+            options && options.ignoreWatchInvokedWithTriggerAsFileCreate,
           );
         }
       }
@@ -739,7 +741,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     modifyFile(
       filePath: string,
       content: string,
-      options?: Partial<ReloadWatchInvokeOptions>
+      options?: Partial<ReloadWatchInvokeOptions>,
     ) {
       const path = this.toFullPath(filePath);
       const currentEntry = this.fs.get(path);
@@ -753,29 +755,28 @@ interface Array<T> { length: number; [n: number]: T; }`,
       } else {
         currentEntry.content = content;
         currentEntry.modifiedTime = this.now();
-        this.fs.get(getDirectoryPath(currentEntry.path))!.modifiedTime =
-          this.now();
+        this.fs.get(getDirectoryPath(currentEntry.path))!.modifiedTime = this.now();
         if (options && options.invokeDirectoryWatcherInsteadOfFileChanged) {
           const directoryFullPath = getDirectoryPath(currentEntry.fullPath);
           this.invokeFileWatcher(
             directoryFullPath,
             FileWatcherEventKind.Changed,
-            /*useFileNameInCallback*/ true
+            /*useFileNameInCallback*/ true,
           );
           this.invokeFsWatchesCallbacks(
             directoryFullPath,
             "rename",
-            currentEntry.fullPath
+            currentEntry.fullPath,
           );
           this.invokeRecursiveFsWatches(
             directoryFullPath,
             "rename",
-            currentEntry.fullPath
+            currentEntry.fullPath,
           );
         } else {
           this.invokeFileAndFsWatches(
             currentEntry.fullPath,
-            FileWatcherEventKind.Changed
+            FileWatcherEventKind.Changed,
           );
         }
       }
@@ -784,7 +785,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     renameFile(fileName: string, newFileName: string) {
       const fullPath = getNormalizedAbsolutePath(
         fileName,
-        this.currentDirectory
+        this.currentDirectory,
       );
       const path = this.toPath(fullPath);
       const file = this.fs.get(path) as FsFile;
@@ -796,7 +797,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
       // Add updated folder with new folder name
       const newFullPath = getNormalizedAbsolutePath(
         newFileName,
-        this.currentDirectory
+        this.currentDirectory,
       );
       const newFile = this.toFsFile({
         path: newFullPath,
@@ -813,7 +814,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     renameFolder(folderName: string, newFolderName: string) {
       const fullPath = getNormalizedAbsolutePath(
         folderName,
-        this.currentDirectory
+        this.currentDirectory,
       );
       const path = this.toPath(fullPath);
       const folder = this.fs.get(path) as FsFolder;
@@ -825,7 +826,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
       // Add updated folder with new folder name
       const newFullPath = getNormalizedAbsolutePath(
         newFolderName,
-        this.currentDirectory
+        this.currentDirectory,
       );
       const newFolder = this.toFsFolder(newFullPath);
       const newPath = newFolder.path;
@@ -844,12 +845,12 @@ interface Array<T> { length: number; [n: number]: T; }`,
         this.fs.delete(entry.path);
         this.invokeFileAndFsWatches(
           entry.fullPath,
-          FileWatcherEventKind.Deleted
+          FileWatcherEventKind.Deleted,
         );
 
         entry.fullPath = combinePaths(
           newFolder.fullPath,
-          getBaseFileName(entry.fullPath)
+          getBaseFileName(entry.fullPath),
         );
         entry.path = this.toPath(entry.fullPath);
         if (newFolder !== oldFolder) {
@@ -858,7 +859,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         this.fs.set(entry.path, entry);
         this.invokeFileAndFsWatches(
           entry.fullPath,
-          FileWatcherEventKind.Created
+          FileWatcherEventKind.Created,
         );
         if (isFsFolder(entry)) {
           this.renameFolderEntries(entry, entry);
@@ -869,7 +870,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     ensureFileOrFolder(
       fileOrDirectoryOrSymLink: FileOrFolderOrSymLink,
       ignoreWatchInvokedWithTriggerAsFileCreate?: boolean,
-      ignoreParentWatch?: boolean
+      ignoreParentWatch?: boolean,
     ) {
       if (isFile(fileOrDirectoryOrSymLink)) {
         const file = this.toFsFile(fileOrDirectoryOrSymLink);
@@ -877,12 +878,12 @@ interface Array<T> { length: number; [n: number]: T; }`,
         if (!this.fs.get(file.path)) {
           const baseFolder = this.ensureFolder(
             getDirectoryPath(file.fullPath),
-            ignoreParentWatch
+            ignoreParentWatch,
           );
           this.addFileOrFolderInFolder(
             baseFolder,
             file,
-            ignoreWatchInvokedWithTriggerAsFileCreate
+            ignoreWatchInvokedWithTriggerAsFileCreate,
           );
         }
       } else if (isSymLink(fileOrDirectoryOrSymLink)) {
@@ -890,17 +891,17 @@ interface Array<T> { length: number; [n: number]: T; }`,
         Debug.assert(!this.fs.get(symLink.path));
         const baseFolder = this.ensureFolder(
           getDirectoryPath(symLink.fullPath),
-          ignoreParentWatch
+          ignoreParentWatch,
         );
         this.addFileOrFolderInFolder(
           baseFolder,
           symLink,
-          ignoreWatchInvokedWithTriggerAsFileCreate
+          ignoreWatchInvokedWithTriggerAsFileCreate,
         );
       } else {
         const fullPath = getNormalizedAbsolutePath(
           fileOrDirectoryOrSymLink.path,
-          this.currentDirectory
+          this.currentDirectory,
         );
         this.ensureFolder(getDirectoryPath(fullPath), ignoreParentWatch);
         this.ensureFolder(fullPath, ignoreWatchInvokedWithTriggerAsFileCreate);
@@ -909,7 +910,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
     private ensureFolder(
       fullPath: string,
-      ignoreWatch: boolean | undefined
+      ignoreWatch: boolean | undefined,
     ): FsFolder {
       const path = this.toPath(fullPath);
       let folder = this.fs.get(path) as FsFolder;
@@ -933,15 +934,14 @@ interface Array<T> { length: number; [n: number]: T; }`,
     private addFileOrFolderInFolder(
       folder: FsFolder,
       fileOrDirectory: FsFile | FsFolder | FsSymLink,
-      ignoreWatch?: boolean
+      ignoreWatch?: boolean,
     ) {
       if (!this.fs.has(fileOrDirectory.path)) {
         insertSorted(folder.entries, fileOrDirectory, (a, b) =>
           compareStringsCaseSensitive(
             getBaseFileName(a.path),
-            getBaseFileName(b.path)
-          )
-        );
+            getBaseFileName(b.path),
+          ));
       }
       folder.modifiedTime = this.now();
       this.fs.set(fileOrDirectory.path, fileOrDirectory);
@@ -951,18 +951,18 @@ interface Array<T> { length: number; [n: number]: T; }`,
       }
       this.invokeFileAndFsWatches(
         fileOrDirectory.fullPath,
-        FileWatcherEventKind.Created
+        FileWatcherEventKind.Created,
       );
       this.invokeFileAndFsWatches(
         folder.fullPath,
-        FileWatcherEventKind.Changed
+        FileWatcherEventKind.Changed,
       );
     }
 
     private removeFileOrFolder(
       fileOrDirectory: FsFile | FsFolder | FsSymLink,
       isRemovableLeafFolder: (folder: FsFolder) => boolean,
-      isRenaming = false
+      isRenaming = false,
     ) {
       const basePath = getDirectoryPath(fileOrDirectory.path);
       const baseFolder = this.fs.get(basePath) as FsFolder;
@@ -978,16 +978,16 @@ interface Array<T> { length: number; [n: number]: T; }`,
       }
       this.invokeFileAndFsWatches(
         fileOrDirectory.fullPath,
-        FileWatcherEventKind.Deleted
+        FileWatcherEventKind.Deleted,
       );
       this.invokeFileAndFsWatches(
         baseFolder.fullPath,
-        FileWatcherEventKind.Changed
+        FileWatcherEventKind.Changed,
       );
       if (
-        basePath !== fileOrDirectory.path &&
-        baseFolder.entries.length === 0 &&
-        isRemovableLeafFolder(baseFolder)
+        basePath !== fileOrDirectory.path
+        && baseFolder.entries.length === 0
+        && isRemovableLeafFolder(baseFolder)
       ) {
         this.removeFileOrFolder(baseFolder, isRemovableLeafFolder);
       }
@@ -1020,7 +1020,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     private watchFileWorker(
       fileName: string,
       cb: FileWatcherCallback,
-      pollingInterval: PollingInterval
+      pollingInterval: PollingInterval,
     ) {
       return createWatcher(this.watchedFiles, this.toFullPath(fileName), {
         fileName,
@@ -1035,36 +1035,35 @@ interface Array<T> { length: number; [n: number]: T; }`,
       cb: FsWatchCallback,
       recursive: boolean,
       fallbackPollingInterval: PollingInterval,
-      fallbackOptions: WatchOptions | undefined
+      fallbackOptions: WatchOptions | undefined,
     ): FileWatcher {
       return this.runWithFallbackPolling
         ? this.watchFile(
-            fileOrDirectory,
-            createFileWatcherCallback(cb),
-            fallbackPollingInterval,
-            fallbackOptions
-          )
+          fileOrDirectory,
+          createFileWatcherCallback(cb),
+          fallbackPollingInterval,
+          fallbackOptions,
+        )
         : createWatcher(
-            recursive ? this.fsWatchesRecursive : this.fsWatches,
-            this.toFullPath(fileOrDirectory),
-            {
-              directoryName: fileOrDirectory,
-              cb,
-              fallbackPollingInterval,
-              fallbackOptions,
-            }
-          );
+          recursive ? this.fsWatchesRecursive : this.fsWatches,
+          this.toFullPath(fileOrDirectory),
+          {
+            directoryName: fileOrDirectory,
+            cb,
+            fallbackPollingInterval,
+            fallbackOptions,
+          },
+        );
     }
 
     invokeFileWatcher(
       fileFullPath: string,
       eventKind: FileWatcherEventKind,
-      useFileNameInCallback?: boolean
+      useFileNameInCallback?: boolean,
     ) {
       invokeWatcherCallbacks(
         this.watchedFiles.get(this.toPath(fileFullPath)),
-        ({ cb, fileName }) =>
-          cb(useFileNameInCallback ? fileName : fileFullPath, eventKind)
+        ({ cb, fileName }) => cb(useFileNameInCallback ? fileName : fileFullPath, eventKind),
       );
     }
 
@@ -1072,22 +1071,21 @@ interface Array<T> { length: number; [n: number]: T; }`,
       map: MultiMap<Path, TestFsWatcher>,
       fullPath: string,
       eventName: "rename" | "change",
-      entryFullPath?: string
+      entryFullPath?: string,
     ) {
       invokeWatcherCallbacks(map.get(this.toPath(fullPath)), ({ cb }) =>
         cb(
           eventName,
           entryFullPath
             ? this.getRelativePathToDirectory(fullPath, entryFullPath)
-            : ""
-        )
-      );
+            : "",
+        ));
     }
 
     invokeFsWatchesCallbacks(
       fullPath: string,
       eventName: "rename" | "change",
-      entryFullPath?: string
+      entryFullPath?: string,
     ) {
       this.fsWatchCallback(this.fsWatches, fullPath, eventName, entryFullPath);
     }
@@ -1095,48 +1093,48 @@ interface Array<T> { length: number; [n: number]: T; }`,
     invokeFsWatchesRecursiveCallbacks(
       fullPath: string,
       eventName: "rename" | "change",
-      entryFullPath?: string
+      entryFullPath?: string,
     ) {
       this.fsWatchCallback(
         this.fsWatchesRecursive,
         fullPath,
         eventName,
-        entryFullPath
+        entryFullPath,
       );
     }
 
     private getRelativePathToDirectory(
       directoryFullPath: string,
-      fileFullPath: string
+      fileFullPath: string,
     ) {
       return getRelativePathToDirectoryOrUrl(
         directoryFullPath,
         fileFullPath,
         this.currentDirectory,
         this.getCanonicalFileName,
-        /*isAbsolutePathAnUrl*/ false
+        /*isAbsolutePathAnUrl*/ false,
       );
     }
 
     private invokeRecursiveFsWatches(
       fullPath: string,
       eventName: "rename" | "change",
-      entryFullPath?: string
+      entryFullPath?: string,
     ) {
       this.invokeFsWatchesRecursiveCallbacks(
         fullPath,
         eventName,
-        entryFullPath
+        entryFullPath,
       );
       const basePath = getDirectoryPath(fullPath);
       if (
-        this.getCanonicalFileName(fullPath) !==
-        this.getCanonicalFileName(basePath)
+        this.getCanonicalFileName(fullPath)
+          !== this.getCanonicalFileName(basePath)
       ) {
         this.invokeRecursiveFsWatches(
           basePath,
           eventName,
-          entryFullPath || fullPath
+          entryFullPath || fullPath,
         );
       }
     }
@@ -1146,19 +1144,19 @@ interface Array<T> { length: number; [n: number]: T; }`,
       this.invokeFsWatchesCallbacks(
         getDirectoryPath(fullPath),
         eventName,
-        fullPath
+        fullPath,
       );
       this.invokeRecursiveFsWatches(fullPath, eventName);
     }
 
     private invokeFileAndFsWatches(
       fileOrFolderFullPath: string,
-      eventKind: FileWatcherEventKind
+      eventKind: FileWatcherEventKind,
     ) {
       this.invokeFileWatcher(fileOrFolderFullPath, eventKind);
       this.invokeFsWatches(
         fileOrFolderFullPath,
-        eventKind === FileWatcherEventKind.Changed ? "change" : "rename"
+        eventKind === FileWatcherEventKind.Changed ? "change" : "rename",
       );
     }
 
@@ -1182,7 +1180,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
       const fsSymLink = this.toFsEntry(symLink.path) as FsSymLink;
       fsSymLink.symLink = getNormalizedAbsolutePath(
         symLink.symLink,
-        getDirectoryPath(fsSymLink.fullPath)
+        getDirectoryPath(fsSymLink.fullPath),
       );
       return fsSymLink;
     }
@@ -1196,7 +1194,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     private getRealFsEntry<T extends FSEntry>(
       isFsEntry: (fsEntry: FSEntry) => fsEntry is T,
       path: Path,
-      fsEntry = this.fs.get(path)!
+      fsEntry = this.fs.get(path)!,
     ): T | undefined {
       if (isFsEntry(fsEntry)) {
         return fsEntry;
@@ -1233,7 +1231,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
     private getRealFolder(
       path: Path,
-      fsEntry = this.fs.get(path)
+      fsEntry = this.fs.get(path),
     ): FsFolder | undefined {
       return this.getRealFsEntry(isFsFolder, path, fsEntry);
     }
@@ -1256,7 +1254,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         fsEntry.modifiedTime = date;
         this.invokeFileAndFsWatches(
           fsEntry.fullPath,
-          FileWatcherEventKind.Changed
+          FileWatcherEventKind.Changed,
         );
       }
     }
@@ -1284,14 +1282,15 @@ interface Array<T> { length: number; [n: number]: T; }`,
       const path = this.toFullPath(s);
       const folder = this.getRealFolder(path);
       if (folder) {
-        return mapDefined(folder.entries, (entry) =>
-          this.isFsFolder(entry) ? getBaseFileName(entry.fullPath) : undefined
+        return mapDefined(
+          folder.entries,
+          (entry) => this.isFsFolder(entry) ? getBaseFileName(entry.fullPath) : undefined,
         );
       }
       Debug.fail(
         folder
           ? "getDirectories called on file"
-          : "getDirectories called on missing folder"
+          : "getDirectories called on missing folder",
       );
       return [];
     }
@@ -1301,7 +1300,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
       extensions?: readonly string[],
       exclude?: readonly string[],
       include?: readonly string[],
-      depth?: number
+      depth?: number,
     ): string[] {
       return matchFiles(
         path,
@@ -1328,7 +1327,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
           }
           return { directories, files };
         },
-        (path) => this.realpath(path)
+        (path) => this.realpath(path),
       );
     }
 
@@ -1367,7 +1366,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
       assert.equal(
         callbacksCount,
         expected,
-        `expected ${expected} timeout callbacks queued but found ${callbacksCount}.`
+        `expected ${expected} timeout callbacks queued but found ${callbacksCount}.`,
       );
     }
 
@@ -1430,7 +1429,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     prependFile(
       path: string,
       content: string,
-      options?: Partial<ReloadWatchInvokeOptions>
+      options?: Partial<ReloadWatchInvokeOptions>,
     ): void {
       this.modifyFile(path, content + this.readFile(path), options);
     }
@@ -1438,7 +1437,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     appendFile(
       path: string,
       content: string,
-      options?: Partial<ReloadWatchInvokeOptions>
+      options?: Partial<ReloadWatchInvokeOptions>,
     ): void {
       this.modifyFile(path, this.readFile(path) + content, options);
     }
@@ -1476,7 +1475,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         const cloneValue = clone(value);
         if (isFsFolder(cloneValue)) {
           cloneValue.entries = cloneValue.entries.map(
-            clone
+            clone,
           ) as SortedArray<FSEntry>;
         }
         result.set(key, cloneValue);
@@ -1492,7 +1491,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
           baseline,
           base.get(newFsEntry.path),
           newFsEntry,
-          this.writtenFiles
+          this.writtenFiles,
         );
       });
       base.forEach((oldFsEntry) => {
@@ -1512,21 +1511,21 @@ interface Array<T> { length: number; [n: number]: T; }`,
         ({ fileName, pollingInterval }) => ({
           fileName,
           pollingInterval,
-        })
+        }),
       );
       baseline.push("");
       serializeMultiMap(
         baseline,
         "FsWatches",
         this.fsWatches,
-        serializeTestFsWatcher
+        serializeTestFsWatcher,
       );
       baseline.push("");
       serializeMultiMap(
         baseline,
         "FsWatchesRecursive",
         this.fsWatchesRecursive,
-        serializeTestFsWatcher
+        serializeTestFsWatcher,
       );
       baseline.push("");
     }
@@ -1575,7 +1574,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     baseline: string[],
     oldFsEntry: FSEntry | undefined,
     newFsEntry: FSEntry | undefined,
-    writtenFiles: ESMap<string, any> | undefined
+    writtenFiles: ESMap<string, any> | undefined,
   ): void {
     const file = newFsEntry && newFsEntry.fullPath;
     if (isFsFile(oldFsEntry)) {
@@ -1585,7 +1584,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         } else if (oldFsEntry.modifiedTime !== newFsEntry.modifiedTime) {
           if (oldFsEntry.fullPath !== newFsEntry.fullPath) {
             baseline.push(
-              `//// [${file}] file was renamed from file ${oldFsEntry.fullPath}`
+              `//// [${file}] file was renamed from file ${oldFsEntry.fullPath}`,
             );
           } else if (writtenFiles && !writtenFiles.has(newFsEntry.path)) {
             baseline.push(`//// [${file}] file changed its modified time`);
@@ -1606,7 +1605,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
         } else if (oldFsEntry.modifiedTime !== newFsEntry.modifiedTime) {
           if (oldFsEntry.fullPath !== newFsEntry.fullPath) {
             baseline.push(
-              `//// [${file}] symlink was renamed from symlink ${oldFsEntry.fullPath}`
+              `//// [${file}] symlink was renamed from symlink ${oldFsEntry.fullPath}`,
             );
           } else if (writtenFiles && !writtenFiles.has(newFsEntry.path)) {
             baseline.push(`//// [${file}] symlink changed its modified time`);
@@ -1641,18 +1640,15 @@ interface Array<T> { length: number; [n: number]: T; }`,
 
   function serializeWatchOptions(fallbackOptions: WatchOptions | undefined) {
     if (!fallbackOptions) return undefined;
-    const { watchFile, watchDirectory, fallbackPolling, ...rest } =
-      fallbackOptions;
+    const { watchFile, watchDirectory, fallbackPolling, ...rest } = fallbackOptions;
     return {
       watchFile: watchFile !== undefined ? WatchFileKind[watchFile] : undefined,
-      watchDirectory:
-        watchDirectory !== undefined
-          ? WatchDirectoryKind[watchDirectory]
-          : undefined,
-      fallbackPolling:
-        fallbackPolling !== undefined
-          ? PollingWatchKind[fallbackPolling]
-          : undefined,
+      watchDirectory: watchDirectory !== undefined
+        ? WatchDirectoryKind[watchDirectory]
+        : undefined,
+      fallbackPolling: fallbackPolling !== undefined
+        ? PollingWatchKind[fallbackPolling]
+        : undefined,
       ...rest,
     };
   }
@@ -1661,7 +1657,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     baseline: string[],
     caption: string,
     multiMap: MultiMap<string, T>,
-    valueMapper: (value: T) => U
+    valueMapper: (value: T) => U,
   ) {
     baseline.push(`${caption}::`);
     multiMap.forEach((values, key) => {
@@ -1676,12 +1672,12 @@ interface Array<T> { length: number; [n: number]: T; }`,
     baseline: string[],
     output: readonly string[],
     start: number,
-    end = output.length
+    end = output.length,
   ) {
     let baselinedOutput: string[] | undefined;
     for (let i = start; i < end; i++) {
       (baselinedOutput ||= []).push(
-        output[i].replace(/Elapsed::\s[0-9]+(?:\.\d+)?ms/g, "Elapsed:: *ms")
+        output[i].replace(/Elapsed::\s[0-9]+(?:\.\d+)?ms/g, "Elapsed:: *ms"),
       );
     }
     if (baselinedOutput) baseline.push(baselinedOutput.join(""));
@@ -1711,7 +1707,7 @@ interface Array<T> { length: number; [n: number]: T; }`,
     return {
       path: getTsBuildProjectFilePath(project, file),
       content: Harness.IO.readFile(
-        `${Harness.IO.getWorkspaceRoot()}/tests/projects/${project}/${file}`
+        `${Harness.IO.getWorkspaceRoot()}/tests/projects/${project}/${file}`,
       )!,
     };
   }

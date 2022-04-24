@@ -21,7 +21,7 @@ ${file.content}`;
     function verifyText(
       service: server.ProjectService,
       file: string,
-      expected: string
+      expected: string,
     ) {
       const info = service.getScriptInfo(file)!;
       const snap = info.getSnapshot();
@@ -29,7 +29,7 @@ ${file.content}`;
       assert.equal(
         snap.getText(0, snap.getLength()),
         expected,
-        `Text of changed file: ${file}`
+        `Text of changed file: ${file}`,
       );
     }
 
@@ -83,12 +83,12 @@ ${file.content}`;
       verifyText(
         service,
         commonFile1.path,
-        fileContentWithComment(commonFile1)
+        fileContentWithComment(commonFile1),
       );
       verifyText(
         service,
         commonFile2.path,
-        fileContentWithComment(commonFile2)
+        fileContentWithComment(commonFile2),
       );
       verifyText(service, app.path, "let zzz = 10;let zz = 10;let z = 1;");
       verifyText(service, file3.path, file3.content);
@@ -103,7 +103,7 @@ ${file.content}`;
       verifyText(
         service,
         commonFile2.path,
-        fileContentWithComment(commonFile2)
+        fileContentWithComment(commonFile2),
       );
       verifyText(service, app.path, "let zzz = 10;let zz = 10;let z = 1;");
       verifyText(service, file3.path, file3.content);

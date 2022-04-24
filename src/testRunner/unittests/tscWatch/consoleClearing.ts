@@ -16,7 +16,7 @@ namespace ts.tscWatch {
 
     function checkConsoleClearingUsingCommandLineOptions(
       subScenario: string,
-      commandLineOptions?: string[]
+      commandLineOptions?: string[],
     ) {
       verifyTscWatch({
         scenario,
@@ -32,7 +32,7 @@ namespace ts.tscWatch {
     }
 
     checkConsoleClearingUsingCommandLineOptions(
-      "without --diagnostics or --extendedDiagnostics"
+      "without --diagnostics or --extendedDiagnostics",
     );
     checkConsoleClearingUsingCommandLineOptions("with --diagnostics", [
       "--diagnostics",
@@ -59,8 +59,7 @@ namespace ts.tscWatch {
         // Initially console is cleared if --preserveOutput is not provided since the config file is yet to be parsed
         runWatchBaseline({
           scenario,
-          subScenario:
-            "when preserveWatchOutput is true in config file/createWatchOfConfigFile",
+          subScenario: "when preserveWatchOutput is true in config file/createWatchOfConfigFile",
           commandLineArgs: ["--w", "-p", configFile.path],
           ...baseline,
           getPrograms: () => [

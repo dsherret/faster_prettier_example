@@ -21,8 +21,7 @@ declare namespace ts.server {
     | TypesRegistryRequest
     | InstallPackageRequest;
 
-  export interface DiscoverTypings
-    extends TypingInstallerRequestWithProjectName {
+  export interface DiscoverTypings extends TypingInstallerRequestWithProjectName {
     readonly fileNames: string[];
     readonly projectRootPath: Path;
     readonly compilerOptions: CompilerOptions;
@@ -41,8 +40,7 @@ declare namespace ts.server {
     readonly kind: "typesRegistry";
   }
 
-  export interface InstallPackageRequest
-    extends TypingInstallerRequestWithProjectName {
+  export interface InstallPackageRequest extends TypingInstallerRequestWithProjectName {
     readonly kind: "installPackage";
     readonly fileName: Path;
     readonly packageName: string;
@@ -61,8 +59,7 @@ declare namespace ts.server {
     readonly message: string;
   }
 
-  export interface InitializationFailedResponse
-    extends TypingInstallerResponse {
+  export interface InitializationFailedResponse extends TypingInstallerResponse {
     readonly kind: EventInitializationFailed;
     readonly message: string;
     readonly stack?: string;
@@ -102,13 +99,13 @@ declare namespace ts.server {
       path: string,
       callback: FileWatcherCallback,
       pollingInterval?: number,
-      options?: WatchOptions
+      options?: WatchOptions,
     ): FileWatcher;
     watchDirectory?(
       path: string,
       callback: DirectoryWatcherCallback,
       recursive?: boolean,
-      options?: WatchOptions
+      options?: WatchOptions,
     ): FileWatcher;
   }
 

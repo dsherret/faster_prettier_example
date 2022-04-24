@@ -21,7 +21,7 @@ describe("unittests:: evaluation:: asyncGeneratorEvaluation", () => {
         export async function main() {
             output.push(await g().next());
         }`,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     await result.main();
     assert.deepEqual(result.output, [{ value: 0, done: true }]);

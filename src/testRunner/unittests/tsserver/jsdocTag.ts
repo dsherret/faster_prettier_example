@@ -18,7 +18,7 @@ namespace ts.projectSystem {
         command: protocol.CommandTypes;
         tags: string | unknown[] | undefined;
         documentation: string | unknown[];
-      }
+      },
     ) {
       const { command, displayPartsForJSDoc, tags, documentation } = options;
       const session = createSession(createServerHost([file, config]));
@@ -34,51 +34,50 @@ namespace ts.projectSystem {
           position: indexOfX,
         } as protocol.FileLocationRequestArgs,
       }).response;
-      const summaryAndLocation =
-        command === protocol.CommandTypes.Quickinfo
-          ? {
-              displayString: "var x: number",
-              start: {
-                line: 3,
-                offset: 5,
-              },
-              end: {
-                line: 3,
-                offset: 6,
-              },
-            }
-          : {
-              displayParts: [
-                {
-                  kind: "keyword",
-                  text: "var",
-                },
-                {
-                  kind: "space",
-                  text: " ",
-                },
-                {
-                  kind: "localName",
-                  text: "x",
-                },
-                {
-                  kind: "punctuation",
-                  text: ":",
-                },
-                {
-                  kind: "space",
-                  text: " ",
-                },
-                {
-                  kind: "keyword",
-                  text: "number",
-                },
-              ],
-              textSpan: {
-                length: 1,
-                start: 38,
-              },
-            };
+      const summaryAndLocation = command === protocol.CommandTypes.Quickinfo
+        ? {
+          displayString: "var x: number",
+          start: {
+            line: 3,
+            offset: 5,
+          },
+          end: {
+            line: 3,
+            offset: 6,
+          },
+        }
+        : {
+          displayParts: [
+            {
+              kind: "keyword",
+              text: "var",
+            },
+            {
+              kind: "space",
+              text: " ",
+            },
+            {
+              kind: "localName",
+              text: "x",
+            },
+            {
+              kind: "punctuation",
+              text: ":",
+            },
+            {
+              kind: "space",
+              text: " ",
+            },
+            {
+              kind: "keyword",
+              text: "number",
+            },
+          ],
+          textSpan: {
+            length: 1,
+            start: 38,
+          },
+        };
       assert.deepEqual(quickInfo, {
         kind: "var",
         kindModifiers: "",
@@ -337,33 +336,31 @@ x(1)`,
         .setHostConfiguration({ preferences: { displayPartsForJSDoc } });
       openFilesForSession([linkInParamTag], session);
       const indexOfX = linkInParamTag.content.lastIndexOf("1");
-      const signatureHelp =
-        session.executeCommandSeq<protocol.SignatureHelpRequest>({
-          command: command as protocol.CommandTypes.SignatureHelp,
-          arguments: {
-            triggerReason: {
-              kind: "invoked",
-            },
-            file: linkInParamTag.path,
-            position: indexOfX,
-          } as protocol.SignatureHelpRequestArgs,
-        }).response;
-      const applicableSpan =
-        command === protocol.CommandTypes.SignatureHelp
-          ? {
-              end: {
-                line: 4,
-                offset: 4,
-              },
-              start: {
-                line: 4,
-                offset: 3,
-              },
-            }
-          : {
-              length: 1,
-              start: 60,
-            };
+      const signatureHelp = session.executeCommandSeq<protocol.SignatureHelpRequest>({
+        command: command as protocol.CommandTypes.SignatureHelp,
+        arguments: {
+          triggerReason: {
+            kind: "invoked",
+          },
+          file: linkInParamTag.path,
+          position: indexOfX,
+        } as protocol.SignatureHelpRequestArgs,
+      }).response;
+      const applicableSpan = command === protocol.CommandTypes.SignatureHelp
+        ? {
+          end: {
+            line: 4,
+            offset: 4,
+          },
+          start: {
+            line: 4,
+            offset: 3,
+          },
+        }
+        : {
+          length: 1,
+          start: 60,
+        };
       assert.deepEqual(signatureHelp, {
         applicableSpan,
         argumentCount: 1,
@@ -631,22 +628,21 @@ foo`,
       };
       const { command, displayPartsForJSDoc, tags } = options;
       const session = createSession(
-        createServerHost([linkInParamJSDoc, config])
+        createServerHost([linkInParamJSDoc, config]),
       );
       session
         .getProjectService()
         .setHostConfiguration({ preferences: { displayPartsForJSDoc } });
       openFilesForSession([linkInParamJSDoc], session);
       const indexOfFoo = linkInParamJSDoc.content.lastIndexOf("fo");
-      const completions =
-        session.executeCommandSeq<protocol.CompletionDetailsRequest>({
-          command: command as protocol.CommandTypes.CompletionDetails,
-          arguments: {
-            entryNames: ["foo"],
-            file: linkInParamJSDoc.path,
-            position: indexOfFoo,
-          } as protocol.CompletionDetailsRequestArgs,
-        }).response;
+      const completions = session.executeCommandSeq<protocol.CompletionDetailsRequest>({
+        command: command as protocol.CommandTypes.CompletionDetails,
+        arguments: {
+          entryNames: ["foo"],
+          file: linkInParamJSDoc.path,
+          position: indexOfFoo,
+        } as protocol.CompletionDetailsRequestArgs,
+      }).response;
       assert.deepEqual(completions, [
         {
           codeActions: undefined,

@@ -162,24 +162,23 @@ namespace ts.server {
         assert.equal(
           session.getProjectService().getFormatCodeOptions("" as NormalizedPath)
             .indentStyle,
-          IndentStyle.Block
+          IndentStyle.Block,
         );
 
-        const setOptionsRequest: protocol.SetCompilerOptionsForInferredProjectsRequest =
-          {
-            command: CommandNames.CompilerOptionsForInferredProjects,
-            seq: 1,
-            type: "request",
-            arguments: {
-              options: {
-                module: protocol.ModuleKind.System,
-                target: protocol.ScriptTarget.ES5,
-                jsx: protocol.JsxEmit.React,
-                newLine: protocol.NewLineKind.Lf,
-                moduleResolution: protocol.ModuleResolutionKind.Node,
-              },
+        const setOptionsRequest: protocol.SetCompilerOptionsForInferredProjectsRequest = {
+          command: CommandNames.CompilerOptionsForInferredProjects,
+          seq: 1,
+          type: "request",
+          arguments: {
+            options: {
+              module: protocol.ModuleKind.System,
+              target: protocol.ScriptTarget.ES5,
+              jsx: protocol.JsxEmit.React,
+              newLine: protocol.NewLineKind.Lf,
+              moduleResolution: protocol.ModuleResolutionKind.Node,
             },
-          };
+          },
+        };
         session.onMessage(JSON.stringify(setOptionsRequest));
         assert.deepEqual(
           session.getProjectService().getCompilerOptionsForInferredProjects(),
@@ -190,7 +189,7 @@ namespace ts.server {
             newLine: NewLineKind.LineFeed,
             moduleResolution: ModuleResolutionKind.NodeJs,
             allowNonTsExtensions: true, // injected by tsserver
-          } as CompilerOptions
+          } as CompilerOptions,
         );
       });
 
@@ -393,7 +392,7 @@ namespace ts.server {
             command,
             seq: 0,
             type: "request",
-          })
+          }),
         ).to.deep.equal(result);
       });
       it("throws when a duplicate handler is passed", () => {
@@ -409,7 +408,7 @@ namespace ts.server {
         session.addProtocolHandler(command, () => resp);
 
         expect(() => session.addProtocolHandler(command, () => resp)).to.throw(
-          `Protocol handler already exists for command "${command}"`
+          `Protocol handler already exists for command "${command}"`,
         );
       });
     });
@@ -582,7 +581,7 @@ namespace ts.server {
           seq: 0,
           type: "request",
           command: session.customHandler,
-        })
+        }),
       ).to.deep.equal({
         response: undefined,
         responseRequired: true,
@@ -687,7 +686,7 @@ namespace ts.server {
       execute(
         command: string,
         args: any,
-        callback: (resp: protocol.Response) => void
+        callback: (resp: protocol.Response) => void,
       ): void {
         if (!this.server) {
           return;
@@ -749,7 +748,7 @@ namespace ts.server {
           responses++;
           expect(responses).to.equal(3);
           done();
-        }
+        },
       );
 
       // Consume the queue and trigger the callbacks
@@ -775,13 +774,12 @@ namespace ts.server {
           },
         ],
       };
-      const renameLocationInNewText =
-        renameLocationInOldText + edits.textChanges[0].newText.length;
+      const renameLocationInNewText = renameLocationInOldText + edits.textChanges[0].newText.length;
       const res = getLocationInNewDocument(
         text,
         fileName,
         renameLocationInNewText,
-        [edits]
+        [edits],
       );
       assert.deepEqual(res, { line: 4, offset: 11 });
     });

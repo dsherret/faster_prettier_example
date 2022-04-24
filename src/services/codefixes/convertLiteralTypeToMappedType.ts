@@ -10,7 +10,7 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToConvertLiteralTypeToMappedType(
-      context
+      context,
     ) {
       const { sourceFile, span } = context;
       const info = getInfo(sourceFile, span.start);
@@ -18,16 +18,14 @@ namespace ts.codefix {
         return undefined;
       }
       const { name, constraint } = info;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, info)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, info));
       return [
         createCodeFixAction(
           fixId,
           changes,
           [Diagnostics.Convert_0_to_1_in_0, constraint, name],
           fixId,
-          Diagnostics.Convert_all_type_literals_to_mapped_type
+          Diagnostics.Convert_all_type_literals_to_mapped_type,
         ),
       ];
     },
@@ -66,7 +64,7 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    { container, typeNode, constraint, name }: Info
+    { container, typeNode, constraint, name }: Info,
   ): void {
     changes.replaceNode(
       sourceFile,
@@ -76,13 +74,13 @@ namespace ts.codefix {
         factory.createTypeParameterDeclaration(
           /*modifiers*/ undefined,
           name,
-          factory.createTypeReferenceNode(constraint)
+          factory.createTypeReferenceNode(constraint),
         ),
         /*nameType*/ undefined,
         /*questionToken*/ undefined,
         typeNode,
-        /*members*/ undefined
-      )
+        /*members*/ undefined,
+      ),
     );
   }
 }

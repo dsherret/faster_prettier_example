@@ -26,8 +26,7 @@ namespace project {
     sourceMapData?: readonly ts.SourceMapEmitResult[];
   }
 
-  interface BatchCompileProjectTestCaseResult
-    extends CompileProjectFilesResult {
+  interface BatchCompileProjectTestCaseResult extends CompileProjectFilesResult {
     outputFiles?: readonly documents.TextDocument[];
   }
 
@@ -40,7 +39,7 @@ namespace project {
         return all;
       }
       return all.filter(
-        (_val, idx) => idx % Harness.shards === Harness.shardId - 1
+        (_val, idx) => idx % Harness.shards === Harness.shardId - 1,
       );
     }
 
@@ -50,8 +49,7 @@ namespace project {
 
     public initializeTests() {
       describe("projects tests", () => {
-        const tests =
-          this.tests.length === 0 ? this.enumerateTestFiles() : this.tests;
+        const tests = this.tests.length === 0 ? this.enumerateTestFiles() : this.tests;
         for (const test of tests) {
           this.runProjectTestCase(typeof test === "string" ? test : test.file);
         }
@@ -59,15 +57,17 @@ namespace project {
     }
 
     private runProjectTestCase(testCaseFileName: string) {
-      for (const { name, payload } of ProjectTestCase.getConfigurations(
-        testCaseFileName
-      )) {
+      for (
+        const { name, payload } of ProjectTestCase.getConfigurations(
+          testCaseFileName,
+        )
+      ) {
         describe(
-          "Compiling project for " +
-            payload.testCase.scenario +
-            ": testcase " +
-            testCaseFileName +
-            (name ? ` (${name})` : ``),
+          "Compiling project for "
+            + payload.testCase.scenario
+            + ": testcase "
+            + testCaseFileName
+            + (name ? ` (${name})` : ``),
           () => {
             let projectTestCase: ProjectTestCase | undefined;
             before(() => {
@@ -75,8 +75,7 @@ namespace project {
             });
             it(`Correct module resolution tracing for ${testCaseFileName}`, () =>
               projectTestCase && projectTestCase.verifyResolution());
-            it(`Correct errors for ${testCaseFileName}`, () =>
-              projectTestCase && projectTestCase.verifyDiagnostics());
+            it(`Correct errors for ${testCaseFileName}`, () => projectTestCase && projectTestCase.verifyDiagnostics());
             it(`Correct JS output for ${testCaseFileName}`, () =>
               projectTestCase && projectTestCase.verifyJavaScriptOutput());
             // NOTE: This check was commented out in previous code. Leaving this here to eventually be restored if needed.
@@ -86,7 +85,7 @@ namespace project {
             after(() => {
               projectTestCase = undefined;
             });
-          }
+          },
         );
       }
     }
@@ -101,7 +100,7 @@ namespace project {
       compilerOptions: ts.CompilerOptions,
       _testCaseJustName: string,
       testCase: ProjectRunnerTestCase & ts.CompilerOptions,
-      _moduleKind: ts.ModuleKind
+      _moduleKind: ts.ModuleKind,
     ) {
       super(sys, compilerOptions);
       this._testCase = testCase;
@@ -109,10 +108,10 @@ namespace project {
 
     public get parseConfigHost(): fakes.ParseConfigHost {
       return (
-        this._projectParseConfigHost ||
-        (this._projectParseConfigHost = new ProjectParseConfigHost(
+        this._projectParseConfigHost
+        || (this._projectParseConfigHost = new ProjectParseConfigHost(
           this.sys,
-          this._testCase
+          this._testCase,
         ))
       );
     }
@@ -127,7 +126,7 @@ namespace project {
 
     constructor(
       sys: fakes.System,
-      testCase: ProjectRunnerTestCase & ts.CompilerOptions
+      testCase: ProjectRunnerTestCase & ts.CompilerOptions,
     ) {
       super(sys);
       this._testCase = testCase;
@@ -138,24 +137,24 @@ namespace project {
       extensions: string[],
       excludes: string[],
       includes: string[],
-      depth: number
+      depth: number,
     ): string[] {
       const result = super.readDirectory(
         path,
         extensions,
         excludes,
         includes,
-        depth
+        depth,
       );
       const projectRoot = vpath.resolve(
         vfs.srcFolder,
-        this._testCase.projectRoot
+        this._testCase.projectRoot,
       );
       return result.map((item) =>
         vpath.relative(
           projectRoot,
           vpath.resolve(projectRoot, item),
-          this.vfs.ignoreCase
+          this.vfs.ignoreCase,
         )
       );
     }
@@ -181,7 +180,7 @@ namespace project {
 
     constructor(
       testCaseFileName: string,
-      { testCase, moduleKind, vfs }: ProjectTestPayload
+      { testCase, moduleKind, vfs }: ProjectTestPayload,
     ) {
       this.testCase = testCase;
       this.testCaseJustName = testCaseFileName
@@ -195,34 +194,30 @@ namespace project {
       if (this.compilerOptions.project) {
         // Parse project
         configFileName = ts.normalizePath(
-          ts.combinePaths(this.compilerOptions.project, "tsconfig.json")
+          ts.combinePaths(this.compilerOptions.project, "tsconfig.json"),
         );
         assert(
           !inputFiles || inputFiles.length === 0,
-          "cannot specify input files and project option together"
+          "cannot specify input files and project option together",
         );
       } else if (!inputFiles || inputFiles.length === 0) {
-        configFileName = ts.findConfigFile("", (path) =>
-          this.sys.fileExists(path)
-        );
+        configFileName = ts.findConfigFile("", (path) => this.sys.fileExists(path));
       }
 
       let errors: ts.Diagnostic[] | undefined;
       const configFileSourceFiles: ts.SourceFile[] = [];
       if (configFileName) {
-        const result = ts.readJsonConfigFile(configFileName, (path) =>
-          this.sys.readFile(path)
-        );
+        const result = ts.readJsonConfigFile(configFileName, (path) => this.sys.readFile(path));
         configFileSourceFiles.push(result);
         const configParseHost = new ProjectParseConfigHost(
           this.sys,
-          this.testCase
+          this.testCase,
         );
         const configParseResult = ts.parseJsonSourceFileConfigFileContent(
           result,
           configParseHost,
           ts.getDirectoryPath(configFileName),
-          this.compilerOptions
+          this.compilerOptions,
         );
         inputFiles = configParseResult.fileNames;
         this.compilerOptions = configParseResult.options;
@@ -234,14 +229,14 @@ namespace project {
         this.compilerOptions,
         this.testCaseJustName,
         this.testCase,
-        moduleKind
+        moduleKind,
       );
       const projectCompilerResult = this.compileProjectFiles(
         moduleKind,
         configFileSourceFiles,
         () => inputFiles,
         compilerHost,
-        this.compilerOptions
+        this.compilerOptions,
       );
 
       this.compilerResult = {
@@ -262,7 +257,7 @@ namespace project {
     }
 
     public static getConfigurations(
-      testCaseFileName: string
+      testCaseFileName: string,
     ): ProjectTestConfiguration[] {
       let testCase: ProjectRunnerTestCase & ts.CompilerOptions;
 
@@ -272,20 +267,21 @@ namespace project {
       } catch (e) {
         assert(
           false,
-          "Unable to open testcase file: " + testCaseFileName + ": " + e.message
+          "Unable to open testcase file: " + testCaseFileName + ": " + e.message,
         );
       }
 
       try {
-        testCase = JSON.parse(testFileText!) as ProjectRunnerTestCase &
-          ts.CompilerOptions;
+        testCase = JSON.parse(testFileText!) as
+          & ProjectRunnerTestCase
+          & ts.CompilerOptions;
       } catch (e) {
         throw assert(
           false,
-          "Testcase: " +
-            testCaseFileName +
-            " does not contain valid json format: " +
-            e.message
+          "Testcase: "
+            + testCaseFileName
+            + " does not contain valid json format: "
+            + e.message,
         );
       }
 
@@ -293,7 +289,7 @@ namespace project {
       fs.mountSync(
         vpath.resolve(Harness.IO.getWorkspaceRoot(), "tests"),
         vpath.combine(vfs.srcFolder, "tests"),
-        vfs.createResolver(Harness.IO)
+        vfs.createResolver(Harness.IO),
       );
       fs.mkdirpSync(vpath.combine(vfs.srcFolder, testCase.projectRoot));
       fs.chdir(vpath.combine(vfs.srcFolder, testCase.projectRoot));
@@ -314,13 +310,14 @@ namespace project {
     public verifyResolution() {
       const cwd = this.vfs.cwd();
       const ignoreCase = this.vfs.ignoreCase;
-      const resolutionInfo: ProjectRunnerTestCaseResolutionInfo &
-        ts.CompilerOptions = JSON.parse(JSON.stringify(this.testCase));
+      const resolutionInfo:
+        & ProjectRunnerTestCaseResolutionInfo
+        & ts.CompilerOptions = JSON.parse(JSON.stringify(this.testCase));
       resolutionInfo.resolvedInputFiles = this.compilerResult
         .program!.getSourceFiles()
         .map(({ fileName: input }) =>
-          vpath.beneath(vfs.builtFolder, input, this.vfs.ignoreCase) ||
-          vpath.beneath(vfs.testLibFolder, input, this.vfs.ignoreCase)
+          vpath.beneath(vfs.builtFolder, input, this.vfs.ignoreCase)
+            || vpath.beneath(vfs.testLibFolder, input, this.vfs.ignoreCase)
             ? Utils.removeTestPathPrefixes(input)
             : vpath.isAbsolute(input)
             ? vpath.relative(cwd, input, ignoreCase)
@@ -329,32 +326,32 @@ namespace project {
 
       resolutionInfo.emittedFiles = this.compilerResult
         .outputFiles!.map(
-          (output) => output.meta.get("fileName") || output.file
+          (output) => output.meta.get("fileName") || output.file,
         )
         .map((output) =>
           Utils.removeTestPathPrefixes(
             vpath.isAbsolute(output)
               ? vpath.relative(cwd, output, ignoreCase)
-              : output
+              : output,
           )
         );
 
       const content = JSON.stringify(resolutionInfo, undefined, "    ");
       Harness.Baseline.runBaseline(
-        this.getBaselineFolder(this.compilerResult.moduleKind) +
-          this.testCaseJustName +
-          ".json",
-        content
+        this.getBaselineFolder(this.compilerResult.moduleKind)
+          + this.testCaseJustName
+          + ".json",
+        content,
       );
     }
 
     public verifyDiagnostics() {
       if (this.compilerResult.errors.length) {
         Harness.Baseline.runBaseline(
-          this.getBaselineFolder(this.compilerResult.moduleKind) +
-            this.testCaseJustName +
-            ".errors.txt",
-          getErrorsBaseline(this.compilerResult)
+          this.getBaselineFolder(this.compilerResult.moduleKind)
+            + this.testCaseJustName
+            + ".errors.txt",
+          getErrorsBaseline(this.compilerResult),
         );
       }
     }
@@ -376,31 +373,33 @@ namespace project {
             let diskRelativeName = vpath.relative(
               this.vfs.cwd(),
               diskFileName,
-              this.vfs.ignoreCase
+              this.vfs.ignoreCase,
             );
             if (
-              vpath.isAbsolute(diskRelativeName) ||
-              diskRelativeName.startsWith("../")
+              vpath.isAbsolute(diskRelativeName)
+              || diskRelativeName.startsWith("../")
             ) {
               // If the generated output file resides in the parent folder or is rooted path,
               // we need to instead create files that can live in the project reference folder
               // but make sure extension of these files matches with the fileName the compiler asked to write
-              diskRelativeName = `diskFile${nonSubfolderDiskFiles}${vpath.extname(
-                fileName,
-                [".js.map", ".js", ".d.ts"],
-                this.vfs.ignoreCase
-              )}`;
+              diskRelativeName = `diskFile${nonSubfolderDiskFiles}${
+                vpath.extname(
+                  fileName,
+                  [".js.map", ".js", ".d.ts"],
+                  this.vfs.ignoreCase,
+                )
+              }`;
               nonSubfolderDiskFiles++;
             }
 
             const content = Utils.removeTestPathPrefixes(
               output.text,
-              /*retainTrailingDirectorySeparator*/ true
+              /*retainTrailingDirectorySeparator*/ true,
             );
             Harness.Baseline.runBaseline(
-              this.getBaselineFolder(this.compilerResult.moduleKind) +
-                diskRelativeName,
-              content as string | null
+              this.getBaselineFolder(this.compilerResult.moduleKind)
+                + diskRelativeName,
+              content as string | null,
             ); // TODO: GH#18217
           } catch (e) {
             errs.push(e);
@@ -428,10 +427,10 @@ namespace project {
         const dTsCompileResult = this.compileDeclarations(this.compilerResult);
         if (dTsCompileResult && dTsCompileResult.errors.length) {
           Harness.Baseline.runBaseline(
-            this.getBaselineFolder(this.compilerResult.moduleKind) +
-              this.testCaseJustName +
-              ".dts.errors.txt",
-            getErrorsBaseline(dTsCompileResult)
+            this.getBaselineFolder(this.compilerResult.moduleKind)
+              + this.testCaseJustName
+              + ".dts.errors.txt",
+            getErrorsBaseline(dTsCompileResult),
           );
         }
       }
@@ -440,29 +439,29 @@ namespace project {
     // Project baselines verified go in project/testCaseName/moduleKind/
     private getBaselineFolder(moduleKind: ts.ModuleKind) {
       return (
-        "project/" +
-        this.testCaseJustName +
-        "/" +
-        moduleNameToString(moduleKind) +
-        "/"
+        "project/"
+        + this.testCaseJustName
+        + "/"
+        + moduleNameToString(moduleKind)
+        + "/"
       );
     }
 
     private cleanProjectUrl(url: string) {
       let diskProjectPath = ts.normalizeSlashes(
-        Harness.IO.resolvePath(this.testCase.projectRoot)!
+        Harness.IO.resolvePath(this.testCase.projectRoot)!,
       );
       let projectRootUrl = "file:///" + diskProjectPath;
       const normalizedProjectRoot = ts.normalizeSlashes(
-        this.testCase.projectRoot
+        this.testCase.projectRoot,
       );
       diskProjectPath = diskProjectPath.substr(
         0,
-        diskProjectPath.lastIndexOf(normalizedProjectRoot)
+        diskProjectPath.lastIndexOf(normalizedProjectRoot),
       );
       projectRootUrl = projectRootUrl.substr(
         0,
-        projectRootUrl.lastIndexOf(normalizedProjectRoot)
+        projectRootUrl.lastIndexOf(normalizedProjectRoot),
       );
       if (url && url.length) {
         if (url.indexOf(projectRootUrl) === 0) {
@@ -485,29 +484,25 @@ namespace project {
       configFileSourceFiles: readonly ts.SourceFile[],
       getInputFiles: () => readonly string[],
       compilerHost: ts.CompilerHost,
-      compilerOptions: ts.CompilerOptions
+      compilerOptions: ts.CompilerOptions,
     ): CompileProjectFilesResult {
       const program = ts.createProgram(
         getInputFiles(),
         compilerOptions,
-        compilerHost
+        compilerHost,
       );
       const errors = ts.getPreEmitDiagnostics(program);
 
-      const { sourceMaps: sourceMapData, diagnostics: emitDiagnostics } =
-        program.emit();
+      const { sourceMaps: sourceMapData, diagnostics: emitDiagnostics } = program.emit();
 
       // Clean up source map data that will be used in baselining
       if (sourceMapData) {
         for (const data of sourceMapData) {
           data.sourceMap = {
             ...data.sourceMap,
-            sources: data.sourceMap.sources.map((source) =>
-              this.cleanProjectUrl(source)
-            ),
-            sourceRoot:
-              data.sourceMap.sourceRoot &&
-              this.cleanProjectUrl(data.sourceMap.sourceRoot),
+            sources: data.sourceMap.sources.map((source) => this.cleanProjectUrl(source)),
+            sourceRoot: data.sourceMap.sourceRoot
+              && this.cleanProjectUrl(data.sourceMap.sourceRoot),
           };
         }
       }
@@ -522,7 +517,7 @@ namespace project {
     }
 
     private compileDeclarations(
-      compilerResult: BatchCompileProjectTestCaseResult
+      compilerResult: BatchCompileProjectTestCaseResult,
     ) {
       if (!compilerResult.program) {
         return;
@@ -535,7 +530,7 @@ namespace project {
         if (sourceFile.isDeclarationFile) {
           if (!vpath.isDefaultLibrary(sourceFile.fileName)) {
             allInputFiles.unshift(
-              new documents.TextDocument(sourceFile.fileName, sourceFile.text)
+              new documents.TextDocument(sourceFile.fileName, sourceFile.text),
             );
           }
           rootFiles.unshift(sourceFile.fileName);
@@ -544,38 +539,36 @@ namespace project {
           if (compilerOptions.outDir) {
             let sourceFilePath = ts.getNormalizedAbsolutePath(
               sourceFile.fileName,
-              compilerResult.program!.getCurrentDirectory()
+              compilerResult.program!.getCurrentDirectory(),
             );
             sourceFilePath = sourceFilePath.replace(
               compilerResult.program!.getCommonSourceDirectory(),
-              ""
+              "",
             );
             emitOutputFilePathWithoutExtension = ts.removeFileExtension(
-              ts.combinePaths(compilerOptions.outDir, sourceFilePath)
+              ts.combinePaths(compilerOptions.outDir, sourceFilePath),
             );
           } else {
             emitOutputFilePathWithoutExtension = ts.removeFileExtension(
-              sourceFile.fileName
+              sourceFile.fileName,
             );
           }
 
-          const outputDtsFileName =
-            emitOutputFilePathWithoutExtension + ts.Extension.Dts;
+          const outputDtsFileName = emitOutputFilePathWithoutExtension + ts.Extension.Dts;
           const file = findOutputDtsFile(outputDtsFileName);
           if (file) {
             allInputFiles.unshift(file);
             rootFiles.unshift(file.meta.get("fileName") || file.file);
           }
         } else {
-          const outputDtsFileName =
-            ts.removeFileExtension(
-              compilerOptions.outFile || compilerOptions.out!
-            ) + ts.Extension.Dts;
+          const outputDtsFileName = ts.removeFileExtension(
+            compilerOptions.outFile || compilerOptions.out!,
+          ) + ts.Extension.Dts;
           const outputDtsFile = findOutputDtsFile(outputDtsFileName)!;
           if (!ts.contains(allInputFiles, outputDtsFile)) {
             allInputFiles.unshift(outputDtsFile);
             rootFiles.unshift(
-              outputDtsFile.meta.get("fileName") || outputDtsFile.file
+              outputDtsFile.meta.get("fileName") || outputDtsFile.file,
             );
           }
         }
@@ -592,19 +585,20 @@ namespace project {
         compilerResult.compilerOptions!,
         this.testCaseJustName,
         this.testCase,
-        compilerResult.moduleKind
+        compilerResult.moduleKind,
       );
       return this.compileProjectFiles(
         compilerResult.moduleKind,
         compilerResult.configFileSourceFiles,
         () => rootFiles,
         compilerHost,
-        compilerResult.compilerOptions!
+        compilerResult.compilerOptions!,
       );
 
       function findOutputDtsFile(fileName: string) {
-        return ts.forEach(compilerResult.outputFiles, (outputFile) =>
-          outputFile.meta.get("fileName") === fileName ? outputFile : undefined
+        return ts.forEach(
+          compilerResult.outputFiles,
+          (outputFile) => outputFile.meta.get("fileName") === fileName ? outputFile : undefined,
         );
       }
     }
@@ -634,7 +628,7 @@ namespace project {
           ? Harness.RunnerBase.removeFullPaths(sourceFile.fileName)
           : sourceFile.fileName,
         content: sourceFile.text,
-      })
+      }),
     );
 
     return Harness.Compiler.getErrorBaseline(inputFiles, compilerResult.errors);
@@ -642,7 +636,7 @@ namespace project {
 
   function createCompilerOptions(
     testCase: ProjectRunnerTestCase & ts.CompilerOptions,
-    moduleKind: ts.ModuleKind
+    moduleKind: ts.ModuleKind,
   ) {
     // Set the special options that depend on other testcase options
     const compilerOptions: ts.CompilerOptions = {
@@ -651,21 +645,19 @@ namespace project {
       moduleResolution: ts.ModuleResolutionKind.Classic,
       module: moduleKind,
       newLine: ts.NewLineKind.CarriageReturnLineFeed,
-      mapRoot:
-        testCase.resolveMapRoot && testCase.mapRoot
-          ? vpath.resolve(vfs.srcFolder, testCase.mapRoot)
-          : testCase.mapRoot,
+      mapRoot: testCase.resolveMapRoot && testCase.mapRoot
+        ? vpath.resolve(vfs.srcFolder, testCase.mapRoot)
+        : testCase.mapRoot,
 
-      sourceRoot:
-        testCase.resolveSourceRoot && testCase.sourceRoot
-          ? vpath.resolve(vfs.srcFolder, testCase.sourceRoot)
-          : testCase.sourceRoot,
+      sourceRoot: testCase.resolveSourceRoot && testCase.sourceRoot
+        ? vpath.resolve(vfs.srcFolder, testCase.sourceRoot)
+        : testCase.sourceRoot,
     };
 
     // Set the values specified using json
     const optionNameMap = ts.arrayToMap(
       ts.optionDeclarations,
-      (option) => option.name
+      (option) => option.name,
     );
     for (const name in testCase) {
       if (name !== "mapRoot" && name !== "sourceRoot") {

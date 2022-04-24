@@ -3,7 +3,7 @@ namespace ts.projectSystem {
     const metadata = "Extra Info";
     function verifyOutput(
       host: TestServerHost,
-      expectedResponse: protocol.Response
+      expectedResponse: protocol.Response,
     ) {
       const output = host.getOutput().map(mapOutputToJson);
       assert.deepEqual(output, [expectedResponse]);
@@ -12,12 +12,12 @@ namespace ts.projectSystem {
 
     function verifyCommandWithMetadata<
       T extends server.protocol.Request,
-      U = undefined
+      U = undefined,
     >(
       session: TestSession,
       host: TestServerHost,
       command: Partial<T>,
-      expectedResponseBody: U
+      expectedResponseBody: U,
     ) {
       command.seq = session.getSeq();
       command.type = "request";
@@ -26,22 +26,22 @@ namespace ts.projectSystem {
         host,
         expectedResponseBody
           ? {
-              seq: 0,
-              type: "response",
-              command: command.command!,
-              request_seq: command.seq,
-              success: true,
-              body: expectedResponseBody,
-              metadata,
-            }
+            seq: 0,
+            type: "response",
+            command: command.command!,
+            request_seq: command.seq,
+            success: true,
+            body: expectedResponseBody,
+            metadata,
+          }
           : {
-              seq: 0,
-              type: "response",
-              command: command.command!,
-              request_seq: command.seq,
-              success: false,
-              message: "No content available.",
-            }
+            seq: 0,
+            type: "response",
+            command: command.command!,
+            request_seq: command.seq,
+            success: false,
+            message: "No content available.",
+          },
       );
     }
 
@@ -66,12 +66,12 @@ namespace ts.projectSystem {
               proxy.getCompletionsAtPosition = (
                 filename,
                 position,
-                options
+                options,
               ) => {
                 const result = info.languageService.getCompletionsAtPosition(
                   filename,
                   position,
-                  options
+                  options,
                 );
                 if (result) {
                   result.metadata = metadata;
@@ -122,7 +122,7 @@ namespace ts.projectSystem {
             command: protocol.CommandTypes.Completions,
             arguments: completionRequestArgs,
           },
-          expectedCompletionEntries
+          expectedCompletionEntries,
         );
       });
 
@@ -152,7 +152,7 @@ namespace ts.projectSystem {
               },
             },
             entries: expectedCompletionEntries,
-          }
+          },
         );
       });
 
@@ -175,7 +175,7 @@ namespace ts.projectSystem {
               offset: aTs.content.indexOf("x") + 1,
             },
           },
-          /*expectedResponseBody*/ undefined
+          /*expectedResponseBody*/ undefined,
         );
       });
     });

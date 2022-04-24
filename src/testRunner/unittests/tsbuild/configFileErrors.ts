@@ -37,14 +37,13 @@ namespace ts {
               "/src/tsconfig.json",
               ",",
               `,
-        "declaration": true,`
+        "declaration": true,`,
             ),
           subScenario: "reports syntax errors after change to config file",
         },
         {
           buildKind: BuildKind.IncrementalDtsUnchanged,
-          modifyFs: (fs) =>
-            appendText(fs, "/src/a.ts", "export function fooBar() { }"),
+          modifyFs: (fs) => appendText(fs, "/src/a.ts", "export function fooBar() { }"),
           subScenario: "reports syntax errors after change to ts file",
         },
         noChangeRun,
@@ -56,7 +55,7 @@ namespace ts {
               JSON.stringify({
                 compilerOptions: { composite: true, declaration: true },
                 files: ["a.ts", "b.ts"],
-              })
+              }),
             ),
           subScenario: "builds after fixing config file errors",
         },

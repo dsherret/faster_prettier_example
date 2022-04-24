@@ -85,9 +85,9 @@ namespace ts {
         for (const key of getOwnKeys(assertionCache) as AssertionKeys[]) {
           const cachedFunc = assertionCache[key];
           if (
-            cachedFunc !== undefined &&
-            Debug[key] !== cachedFunc.assertion &&
-            level >= cachedFunc.level
+            cachedFunc !== undefined
+            && Debug[key] !== cachedFunc.assertion
+            && level >= cachedFunc.level
           ) {
             (Debug as any)[key] = cachedFunc;
             assertionCache[key] = undefined;
@@ -108,7 +108,7 @@ namespace ts {
      */
     function shouldAssertFunction<K extends AssertionKeys>(
       level: AssertionLevel,
-      name: K
+      name: K,
     ): boolean {
       if (!shouldAssert(level)) {
         assertionCache[name] = { level, assertion: Debug[name] };
@@ -120,11 +120,11 @@ namespace ts {
 
     export function fail(
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): never {
       debugger;
       const e = new Error(
-        message ? `Debug Failure. ${message}` : "Debug Failure."
+        message ? `Debug Failure. ${message}` : "Debug Failure.",
       );
       if ((Error as any).captureStackTrace) {
         (Error as any).captureStackTrace(e, stackCrawlMark || fail);
@@ -135,13 +135,15 @@ namespace ts {
     export function failBadSyntaxKind(
       node: Node,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): never {
       return fail(
-        `${message || "Unexpected node."}\r\nNode ${formatSyntaxKind(
-          node.kind
-        )} was unexpected.`,
-        stackCrawlMark || failBadSyntaxKind
+        `${message || "Unexpected node."}\r\nNode ${
+          formatSyntaxKind(
+            node.kind,
+          )
+        } was unexpected.`,
+        stackCrawlMark || failBadSyntaxKind,
       );
     }
 
@@ -149,16 +151,15 @@ namespace ts {
       expression: unknown,
       message?: string,
       verboseDebugInfo?: string | (() => string),
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts expression {
       if (!expression) {
         message = message
           ? `False expression: ${message}`
           : "False expression.";
         if (verboseDebugInfo) {
-          message +=
-            "\r\nVerbose Debug Information: " +
-            (typeof verboseDebugInfo === "string"
+          message += "\r\nVerbose Debug Information: "
+            + (typeof verboseDebugInfo === "string"
               ? verboseDebugInfo
               : verboseDebugInfo());
         }
@@ -171,13 +172,13 @@ namespace ts {
       b: T,
       msg?: string,
       msg2?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void {
       if (a !== b) {
         const message = msg ? (msg2 ? `${msg} ${msg2}` : msg) : "";
         fail(
           `Expected ${a} === ${b}. ${message}`,
-          stackCrawlMark || assertEqual
+          stackCrawlMark || assertEqual,
         );
       }
     }
@@ -186,12 +187,12 @@ namespace ts {
       a: number,
       b: number,
       msg?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void {
       if (a >= b) {
         fail(
           `Expected ${a} < ${b}. ${msg || ""}`,
-          stackCrawlMark || assertLessThan
+          stackCrawlMark || assertLessThan,
         );
       }
     }
@@ -199,7 +200,7 @@ namespace ts {
     export function assertLessThanOrEqual(
       a: number,
       b: number,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void {
       if (a > b) {
         fail(`Expected ${a} <= ${b}`, stackCrawlMark || assertLessThanOrEqual);
@@ -209,12 +210,12 @@ namespace ts {
     export function assertGreaterThanOrEqual(
       a: number,
       b: number,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void {
       if (a < b) {
         fail(
           `Expected ${a} >= ${b}`,
-          stackCrawlMark || assertGreaterThanOrEqual
+          stackCrawlMark || assertGreaterThanOrEqual,
         );
       }
     }
@@ -222,7 +223,7 @@ namespace ts {
     export function assertIsDefined<T>(
       value: T,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts value is NonNullable<T> {
       // eslint-disable-next-line no-null/no-null
       if (value === undefined || value === null) {
@@ -233,7 +234,7 @@ namespace ts {
     export function checkDefined<T>(
       value: T | null | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): T {
       assertIsDefined(value, message, stackCrawlMark || checkDefined);
       return value;
@@ -242,17 +243,17 @@ namespace ts {
     export function assertEachIsDefined<T extends Node>(
       value: NodeArray<T>,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts value is NodeArray<T>;
     export function assertEachIsDefined<T>(
       value: readonly T[],
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts value is readonly NonNullable<T>[];
     export function assertEachIsDefined<T>(
       value: readonly T[],
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       for (const v of value) {
         assertIsDefined(v, message, stackCrawlMark || assertEachIsDefined);
@@ -262,7 +263,7 @@ namespace ts {
     export function checkEachDefined<T, A extends readonly T[]>(
       value: A,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): A {
       assertEachIsDefined(value, message, stackCrawlMark || checkEachDefined);
       return value;
@@ -271,14 +272,13 @@ namespace ts {
     export function assertNever(
       member: never,
       message = "Illegal value:",
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): never {
-      const detail =
-        typeof member === "object" &&
-        hasProperty(member, "kind") &&
-        hasProperty(member, "pos")
-          ? "SyntaxKind: " + formatSyntaxKind((member as Node).kind)
-          : JSON.stringify(member);
+      const detail = typeof member === "object"
+          && hasProperty(member, "kind")
+          && hasProperty(member, "pos")
+        ? "SyntaxKind: " + formatSyntaxKind((member as Node).kind)
+        : JSON.stringify(member);
       return fail(`${message} ${detail}`, stackCrawlMark || assertNever);
     }
 
@@ -286,32 +286,32 @@ namespace ts {
       nodes: NodeArray<T>,
       test: (node: T) => node is U,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts nodes is NodeArray<U>;
     export function assertEachNode<T extends Node, U extends T>(
       nodes: readonly T[],
       test: (node: T) => node is U,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts nodes is readonly U[];
     export function assertEachNode(
       nodes: readonly Node[],
       test: (node: Node) => boolean,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void;
     export function assertEachNode(
       nodes: readonly Node[],
       test: (node: Node) => boolean,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       if (shouldAssertFunction(AssertionLevel.Normal, "assertEachNode")) {
         assert(
           test === undefined || every(nodes, test),
           message || "Unexpected node.",
           () => `Node array did not pass test '${getFunctionName(test)}'.`,
-          stackCrawlMark || assertEachNode
+          stackCrawlMark || assertEachNode,
         );
       }
     }
@@ -320,29 +320,31 @@ namespace ts {
       node: T | undefined,
       test: (node: T) => node is U,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is U;
     export function assertNode(
       node: Node | undefined,
       test: ((node: Node) => boolean) | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void;
     export function assertNode(
       node: Node | undefined,
       test: ((node: Node) => boolean) | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       if (shouldAssertFunction(AssertionLevel.Normal, "assertNode")) {
         assert(
           node !== undefined && (test === undefined || test(node)),
           message || "Unexpected node.",
           () =>
-            `Node ${formatSyntaxKind(
-              node?.kind
-            )} did not pass test '${getFunctionName(test!)}'.`,
-          stackCrawlMark || assertNode
+            `Node ${
+              formatSyntaxKind(
+                node?.kind,
+              )
+            } did not pass test '${getFunctionName(test!)}'.`,
+          stackCrawlMark || assertNode,
         );
       }
     }
@@ -351,29 +353,31 @@ namespace ts {
       node: T | undefined,
       test: (node: Node) => node is U,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is Exclude<T, U>;
     export function assertNotNode(
       node: Node | undefined,
       test: ((node: Node) => boolean) | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void;
     export function assertNotNode(
       node: Node | undefined,
       test: ((node: Node) => boolean) | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       if (shouldAssertFunction(AssertionLevel.Normal, "assertNotNode")) {
         assert(
           node === undefined || test === undefined || !test(node),
           message || "Unexpected node.",
           () =>
-            `Node ${formatSyntaxKind(
-              node!.kind
-            )} should not have passed test '${getFunctionName(test!)}'.`,
-          stackCrawlMark || assertNotNode
+            `Node ${
+              formatSyntaxKind(
+                node!.kind,
+              )
+            } should not have passed test '${getFunctionName(test!)}'.`,
+          stackCrawlMark || assertNotNode,
         );
       }
     }
@@ -382,35 +386,37 @@ namespace ts {
       node: T,
       test: (node: T) => node is U,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is U;
     export function assertOptionalNode<T extends Node, U extends T>(
       node: T | undefined,
       test: (node: T) => node is U,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is U | undefined;
     export function assertOptionalNode(
       node: Node | undefined,
       test: ((node: Node) => boolean) | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void;
     export function assertOptionalNode(
       node: Node | undefined,
       test: ((node: Node) => boolean) | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       if (shouldAssertFunction(AssertionLevel.Normal, "assertOptionalNode")) {
         assert(
           test === undefined || node === undefined || test(node),
           message || "Unexpected node.",
           () =>
-            `Node ${formatSyntaxKind(
-              node?.kind
-            )} did not pass test '${getFunctionName(test!)}'.`,
-          stackCrawlMark || assertOptionalNode
+            `Node ${
+              formatSyntaxKind(
+                node?.kind,
+              )
+            } did not pass test '${getFunctionName(test!)}'.`,
+          stackCrawlMark || assertOptionalNode,
         );
       }
     }
@@ -419,35 +425,37 @@ namespace ts {
       node: T,
       kind: K,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is Extract<T, { readonly kind: K }>;
     export function assertOptionalToken<T extends Node, K extends SyntaxKind>(
       node: T | undefined,
       kind: K,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is Extract<T, { readonly kind: K }> | undefined;
     export function assertOptionalToken(
       node: Node | undefined,
       kind: SyntaxKind | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): void;
     export function assertOptionalToken(
       node: Node | undefined,
       kind: SyntaxKind | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       if (shouldAssertFunction(AssertionLevel.Normal, "assertOptionalToken")) {
         assert(
           kind === undefined || node === undefined || node.kind === kind,
           message || "Unexpected node.",
           () =>
-            `Node ${formatSyntaxKind(node?.kind)} was not a '${formatSyntaxKind(
-              kind
-            )}' token.`,
-          stackCrawlMark || assertOptionalToken
+            `Node ${formatSyntaxKind(node?.kind)} was not a '${
+              formatSyntaxKind(
+                kind,
+              )
+            }' token.`,
+          stackCrawlMark || assertOptionalToken,
         );
       }
     }
@@ -455,19 +463,19 @@ namespace ts {
     export function assertMissingNode(
       node: Node | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ): asserts node is undefined;
     export function assertMissingNode(
       node: Node | undefined,
       message?: string,
-      stackCrawlMark?: AnyFunction
+      stackCrawlMark?: AnyFunction,
     ) {
       if (shouldAssertFunction(AssertionLevel.Normal, "assertMissingNode")) {
         assert(
           node === undefined,
           message || "Unexpected node.",
           () => `Node ${formatSyntaxKind(node!.kind)} was unexpected'.`,
-          stackCrawlMark || assertMissingNode
+          stackCrawlMark || assertMissingNode,
         );
       }
     }
@@ -493,12 +501,16 @@ namespace ts {
     }
 
     export function formatSymbol(symbol: Symbol): string {
-      return `{ name: ${unescapeLeadingUnderscores(
-        symbol.escapedName
-      )}; flags: ${formatSymbolFlags(symbol.flags)}; declarations: ${map(
-        symbol.declarations,
-        (node) => formatSyntaxKind(node.kind)
-      )} }`;
+      return `{ name: ${
+        unescapeLeadingUnderscores(
+          symbol.escapedName,
+        )
+      }; flags: ${formatSymbolFlags(symbol.flags)}; declarations: ${
+        map(
+          symbol.declarations,
+          (node) => formatSyntaxKind(node.kind),
+        )
+      } }`;
     }
 
     /**
@@ -543,9 +555,7 @@ namespace ts {
         }
       }
 
-      return stableSort<[number, string]>(result, (x, y) =>
-        compareValues(x[0], y[0])
-      );
+      return stableSort<[number, string]>(result, (x, y) => compareValues(x[0], y[0]));
     }
 
     export function formatSyntaxKind(kind: SyntaxKind | undefined): string {
@@ -561,13 +571,13 @@ namespace ts {
     }
 
     export function formatModifierFlags(
-      flags: ModifierFlags | undefined
+      flags: ModifierFlags | undefined,
     ): string {
       return formatEnum(flags, (ts as any).ModifierFlags, /*isFlags*/ true);
     }
 
     export function formatTransformFlags(
-      flags: TransformFlags | undefined
+      flags: TransformFlags | undefined,
     ): string {
       return formatEnum(flags, (ts as any).TransformFlags, /*isFlags*/ true);
     }
@@ -585,7 +595,7 @@ namespace ts {
     }
 
     export function formatSignatureFlags(
-      flags: SignatureFlags | undefined
+      flags: SignatureFlags | undefined,
     ): string {
       return formatEnum(flags, (ts as any).SignatureFlags, /*isFlags*/ true);
     }
@@ -632,34 +642,31 @@ namespace ts {
           // for use with vscode-js-debug's new customDescriptionGenerator in launch.json
           __tsDebuggerDisplay: {
             value(this: FlowNodeBase) {
-              const flowHeader =
-                this.flags & FlowFlags.Start
-                  ? "FlowStart"
-                  : this.flags & FlowFlags.BranchLabel
-                  ? "FlowBranchLabel"
-                  : this.flags & FlowFlags.LoopLabel
-                  ? "FlowLoopLabel"
-                  : this.flags & FlowFlags.Assignment
-                  ? "FlowAssignment"
-                  : this.flags & FlowFlags.TrueCondition
-                  ? "FlowTrueCondition"
-                  : this.flags & FlowFlags.FalseCondition
-                  ? "FlowFalseCondition"
-                  : this.flags & FlowFlags.SwitchClause
-                  ? "FlowSwitchClause"
-                  : this.flags & FlowFlags.ArrayMutation
-                  ? "FlowArrayMutation"
-                  : this.flags & FlowFlags.Call
-                  ? "FlowCall"
-                  : this.flags & FlowFlags.ReduceLabel
-                  ? "FlowReduceLabel"
-                  : this.flags & FlowFlags.Unreachable
-                  ? "FlowUnreachable"
-                  : "UnknownFlow";
+              const flowHeader = this.flags & FlowFlags.Start
+                ? "FlowStart"
+                : this.flags & FlowFlags.BranchLabel
+                ? "FlowBranchLabel"
+                : this.flags & FlowFlags.LoopLabel
+                ? "FlowLoopLabel"
+                : this.flags & FlowFlags.Assignment
+                ? "FlowAssignment"
+                : this.flags & FlowFlags.TrueCondition
+                ? "FlowTrueCondition"
+                : this.flags & FlowFlags.FalseCondition
+                ? "FlowFalseCondition"
+                : this.flags & FlowFlags.SwitchClause
+                ? "FlowSwitchClause"
+                : this.flags & FlowFlags.ArrayMutation
+                ? "FlowArrayMutation"
+                : this.flags & FlowFlags.Call
+                ? "FlowCall"
+                : this.flags & FlowFlags.ReduceLabel
+                ? "FlowReduceLabel"
+                : this.flags & FlowFlags.Unreachable
+                ? "FlowUnreachable"
+                : "UnknownFlow";
               const remainingFlags = this.flags & ~(FlowFlags.Referenced - 1);
-              return `${flowHeader}${
-                remainingFlags ? ` (${formatFlowFlags(remainingFlags)})` : ""
-              }`;
+              return `${flowHeader}${remainingFlags ? ` (${formatFlowFlags(remainingFlags)})` : ""}`;
             },
           },
           __debugFlowFlags: {
@@ -667,7 +674,7 @@ namespace ts {
               return formatEnum(
                 this.flags,
                 (ts as any).FlowFlags,
-                /*isFlags*/ true
+                /*isFlags*/ true,
               );
             },
           },
@@ -713,7 +720,7 @@ namespace ts {
               // we're just taking note of it for anyone checking regex performance in the future.
               defaultValue = String(defaultValue).replace(
                 /(?:,[\s\w\d_]+:[^,]+)+\]$/,
-                "]"
+                "]",
               );
               return `NodeArray ${defaultValue}`;
             },
@@ -770,10 +777,9 @@ namespace ts {
           // for use with vscode-js-debug's new customDescriptionGenerator in launch.json
           __tsDebuggerDisplay: {
             value(this: Symbol) {
-              const symbolHeader =
-                this.flags & SymbolFlags.Transient
-                  ? "TransientSymbol"
-                  : "Symbol";
+              const symbolHeader = this.flags & SymbolFlags.Transient
+                ? "TransientSymbol"
+                : "Symbol";
               const remainingSymbolFlags = this.flags & ~SymbolFlags.Transient;
               return `${symbolHeader} '${symbolName(this)}'${
                 remainingSymbolFlags
@@ -787,68 +793,64 @@ namespace ts {
               return formatSymbolFlags(this.flags);
             },
           },
-        }
+        },
       );
 
       Object.defineProperties(objectAllocator.getTypeConstructor().prototype, {
         // for use with vscode-js-debug's new customDescriptionGenerator in launch.json
         __tsDebuggerDisplay: {
           value(this: Type) {
-            const typeHeader =
-              this.flags & TypeFlags.Nullable
-                ? "NullableType"
-                : this.flags & TypeFlags.StringOrNumberLiteral
-                ? `LiteralType ${JSON.stringify((this as LiteralType).value)}`
-                : this.flags & TypeFlags.BigIntLiteral
-                ? `LiteralType ${
-                    (this as BigIntLiteralType).value.negative ? "-" : ""
-                  }${(this as BigIntLiteralType).value.base10Value}n`
-                : this.flags & TypeFlags.UniqueESSymbol
-                ? "UniqueESSymbolType"
-                : this.flags & TypeFlags.Enum
-                ? "EnumType"
-                : this.flags & TypeFlags.Intrinsic
-                ? `IntrinsicType ${(this as IntrinsicType).intrinsicName}`
-                : this.flags & TypeFlags.Union
-                ? "UnionType"
-                : this.flags & TypeFlags.Intersection
-                ? "IntersectionType"
-                : this.flags & TypeFlags.Index
-                ? "IndexType"
-                : this.flags & TypeFlags.IndexedAccess
-                ? "IndexedAccessType"
-                : this.flags & TypeFlags.Conditional
-                ? "ConditionalType"
-                : this.flags & TypeFlags.Substitution
-                ? "SubstitutionType"
-                : this.flags & TypeFlags.TypeParameter
-                ? "TypeParameter"
-                : this.flags & TypeFlags.Object
-                ? (this as ObjectType).objectFlags &
-                  ObjectFlags.ClassOrInterface
-                  ? "InterfaceType"
-                  : (this as ObjectType).objectFlags & ObjectFlags.Reference
-                  ? "TypeReference"
-                  : (this as ObjectType).objectFlags & ObjectFlags.Tuple
-                  ? "TupleType"
-                  : (this as ObjectType).objectFlags & ObjectFlags.Anonymous
-                  ? "AnonymousType"
-                  : (this as ObjectType).objectFlags & ObjectFlags.Mapped
-                  ? "MappedType"
-                  : (this as ObjectType).objectFlags & ObjectFlags.ReverseMapped
-                  ? "ReverseMappedType"
-                  : (this as ObjectType).objectFlags & ObjectFlags.EvolvingArray
-                  ? "EvolvingArrayType"
-                  : "ObjectType"
-                : "Type";
-            const remainingObjectFlags =
-              this.flags & TypeFlags.Object
-                ? (this as ObjectType).objectFlags &
-                  ~ObjectFlags.ObjectTypeKindMask
-                : 0;
-            return `${typeHeader}${
-              this.symbol ? ` '${symbolName(this.symbol)}'` : ""
-            }${
+            const typeHeader = this.flags & TypeFlags.Nullable
+              ? "NullableType"
+              : this.flags & TypeFlags.StringOrNumberLiteral
+              ? `LiteralType ${JSON.stringify((this as LiteralType).value)}`
+              : this.flags & TypeFlags.BigIntLiteral
+              ? `LiteralType ${(this as BigIntLiteralType).value.negative ? "-" : ""}${
+                (this as BigIntLiteralType).value.base10Value
+              }n`
+              : this.flags & TypeFlags.UniqueESSymbol
+              ? "UniqueESSymbolType"
+              : this.flags & TypeFlags.Enum
+              ? "EnumType"
+              : this.flags & TypeFlags.Intrinsic
+              ? `IntrinsicType ${(this as IntrinsicType).intrinsicName}`
+              : this.flags & TypeFlags.Union
+              ? "UnionType"
+              : this.flags & TypeFlags.Intersection
+              ? "IntersectionType"
+              : this.flags & TypeFlags.Index
+              ? "IndexType"
+              : this.flags & TypeFlags.IndexedAccess
+              ? "IndexedAccessType"
+              : this.flags & TypeFlags.Conditional
+              ? "ConditionalType"
+              : this.flags & TypeFlags.Substitution
+              ? "SubstitutionType"
+              : this.flags & TypeFlags.TypeParameter
+              ? "TypeParameter"
+              : this.flags & TypeFlags.Object
+              ? (this as ObjectType).objectFlags
+                  & ObjectFlags.ClassOrInterface
+                ? "InterfaceType"
+                : (this as ObjectType).objectFlags & ObjectFlags.Reference
+                ? "TypeReference"
+                : (this as ObjectType).objectFlags & ObjectFlags.Tuple
+                ? "TupleType"
+                : (this as ObjectType).objectFlags & ObjectFlags.Anonymous
+                ? "AnonymousType"
+                : (this as ObjectType).objectFlags & ObjectFlags.Mapped
+                ? "MappedType"
+                : (this as ObjectType).objectFlags & ObjectFlags.ReverseMapped
+                ? "ReverseMappedType"
+                : (this as ObjectType).objectFlags & ObjectFlags.EvolvingArray
+                ? "EvolvingArrayType"
+                : "ObjectType"
+              : "Type";
+            const remainingObjectFlags = this.flags & TypeFlags.Object
+              ? (this as ObjectType).objectFlags
+                & ~ObjectFlags.ObjectTypeKindMask
+              : 0;
+            return `${typeHeader}${this.symbol ? ` '${symbolName(this.symbol)}'` : ""}${
               remainingObjectFlags
                 ? ` (${formatObjectFlags(remainingObjectFlags)})`
                 : ""
@@ -894,7 +896,7 @@ namespace ts {
               return this.checker?.signatureToString(this);
             },
           },
-        }
+        },
       );
 
       const nodeConstructors = [
@@ -917,11 +919,13 @@ namespace ts {
                   : isPrivateIdentifier(this)
                   ? `PrivateIdentifier '${idText(this)}'`
                   : isStringLiteral(this)
-                  ? `StringLiteral ${JSON.stringify(
+                  ? `StringLiteral ${
+                    JSON.stringify(
                       this.text.length < 10
                         ? this.text
-                        : this.text.slice(10) + "..."
-                    )}`
+                        : this.text.slice(10) + "...",
+                    )
+                  }`
                   : isNumericLiteral(this)
                   ? `NumericLiteral ${this.text}`
                   : isBigIntLiteral(this)
@@ -987,9 +991,7 @@ namespace ts {
                   : isImportTypeNode(this)
                   ? "ImportTypeNode"
                   : formatSyntaxKind(this.kind);
-                return `${nodeHeader}${
-                  this.flags ? ` (${formatNodeFlags(this.flags)})` : ""
-                }`;
+                return `${nodeHeader}${this.flags ? ` (${formatNodeFlags(this.flags)})` : ""}`;
               },
             },
             __debugKind: {
@@ -1005,7 +1007,7 @@ namespace ts {
             __debugModifierFlags: {
               get(this: Node) {
                 return formatModifierFlags(
-                  getEffectiveModifierFlagsNoCache(this)
+                  getEffectiveModifierFlagsNoCache(this),
                 );
               },
             },
@@ -1032,14 +1034,13 @@ namespace ts {
                 let text = map?.get(this);
                 if (text === undefined) {
                   const parseNode = getParseTreeNode(this);
-                  const sourceFile =
-                    parseNode && getSourceFileOfNode(parseNode);
+                  const sourceFile = parseNode && getSourceFileOfNode(parseNode);
                   text = sourceFile
                     ? getSourceTextOfNodeFromSourceFile(
-                        sourceFile,
-                        parseNode,
-                        includeTrivia
-                      )
+                      sourceFile,
+                      parseNode,
+                      includeTrivia,
+                    )
                     : "";
                   map?.set(this, text);
                 }
@@ -1054,11 +1055,11 @@ namespace ts {
       try {
         if (sys && sys.require) {
           const basePath = getDirectoryPath(
-            resolvePath(sys.getExecutingFilePath())
+            resolvePath(sys.getExecutingFilePath()),
           );
           const result = sys.require(
             basePath,
-            "./compiler-debug"
+            "./compiler-debug",
           ) as RequireResult<ExtendedDebugModule>;
           if (!result.error) {
             result.module.init(ts);
@@ -1077,7 +1078,7 @@ namespace ts {
       error: boolean | undefined,
       errorAfter: Version | undefined,
       since: Version | undefined,
-      message: string | undefined
+      message: string | undefined,
     ) {
       let deprecationMessage = error
         ? "DeprecationError: "
@@ -1101,14 +1102,14 @@ namespace ts {
       name: string,
       errorAfter: Version | undefined,
       since: Version | undefined,
-      message: string | undefined
+      message: string | undefined,
     ) {
       const deprecationMessage = formatDeprecationMessage(
         name,
         /*error*/ true,
         errorAfter,
         since,
-        message
+        message,
       );
       return () => {
         throw new TypeError(deprecationMessage);
@@ -1119,7 +1120,7 @@ namespace ts {
       name: string,
       errorAfter: Version | undefined,
       since: Version | undefined,
-      message: string | undefined
+      message: string | undefined,
     ) {
       let hasWrittenDeprecation = false;
       return () => {
@@ -1130,8 +1131,8 @@ namespace ts {
               /*error*/ false,
               errorAfter,
               since,
-              message
-            )
+              message,
+            ),
           );
           hasWrittenDeprecation = true;
         }
@@ -1140,31 +1141,26 @@ namespace ts {
 
     function createDeprecation(
       name: string,
-      options: DeprecationOptions & { error: true }
+      options: DeprecationOptions & { error: true },
     ): () => never;
     function createDeprecation(
       name: string,
-      options?: DeprecationOptions
+      options?: DeprecationOptions,
     ): () => void;
     function createDeprecation(name: string, options: DeprecationOptions = {}) {
-      const version =
-        typeof options.typeScriptVersion === "string"
-          ? new Version(options.typeScriptVersion)
-          : options.typeScriptVersion ?? getTypeScriptVersion();
-      const errorAfter =
-        typeof options.errorAfter === "string"
-          ? new Version(options.errorAfter)
-          : options.errorAfter;
-      const warnAfter =
-        typeof options.warnAfter === "string"
-          ? new Version(options.warnAfter)
-          : options.warnAfter;
-      const since =
-        typeof options.since === "string"
-          ? new Version(options.since)
-          : options.since ?? warnAfter;
-      const error =
-        options.error || (errorAfter && version.compareTo(errorAfter) <= 0);
+      const version = typeof options.typeScriptVersion === "string"
+        ? new Version(options.typeScriptVersion)
+        : options.typeScriptVersion ?? getTypeScriptVersion();
+      const errorAfter = typeof options.errorAfter === "string"
+        ? new Version(options.errorAfter)
+        : options.errorAfter;
+      const warnAfter = typeof options.warnAfter === "string"
+        ? new Version(options.warnAfter)
+        : options.warnAfter;
+      const since = typeof options.since === "string"
+        ? new Version(options.since)
+        : options.since ?? warnAfter;
+      const error = options.error || (errorAfter && version.compareTo(errorAfter) <= 0);
       const warn = !warnAfter || version.compareTo(warnAfter) >= 0;
       return error
         ? createErrorDeprecation(name, errorAfter, since, options.message)
@@ -1175,9 +1171,9 @@ namespace ts {
 
     function wrapFunction<F extends (...args: any[]) => any>(
       deprecation: () => void,
-      func: F
+      func: F,
     ): F {
-      return function (this: unknown) {
+      return function(this: unknown) {
         deprecation();
         return func.apply(this, arguments);
       } as F;
@@ -1185,7 +1181,7 @@ namespace ts {
 
     export function deprecate<F extends (...args: any[]) => any>(
       func: F,
-      options?: DeprecationOptions
+      options?: DeprecationOptions,
     ): F {
       const deprecation = createDeprecation(getFunctionName(func), options);
       return wrapFunction(deprecation, func);

@@ -1,7 +1,6 @@
 /// <reference lib="es2015.iterable" />
 
-interface Generator<T = unknown, TReturn = any, TNext = unknown>
-  extends Iterator<T, TReturn, TNext> {
+interface Generator<T = unknown, TReturn = any, TNext = unknown> extends Iterator<T, TReturn, TNext> {
   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
   next(...args: [] | [TNext]): IteratorResult<T, TReturn>;
   return(value: TReturn): IteratorResult<T, TReturn>;
@@ -14,7 +13,7 @@ interface GeneratorFunction {
    * Creates a new Generator object.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: any[]): Generator;
+  new(...args: any[]): Generator;
   /**
    * Creates a new Generator object.
    * @param args A list of arguments the function accepts.
@@ -39,7 +38,7 @@ interface GeneratorFunctionConstructor {
    * Creates a new Generator function.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: string[]): GeneratorFunction;
+  new(...args: string[]): GeneratorFunction;
   /**
    * Creates a new Generator function.
    * @param args A list of arguments the function accepts.

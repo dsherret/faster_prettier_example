@@ -3,9 +3,8 @@ namespace ts.codefix {
   const fixName = "fixCannotFindModule";
   const fixIdInstallTypesPackage = "installTypesPackage";
 
-  const errorCodeCannotFindModule =
-    Diagnostics.Cannot_find_module_0_or_its_corresponding_type_declarations
-      .code;
+  const errorCodeCannotFindModule = Diagnostics.Cannot_find_module_0_or_its_corresponding_type_declarations
+    .code;
   const errorCodes = [
     errorCodeCannotFindModule,
     Diagnostics
@@ -25,20 +24,20 @@ namespace ts.codefix {
       const typesPackageName = getTypesPackageNameToInstall(
         packageName,
         host,
-        context.errorCode
+        context.errorCode,
       );
       return typesPackageName === undefined
         ? []
         : [
-            createCodeFixAction(
-              fixName,
-              /*changes*/ [],
-              [Diagnostics.Install_0, typesPackageName],
-              fixIdInstallTypesPackage,
-              Diagnostics.Install_all_missing_types_packages,
-              getInstallCommand(sourceFile.fileName, typesPackageName)
-            ),
-          ];
+          createCodeFixAction(
+            fixName,
+            /*changes*/ [],
+            [Diagnostics.Install_0, typesPackageName],
+            fixIdInstallTypesPackage,
+            Diagnostics.Install_all_missing_types_packages,
+            getInstallCommand(sourceFile.fileName, typesPackageName),
+          ),
+        ];
     },
     fixIds: [fixIdInstallTypesPackage],
     getAllCodeActions: (context) => {
@@ -50,7 +49,7 @@ namespace ts.codefix {
             const pkg = getTypesPackageNameToInstall(
               packageName,
               context.host,
-              diag.code
+              diag.code,
             );
             if (pkg) {
               commands.push(getInstallCommand(diag.file.fileName, pkg));
@@ -66,18 +65,18 @@ namespace ts.codefix {
 
   function getInstallCommand(
     fileName: string,
-    packageName: string
+    packageName: string,
   ): InstallPackageAction {
     return { type: "install package", file: fileName, packageName };
   }
 
   function tryGetImportedPackageName(
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ): string | undefined {
     const moduleSpecifierText = tryCast(
       getTokenAtPosition(sourceFile, pos),
-      isStringLiteral
+      isStringLiteral,
     );
     if (!moduleSpecifierText) return undefined;
     const moduleName = moduleSpecifierText.text;
@@ -88,7 +87,7 @@ namespace ts.codefix {
   function getTypesPackageNameToInstall(
     packageName: string,
     host: LanguageServiceHost,
-    diagCode: number
+    diagCode: number,
   ): string | undefined {
     return diagCode === errorCodeCannotFindModule
       ? JsTyping.nodeCoreModules.has(packageName)

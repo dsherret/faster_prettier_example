@@ -24,7 +24,7 @@ namespace ts.projectSystem {
         content: packageJsonContent,
       };
 
-      const userContent = 'import("foo");\nfoo';
+      const userContent = "import(\"foo\");\nfoo";
       const aUser: File = { path: "/a/user.ts", content: userContent };
       const bUser: File = { path: "/b/user.ts", content: userContent };
       const tsconfig: File = {
@@ -70,7 +70,7 @@ namespace ts.projectSystem {
                     {
                       start: { line: 1, offset: 1 },
                       end: { line: 1, offset: 1 },
-                      newText: 'import { foo } from "foo";\n\n',
+                      newText: "import { foo } from \"foo\";\n\n",
                     },
                   ],
                 },
@@ -79,7 +79,7 @@ namespace ts.projectSystem {
               fixId: undefined,
               fixAllDescription: undefined,
             },
-          ]
+          ],
         );
       }
     });

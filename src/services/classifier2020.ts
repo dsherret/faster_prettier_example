@@ -34,13 +34,13 @@ namespace ts.classifier.v2020 {
     program: Program,
     cancellationToken: CancellationToken,
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ): ClassifiedSpan2020[] {
     const classifications = getEncodedSemanticClassifications(
       program,
       cancellationToken,
       sourceFile,
-      span
+      span,
     );
 
     Debug.assert(classifications.spans.length % 3 === 0);
@@ -60,7 +60,7 @@ namespace ts.classifier.v2020 {
     program: Program,
     cancellationToken: CancellationToken,
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ): Classifications {
     return {
       spans: getSemanticTokens(program, sourceFile, span, cancellationToken),
@@ -72,7 +72,7 @@ namespace ts.classifier.v2020 {
     program: Program,
     sourceFile: SourceFile,
     span: TextSpan,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): number[] {
     const resultTokens: number[] = [];
 
@@ -80,7 +80,7 @@ namespace ts.classifier.v2020 {
       resultTokens.push(
         node.getStart(sourceFile),
         node.getWidth(sourceFile),
-        ((typeIdx + 1) << TokenEncodingConsts.typeOffset) + modifierSet
+        ((typeIdx + 1) << TokenEncodingConsts.typeOffset) + modifierSet,
       );
     };
 
@@ -95,7 +95,7 @@ namespace ts.classifier.v2020 {
     sourceFile: SourceFile,
     span: TextSpan,
     collector: (node: Node, tokenType: number, tokenModifier: number) => void,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ) {
     const typeChecker = program.getTypeChecker();
 
@@ -114,9 +114,9 @@ namespace ts.classifier.v2020 {
       }
 
       if (
-        !node ||
-        !textSpanIntersectsWith(span, node.pos, node.getFullWidth()) ||
-        node.getFullWidth() === 0
+        !node
+        || !textSpanIntersectsWith(span, node.pos, node.getFullWidth())
+        || node.getFullWidth() === 0
       ) {
         return;
       }
@@ -129,10 +129,10 @@ namespace ts.classifier.v2020 {
       }
 
       if (
-        isIdentifier(node) &&
-        !inJSXElement &&
-        !inImportClause(node) &&
-        !isInfinityOrNaNString(node.escapedText)
+        isIdentifier(node)
+        && !inJSXElement
+        && !inImportClause(node)
+        && !isInfinityOrNaNString(node.escapedText)
       ) {
         let symbol = typeChecker.getSymbolAtLocation(node);
         if (symbol) {
@@ -143,12 +143,11 @@ namespace ts.classifier.v2020 {
           if (typeIdx !== undefined) {
             let modifierSet = 0;
             if (node.parent) {
-              const parentIsDeclaration =
-                isBindingElement(node.parent) ||
-                tokenFromDeclarationMapping.get(node.parent.kind) === typeIdx;
+              const parentIsDeclaration = isBindingElement(node.parent)
+                || tokenFromDeclarationMapping.get(node.parent.kind) === typeIdx;
               if (
-                parentIsDeclaration &&
-                (node.parent as NamedDeclaration).name === node
+                parentIsDeclaration
+                && (node.parent as NamedDeclaration).name === node
               ) {
                 modifierSet = 1 << TokenModifier.declaration;
               }
@@ -156,8 +155,8 @@ namespace ts.classifier.v2020 {
 
             // property declaration in constructor
             if (
-              typeIdx === TokenType.parameter &&
-              isRightSideOfQualifiedNameOrPropertyAccess(node)
+              typeIdx === TokenType.parameter
+              && isRightSideOfQualifiedNameOrPropertyAccess(node)
             ) {
               typeIdx = TokenType.property;
             }
@@ -175,21 +174,21 @@ namespace ts.classifier.v2020 {
                 modifierSet |= 1 << TokenModifier.async;
               }
               if (
-                typeIdx !== TokenType.class &&
-                typeIdx !== TokenType.interface
+                typeIdx !== TokenType.class
+                && typeIdx !== TokenType.interface
               ) {
                 if (
-                  modifiers & ModifierFlags.Readonly ||
-                  nodeFlags & NodeFlags.Const ||
-                  symbol.getFlags() & SymbolFlags.EnumMember
+                  modifiers & ModifierFlags.Readonly
+                  || nodeFlags & NodeFlags.Const
+                  || symbol.getFlags() & SymbolFlags.EnumMember
                 ) {
                   modifierSet |= 1 << TokenModifier.readonly;
                 }
               }
               if (
-                (typeIdx === TokenType.variable ||
-                  typeIdx === TokenType.function) &&
-                isLocalDeclaration(decl, sourceFile)
+                (typeIdx === TokenType.variable
+                  || typeIdx === TokenType.function)
+                && isLocalDeclaration(decl, sourceFile)
               ) {
                 modifierSet |= 1 << TokenModifier.local;
               }
@@ -197,10 +196,8 @@ namespace ts.classifier.v2020 {
                 modifierSet |= 1 << TokenModifier.defaultLibrary;
               }
             } else if (
-              symbol.declarations &&
-              symbol.declarations.some((d) =>
-                program.isSourceFileDefaultLibrary(d.getSourceFile())
-              )
+              symbol.declarations
+              && symbol.declarations.some((d) => program.isSourceFileDefaultLibrary(d.getSourceFile()))
             ) {
               modifierSet |= 1 << TokenModifier.defaultLibrary;
             }
@@ -218,7 +215,7 @@ namespace ts.classifier.v2020 {
 
   function classifySymbol(
     symbol: Symbol,
-    meaning: SemanticMeaning
+    meaning: SemanticMeaning,
   ): TokenType | undefined {
     const flags = symbol.getFlags();
     if (flags & SymbolFlags.Class) {
@@ -234,9 +231,8 @@ namespace ts.classifier.v2020 {
     } else if (flags & SymbolFlags.TypeParameter) {
       return TokenType.typeParameter;
     }
-    let decl =
-      symbol.valueDeclaration ||
-      (symbol.declarations && symbol.declarations[0]);
+    let decl = symbol.valueDeclaration
+      || (symbol.declarations && symbol.declarations[0]);
     if (decl && isBindingElement(decl)) {
       decl = getDeclarationForBindingElement(decl);
     }
@@ -246,13 +242,13 @@ namespace ts.classifier.v2020 {
   function reclassifyByType(
     typeChecker: TypeChecker,
     node: Node,
-    typeIdx: TokenType
+    typeIdx: TokenType,
   ): TokenType {
     // type based classifications
     if (
-      typeIdx === TokenType.variable ||
-      typeIdx === TokenType.property ||
-      typeIdx === TokenType.parameter
+      typeIdx === TokenType.variable
+      || typeIdx === TokenType.property
+      || typeIdx === TokenType.parameter
     ) {
       const type = typeChecker.getTypeAtLocation(node);
       if (type) {
@@ -262,15 +258,15 @@ namespace ts.classifier.v2020 {
           );
         };
         if (
-          typeIdx !== TokenType.parameter &&
-          test((t) => t.getConstructSignatures().length > 0)
+          typeIdx !== TokenType.parameter
+          && test((t) => t.getConstructSignatures().length > 0)
         ) {
           return TokenType.class;
         }
         if (
-          (test((t) => t.getCallSignatures().length > 0) &&
-            !test((t) => t.getProperties().length > 0)) ||
-          isExpressionInCallExpression(node)
+          (test((t) => t.getCallSignatures().length > 0)
+            && !test((t) => t.getProperties().length > 0))
+          || isExpressionInCallExpression(node)
         ) {
           return typeIdx === TokenType.property
             ? TokenType.member
@@ -283,16 +279,16 @@ namespace ts.classifier.v2020 {
 
   function isLocalDeclaration(
     decl: Declaration,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): boolean {
     if (isBindingElement(decl)) {
       decl = getDeclarationForBindingElement(decl);
     }
     if (isVariableDeclaration(decl)) {
       return (
-        (!isSourceFile(decl.parent.parent.parent) ||
-          isCatchClause(decl.parent)) &&
-        decl.getSourceFile() === sourceFile
+        (!isSourceFile(decl.parent.parent.parent)
+          || isCatchClause(decl.parent))
+        && decl.getSourceFile() === sourceFile
       );
     } else if (isFunctionDeclaration(decl)) {
       return !isSourceFile(decl.parent) && decl.getSourceFile() === sourceFile;
@@ -301,7 +297,7 @@ namespace ts.classifier.v2020 {
   }
 
   function getDeclarationForBindingElement(
-    element: BindingElement
+    element: BindingElement,
   ): VariableDeclaration | ParameterDeclaration {
     while (true) {
       if (isBindingElement(element.parent.parent)) {
@@ -315,10 +311,10 @@ namespace ts.classifier.v2020 {
   function inImportClause(node: Node): boolean {
     const parent = node.parent;
     return (
-      parent &&
-      (isImportClause(parent) ||
-        isImportSpecifier(parent) ||
-        isNamespaceImport(parent))
+      parent
+      && (isImportClause(parent)
+        || isImportSpecifier(parent)
+        || isNamespaceImport(parent))
     );
   }
 
@@ -331,8 +327,8 @@ namespace ts.classifier.v2020 {
 
   function isRightSideOfQualifiedNameOrPropertyAccess(node: Node): boolean {
     return (
-      (isQualifiedName(node.parent) && node.parent.right === node) ||
-      (isPropertyAccessExpression(node.parent) && node.parent.name === node)
+      (isQualifiedName(node.parent) && node.parent.right === node)
+      || (isPropertyAccessExpression(node.parent) && node.parent.name === node)
     );
   }
 

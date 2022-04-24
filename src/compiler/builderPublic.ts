@@ -64,13 +64,13 @@ namespace ts {
      * Get the diagnostics for compiler options
      */
     getOptionsDiagnostics(
-      cancellationToken?: CancellationToken
+      cancellationToken?: CancellationToken,
     ): readonly Diagnostic[];
     /**
      * Get the diagnostics that dont belong to any file
      */
     getGlobalDiagnostics(
-      cancellationToken?: CancellationToken
+      cancellationToken?: CancellationToken,
     ): readonly Diagnostic[];
     /**
      * Get the diagnostics from config file parsing
@@ -81,14 +81,14 @@ namespace ts {
      */
     getSyntacticDiagnostics(
       sourceFile?: SourceFile,
-      cancellationToken?: CancellationToken
+      cancellationToken?: CancellationToken,
     ): readonly Diagnostic[];
     /**
      * Get the declaration diagnostics, for all source files if source file is not supplied
      */
     getDeclarationDiagnostics(
       sourceFile?: SourceFile,
-      cancellationToken?: CancellationToken
+      cancellationToken?: CancellationToken,
     ): readonly DiagnosticWithLocation[];
     /**
      * Get all the dependencies of the file
@@ -105,7 +105,7 @@ namespace ts {
      */
     getSemanticDiagnostics(
       sourceFile?: SourceFile,
-      cancellationToken?: CancellationToken
+      cancellationToken?: CancellationToken,
     ): readonly Diagnostic[];
     /**
      * Emits the JavaScript and declaration files.
@@ -123,12 +123,12 @@ namespace ts {
       writeFile?: WriteFileCallback,
       cancellationToken?: CancellationToken,
       emitOnlyDtsFiles?: boolean,
-      customTransformers?: CustomTransformers
+      customTransformers?: CustomTransformers,
     ): EmitResult;
     /*@internal*/
     emitBuildInfo(
       writeFile?: WriteFileCallback,
-      cancellationToken?: CancellationToken
+      cancellationToken?: CancellationToken,
     ): EmitResult;
     /**
      * Get the current directory of the program
@@ -148,7 +148,7 @@ namespace ts {
      */
     getSemanticDiagnosticsOfNextAffectedFile(
       cancellationToken?: CancellationToken,
-      ignoreSourceFile?: (sourceFile: SourceFile) => boolean
+      ignoreSourceFile?: (sourceFile: SourceFile) => boolean,
     ): AffectedFileResult<readonly Diagnostic[]>;
   }
 
@@ -156,8 +156,7 @@ namespace ts {
    * The builder that can handle the changes in program and iterate through changed file to emit the files
    * The semantic diagnostics are cached per file and managed by clearing for the changed/affected files
    */
-  export interface EmitAndSemanticDiagnosticsBuilderProgram
-    extends SemanticDiagnosticsBuilderProgram {
+  export interface EmitAndSemanticDiagnosticsBuilderProgram extends SemanticDiagnosticsBuilderProgram {
     /**
      * Emits the next affected file's emit result (EmitResult and sourceFiles emitted) or returns undefined if iteration is complete
      * The first of writeFile if provided, writeFile of BuilderProgramHost if provided, writeFile of compiler host
@@ -167,7 +166,7 @@ namespace ts {
       writeFile?: WriteFileCallback,
       cancellationToken?: CancellationToken,
       emitOnlyDtsFiles?: boolean,
-      customTransformers?: CustomTransformers
+      customTransformers?: CustomTransformers,
     ): AffectedFileResult<EmitResult>;
   }
 
@@ -178,7 +177,7 @@ namespace ts {
     newProgram: Program,
     host: BuilderProgramHost,
     oldProgram?: SemanticDiagnosticsBuilderProgram,
-    configFileParsingDiagnostics?: readonly Diagnostic[]
+    configFileParsingDiagnostics?: readonly Diagnostic[],
   ): SemanticDiagnosticsBuilderProgram;
   export function createSemanticDiagnosticsBuilderProgram(
     rootNames: readonly string[] | undefined,
@@ -186,7 +185,7 @@ namespace ts {
     host?: CompilerHost,
     oldProgram?: SemanticDiagnosticsBuilderProgram,
     configFileParsingDiagnostics?: readonly Diagnostic[],
-    projectReferences?: readonly ProjectReference[]
+    projectReferences?: readonly ProjectReference[],
   ): SemanticDiagnosticsBuilderProgram;
   export function createSemanticDiagnosticsBuilderProgram(
     newProgramOrRootNames: Program | readonly string[] | undefined,
@@ -196,7 +195,7 @@ namespace ts {
       | readonly Diagnostic[]
       | SemanticDiagnosticsBuilderProgram,
     configFileParsingDiagnostics?: readonly Diagnostic[],
-    projectReferences?: readonly ProjectReference[]
+    projectReferences?: readonly ProjectReference[],
   ) {
     return createBuilderProgram(
       BuilderProgramKind.SemanticDiagnosticsBuilderProgram,
@@ -206,8 +205,8 @@ namespace ts {
         oldProgramOrHost,
         configFileParsingDiagnosticsOrOldProgram,
         configFileParsingDiagnostics,
-        projectReferences
-      )
+        projectReferences,
+      ),
     );
   }
 
@@ -219,7 +218,7 @@ namespace ts {
     newProgram: Program,
     host: BuilderProgramHost,
     oldProgram?: EmitAndSemanticDiagnosticsBuilderProgram,
-    configFileParsingDiagnostics?: readonly Diagnostic[]
+    configFileParsingDiagnostics?: readonly Diagnostic[],
   ): EmitAndSemanticDiagnosticsBuilderProgram;
   export function createEmitAndSemanticDiagnosticsBuilderProgram(
     rootNames: readonly string[] | undefined,
@@ -227,7 +226,7 @@ namespace ts {
     host?: CompilerHost,
     oldProgram?: EmitAndSemanticDiagnosticsBuilderProgram,
     configFileParsingDiagnostics?: readonly Diagnostic[],
-    projectReferences?: readonly ProjectReference[]
+    projectReferences?: readonly ProjectReference[],
   ): EmitAndSemanticDiagnosticsBuilderProgram;
   export function createEmitAndSemanticDiagnosticsBuilderProgram(
     newProgramOrRootNames: Program | readonly string[] | undefined,
@@ -237,7 +236,7 @@ namespace ts {
       | readonly Diagnostic[]
       | EmitAndSemanticDiagnosticsBuilderProgram,
     configFileParsingDiagnostics?: readonly Diagnostic[],
-    projectReferences?: readonly ProjectReference[]
+    projectReferences?: readonly ProjectReference[],
   ) {
     return createBuilderProgram(
       BuilderProgramKind.EmitAndSemanticDiagnosticsBuilderProgram,
@@ -247,8 +246,8 @@ namespace ts {
         oldProgramOrHost,
         configFileParsingDiagnosticsOrOldProgram,
         configFileParsingDiagnostics,
-        projectReferences
-      )
+        projectReferences,
+      ),
     );
   }
 
@@ -259,7 +258,7 @@ namespace ts {
     newProgram: Program,
     host: BuilderProgramHost,
     oldProgram?: BuilderProgram,
-    configFileParsingDiagnostics?: readonly Diagnostic[]
+    configFileParsingDiagnostics?: readonly Diagnostic[],
   ): BuilderProgram;
   export function createAbstractBuilder(
     rootNames: readonly string[] | undefined,
@@ -267,7 +266,7 @@ namespace ts {
     host?: CompilerHost,
     oldProgram?: BuilderProgram,
     configFileParsingDiagnostics?: readonly Diagnostic[],
-    projectReferences?: readonly ProjectReference[]
+    projectReferences?: readonly ProjectReference[],
   ): BuilderProgram;
   export function createAbstractBuilder(
     newProgramOrRootNames: Program | readonly string[] | undefined,
@@ -277,7 +276,7 @@ namespace ts {
       | readonly Diagnostic[]
       | BuilderProgram,
     configFileParsingDiagnostics?: readonly Diagnostic[],
-    projectReferences?: readonly ProjectReference[]
+    projectReferences?: readonly ProjectReference[],
   ): BuilderProgram {
     const {
       newProgram,
@@ -288,14 +287,14 @@ namespace ts {
       oldProgramOrHost,
       configFileParsingDiagnosticsOrOldProgram,
       configFileParsingDiagnostics,
-      projectReferences
+      projectReferences,
     );
     return createRedirectedBuilderProgram(
       () => ({
         program: newProgram,
         compilerOptions: newProgram.getCompilerOptions(),
       }),
-      newConfigFileParsingDiagnostics
+      newConfigFileParsingDiagnostics,
     );
   }
 }

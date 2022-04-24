@@ -11,9 +11,7 @@ namespace ts.codefix {
       const info = getInfo(sourceFile, context.span.start, context.errorCode);
       if (!info) return undefined;
 
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, info)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, info));
 
       return [
         createCodeFixAction(
@@ -21,7 +19,7 @@ namespace ts.codefix {
           changes,
           [Diagnostics.Change_0_to_1, ";", ","],
           fixId,
-          [Diagnostics.Change_0_to_1, ";", ","]
+          [Diagnostics.Change_0_to_1, ";", ","],
         ),
       ];
     },
@@ -40,14 +38,14 @@ namespace ts.codefix {
   function getInfo(
     sourceFile: SourceFile,
     pos: number,
-    _: number
+    _: number,
   ): Info | undefined {
     const node = getTokenAtPosition(sourceFile, pos);
 
-    return node.kind === SyntaxKind.SemicolonToken &&
-      node.parent &&
-      (isObjectLiteralExpression(node.parent) ||
-        isArrayLiteralExpression(node.parent))
+    return node.kind === SyntaxKind.SemicolonToken
+        && node.parent
+        && (isObjectLiteralExpression(node.parent)
+          || isArrayLiteralExpression(node.parent))
       ? { node }
       : undefined;
   }
@@ -55,7 +53,7 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    { node }: Info
+    { node }: Info,
   ): void {
     const newNode = factory.createToken(SyntaxKind.CommaToken);
     changes.replaceNode(sourceFile, node, newNode);

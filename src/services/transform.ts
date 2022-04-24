@@ -8,7 +8,7 @@ namespace ts {
   export function transform<T extends Node>(
     source: T | T[],
     transformers: TransformerFactory<T>[],
-    compilerOptions?: CompilerOptions
+    compilerOptions?: CompilerOptions,
   ) {
     const diagnostics: DiagnosticWithLocation[] = [];
     compilerOptions = fixupCompilerOptions(compilerOptions!, diagnostics); // TODO: GH#18217
@@ -20,7 +20,7 @@ namespace ts {
       compilerOptions,
       nodes,
       transformers,
-      /*allowDtsFiles*/ true
+      /*allowDtsFiles*/ true,
     );
     result.diagnostics = concatenate(result.diagnostics, diagnostics);
     return result;

@@ -52,8 +52,8 @@ export function f22() { } // trailing`,
         ],
         {
           currentDirectory: projectRoot,
-        }
-      )
+        },
+      ),
     );
     const { cb, getPrograms } = commandLineCallbacks(sys);
     const buildHost = createSolutionBuilderWithWatchHost(
@@ -61,7 +61,7 @@ export function f22() { } // trailing`,
       /*createProgram*/ undefined,
       createDiagnosticReporter(sys, /*pretty*/ true),
       createBuilderStatusReporter(sys, /*pretty*/ true),
-      createWatchStatusReporter(sys, /*pretty*/ true)
+      createWatchStatusReporter(sys, /*pretty*/ true),
     );
     buildHost.afterProgramEmitAndDiagnostics = cb;
     buildHost.afterEmitBundle = cb;
@@ -81,8 +81,7 @@ export function f22() { } // trailing`,
       changes: [
         {
           caption: "change to shared",
-          change: (sys) =>
-            sys.prependFile(sharedIndex.path, "export function fooBar() {}"),
+          change: (sys) => sys.prependFile(sharedIndex.path, "export function fooBar() {}"),
           timeouts: (sys) => {
             sys.checkTimeoutQueueLengthAndRun(1); // Shared
             sys.checkTimeoutQueueLengthAndRun(1); // webpack
@@ -110,7 +109,7 @@ export function f22() { } // trailing`,
             node,
             SyntaxKind.MultiLineCommentTrivia,
             `@before${project}`,
-            /*hasTrailingNewLine*/ true
+            /*hasTrailingNewLine*/ true,
           );
           return node;
         }
@@ -130,7 +129,7 @@ export function f22() { } // trailing`,
           addSyntheticLeadingComment(
             node,
             SyntaxKind.SingleLineCommentTrivia,
-            `@after${project}`
+            `@after${project}`,
           );
           return node;
         }

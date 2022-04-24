@@ -9,15 +9,15 @@ namespace ts {
     getTypeOfSymbol: (sym: Symbol) => Type,
     getResolvedSymbol: (node: Node) => Symbol,
     getConstraintOfTypeParameter: (
-      typeParameter: TypeParameter
+      typeParameter: TypeParameter,
     ) => Type | undefined,
     getFirstIdentifier: (node: EntityNameOrEntityNameExpression) => Identifier,
-    getTypeArguments: (type: TypeReference) => readonly Type[]
+    getTypeArguments: (type: TypeReference) => readonly Type[],
   ) {
     return getSymbolWalker;
 
     function getSymbolWalker(
-      accept: (symbol: Symbol) => boolean = () => true
+      accept: (symbol: Symbol) => boolean = () => true,
     ): SymbolWalker {
       const visitedTypes: Type[] = []; // Sparse array from id to type
       const visitedSymbols: Symbol[] = []; // Sparse array from id to symbol
@@ -105,7 +105,7 @@ namespace ts {
       }
 
       function visitUnionOrIntersectionType(
-        type: UnionOrIntersectionType
+        type: UnionOrIntersectionType,
       ): void {
         forEach(type.types, visitType);
       }
@@ -188,12 +188,12 @@ namespace ts {
           // So to get the intervening symbols, we need to check if there's a type
           // query node on any of the symbol's declarations and get symbols there
           if (
-            (d as any).type &&
-            (d as any).type.kind === SyntaxKind.TypeQuery
+            (d as any).type
+            && (d as any).type.kind === SyntaxKind.TypeQuery
           ) {
             const query = (d as any).type as TypeQueryNode;
             const entity = getResolvedSymbol(
-              getFirstIdentifier(query.exprName)
+              getFirstIdentifier(query.exprName),
             );
             visitSymbol(entity);
           }

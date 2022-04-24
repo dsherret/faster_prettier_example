@@ -21,7 +21,7 @@ namespace ts {
       writeProjects(
         fs,
         ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
-        deps
+        deps,
       );
     });
 
@@ -50,14 +50,14 @@ namespace ts {
       checkGraphOrdering(
         ["A", "H"],
         ["D", "E", "C", "B", "A", "J", "I", "H"],
-        /*circular*/ true
+        /*circular*/ true,
       );
     });
 
     function checkGraphOrdering(
       rootNames: string[],
       expectedBuildSet: string[],
-      circular?: true
+      circular?: true,
     ) {
       const builder = createSolutionBuilder(
         host!,
@@ -66,7 +66,7 @@ namespace ts {
           dry: true,
           force: false,
           verbose: false,
-        }
+        },
       );
       const buildOrder = builder.getBuildOrder();
       assert.equal(isCircularBuildOrder(buildOrder), !!circular);
@@ -81,7 +81,7 @@ namespace ts {
           assert.isAbove(
             buildQueue.indexOf(child),
             buildQueue.indexOf(parent),
-            `Expecting child ${child} to be built after parent ${parent}`
+            `Expecting child ${child} to be built after parent ${parent}`,
           );
         }
       }
@@ -94,18 +94,20 @@ namespace ts {
     function writeProjects(
       fileSystem: vfs.FileSystem,
       projectNames: string[],
-      deps: [string, string][]
+      deps: [string, string][],
     ): string[] {
       const projFileNames: string[] = [];
       for (const dep of deps) {
-        if (projectNames.indexOf(dep[0]) < 0)
+        if (projectNames.indexOf(dep[0]) < 0) {
           throw new Error(
-            `Invalid dependency - project ${dep[0]} does not exist`
+            `Invalid dependency - project ${dep[0]} does not exist`,
           );
-        if (projectNames.indexOf(dep[1]) < 0)
+        }
+        if (projectNames.indexOf(dep[1]) < 0) {
           throw new Error(
-            `Invalid dependency - project ${dep[1]} does not exist`
+            `Invalid dependency - project ${dep[1]} does not exist`,
           );
+        }
       }
       for (const proj of projectNames) {
         fileSystem.mkdirpSync(`/project/${proj}`);
@@ -120,7 +122,7 @@ namespace ts {
               .map((d) => ({ path: `../${d[1]}` })),
           },
           undefined,
-          2
+          2,
         );
         fileSystem.writeFileSync(configFileName, configContent);
         projFileNames.push(configFileName);

@@ -16,6 +16,6 @@ namespace Utils {
     }
   }
 
-  export const findUpRoot: { (): string; cached?: string } = () =>
-    (findUpRoot.cached ||= dirname(findUpFile("Gulpfile.js")));
+  export const findUpRoot: { (): string; cached?: string } =
+    () => (findUpRoot.cached ||= dirname(findUpFile("Gulpfile.js")));
 }

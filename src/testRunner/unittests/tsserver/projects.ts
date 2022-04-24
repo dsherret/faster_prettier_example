@@ -12,11 +12,10 @@ namespace ts.projectSystem {
       });
       openFilesForSession([file1], session);
 
-      const getErrRequest =
-        makeSessionRequest<server.protocol.SemanticDiagnosticsSyncRequestArgs>(
-          server.CommandNames.SemanticDiagnosticsSync,
-          { file: file1.path }
-        );
+      const getErrRequest = makeSessionRequest<server.protocol.SemanticDiagnosticsSyncRequestArgs>(
+        server.CommandNames.SemanticDiagnosticsSync,
+        { file: file1.path },
+      );
 
       // Two errors: CommonFile2 not found and cannot find name y
       session.executeCommand(getErrRequest);
@@ -27,7 +26,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "projects",
         "handles the missing files added with tripleslash ref",
-        session
+        session,
       );
     });
 
@@ -221,7 +220,7 @@ namespace ts.projectSystem {
           syntaxOnly: true,
         });
         projectService.applyChangesInOpenFiles(
-          singleIterator({ fileName: file1.path, content: file1.content })
+          singleIterator({ fileName: file1.path, content: file1.content }),
         );
 
         checkNumberOfProjects(projectService, { inferredProjects: 1 });
@@ -266,11 +265,11 @@ namespace ts.projectSystem {
       // should contain completions for string
       assert.isTrue(
         completions1.entries.some((e) => e.name === "charAt"),
-        "should contain 'charAt'"
+        "should contain 'charAt'",
       );
       assert.isFalse(
         completions1.entries.some((e) => e.name === "toExponential"),
-        "should not contain 'toExponential'"
+        "should not contain 'toExponential'",
       );
 
       service.closeClientFile(f2.path);
@@ -280,11 +279,11 @@ namespace ts.projectSystem {
       // should contain completions for string
       assert.isFalse(
         completions2.entries.some((e) => e.name === "charAt"),
-        "should not contain 'charAt'"
+        "should not contain 'charAt'",
       );
       assert.isTrue(
         completions2.entries.some((e) => e.name === "toExponential"),
-        "should contain 'toExponential'"
+        "should contain 'toExponential'",
       );
     });
 
@@ -324,7 +323,7 @@ namespace ts.projectSystem {
         .getCompletionsAtPosition(f1.path, 0, emptyOptions)!;
       assert.isTrue(
         completions1.entries.some((e) => e.name === "somelongname"),
-        "should contain 'somelongname'"
+        "should contain 'somelongname'",
       );
 
       service.closeClientFile(f2.path);
@@ -333,7 +332,7 @@ namespace ts.projectSystem {
         .getCompletionsAtPosition(f1.path, 0, emptyOptions)!;
       assert.isFalse(
         completions2.entries.some((e) => e.name === "somelongname"),
-        "should not contain 'somelongname'"
+        "should not contain 'somelongname'",
       );
       const sf2 = service.externalProjects[0]
         .getLanguageService()
@@ -447,7 +446,7 @@ namespace ts.projectSystem {
         const proj = projectService.externalProjects[0];
         assert.deepEqual(
           proj.getFileNames(/*excludeFilesFromExternalLibraries*/ true),
-          [file1.path]
+          [file1.path],
         );
         assert.deepEqual(proj.getTypeAcquisition().include, ["duck-types"]);
       } finally {
@@ -483,7 +482,7 @@ namespace ts.projectSystem {
         enqueueInstallTypingsRequest: (
           proj,
           typeAcquisition,
-          unresolvedImports
+          unresolvedImports,
         ) => {
           assert.isUndefined(request);
           request = JSON.stringify(
@@ -491,8 +490,8 @@ namespace ts.projectSystem {
               proj,
               typeAcquisition,
               unresolvedImports || server.emptyArray,
-              cachePath
-            )
+              cachePath,
+            ),
           );
         },
         attach: noop,
@@ -534,7 +533,7 @@ namespace ts.projectSystem {
           projectRootPath: "/",
           cachePath,
           kind: "discover",
-        })
+        }),
       );
       const response = JSON.parse(request!);
       request = undefined;
@@ -600,7 +599,7 @@ namespace ts.projectSystem {
         const proj = projectService.externalProjects[0];
         assert.deepEqual(
           proj.getFileNames(/*excludeFilesFromExternalLibraries*/ true),
-          [file1.path]
+          [file1.path],
         );
         assert.deepEqual(proj.getTypeAcquisition().include, [
           "kendo-ui",
@@ -683,7 +682,7 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { inferredProjects: 2 });
       assert.strictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[0]
+        inferredProjects[0],
       );
       checkProjectActualFiles(projectService.inferredProjects[0], [file2.path]);
       checkProjectActualFiles(projectService.inferredProjects[1], [file3.path]);
@@ -693,11 +692,11 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { inferredProjects: 1 });
       assert.notStrictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[0]
+        inferredProjects[0],
       );
       assert.notStrictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[1]
+        inferredProjects[1],
       );
       checkProjectRootFiles(projectService.inferredProjects[0], [file1.path]);
       checkProjectActualFiles(projectService.inferredProjects[0], [
@@ -711,7 +710,7 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { inferredProjects: 3 });
       assert.strictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[0]
+        inferredProjects[0],
       );
       assert.isTrue(projectService.inferredProjects[0].isOrphan());
       checkProjectActualFiles(projectService.inferredProjects[1], [file2.path]);
@@ -722,15 +721,15 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { inferredProjects: 3 });
       assert.strictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[0]
+        inferredProjects[0],
       );
       assert.strictEqual(
         projectService.inferredProjects[1],
-        inferredProjects[1]
+        inferredProjects[1],
       );
       assert.strictEqual(
         projectService.inferredProjects[2],
-        inferredProjects[2]
+        inferredProjects[2],
       );
       assert.isTrue(projectService.inferredProjects[0].isOrphan());
       checkProjectActualFiles(projectService.inferredProjects[1], [file2.path]);
@@ -740,11 +739,11 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { inferredProjects: 2 });
       assert.strictEqual(
         projectService.inferredProjects[0],
-        inferredProjects[2]
+        inferredProjects[2],
       );
       assert.strictEqual(
         projectService.inferredProjects[1],
-        inferredProjects[1]
+        inferredProjects[1],
       );
       checkProjectActualFiles(projectService.inferredProjects[0], [file3.path]);
       checkProjectActualFiles(projectService.inferredProjects[1], [file2.path]);
@@ -893,13 +892,12 @@ namespace ts.projectSystem {
       const extraFileExtensions = [
         { extension: ".html", scriptKind: ScriptKind.JS, isMixedContent: true },
       ];
-      const configureHostRequest =
-        makeSessionRequest<protocol.ConfigureRequestArguments>(
-          CommandNames.Configure,
-          {
-            extraFileExtensions,
-          }
-        );
+      const configureHostRequest = makeSessionRequest<protocol.ConfigureRequestArguments>(
+        CommandNames.Configure,
+        {
+          extraFileExtensions,
+        },
+      );
       session.executeCommand(configureHostRequest);
 
       // The configured project should now be updated to include html file
@@ -907,7 +905,7 @@ namespace ts.projectSystem {
       assert.strictEqual(
         configuredProjectAt(projectService, 0),
         configuredProj,
-        "Same configured project should be updated"
+        "Same configured project should be updated",
       );
       checkProjectActualFiles(configuredProjectAt(projectService, 0), [
         file1.path,
@@ -922,7 +920,7 @@ namespace ts.projectSystem {
           hasMixedContent: true,
           scriptKind: ScriptKind.JS,
           content: `var hello = "hello";`,
-        })
+        }),
       );
       // Now HTML file is included in the project
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
@@ -939,14 +937,14 @@ namespace ts.projectSystem {
         .getCompletionsAtPosition(file1.path, 1, emptyOptions);
       assert(
         completions && some(completions.entries, (e) => e.name === "hello"),
-        `expected entry hello to be in completion list`
+        `expected entry hello to be in completion list`,
       );
 
       // Close HTML file
       projectService.applyChangesInOpenFiles(
         /*openFiles*/ undefined,
         /*changedFiles*/ undefined,
-        /*closedFiles*/ [file2.path]
+        /*closedFiles*/ [file2.path],
       );
 
       // HTML file is still included in project
@@ -963,7 +961,7 @@ namespace ts.projectSystem {
         .getCompletionsAtPosition(file1.path, 5, emptyOptions);
       assert(
         completions && completions.entries[0].name !== "hello",
-        `unexpected hello entry in completion list`
+        `unexpected hello entry in completion list`,
       );
     });
 
@@ -985,7 +983,7 @@ namespace ts.projectSystem {
       let host = createServerHost([file1, file2, config1, libFile], {
         executingFilePath: combinePaths(
           getDirectoryPath(libFile.path),
-          "tsc.js"
+          "tsc.js",
         ),
       });
       let session = createSession(host);
@@ -994,13 +992,12 @@ namespace ts.projectSystem {
       const extraFileExtensions = [
         { extension: ".html", scriptKind: ScriptKind.JS, isMixedContent: true },
       ];
-      const configureHostRequest =
-        makeSessionRequest<protocol.ConfigureRequestArguments>(
-          CommandNames.Configure,
-          {
-            extraFileExtensions,
-          }
-        );
+      const configureHostRequest = makeSessionRequest<protocol.ConfigureRequestArguments>(
+        CommandNames.Configure,
+        {
+          extraFileExtensions,
+        },
+      );
       session.executeCommand(configureHostRequest);
 
       openFilesForSession([file1], session);
@@ -1022,7 +1019,7 @@ namespace ts.projectSystem {
       host = createServerHost([file1, file2, config2, libFile], {
         executingFilePath: combinePaths(
           getDirectoryPath(libFile.path),
-          "tsc.js"
+          "tsc.js",
         ),
       });
       session = createSession(host);
@@ -1048,7 +1045,7 @@ namespace ts.projectSystem {
       host = createServerHost([file1, file2, config3, libFile], {
         executingFilePath: combinePaths(
           getDirectoryPath(libFile.path),
-          "tsc.js"
+          "tsc.js",
         ),
       });
       session = createSession(host);
@@ -1077,7 +1074,7 @@ namespace ts.projectSystem {
       host = createServerHost([file1, file2, config4, libFile], {
         executingFilePath: combinePaths(
           getDirectoryPath(libFile.path),
-          "tsc.js"
+          "tsc.js",
         ),
       });
       session = createSession(host);
@@ -1106,7 +1103,7 @@ namespace ts.projectSystem {
       host = createServerHost([file1, file2, config5, libFile], {
         executingFilePath: combinePaths(
           getDirectoryPath(libFile.path),
-          "tsc.js"
+          "tsc.js",
         ),
       });
       session = createSession(host);
@@ -1149,7 +1146,7 @@ namespace ts.projectSystem {
             newText: "let y = 1",
           }),
         }),
-        /*closedFiles*/ undefined
+        /*closedFiles*/ undefined,
       );
 
       checkNumberOfProjects(projectService, { inferredProjects: 1 });
@@ -1188,7 +1185,7 @@ namespace ts.projectSystem {
       assert.equal(
         actualText,
         "",
-        `expected content to be empty string, got "${actualText}"`
+        `expected content to be empty string, got "${actualText}"`,
       );
 
       projectService.openClientFile(file1.path, `var x = 1;`);
@@ -1206,7 +1203,7 @@ namespace ts.projectSystem {
       assert.equal(
         actualText2,
         "",
-        `expected content to be empty string, got "${actualText2}"`
+        `expected content to be empty string, got "${actualText2}"`,
       );
     });
 
@@ -1263,12 +1260,12 @@ namespace ts.projectSystem {
       const project1 = projectService.configuredProjects.get(tsconfig1.path)!;
       assert.isTrue(
         project1.hasOpenRef(),
-        "Has open ref count in project1 - 1"
+        "Has open ref count in project1 - 1",
       ); // file2
       assert.equal(
         project1.getScriptInfo(file2.path)!.containingProjects.length,
         1,
-        "containing projects count"
+        "containing projects count",
       );
       assert.isFalse(project1.isClosed());
 
@@ -1276,49 +1273,49 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { configuredProjects: 2 });
       assert.isTrue(
         project1.hasOpenRef(),
-        "Has open ref count in project1 - 2"
+        "Has open ref count in project1 - 2",
       ); // file2
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfig1.path),
-        project1
+        project1,
       );
       assert.isFalse(project1.isClosed());
 
       const project2 = projectService.configuredProjects.get(tsconfig2.path)!;
       assert.isTrue(
         project2.hasOpenRef(),
-        "Has open ref count in project2 - 2"
+        "Has open ref count in project2 - 2",
       ); // file1
       assert.isFalse(project2.isClosed());
 
       assert.equal(
         project1.getScriptInfo(file1.path)!.containingProjects.length,
         2,
-        `${file1.path} containing projects count`
+        `${file1.path} containing projects count`,
       );
       assert.equal(
         project1.getScriptInfo(file2.path)!.containingProjects.length,
         1,
-        `${file2.path} containing projects count`
+        `${file2.path} containing projects count`,
       );
 
       projectService.closeClientFile(file2.path);
       checkNumberOfProjects(projectService, { configuredProjects: 2 });
       assert.isFalse(
         project1.hasOpenRef(),
-        "Has open ref count in project1 - 3"
+        "Has open ref count in project1 - 3",
       ); // No files
       assert.isTrue(
         project2.hasOpenRef(),
-        "Has open ref count in project2 - 3"
+        "Has open ref count in project2 - 3",
       ); // file1
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfig1.path),
-        project1
+        project1,
       );
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfig2.path),
-        project2
+        project2,
       );
       assert.isFalse(project1.isClosed());
       assert.isFalse(project2.isClosed());
@@ -1327,19 +1324,19 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { configuredProjects: 2 });
       assert.isFalse(
         project1.hasOpenRef(),
-        "Has open ref count in project1 - 4"
+        "Has open ref count in project1 - 4",
       ); // No files
       assert.isFalse(
         project2.hasOpenRef(),
-        "Has open ref count in project2 - 4"
+        "Has open ref count in project2 - 4",
       ); // No files
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfig1.path),
-        project1
+        project1,
       );
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfig2.path),
-        project2
+        project2,
       );
       assert.isFalse(project1.isClosed());
       assert.isFalse(project2.isClosed());
@@ -1348,12 +1345,12 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfig1.path),
-        project1
+        project1,
       );
       assert.isUndefined(projectService.configuredProjects.get(tsconfig2.path));
       assert.isTrue(
         project1.hasOpenRef(),
-        "Has open ref count in project1 - 5"
+        "Has open ref count in project1 - 5",
       ); // file2
       assert.isFalse(project1.isClosed());
       assert.isTrue(project2.isClosed());
@@ -1423,7 +1420,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "projects",
         "getting errors from closed script info does not throw exception because of getting project from orphan script info",
-        session
+        session,
       );
     });
 
@@ -1489,7 +1486,7 @@ namespace ts.projectSystem {
 
       const projectService = session.getProjectService();
       const configuredProject = projectService.configuredProjects.get(
-        config.path
+        config.path,
       )!;
       verifyConfiguredProject();
 
@@ -1592,7 +1589,7 @@ namespace ts.projectSystem {
 
     describe("includes deferred files in the project context", () => {
       function verifyDeferredContext(
-        lazyConfiguredProjectsFromExternalProject: boolean
+        lazyConfiguredProjectsFromExternalProject: boolean,
       ) {
         const file1 = {
           path: "/a.deferred",
@@ -1626,13 +1623,12 @@ namespace ts.projectSystem {
             isMixedContent: true,
           },
         ];
-        const configureHostRequest =
-          makeSessionRequest<protocol.ConfigureRequestArguments>(
-            CommandNames.Configure,
-            {
-              extraFileExtensions,
-            }
-          );
+        const configureHostRequest = makeSessionRequest<protocol.ConfigureRequestArguments>(
+          CommandNames.Configure,
+          {
+            extraFileExtensions,
+          },
+        );
         session.executeCommand(configureHostRequest);
 
         // Open external project
@@ -1656,18 +1652,18 @@ namespace ts.projectSystem {
 
         // Allow allowNonTsExtensions will be set to true for deferred extensions.
         assert.isTrue(
-          configuredProject.getCompilerOptions().allowNonTsExtensions
+          configuredProject.getCompilerOptions().allowNonTsExtensions,
         );
       }
 
       it("when lazyConfiguredProjectsFromExternalProject not set", () => {
         verifyDeferredContext(
-          /*lazyConfiguredProjectsFromExternalProject*/ false
+          /*lazyConfiguredProjectsFromExternalProject*/ false,
         );
       });
       it("when lazyConfiguredProjectsFromExternalProject is set", () => {
         verifyDeferredContext(
-          /*lazyConfiguredProjectsFromExternalProject*/ true
+          /*lazyConfiguredProjectsFromExternalProject*/ true,
         );
       });
     });
@@ -1726,7 +1722,7 @@ namespace ts.projectSystem {
 
       function verifyFile2InfoIsOrphan() {
         const info = Debug.checkDefined(
-          service.getScriptInfoForPath(file2.path as Path)
+          service.getScriptInfoForPath(file2.path as Path),
         );
         assert.equal(info.containingProjects.length, 0);
       }
@@ -1771,7 +1767,7 @@ namespace ts.projectSystem {
       };
       const fileB: File = {
         path: `${projectRootPath}/B/b.ts`,
-        content: 'import { foo } from "../A/a"; console.log(foo);',
+        content: "import { foo } from \"../A/a\"; console.log(foo);",
       };
       const configB: File = {
         path: `${projectRootPath}/B/tsconfig.json`,
@@ -1792,7 +1788,7 @@ namespace ts.projectSystem {
       projectService.openClientFile(fileB.path);
       const knownProjects = projectService.synchronizeProjectList(
         [],
-        /*includeProjectReferenceRedirectInfo*/ true
+        /*includeProjectReferenceRedirectInfo*/ true,
       );
       assert.deepEqual(knownProjects[0].files, [
         {
@@ -1845,7 +1841,7 @@ namespace ts.projectSystem {
       };
       const fileB: File = {
         path: `${projectRootPath}/B/b.ts`,
-        content: 'import { foo } from "../B/b2"; console.log(foo);',
+        content: "import { foo } from \"../B/b2\"; console.log(foo);",
       };
       const fileB2: File = {
         path: `${projectRootPath}/B/b2.ts`,
@@ -1870,7 +1866,7 @@ namespace ts.projectSystem {
       projectService.openClientFile(fileB.path);
       const knownProjects = projectService.synchronizeProjectList(
         [],
-        /*includeProjectReferenceRedirectInfo*/ true
+        /*includeProjectReferenceRedirectInfo*/ true,
       );
       assert.deepEqual(knownProjects[0].files, [
         {
@@ -1916,11 +1912,11 @@ namespace ts.projectSystem {
       "**/*",
       "../B/b2.ts"
   ]
-}`
+}`,
       );
       const newKnownProjects = projectService.synchronizeProjectList(
         knownProjects.map((proj) => proj.info!),
-        /*includeProjectReferenceRedirectInfo*/ true
+        /*includeProjectReferenceRedirectInfo*/ true,
       );
       assert.deepEqual(newKnownProjects[0].changes?.added, [
         {
@@ -1950,7 +1946,7 @@ namespace ts.projectSystem {
       projectService.openClientFile(file.path);
       const knownProjects = projectService.synchronizeProjectList(
         [],
-        /*includeProjectReferenceRedirectInfo*/ false
+        /*includeProjectReferenceRedirectInfo*/ false,
       );
       assert.deepEqual(knownProjects[0].files, [
         libFile.path,
@@ -1974,7 +1970,7 @@ namespace ts.projectSystem {
       projectService.openClientFile(file.path);
       const knownProjects = projectService.synchronizeProjectList(
         [],
-        /*includeProjectReferenceRedirectInfo*/ true
+        /*includeProjectReferenceRedirectInfo*/ true,
       );
       assert.deepEqual(knownProjects[0].files, [
         { fileName: libFile.path, isSourceOfProjectReferenceRedirect: false },
@@ -2036,8 +2032,7 @@ namespace ts.projectSystem {
 
       // file is deleted but watches are not yet invoked
       const originalFileExists = host.fileExists;
-      host.fileExists = (s) =>
-        s === fileA.path ? false : originalFileExists.call(host, s);
+      host.fileExists = (s) => s === fileA.path ? false : originalFileExists.call(host, s);
       closeFilesForSession([fileA], session);
       host.checkTimeoutQueueLength(2); // Update configured project and projects for open file
 
@@ -2061,7 +2056,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "projects",
         "handles delayed directory watch invoke on file creation",
-        session
+        session,
       );
 
       function openFile(file: File) {
@@ -2078,20 +2073,20 @@ namespace ts.projectSystem {
       // Intentionally create scriptinfo and attach it to project
       const info = service.getOrCreateScriptInfoForNormalizedPath(
         commonFile2.path as server.NormalizedPath,
-        /*openedByClient*/ false
+        /*openedByClient*/ false,
       )!;
       info.attachToProject(project);
       try {
         service.applyChangesInOpenFiles(
           /*openFiles*/ undefined,
           /*changedFiles*/ undefined,
-          [commonFile1.path]
+          [commonFile1.path],
         );
       } catch (e) {
         assert.isTrue(
           e.message.indexOf(
-            "Debug Failure. False expression: Found script Info still attached to project"
-          ) === 0
+            "Debug Failure. False expression: Found script Info still attached to project",
+          ) === 0,
         );
       }
     });
@@ -2099,13 +2094,13 @@ namespace ts.projectSystem {
       const rootFilePath = server.asNormalizedPath("/project/index.ts");
       const rootProjectPath = server.asNormalizedPath("/project/tsconfig.json");
       const nodeModulesFilePath1 = server.asNormalizedPath(
-        "/project/node_modules/@types/a/index.d.ts"
+        "/project/node_modules/@types/a/index.d.ts",
       );
       const nodeModulesProjectPath1 = server.asNormalizedPath(
-        "/project/node_modules/@types/a/tsconfig.json"
+        "/project/node_modules/@types/a/tsconfig.json",
       );
       const nodeModulesFilePath2 = server.asNormalizedPath(
-        "/project/node_modules/@types/b/index.d.ts"
+        "/project/node_modules/@types/b/index.d.ts",
       );
       const serverHost = createServerHost([
         { path: rootFilePath, content: "import 'a'; import 'b';" },
@@ -2121,18 +2116,16 @@ namespace ts.projectSystem {
       const openRootFileResult = projectService.openClientFile(rootFilePath);
       assert.strictEqual(
         openRootFileResult.configFileName?.toString(),
-        rootProjectPath
+        rootProjectPath,
       );
 
-      const openNodeModulesFileResult1 =
-        projectService.openClientFile(nodeModulesFilePath1);
+      const openNodeModulesFileResult1 = projectService.openClientFile(nodeModulesFilePath1);
       assert.strictEqual(
         openNodeModulesFileResult1.configFileName?.toString(),
-        nodeModulesProjectPath1
+        nodeModulesProjectPath1,
       );
 
-      const openNodeModulesFileResult2 =
-        projectService.openClientFile(nodeModulesFilePath2);
+      const openNodeModulesFileResult2 = projectService.openClientFile(nodeModulesFilePath2);
       assert.isUndefined(openNodeModulesFileResult2.configFileName);
 
       const rootProject = projectService.findProject(rootProjectPath)!;

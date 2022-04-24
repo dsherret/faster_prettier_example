@@ -15,7 +15,7 @@ namespace ts.performance {
     condition: boolean,
     measureName: string,
     startMarkName: string,
-    endMarkName: string
+    endMarkName: string,
   ) {
     return condition
       ? createTimer(measureName, startMarkName, endMarkName)
@@ -25,7 +25,7 @@ namespace ts.performance {
   export function createTimer(
     measureName: string,
     startMarkName: string,
-    endMarkName: string
+    endMarkName: string,
   ): Timer {
     let enterCount = 0;
     return {
@@ -83,15 +83,13 @@ namespace ts.performance {
   export function measure(
     measureName: string,
     startMarkName?: string,
-    endMarkName?: string
+    endMarkName?: string,
   ) {
     if (enabled) {
-      const end =
-        (endMarkName !== undefined ? marks.get(endMarkName) : undefined) ??
-        timestamp();
-      const start =
-        (startMarkName !== undefined ? marks.get(startMarkName) : undefined) ??
-        timeorigin;
+      const end = (endMarkName !== undefined ? marks.get(endMarkName) : undefined)
+        ?? timestamp();
+      const start = (startMarkName !== undefined ? marks.get(startMarkName) : undefined)
+        ?? timeorigin;
       const previousDuration = durations.get(measureName) || 0;
       durations.set(measureName, previousDuration + (end - start));
       performanceImpl?.measure(measureName, startMarkName, endMarkName);
@@ -122,7 +120,7 @@ namespace ts.performance {
    * @param cb The action to perform for each measure
    */
   export function forEachMeasure(
-    cb: (measureName: string, duration: number) => void
+    cb: (measureName: string, duration: number) => void,
   ) {
     durations.forEach((duration, measureName) => cb(measureName, duration));
   }
@@ -146,9 +144,9 @@ namespace ts.performance {
         // or `--prof`, if we're running with our own `--generateCpuProfile` flag, or when
         // running in debug mode (since its possible to generate a cpu profile while debugging).
         if (
-          perfHooks.shouldWriteNativeEvents ||
-          system?.cpuProfilingEnabled?.() ||
-          system?.debugMode
+          perfHooks.shouldWriteNativeEvents
+          || system?.cpuProfilingEnabled?.()
+          || system?.debugMode
         ) {
           performanceImpl = perfHooks.performance;
         }

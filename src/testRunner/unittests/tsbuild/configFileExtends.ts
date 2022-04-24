@@ -38,15 +38,13 @@ namespace ts {
     }
     verifyTsc({
       scenario: "configFileExtends",
-      subScenario:
-        "when building solution with projects extends config with include",
+      subScenario: "when building solution with projects extends config with include",
       fs: getConfigExtendsWithIncludeFs,
       commandLineArgs: ["--b", "/src/tsconfig.json", "--v", "--listFiles"],
     });
     verifyTsc({
       scenario: "configFileExtends",
-      subScenario:
-        "when building project uses reference and both extend config with include",
+      subScenario: "when building project uses reference and both extend config with include",
       fs: getConfigExtendsWithIncludeFs,
       commandLineArgs: [
         "--b",

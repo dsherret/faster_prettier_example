@@ -9,34 +9,34 @@ namespace ts.codefix {
     getCodeActions(context) {
       const { sourceFile, span } = context;
       const ctr = getNode(sourceFile, span.start);
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, ctr)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, ctr));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Add_missing_super_call,
           fixId,
-          Diagnostics.Add_all_missing_super_calls
+          Diagnostics.Add_all_missing_super_calls,
         ),
       ];
     },
     fixIds: [fixId],
     getAllCodeActions: (context) =>
-      codeFixAll(context, errorCodes, (changes, diag) =>
-        doChange(changes, context.sourceFile, getNode(diag.file, diag.start))
+      codeFixAll(
+        context,
+        errorCodes,
+        (changes, diag) => doChange(changes, context.sourceFile, getNode(diag.file, diag.start)),
       ),
   });
 
   function getNode(
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ): ConstructorDeclaration {
     const token = getTokenAtPosition(sourceFile, pos);
     Debug.assert(
       isConstructorDeclaration(token.parent),
-      "token should be at the constructor declaration"
+      "token should be at the constructor declaration",
     );
     return token.parent;
   }
@@ -44,14 +44,14 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    ctr: ConstructorDeclaration
+    ctr: ConstructorDeclaration,
   ) {
     const superCall = factory.createExpressionStatement(
       factory.createCallExpression(
         factory.createSuper(),
         /*typeArguments*/ undefined,
-        /*argumentsArray*/ emptyArray
-      )
+        /*argumentsArray*/ emptyArray,
+      ),
     );
     changes.insertNodeAtConstructorStart(sourceFile, ctr, superCall);
   }

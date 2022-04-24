@@ -4,12 +4,10 @@ namespace ts {
       name: string,
       sources: { file: string; text: string }[],
       customTransformers: CustomTransformers,
-      options: CompilerOptions = {}
+      options: CompilerOptions = {},
     ) {
       it(name, () => {
-        const roots = sources.map((source) =>
-          createSourceFile(source.file, source.text, ScriptTarget.ES2015)
-        );
+        const roots = sources.map((source) => createSourceFile(source.file, source.text, ScriptTarget.ES2015));
         const fileMap = arrayToMap(roots, (file) => file.fileName);
         const outputs = new Map<string, string>();
         const host: CompilerHost = {
@@ -21,22 +19,21 @@ namespace ts {
           useCaseSensitiveFileNames: () => true,
           getNewLine: () => "\n",
           fileExists: (fileName) => fileMap.has(fileName),
-          readFile: (fileName) =>
-            fileMap.has(fileName) ? fileMap.get(fileName)!.text : undefined,
+          readFile: (fileName) => fileMap.has(fileName) ? fileMap.get(fileName)!.text : undefined,
           writeFile: (fileName, text) => outputs.set(fileName, text),
         };
 
         const program = createProgram(
           arrayFrom(fileMap.keys()),
           { newLine: NewLineKind.LineFeed, ...options },
-          host
+          host,
         );
         program.emit(
           /*targetSourceFile*/ undefined,
           host.writeFile,
           /*cancellationToken*/ undefined,
           /*emitOnlyDtsFiles*/ false,
-          customTransformers
+          customTransformers,
         );
         let content = "";
         for (const [file, text] of arrayFrom(outputs.entries())) {
@@ -76,7 +73,7 @@ namespace ts {
           node,
           SyntaxKind.MultiLineCommentTrivia,
           "@before",
-          /*hasTrailingNewLine*/ true
+          /*hasTrailingNewLine*/ true,
         );
         return node;
       }
@@ -96,7 +93,7 @@ namespace ts {
         addSyntheticLeadingComment(
           node,
           SyntaxKind.SingleLineCommentTrivia,
-          "@after"
+          "@after",
         );
         return node;
       }
@@ -121,12 +118,14 @@ namespace ts {
       ],
       {
         before: [
-          (context) => (node) =>
-            visitNode(node, function visitor(node: Node): Node {
-              if (isStringLiteral(node) && node.text === "change")
-                return factory.createStringLiteral("changed");
-              return visitEachChild(node, visitor, context);
-            }),
+          (context) =>
+            (node) =>
+              visitNode(node, function visitor(node: Node): Node {
+                if (isStringLiteral(node) && node.text === "change") {
+                  return factory.createStringLiteral("changed");
+                }
+                return visitEachChild(node, visitor, context);
+              }),
         ],
       },
       {
@@ -134,7 +133,7 @@ namespace ts {
         module: ModuleKind.ES2015,
         emitDecoratorMetadata: true,
         experimentalDecorators: true,
-      }
+      },
     );
 
     emitsCorrectly(
@@ -150,29 +149,29 @@ namespace ts {
       ],
       {
         before: [
-          (context) => (node) =>
-            visitNode(node, function visitor(node: Node): Node {
-              if (isStringLiteral(node) && node.text === "change") {
-                const text = "'changed'";
-                const lineMap = computeLineStarts(text);
-                setSourceMapRange(node, {
-                  pos: 0,
-                  end: text.length,
-                  source: {
-                    text,
-                    fileName: "another.html",
-                    lineMap,
-                    getLineAndCharacterOfPosition: (pos) =>
-                      computeLineAndCharacterOfPosition(lineMap, pos),
-                  },
-                });
-                return node;
-              }
-              return visitEachChild(node, visitor, context);
-            }),
+          (context) =>
+            (node) =>
+              visitNode(node, function visitor(node: Node): Node {
+                if (isStringLiteral(node) && node.text === "change") {
+                  const text = "'changed'";
+                  const lineMap = computeLineStarts(text);
+                  setSourceMapRange(node, {
+                    pos: 0,
+                    end: text.length,
+                    source: {
+                      text,
+                      fileName: "another.html",
+                      lineMap,
+                      getLineAndCharacterOfPosition: (pos) => computeLineAndCharacterOfPosition(lineMap, pos),
+                    },
+                  });
+                  return node;
+                }
+                return visitEachChild(node, visitor, context);
+              }),
         ],
       },
-      { sourceMap: true }
+      { sourceMap: true },
     );
 
     emitsCorrectly(
@@ -206,13 +205,13 @@ namespace ts {
               transformBundle: (node) =>
                 factory.createBundle(
                   map(node.sourceFiles, transformSourceFile),
-                  node.prepends
+                  node.prepends,
                 ),
             };
           },
         ],
       },
-      { sourceMap: true, outFile: "source.js" }
+      { sourceMap: true, outFile: "source.js" },
     );
   });
 }

@@ -40,13 +40,13 @@ namespace Harness {
     public enumerateFiles(
       folder: string,
       regex?: RegExp,
-      options?: { recursive: boolean }
+      options?: { recursive: boolean },
     ): string[] {
       return ts.map(
         IO.listFiles(userSpecifiedRoot + folder, regex, {
           recursive: options ? options.recursive : false,
         }),
-        ts.normalizeSlashes
+        ts.normalizeSlashes,
       );
     }
 
@@ -60,7 +60,7 @@ namespace Harness {
         return all as ReturnType<this["enumerateTestFiles"]>;
       }
       return all.filter(
-        (_val, idx) => idx % shards === shardId - 1
+        (_val, idx) => idx % shards === shardId - 1,
       ) as ReturnType<this["enumerateTestFiles"]>;
     }
 

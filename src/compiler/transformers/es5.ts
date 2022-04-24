@@ -13,12 +13,12 @@ namespace ts {
     let previousOnEmitNode: (
       hint: EmitHint,
       node: Node,
-      emitCallback: (hint: EmitHint, node: Node) => void
+      emitCallback: (hint: EmitHint, node: Node) => void,
     ) => void;
     let noSubstitution: boolean[];
     if (
-      compilerOptions.jsx === JsxEmit.Preserve ||
-      compilerOptions.jsx === JsxEmit.ReactNative
+      compilerOptions.jsx === JsxEmit.Preserve
+      || compilerOptions.jsx === JsxEmit.ReactNative
     ) {
       previousOnEmitNode = context.onEmitNode;
       context.onEmitNode = onEmitNode;
@@ -53,7 +53,7 @@ namespace ts {
     function onEmitNode(
       hint: EmitHint,
       node: Node,
-      emitCallback: (emitContext: EmitHint, node: Node) => void
+      emitCallback: (emitContext: EmitHint, node: Node) => void,
     ) {
       switch (node.kind) {
         case SyntaxKind.JsxOpeningElement:
@@ -98,7 +98,7 @@ namespace ts {
      * @param node A PropertyAccessExpression
      */
     function substitutePropertyAccessExpression(
-      node: PropertyAccessExpression
+      node: PropertyAccessExpression,
     ): Expression {
       if (isPrivateIdentifier(node.name)) {
         return node;
@@ -107,7 +107,7 @@ namespace ts {
       if (literalName) {
         return setTextRange(
           factory.createElementAccessExpression(node.expression, literalName),
-          node
+          node,
         );
       }
       return node;
@@ -119,15 +119,14 @@ namespace ts {
      * @param node A PropertyAssignment
      */
     function substitutePropertyAssignment(
-      node: PropertyAssignment
+      node: PropertyAssignment,
     ): PropertyAssignment {
-      const literalName =
-        isIdentifier(node.name) && trySubstituteReservedName(node.name);
+      const literalName = isIdentifier(node.name) && trySubstituteReservedName(node.name);
       if (literalName) {
         return factory.updatePropertyAssignment(
           node,
           literalName,
-          node.initializer
+          node.initializer,
         );
       }
       return node;
@@ -139,13 +138,12 @@ namespace ts {
      * @param name An Identifier
      */
     function trySubstituteReservedName(name: Identifier) {
-      const token =
-        name.originalKeywordKind ||
-        (nodeIsSynthesized(name) ? stringToToken(idText(name)) : undefined);
+      const token = name.originalKeywordKind
+        || (nodeIsSynthesized(name) ? stringToToken(idText(name)) : undefined);
       if (
-        token !== undefined &&
-        token >= SyntaxKind.FirstReservedWord &&
-        token <= SyntaxKind.LastReservedWord
+        token !== undefined
+        && token >= SyntaxKind.FirstReservedWord
+        && token <= SyntaxKind.LastReservedWord
       ) {
         return setTextRange(factory.createStringLiteralFromNode(name), name);
       }

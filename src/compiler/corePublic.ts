@@ -63,8 +63,8 @@ namespace ts {
   /* @internal */
   export interface MapConstructor {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new <K, V>(
-      iterable?: readonly (readonly [K, V])[] | ReadonlyESMap<K, V>
+    new<K, V>(
+      iterable?: readonly (readonly [K, V])[] | ReadonlyESMap<K, V>,
     ): ESMap<K, V>;
   }
 
@@ -85,7 +85,7 @@ namespace ts {
   /* @internal */
   export interface SetConstructor {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new <T>(iterable?: readonly T[] | ReadonlySet<T>): Set<T>;
+    new<T>(iterable?: readonly T[] | ReadonlySet<T>): Set<T>;
   }
 
   /** ES6 Iterator type. */
@@ -116,14 +116,13 @@ namespace ts {
   namespace NativeCollections {
     declare const self: any;
 
-    const globals =
-      typeof globalThis !== "undefined"
-        ? globalThis
-        : typeof global !== "undefined"
-        ? global
-        : typeof self !== "undefined"
-        ? self
-        : undefined;
+    const globals = typeof globalThis !== "undefined"
+      ? globalThis
+      : typeof global !== "undefined"
+      ? global
+      : typeof self !== "undefined"
+      ? self
+      : undefined;
 
     /**
      * Returns the native Map implementation if it is available and compatible (i.e. supports iteration).
@@ -132,9 +131,9 @@ namespace ts {
       // Internet Explorer's Map doesn't support iteration, so don't use it.
       const gMap = globals?.Map;
       // eslint-disable-next-line no-in-operator
-      return typeof gMap !== "undefined" &&
-        "entries" in gMap.prototype &&
-        new gMap([[0, 0]]).size === 1
+      return typeof gMap !== "undefined"
+          && "entries" in gMap.prototype
+          && new gMap([[0, 0]]).size === 1
         ? gMap
         : undefined;
     }
@@ -146,9 +145,9 @@ namespace ts {
       // Internet Explorer's Set doesn't support iteration, so don't use it.
       const gSet = globals?.Set;
       // eslint-disable-next-line no-in-operator
-      return typeof gSet !== "undefined" &&
-        "entries" in gSet.prototype &&
-        new gSet([0]).size === 1
+      return typeof gSet !== "undefined"
+          && "entries" in gSet.prototype
+          && new gSet([0]).size === 1
         ? gSet
         : undefined;
     }
@@ -158,13 +157,13 @@ namespace ts {
   export const Map = getCollectionImplementation(
     "Map",
     "tryGetNativeMap",
-    "createMapShim"
+    "createMapShim",
   );
   /* @internal */
   export const Set = getCollectionImplementation(
     "Set",
     "tryGetNativeSet",
-    "createSetShim"
+    "createSetShim",
   );
 
   /* @internal */
@@ -173,18 +172,14 @@ namespace ts {
       | readonly any[]
       | ReadonlySet<any>
       | ReadonlyESMap<any, any>
-      | undefined
+      | undefined,
   >(
-    iterable: I
+    iterable: I,
   ) => Iterator<
-    I extends ReadonlyESMap<infer K, infer V>
-      ? [K, V]
-      : I extends ReadonlySet<infer T>
-      ? T
-      : I extends readonly (infer T)[]
-      ? T
-      : I extends undefined
-      ? undefined
+    I extends ReadonlyESMap<infer K, infer V> ? [K, V]
+      : I extends ReadonlySet<infer T> ? T
+      : I extends readonly (infer T)[] ? T
+      : I extends undefined ? undefined
       : never
   >;
 
@@ -194,24 +189,24 @@ namespace ts {
     K2 extends MatchingKeys<
       typeof ShimCollections,
       (
-        getIterator?: GetIteratorCallback
+        getIterator?: GetIteratorCallback,
       ) => ReturnType<typeof NativeCollections[K1]>
-    >
+    >,
   >(
     name: string,
     nativeFactory: K1,
-    shimFactory: K2
+    shimFactory: K2,
   ): NonNullable<ReturnType<typeof NativeCollections[K1]>> {
     // NOTE: ts.ShimCollections will be defined for typescriptServices.js but not for tsc.js, so we must test for it.
-    const constructor =
-      NativeCollections[nativeFactory]() ??
-      ShimCollections?.[shimFactory](getIterator);
-    if (constructor)
+    const constructor = NativeCollections[nativeFactory]()
+      ?? ShimCollections?.[shimFactory](getIterator);
+    if (constructor) {
       return constructor as NonNullable<
         ReturnType<typeof NativeCollections[K1]>
       >;
+    }
     throw new Error(
-      `TypeScript requires an environment that provides a compatible native ${name} implementation.`
+      `TypeScript requires an environment that provides a compatible native ${name} implementation.`,
     );
   }
 }

@@ -2,8 +2,7 @@ namespace Harness {
   // In harness baselines, null is different than undefined. See `generateActual` in `harness.ts`.
   export class Test262BaselineRunner extends RunnerBase {
     private static readonly basePath = "internal/cases/test262";
-    private static readonly helpersFilePath =
-      "tests/cases/test262-harness/helpers.d.ts";
+    private static readonly helpersFilePath = "tests/cases/test262-harness/helpers.d.ts";
     private static readonly helperFile: Compiler.TestFile = {
       unitName: Test262BaselineRunner.helpersFilePath,
       content: IO.readFile(Test262BaselineRunner.helpersFilePath)!,
@@ -35,18 +34,16 @@ namespace Harness {
 
         before(() => {
           const content = IO.readFile(filePath)!;
-          const testFilename =
-            ts.removeFileExtension(filePath).replace(/\//g, "_") + ".test";
+          const testFilename = ts.removeFileExtension(filePath).replace(/\//g, "_") + ".test";
           const testCaseContent = TestCaseParser.makeUnitsFromTest(
             content,
-            testFilename
+            testFilename,
           );
 
-          const inputFiles: Compiler.TestFile[] =
-            testCaseContent.testUnitData.map((unit) => {
-              const unitName = Test262BaselineRunner.getTestFilePath(unit.name);
-              return { unitName, content: unit.content };
-            });
+          const inputFiles: Compiler.TestFile[] = testCaseContent.testUnitData.map((unit) => {
+            const unitName = Test262BaselineRunner.getTestFilePath(unit.name);
+            return { unitName, content: unit.content };
+          });
 
           // Emit the results
           testState = {
@@ -60,7 +57,7 @@ namespace Harness {
             /*otherFiles*/ [],
             /* harnessOptions */ undefined,
             Test262BaselineRunner.options,
-            /* currentDirectory */ undefined
+            /* currentDirectory */ undefined,
           );
         });
 
@@ -70,44 +67,43 @@ namespace Harness {
 
         it("has the expected emitted code", () => {
           const files = Array.from(testState.compilerResult.js.values()).filter(
-            (f) => f.file !== Test262BaselineRunner.helpersFilePath
+            (f) => f.file !== Test262BaselineRunner.helpersFilePath,
           );
           Baseline.runBaseline(
             testState.filename + ".output.js",
             Compiler.collateOutputs(files),
-            Test262BaselineRunner.baselineOptions
+            Test262BaselineRunner.baselineOptions,
           );
         });
 
         it("has the expected errors", () => {
           const errors = testState.compilerResult.diagnostics;
           // eslint-disable-next-line no-null/no-null
-          const baseline =
-            errors.length === 0
-              ? null
-              : Compiler.getErrorBaseline(testState.inputFiles, errors);
+          const baseline = errors.length === 0
+            ? null
+            : Compiler.getErrorBaseline(testState.inputFiles, errors);
           Baseline.runBaseline(
             testState.filename + ".errors.txt",
             baseline,
-            Test262BaselineRunner.baselineOptions
+            Test262BaselineRunner.baselineOptions,
           );
         });
 
         it("satisfies invariants", () => {
           const sourceFile = testState.compilerResult.program!.getSourceFile(
-            Test262BaselineRunner.getTestFilePath(testState.filename)
+            Test262BaselineRunner.getTestFilePath(testState.filename),
           );
           Utils.assertInvariants(sourceFile, /*parent:*/ undefined);
         });
 
         it("has the expected AST", () => {
           const sourceFile = testState.compilerResult.program!.getSourceFile(
-            Test262BaselineRunner.getTestFilePath(testState.filename)
+            Test262BaselineRunner.getTestFilePath(testState.filename),
           )!;
           Baseline.runBaseline(
             testState.filename + ".AST.txt",
             Utils.sourceFileToJSON(sourceFile),
-            Test262BaselineRunner.baselineOptions
+            Test262BaselineRunner.baselineOptions,
           );
         });
       });
@@ -125,9 +121,9 @@ namespace Harness {
           Test262BaselineRunner.testFileExtensionRegex,
           {
             recursive: true,
-          }
+          },
         ),
-        ts.normalizePath
+        ts.normalizePath,
       );
     }
 
@@ -139,9 +135,7 @@ namespace Harness {
           this.runTest(fn);
         });
       } else {
-        this.tests.forEach((test) =>
-          this.runTest(typeof test === "string" ? test : test.file)
-        );
+        this.tests.forEach((test) => this.runTest(typeof test === "string" ? test : test.file));
       }
     }
   }

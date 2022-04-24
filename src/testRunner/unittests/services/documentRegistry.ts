@@ -7,18 +7,18 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
     const f2 = documentRegistry.acquireDocument(
       "file1.ts",
       defaultCompilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
 
     assert(
       f1 === f2,
-      "DocumentRegistry should return the same document for the same name"
+      "DocumentRegistry should return the same document for the same name",
     );
   });
 
@@ -35,14 +35,14 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       compilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
     compilerOptions.declaration = false;
     const f2 = documentRegistry.acquireDocument(
       "file1.ts",
       compilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
 
     assert(f1 === f2, "Expected to have the same document instance");
@@ -53,12 +53,12 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       compilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
 
     assert(
       f1 !== f3,
-      "Changed target: Expected to have different instances of document"
+      "Changed target: Expected to have different instances of document",
     );
 
     compilerOptions.preserveConstEnums = true;
@@ -66,12 +66,12 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       compilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
 
     assert(
       f3 === f4,
-      "Changed preserveConstEnums: Expected to have the same instance of the document"
+      "Changed preserveConstEnums: Expected to have the same instance of the document",
     );
 
     compilerOptions.module = ts.ModuleKind.System;
@@ -79,12 +79,12 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       compilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
 
     assert(
       f4 !== f5,
-      "Changed module: Expected to have different instances of the document"
+      "Changed module: Expected to have different instances of the document",
     );
   });
 
@@ -97,7 +97,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "1"
+      /* version */ "1",
     );
 
     // Simulate another LS getting the document at another version.
@@ -105,7 +105,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       ts.ScriptSnapshot.fromString("var x = 1;"),
-      /* version */ "2"
+      /* version */ "2",
     );
 
     assert(f2.version === "2");
@@ -122,7 +122,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
     snapshot.getChangeRange = () =>
       ts.createTextChangeRange(
         ts.createTextSpan(0, contents.length),
-        contents.length
+        contents.length,
       );
 
     // Simulate one LS getting the document.
@@ -130,7 +130,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       snapshot,
-      /* version */ "1"
+      /* version */ "1",
     );
 
     // Simulate another LS getting that document.
@@ -138,7 +138,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       snapshot,
-      /* version */ "1"
+      /* version */ "1",
     );
 
     // Now LS1 updates their document.
@@ -146,7 +146,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       snapshot,
-      /* version */ "2"
+      /* version */ "2",
     );
 
     // Now LS2 tries to update their document.
@@ -154,7 +154,7 @@ describe("unittests:: services:: DocumentRegistry", () => {
       "file1.ts",
       defaultCompilerOptions,
       snapshot,
-      /* version */ "3"
+      /* version */ "3",
     );
   });
 });

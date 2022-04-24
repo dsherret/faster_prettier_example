@@ -37,7 +37,7 @@ namespace ts {
 
   export type CommandLineProgram = [
     Program,
-    EmitAndSemanticDiagnosticsBuilderProgram?
+    EmitAndSemanticDiagnosticsBuilderProgram?,
   ];
   export interface CommandLineCallbacks {
     cb: ExecuteCommandLineCallbacks;
@@ -48,7 +48,7 @@ namespace ts {
     program:
       | Program
       | EmitAndSemanticDiagnosticsBuilderProgram
-      | ParsedCommandLine
+      | ParsedCommandLine,
   ): program is Program | EmitAndSemanticDiagnosticsBuilderProgram {
     return !!(program as Program | EmitAndSemanticDiagnosticsBuilderProgram)
       .getCompilerOptions;
@@ -56,7 +56,7 @@ namespace ts {
   export function commandLineCallbacks(
     sys: System & { writtenFiles: ReadonlyCollection<Path> },
     originalReadCall?: System["readFile"],
-    originalWriteFile?: System["writeFile"]
+    originalWriteFile?: System["writeFile"],
   ): CommandLineCallbacks {
     let programs: CommandLineProgram[] | undefined;
 
@@ -67,19 +67,19 @@ namespace ts {
             program.getCompilerOptions(),
             sys,
             originalReadCall,
-            originalWriteFile
+            originalWriteFile,
           );
           (programs || (programs = [])).push(
             isBuilderProgram(program)
               ? [program.getProgram(), program]
-              : [program]
+              : [program],
           );
         } else {
           baselineBuildInfo(
             program.options,
             sys,
             originalReadCall,
-            originalWriteFile
+            originalWriteFile,
           );
         }
       },
@@ -115,8 +115,9 @@ namespace ts {
       executingFilePath: "/lib/tsc",
       env: environmentVariables,
     }) as TscCompileSystem;
-    if (input.disableUseFileVersionAsSignature)
+    if (input.disableUseFileVersionAsSignature) {
       sys.disableUseFileVersionAsSignature = true;
+    }
     fakes.patchHostForBuildInfoReadWrite(sys);
     const writtenFiles = (sys.writtenFiles = new Set());
     const originalWriteFile = sys.writeFile;
@@ -131,8 +132,7 @@ namespace ts {
     sys.readFile = (path) => {
       // Dont record libs
       if (path.startsWith("/src/")) {
-        actualReadFileMap[path] =
-          (getProperty(actualReadFileMap, path) || 0) + 1;
+        actualReadFileMap[path] = (getProperty(actualReadFileMap, path) || 0) + 1;
       }
       return originalReadFile.call(sys, path);
     };
@@ -142,11 +142,11 @@ namespace ts {
     const { cb, getPrograms } = commandLineCallbacks(
       sys,
       originalReadFile,
-      originalWriteFile
+      originalWriteFile,
     );
     executeCommandLine(sys, cb, commandLineArgs);
     sys.write(
-      `exitCode:: ExitStatus.${ExitStatus[sys.exitCode as ExitStatus]}\n`
+      `exitCode:: ExitStatus.${ExitStatus[sys.exitCode as ExitStatus]}\n`,
     );
     if (baselinePrograms) {
       const baseline: string[] = [];
@@ -154,17 +154,19 @@ namespace ts {
         baseline,
         getPrograms,
         emptyArray,
-        baselineDependencies
+        baselineDependencies,
       );
       sys.write(baseline.join("\n"));
     }
     if (baselineReadFileCalls) {
       sys.write(
-        `readFiles:: ${JSON.stringify(
-          actualReadFileMap,
-          /*replacer*/ undefined,
-          " "
-        )} `
+        `readFiles:: ${
+          JSON.stringify(
+            actualReadFileMap,
+            /*replacer*/ undefined,
+            " ",
+          )
+        } `,
       );
     }
     if (baselineSourceMap) generateSourceMapBaselineFiles(sys);
@@ -172,19 +174,18 @@ namespace ts {
     fs.makeReadonly();
 
     sys.baseLine = () => {
-      const baseFsPatch =
-        !buildKind || buildKind === BuildKind.Initial
-          ? inputFs.diff(/*base*/ undefined, { baseIsNotShadowRoot: true })
-          : inputFs.diff(initialFs, {
-              includeChangedFileWithSameContent: true,
-            });
+      const baseFsPatch = !buildKind || buildKind === BuildKind.Initial
+        ? inputFs.diff(/*base*/ undefined, { baseIsNotShadowRoot: true })
+        : inputFs.diff(initialFs, {
+          includeChangedFileWithSameContent: true,
+        });
       const patch = fs.diff(inputFs, {
         includeChangedFileWithSameContent: true,
       });
       return {
-        file: `${isBuild(commandLineArgs) ? "tsbuild" : "tsc"}/${scenario}/${
-          buildKind || BuildKind.Initial
-        }/${subScenario.split(" ").join("-")}.js`,
+        file: `${isBuild(commandLineArgs) ? "tsbuild" : "tsc"}/${scenario}/${buildKind || BuildKind.Initial}/${
+          subScenario.split(" ").join("-")
+        }.js`,
         text: `Input::
 ${baseFsPatch ? vfs.formatPatch(baseFsPatch) : ""}
 
@@ -198,7 +199,7 @@ ${patch ? vfs.formatPatch(patch) : ""}`,
   }
 
   export function verifyTscBaseline(
-    sys: () => { baseLine: TscCompileSystem["baseLine"] }
+    sys: () => { baseLine: TscCompileSystem["baseLine"] },
   ) {
     it(`Generates files matching the baseline`, () => {
       const { file, text } = sys().baseLine();
@@ -207,9 +208,7 @@ ${patch ? vfs.formatPatch(patch) : ""}`,
   }
 
   export function verifyTsc(input: TscCompile) {
-    describe(`tsc ${input.commandLineArgs.join(" ")} ${input.scenario}:: ${
-      input.subScenario
-    }`, () => {
+    describe(`tsc ${input.commandLineArgs.join(" ")} ${input.scenario}:: ${input.subScenario}`, () => {
       describe(input.scenario, () => {
         describe(input.subScenario, () => {
           let sys: TscCompileSystem;

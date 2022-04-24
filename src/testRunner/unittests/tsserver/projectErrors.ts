@@ -2,7 +2,7 @@ namespace ts.projectSystem {
   describe("unittests:: tsserver:: Project Errors", () => {
     function checkProjectErrors(
       projectFiles: server.ProjectFilesWithTSDiagnostics,
-      expectedErrors: readonly string[]
+      expectedErrors: readonly string[],
     ): void {
       assert.isTrue(projectFiles !== undefined, "missing project files");
       checkProjectErrorsWorker(projectFiles.projectErrors, expectedErrors);
@@ -10,23 +10,23 @@ namespace ts.projectSystem {
 
     function checkProjectErrorsWorker(
       errors: readonly Diagnostic[],
-      expectedErrors: readonly string[]
+      expectedErrors: readonly string[],
     ): void {
       assert.equal(
         errors ? errors.length : 0,
         expectedErrors.length,
-        `expected ${expectedErrors.length} error in the list`
+        `expected ${expectedErrors.length} error in the list`,
       );
       if (expectedErrors.length) {
         for (let i = 0; i < errors.length; i++) {
           const actualMessage = flattenDiagnosticMessageText(
             errors[i].messageText,
-            "\n"
+            "\n",
           );
           const expectedMessage = expectedErrors[i];
           assert.isTrue(
             actualMessage.indexOf(expectedMessage) === 0,
-            `error message does not match, expected ${actualMessage} to start with ${expectedMessage}`
+            `error message does not match, expected ${actualMessage} to start with ${expectedMessage}`,
           );
         }
       }
@@ -34,12 +34,12 @@ namespace ts.projectSystem {
 
     function checkDiagnosticsWithLinePos(
       errors: server.protocol.DiagnosticWithLinePosition[],
-      expectedErrors: string[]
+      expectedErrors: string[],
     ) {
       assert.equal(
         errors ? errors.length : 0,
         expectedErrors.length,
-        `expected ${expectedErrors.length} error in the list`
+        `expected ${expectedErrors.length} error in the list`,
       );
       if (expectedErrors.length) {
         zipWith(
@@ -48,9 +48,9 @@ namespace ts.projectSystem {
           ({ message: actualMessage }, expectedMessage) => {
             assert.isTrue(
               startsWith(actualMessage, actualMessage),
-              `error message does not match, expected ${actualMessage} to start with ${expectedMessage}`
+              `error message does not match, expected ${actualMessage} to start with ${expectedMessage}`,
             );
-          }
+          },
         );
       }
     }
@@ -68,13 +68,12 @@ namespace ts.projectSystem {
       const session = createSession(host);
       const projectService = session.getProjectService();
       const projectFileName = "/a/b/test.csproj";
-      const compilerOptionsRequest: server.protocol.CompilerOptionsDiagnosticsRequest =
-        {
-          type: "request",
-          command: server.CommandNames.CompilerOptionsDiagnosticsFull,
-          seq: 2,
-          arguments: { projectFileName },
-        };
+      const compilerOptionsRequest: server.protocol.CompilerOptionsDiagnosticsRequest = {
+        type: "request",
+        command: server.CommandNames.CompilerOptionsDiagnosticsFull,
+        seq: 2,
+        arguments: { projectFileName },
+      };
 
       {
         projectService.openExternalProject({
@@ -131,13 +130,12 @@ namespace ts.projectSystem {
       openFilesForSession([file1], session);
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
       const project = configuredProjectAt(projectService, 0);
-      const compilerOptionsRequest: server.protocol.CompilerOptionsDiagnosticsRequest =
-        {
-          type: "request",
-          command: server.CommandNames.CompilerOptionsDiagnosticsFull,
-          seq: 2,
-          arguments: { projectFileName: project.getProjectName() },
-        };
+      const compilerOptionsRequest: server.protocol.CompilerOptionsDiagnosticsRequest = {
+        type: "request",
+        command: server.CommandNames.CompilerOptionsDiagnosticsFull,
+        seq: 2,
+        arguments: { projectFileName: project.getProjectName() },
+      };
       let diags = session.executeCommand(compilerOptionsRequest)
         .response as server.protocol.DiagnosticWithLinePosition[];
       checkDiagnosticsWithLinePos(diags, ["File '/a/b/applib.ts' not found."]);
@@ -177,16 +175,16 @@ namespace ts.projectSystem {
         projectService.checkNumberOfProjects({ configuredProjects: 1 });
         const configuredProject = find(
           projectService.synchronizeProjectList([]),
-          (f) => f.info!.projectName === corruptedConfig.path
+          (f) => f.info!.projectName === corruptedConfig.path,
         )!;
         assert.isTrue(
           configuredProject !== undefined,
-          "should find configured project"
+          "should find configured project",
         );
         checkProjectErrors(configuredProject, []);
         const projectErrors = configuredProjectAt(
           projectService,
-          0
+          0,
         ).getAllProjectErrors();
         checkProjectErrorsWorker(projectErrors, ["'{' expected."]);
         assert.isNotNull(projectErrors[0].file);
@@ -198,16 +196,16 @@ namespace ts.projectSystem {
         projectService.checkNumberOfProjects({ configuredProjects: 1 });
         const configuredProject = find(
           projectService.synchronizeProjectList([]),
-          (f) => f.info!.projectName === corruptedConfig.path
+          (f) => f.info!.projectName === corruptedConfig.path,
         )!;
         assert.isTrue(
           configuredProject !== undefined,
-          "should find configured project"
+          "should find configured project",
         );
         checkProjectErrors(configuredProject, []);
         const projectErrors = configuredProjectAt(
           projectService,
-          0
+          0,
         ).getAllProjectErrors();
         checkProjectErrorsWorker(projectErrors, []);
       }
@@ -240,16 +238,16 @@ namespace ts.projectSystem {
         projectService.checkNumberOfProjects({ configuredProjects: 1 });
         const configuredProject = find(
           projectService.synchronizeProjectList([]),
-          (f) => f.info!.projectName === corruptedConfig.path
+          (f) => f.info!.projectName === corruptedConfig.path,
         )!;
         assert.isTrue(
           configuredProject !== undefined,
-          "should find configured project"
+          "should find configured project",
         );
         checkProjectErrors(configuredProject, []);
         const projectErrors = configuredProjectAt(
           projectService,
-          0
+          0,
         ).getAllProjectErrors();
         checkProjectErrorsWorker(projectErrors, []);
       }
@@ -259,16 +257,16 @@ namespace ts.projectSystem {
         projectService.checkNumberOfProjects({ configuredProjects: 1 });
         const configuredProject = find(
           projectService.synchronizeProjectList([]),
-          (f) => f.info!.projectName === corruptedConfig.path
+          (f) => f.info!.projectName === corruptedConfig.path,
         )!;
         assert.isTrue(
           configuredProject !== undefined,
-          "should find configured project"
+          "should find configured project",
         );
         checkProjectErrors(configuredProject, []);
         const projectErrors = configuredProjectAt(
           projectService,
-          0
+          0,
         ).getAllProjectErrors();
         checkProjectErrorsWorker(projectErrors, ["'{' expected."]);
         assert.isNotNull(projectErrors[0].file);
@@ -339,7 +337,7 @@ namespace ts.projectSystem {
           `when opening new file that doesnt exist on disk yet ${
             useProjectRoot ? "with projectRoot" : "without projectRoot"
           }`,
-          session
+          session,
         );
       }
 
@@ -356,13 +354,11 @@ namespace ts.projectSystem {
       const projectDir = "/a/b/projects/myproject";
       const app: File = {
         path: `${projectDir}/bar/app.ts`,
-        content:
-          "class Bar implements foo.Foo { getFoo() { return ''; } get2() { return 1; } }",
+        content: "class Bar implements foo.Foo { getFoo() { return ''; } get2() { return 1; } }",
       };
       const foo: File = {
         path: `${projectDir}/foo/foo.ts`,
-        content:
-          "declare namespace foo { interface Foo { get2(): number; getFoo(): string; } }",
+        content: "declare namespace foo { interface Foo { get2(): number; getFoo(): string; } }",
       };
       const configFile: File = {
         path: `${projectDir}/tsconfig.json`,
@@ -390,7 +386,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "projectErrors",
         `folder rename updates project structure and reports no errors`,
-        session
+        session,
       );
     });
 
@@ -416,7 +412,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "projectErrors",
         "getting errors before opening file",
-        session
+        session,
       );
     });
 
@@ -442,11 +438,11 @@ namespace ts.projectSystem {
       });
       openFilesForSession(
         [{ file: app, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       openFilesForSession(
         [{ file: backendTest, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       verifyGetErrRequest({
         session,
@@ -456,7 +452,7 @@ namespace ts.projectSystem {
       closeFilesForSession([backendTest], session);
       openFilesForSession(
         [{ file: serverUtilities.path, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       verifyGetErrRequest({
         session,
@@ -466,7 +462,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "projectErrors",
         `reports errors correctly when file referenced by inferred project root, is opened right after closing the root file`,
-        session
+        session,
       );
     });
 
@@ -521,7 +517,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         `correct errors when resolution resolves to file that has same ambient module and is also module`,
-        session
+        session,
       );
 
       function checkErrors() {
@@ -576,7 +572,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events are generated when the config file has errors",
-        session
+        session,
       );
     });
 
@@ -600,7 +596,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events are generated when the config file doesnt have errors",
-        session
+        session,
       );
     });
 
@@ -639,7 +635,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events are generated when the config file changes",
-        session
+        session,
       );
     });
 
@@ -678,7 +674,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events are not generated when the config file does not include file opened and config file has errors",
-        session
+        session,
       );
     });
 
@@ -706,7 +702,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events are not generated when the config file has errors but suppressDiagnosticEvents is true",
-        session
+        session,
       );
     });
 
@@ -742,7 +738,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events are not generated when the config file does not include file opened and doesnt contain any errors",
-        session
+        session,
       );
     });
 
@@ -769,7 +765,7 @@ declare module '@custom/plugin' {
       baselineTsserverLogs(
         "projectErrors",
         "configFileDiagnostic events contains the project reference errors",
-        session
+        session,
       );
     });
   });
@@ -876,12 +872,10 @@ declare module '@custom/plugin' {
                     "mapRoot": "./"
                 }
             }`;
-      const configFileContentWithComment =
-        configFileContentBeforeComment +
-        configFileContentComment +
-        configFileContentAfterComment;
-      const configFileContentWithoutCommentLine =
-        configFileContentBeforeComment + configFileContentAfterComment;
+      const configFileContentWithComment = configFileContentBeforeComment
+        + configFileContentComment
+        + configFileContentAfterComment;
+      const configFileContentWithoutCommentLine = configFileContentBeforeComment + configFileContentAfterComment;
 
       const configFile = {
         path: "/a/b/tsconfig.json",
@@ -895,7 +889,7 @@ declare module '@custom/plugin' {
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
       const projectName = configuredProjectAt(
         projectService,
-        0
+        0,
       ).getProjectName();
 
       const diags = session.executeCommand({
@@ -933,26 +927,26 @@ declare module '@custom/plugin' {
 
       function verifyDiagnostic(
         beforeEditDiag: server.protocol.DiagnosticWithLinePosition,
-        afterEditDiag: server.protocol.DiagnosticWithLinePosition
+        afterEditDiag: server.protocol.DiagnosticWithLinePosition,
       ) {
         assert.equal(beforeEditDiag.message, afterEditDiag.message);
         assert.equal(beforeEditDiag.code, afterEditDiag.code);
         assert.equal(beforeEditDiag.category, afterEditDiag.category);
         assert.equal(
           beforeEditDiag.startLocation.line,
-          afterEditDiag.startLocation.line + 1
+          afterEditDiag.startLocation.line + 1,
         );
         assert.equal(
           beforeEditDiag.startLocation.offset,
-          afterEditDiag.startLocation.offset
+          afterEditDiag.startLocation.offset,
         );
         assert.equal(
           beforeEditDiag.endLocation.line,
-          afterEditDiag.endLocation.line + 1
+          afterEditDiag.endLocation.line + 1,
         );
         assert.equal(
           beforeEditDiag.endLocation.offset,
-          afterEditDiag.endLocation.offset
+          afterEditDiag.endLocation.offset,
         );
       }
     });
@@ -1037,7 +1031,7 @@ console.log(blabla);`,
       baselineTsserverLogs(
         "projectErrors",
         `should not report incorrect error when json is root file found by tsconfig`,
-        session
+        session,
       );
     });
 
@@ -1049,7 +1043,7 @@ console.log(blabla);`,
       baselineTsserverLogs(
         "projectErrors",
         `should report error when json is not root file found by tsconfig`,
-        session
+        session,
       );
     });
   });
@@ -1077,7 +1071,7 @@ console.log(blabla);`,
       });
       openFilesForSession(
         [{ file: main, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       verifyGetErrRequest({ session, host, files: [main] });
 
@@ -1117,7 +1111,7 @@ console.log(blabla);`,
       host.ensureFileOrFolder(
         moduleFile,
         /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true,
-        /*ignoreParentWatch*/ true
+        /*ignoreParentWatch*/ true,
       );
       // Since we added/removed in .staging no timeout
       verifyWhileNpmInstall(0);
@@ -1125,7 +1119,7 @@ console.log(blabla);`,
       // Remove staging folder to remove errors
       host.deleteFolder(
         `${tscWatch.projectRoot}/node_modules/.staging`,
-        /*recursive*/ true
+        /*recursive*/ true,
       );
       npmInstallComplete = true;
       projectFiles.push(moduleFile);
@@ -1134,10 +1128,8 @@ console.log(blabla);`,
 
       baselineTsserverLogs(
         "projectErrors",
-        `npm install when timeout occurs ${
-          timeoutDuringPartialInstallation ? "inbetween" : "after"
-        } installation`,
-        session
+        `npm install when timeout occurs ${timeoutDuringPartialInstallation ? "inbetween" : "after"} installation`,
+        session,
       );
 
       function verifyWhileNpmInstall(timeouts: number) {
@@ -1154,12 +1146,11 @@ console.log(blabla);`,
           session,
           host,
           files: [main],
-          existingTimeouts:
-            !npmInstallComplete && !timeoutDuringPartialInstallation
-              ? timeouts
-                ? 3
-                : 2
-              : undefined,
+          existingTimeouts: !npmInstallComplete && !timeoutDuringPartialInstallation
+            ? timeouts
+              ? 3
+              : 2
+            : undefined,
         });
       }
     }

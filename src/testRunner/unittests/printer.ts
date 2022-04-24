@@ -4,7 +4,7 @@ namespace ts {
       return function printsCorrectly(
         name: string,
         options: PrinterOptions,
-        printCallback: (printer: Printer) => string
+        printCallback: (printer: Printer) => string,
       ) {
         it(name, () => {
           Harness.Baseline.runBaseline(
@@ -13,8 +13,8 @@ namespace ts {
               createPrinter({
                 newLine: NewLineKind.CarriageReturnLineFeed,
                 ...options,
-              })
-            )
+              }),
+            ),
           );
         });
       };
@@ -63,15 +63,11 @@ namespace ts {
                         // comment10
                         function functionWithDefaultArgValue(argument: string = "defaultValue"): void { }
                     `,
-            ScriptTarget.ES2015
+            ScriptTarget.ES2015,
           );
         });
-        printsCorrectly("default", {}, (printer) =>
-          printer.printFile(sourceFile)
-        );
-        printsCorrectly("removeComments", { removeComments: true }, (printer) =>
-          printer.printFile(sourceFile)
-        );
+        printsCorrectly("default", {}, (printer) => printer.printFile(sourceFile));
+        printsCorrectly("removeComments", { removeComments: true }, (printer) => printer.printFile(sourceFile));
       });
 
       // https://github.com/microsoft/TypeScript/issues/14948
@@ -81,10 +77,9 @@ namespace ts {
           createSourceFile(
             "source.ts",
             "let greeting = `Hi ${name}, how are you?`;",
-            ScriptTarget.ES2017
-          )
-        )
-      );
+            ScriptTarget.ES2017,
+          ),
+        ));
 
       // https://github.com/microsoft/TypeScript/issues/18071
       printsCorrectly("regularExpressionLiteral", {}, (printer) =>
@@ -92,10 +87,9 @@ namespace ts {
           createSourceFile(
             "source.ts",
             "let regex = /abc/;",
-            ScriptTarget.ES2017
-          )
-        )
-      );
+            ScriptTarget.ES2017,
+          ),
+        ));
 
       // https://github.com/microsoft/TypeScript/issues/22239
       printsCorrectly(
@@ -106,19 +100,18 @@ namespace ts {
             createSourceFile(
               "source.ts",
               "import {foo} from 'foo';",
-              ScriptTarget.ESNext
-            )
-          )
+              ScriptTarget.ESNext,
+            ),
+          ),
       );
       printsCorrectly("classHeritageClauses", {}, (printer) =>
         printer.printFile(
           createSourceFile(
             "source.ts",
             `class A extends B implements C implements D {}`,
-            ScriptTarget.ES2017
-          )
-        )
-      );
+            ScriptTarget.ES2017,
+          ),
+        ));
 
       // https://github.com/microsoft/TypeScript/issues/35093
       printsCorrectly("definiteAssignmentAssertions", {}, (printer) =>
@@ -130,10 +123,9 @@ namespace ts {
                 }
 
                 let x!: string;`,
-            ScriptTarget.ES2017
-          )
-        )
-      );
+            ScriptTarget.ES2017,
+          ),
+        ));
 
       // https://github.com/microsoft/TypeScript/issues/35054
       printsCorrectly("jsx attribute escaping", {}, (printer) => {
@@ -143,8 +135,8 @@ namespace ts {
             String.raw`<a x='\\"'/>`,
             ScriptTarget.ESNext,
             /*setParentNodes*/ undefined,
-            ScriptKind.TSX
-          )
+            ScriptKind.TSX,
+          ),
         );
       });
     });
@@ -156,7 +148,7 @@ namespace ts {
             files: {
               "/test.d.ts": `/// <reference types="node" />\n/// <reference path="./src/test.d.ts />\n`,
             },
-          })
+          }),
         );
         const program = createProgram(["/test.d.ts"], {}, host);
         const file = program.getSourceFile("/test.d.ts")!;
@@ -172,7 +164,7 @@ namespace ts {
             files: {
               "/test.d.ts": `/// <reference types="node" />\n/// <reference path="./src/test.d.ts />\nvar a: number;\n`,
             },
-          })
+          }),
         );
         const program = createProgram(["/test.d.ts"], {}, host);
         const file = program.getSourceFile("/test.d.ts")!;
@@ -197,7 +189,7 @@ namespace ts {
                         // comment0
                         const a = 1;
                     `,
-            ScriptTarget.ES2015
+            ScriptTarget.ES2015,
           ),
           createSourceFile(
             "b.ts",
@@ -207,14 +199,12 @@ namespace ts {
                         // comment1
                         const b = 2;
                     `,
-            ScriptTarget.ES2015
+            ScriptTarget.ES2015,
           ),
         ]);
       });
       printsCorrectly("default", {}, (printer) => printer.printBundle(bundle));
-      printsCorrectly("removeComments", { removeComments: true }, (printer) =>
-        printer.printBundle(bundle)
-      );
+      printsCorrectly("removeComments", { removeComments: true }, (printer) => printer.printBundle(bundle));
     });
 
     describe("printNode", () => {
@@ -237,21 +227,19 @@ namespace ts {
                 factory.createIdentifier("prop"),
                 /*questionToken*/ undefined,
                 /*type*/ undefined,
-                /*initializer*/ undefined
+                /*initializer*/ undefined,
               ),
-            ]
+            ],
           ),
-          createSourceFile("source.ts", "", ScriptTarget.ES2015)
-        )
-      );
+          createSourceFile("source.ts", "", ScriptTarget.ES2015),
+        ));
 
       printsCorrectly("namespaceExportDeclaration", {}, (printer) =>
         printer.printNode(
           EmitHint.Unspecified,
           factory.createNamespaceExportDeclaration("B"),
-          createSourceFile("source.ts", "", ScriptTarget.ES2015)
-        )
-      );
+          createSourceFile("source.ts", "", ScriptTarget.ES2015),
+        ));
 
       printsCorrectly(
         "newExpressionWithPropertyAccessOnCallExpression",
@@ -264,15 +252,15 @@ namespace ts {
                 factory.createCallExpression(
                   factory.createIdentifier("f"),
                   /*typeArguments*/ undefined,
-                  /*argumentsArray*/ undefined
+                  /*argumentsArray*/ undefined,
                 ),
-                "x"
+                "x",
               ),
               /*typeArguments*/ undefined,
-              /*argumentsArray*/ undefined
+              /*argumentsArray*/ undefined,
             ),
-            createSourceFile("source.ts", "", ScriptTarget.ESNext)
-          )
+            createSourceFile("source.ts", "", ScriptTarget.ESNext),
+          ),
       );
 
       printsCorrectly("newExpressionOnConditionalExpression", {}, (printer) =>
@@ -284,14 +272,13 @@ namespace ts {
               factory.createToken(SyntaxKind.QuestionToken),
               factory.createIdentifier("y"),
               factory.createToken(SyntaxKind.ColonToken),
-              factory.createIdentifier("z")
+              factory.createIdentifier("z"),
             ),
             /*typeArguments*/ undefined,
-            /*argumentsArray*/ undefined
+            /*argumentsArray*/ undefined,
           ),
-          createSourceFile("source.ts", "", ScriptTarget.ESNext)
-        )
-      );
+          createSourceFile("source.ts", "", ScriptTarget.ESNext),
+        ));
 
       printsCorrectly("emptyGlobalAugmentation", {}, (printer) =>
         printer.printNode(
@@ -301,11 +288,10 @@ namespace ts {
             /*modifiers*/ [factory.createToken(SyntaxKind.DeclareKeyword)],
             factory.createIdentifier("global"),
             factory.createModuleBlock(emptyArray),
-            NodeFlags.GlobalAugmentation
+            NodeFlags.GlobalAugmentation,
           ),
-          createSourceFile("source.ts", "", ScriptTarget.ES2015)
-        )
-      );
+          createSourceFile("source.ts", "", ScriptTarget.ES2015),
+        ));
 
       printsCorrectly(
         "emptyGlobalAugmentationWithNoDeclareKeyword",
@@ -318,10 +304,10 @@ namespace ts {
               /*modifiers*/ undefined,
               factory.createIdentifier("global"),
               factory.createModuleBlock(emptyArray),
-              NodeFlags.GlobalAugmentation
+              NodeFlags.GlobalAugmentation,
             ),
-            createSourceFile("source.ts", "", ScriptTarget.ES2015)
-          )
+            createSourceFile("source.ts", "", ScriptTarget.ES2015),
+          ),
       );
 
       // https://github.com/Microsoft/TypeScript/issues/15971
@@ -344,7 +330,7 @@ namespace ts {
                 /*typeParameters*/ undefined,
                 [],
                 /*type*/ factory.createKeywordTypeNode(SyntaxKind.VoidKeyword),
-                /*body*/ undefined
+                /*body*/ undefined,
               ),
               factory.createPropertyDeclaration(
                 /*decorators*/ undefined,
@@ -352,15 +338,14 @@ namespace ts {
                 /*name*/ factory.createIdentifier("property"),
                 /*questionToken*/ factory.createToken(SyntaxKind.QuestionToken),
                 /*type*/ factory.createKeywordTypeNode(
-                  SyntaxKind.StringKeyword
+                  SyntaxKind.StringKeyword,
                 ),
-                /*initializer*/ undefined
+                /*initializer*/ undefined,
               ),
-            ]
+            ],
           ),
-          createSourceFile("source.ts", "", ScriptTarget.ES2015)
-        )
-      );
+          createSourceFile("source.ts", "", ScriptTarget.ES2015),
+        ));
 
       // https://github.com/Microsoft/TypeScript/issues/15651
       printsCorrectly("functionTypes", {}, (printer) =>
@@ -375,16 +360,16 @@ namespace ts {
                     /*decorators*/ undefined,
                     /*modifiers*/ undefined,
                     /*dotDotDotToken*/ undefined,
-                    factory.createIdentifier("args")
+                    factory.createIdentifier("args"),
                   ),
                 ],
-                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
               ),
               factory.createFunctionTypeNode(
                 [
                   factory.createTypeParameterDeclaration(
                     /*modifiers*/ undefined,
-                    "T"
+                    "T",
                   ),
                 ],
                 [
@@ -392,10 +377,10 @@ namespace ts {
                     /*decorators*/ undefined,
                     /*modifiers*/ undefined,
                     /*dotDotDotToken*/ undefined,
-                    factory.createIdentifier("args")
+                    factory.createIdentifier("args"),
                   ),
                 ],
-                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
               ),
               factory.createFunctionTypeNode(
                 /*typeArguments*/ undefined,
@@ -404,10 +389,10 @@ namespace ts {
                     /*decorators*/ undefined,
                     /*modifiers*/ undefined,
                     factory.createToken(SyntaxKind.DotDotDotToken),
-                    factory.createIdentifier("args")
+                    factory.createIdentifier("args"),
                   ),
                 ],
-                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
               ),
               factory.createFunctionTypeNode(
                 /*typeArguments*/ undefined,
@@ -417,10 +402,10 @@ namespace ts {
                     /*modifiers*/ undefined,
                     /*dotDotDotToken*/ undefined,
                     factory.createIdentifier("args"),
-                    factory.createToken(SyntaxKind.QuestionToken)
+                    factory.createToken(SyntaxKind.QuestionToken),
                   ),
                 ],
-                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
               ),
               factory.createFunctionTypeNode(
                 /*typeArguments*/ undefined,
@@ -431,10 +416,10 @@ namespace ts {
                     /*dotDotDotToken*/ undefined,
                     factory.createIdentifier("args"),
                     /*questionToken*/ undefined,
-                    factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                    factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
                   ),
                 ],
-                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
               ),
               factory.createFunctionTypeNode(
                 /*typeArguments*/ undefined,
@@ -443,17 +428,16 @@ namespace ts {
                     /*decorators*/ undefined,
                     /*modifiers*/ undefined,
                     /*dotDotDotToken*/ undefined,
-                    factory.createObjectBindingPattern([])
+                    factory.createObjectBindingPattern([]),
                   ),
                 ],
-                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+                factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
               ),
             ]),
-            EmitFlags.SingleLine
+            EmitFlags.SingleLine,
           ),
-          createSourceFile("source.ts", "", ScriptTarget.ES2015)
-        )
-      );
+          createSourceFile("source.ts", "", ScriptTarget.ES2015),
+        ));
     });
   });
 }

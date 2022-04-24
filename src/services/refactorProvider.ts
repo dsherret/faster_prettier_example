@@ -10,25 +10,22 @@ namespace ts.refactor {
   }
 
   export function getApplicableRefactors(
-    context: RefactorContext
+    context: RefactorContext,
   ): ApplicableRefactorInfo[] {
     return arrayFrom(
       flatMapIterator(refactors.values(), (refactor) =>
-        (context.cancellationToken &&
-          context.cancellationToken.isCancellationRequested()) ||
-        !refactor.kinds?.some((kind) =>
-          refactorKindBeginsWith(kind, context.kind)
-        )
+        (context.cancellationToken
+            && context.cancellationToken.isCancellationRequested())
+          || !refactor.kinds?.some((kind) => refactorKindBeginsWith(kind, context.kind))
           ? undefined
-          : refactor.getAvailableActions(context)
-      )
+          : refactor.getAvailableActions(context)),
     );
   }
 
   export function getEditsForRefactor(
     context: RefactorContext,
     refactorName: string,
-    actionName: string
+    actionName: string,
   ): RefactorEditInfo | undefined {
     const refactor = refactors.get(refactorName);
     return refactor && refactor.getEditsForAction(context, actionName);

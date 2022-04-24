@@ -3,7 +3,7 @@ interface Map<K, V> {
   delete(key: K): boolean;
   forEach(
     callbackfn: (value: V, key: K, map: Map<K, V>) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   get(key: K): V | undefined;
   has(key: K): boolean;
@@ -12,8 +12,8 @@ interface Map<K, V> {
 }
 
 interface MapConstructor {
-  new (): Map<any, any>;
-  new <K, V>(entries?: readonly (readonly [K, V])[] | null): Map<K, V>;
+  new(): Map<any, any>;
+  new<K, V>(entries?: readonly (readonly [K, V])[] | null): Map<K, V>;
   readonly prototype: Map<any, any>;
 }
 declare var Map: MapConstructor;
@@ -21,7 +21,7 @@ declare var Map: MapConstructor;
 interface ReadonlyMap<K, V> {
   forEach(
     callbackfn: (value: V, key: K, map: ReadonlyMap<K, V>) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   get(key: K): V | undefined;
   has(key: K): boolean;
@@ -36,8 +36,8 @@ interface WeakMap<K extends object, V> {
 }
 
 interface WeakMapConstructor {
-  new <K extends object = object, V = any>(
-    entries?: readonly [K, V][] | null
+  new<K extends object = object, V = any>(
+    entries?: readonly [K, V][] | null,
   ): WeakMap<K, V>;
   readonly prototype: WeakMap<object, any>;
 }
@@ -49,14 +49,14 @@ interface Set<T> {
   delete(value: T): boolean;
   forEach(
     callbackfn: (value: T, value2: T, set: Set<T>) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   has(value: T): boolean;
   readonly size: number;
 }
 
 interface SetConstructor {
-  new <T = any>(values?: readonly T[] | null): Set<T>;
+  new<T = any>(values?: readonly T[] | null): Set<T>;
   readonly prototype: Set<any>;
 }
 declare var Set: SetConstructor;
@@ -64,7 +64,7 @@ declare var Set: SetConstructor;
 interface ReadonlySet<T> {
   forEach(
     callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   has(value: T): boolean;
   readonly size: number;
@@ -77,7 +77,7 @@ interface WeakSet<T extends object> {
 }
 
 interface WeakSetConstructor {
-  new <T extends object = object>(values?: readonly T[] | null): WeakSet<T>;
+  new<T extends object = object>(values?: readonly T[] | null): WeakSet<T>;
   readonly prototype: WeakSet<object>;
 }
 declare var WeakSet: WeakSetConstructor;

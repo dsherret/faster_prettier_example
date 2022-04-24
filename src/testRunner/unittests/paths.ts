@@ -5,7 +5,7 @@ describe("unittests:: core paths", () => {
     assert.strictEqual(ts.normalizeSlashes("a\\b"), "a/b");
     assert.strictEqual(
       ts.normalizeSlashes("\\\\server\\path"),
-      "//server/path"
+      "//server/path",
     );
   });
   it("getRootLength", () => {
@@ -132,21 +132,21 @@ describe("unittests:: core paths", () => {
     assert.strictEqual(ts.getDirectoryPath("file://server/"), "file://server/");
     assert.strictEqual(
       ts.getDirectoryPath("file://server/path"),
-      "file://server/"
+      "file://server/",
     );
     assert.strictEqual(
       ts.getDirectoryPath("file://server/path/"),
-      "file://server/"
+      "file://server/",
     );
     assert.strictEqual(ts.getDirectoryPath("http://server"), "http://server");
     assert.strictEqual(ts.getDirectoryPath("http://server/"), "http://server/");
     assert.strictEqual(
       ts.getDirectoryPath("http://server/path"),
-      "http://server/"
+      "http://server/",
     );
     assert.strictEqual(
       ts.getDirectoryPath("http://server/path/"),
-      "http://server/"
+      "http://server/",
     );
   });
   it("getBaseFileName", () => {
@@ -181,31 +181,31 @@ describe("unittests:: core paths", () => {
     assert.strictEqual(ts.getBaseFileName("http://server/a/"), "a");
     assert.strictEqual(
       ts.getBaseFileName("/path/a.ext", ".ext", /*ignoreCase*/ false),
-      "a"
+      "a",
     );
     assert.strictEqual(
       ts.getBaseFileName("/path/a.ext", ".EXT", /*ignoreCase*/ true),
-      "a"
+      "a",
     );
     assert.strictEqual(
       ts.getBaseFileName("/path/a.ext", "ext", /*ignoreCase*/ false),
-      "a"
+      "a",
     );
     assert.strictEqual(
       ts.getBaseFileName("/path/a.b", ".ext", /*ignoreCase*/ false),
-      "a.b"
+      "a.b",
     );
     assert.strictEqual(
       ts.getBaseFileName("/path/a.b", [".b", ".c"], /*ignoreCase*/ false),
-      "a"
+      "a",
     );
     assert.strictEqual(
       ts.getBaseFileName("/path/a.c", [".b", ".c"], /*ignoreCase*/ false),
-      "a"
+      "a",
     );
     assert.strictEqual(
       ts.getBaseFileName("/path/a.d", [".b", ".c"], /*ignoreCase*/ false),
-      "a.d"
+      "a.d",
     );
   });
   it("getAnyExtensionFromPath", () => {
@@ -216,31 +216,31 @@ describe("unittests:: core paths", () => {
     assert.strictEqual(ts.getAnyExtensionFromPath("a.ext/"), ".ext");
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.ext", ".ext", /*ignoreCase*/ false),
-      ".ext"
+      ".ext",
     );
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.ext", ".EXT", /*ignoreCase*/ true),
-      ".ext"
+      ".ext",
     );
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.ext", "ext", /*ignoreCase*/ false),
-      ".ext"
+      ".ext",
     );
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.b", ".ext", /*ignoreCase*/ false),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.b", [".b", ".c"], /*ignoreCase*/ false),
-      ".b"
+      ".b",
     );
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.c", [".b", ".c"], /*ignoreCase*/ false),
-      ".c"
+      ".c",
     );
     assert.strictEqual(
       ts.getAnyExtensionFromPath("a.d", [".b", ".c"], /*ignoreCase*/ false),
-      ""
+      "",
     );
   });
   it("getPathComponents", () => {
@@ -316,7 +316,7 @@ describe("unittests:: core paths", () => {
   it("combinePaths", () => {
     assert.strictEqual(
       ts.combinePaths("/", "/node_modules/@types"),
-      "/node_modules/@types"
+      "/node_modules/@types",
     );
     assert.strictEqual(ts.combinePaths("/a/..", ""), "/a/..");
     assert.strictEqual(ts.combinePaths("/a/..", "b"), "/a/../b");
@@ -357,141 +357,141 @@ describe("unittests:: core paths", () => {
   it("getPathRelativeTo", () => {
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/", "/", /*ignoreCase*/ false),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a", "/a", /*ignoreCase*/ false),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a/", "/a", /*ignoreCase*/ false),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a", "/", /*ignoreCase*/ false),
-      ".."
+      "..",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a", "/b", /*ignoreCase*/ false),
-      "../b"
+      "../b",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a/b", "/b", /*ignoreCase*/ false),
-      "../../b"
+      "../../b",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a/b/c", "/b", /*ignoreCase*/ false),
-      "../../../b"
+      "../../../b",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a/b/c", "/b/c", /*ignoreCase*/ false),
-      "../../../b/c"
+      "../../../b/c",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("/a/b/c", "/a/b", /*ignoreCase*/ false),
-      ".."
+      "..",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory("c:", "d:", /*ignoreCase*/ false),
-      "d:/"
+      "d:/",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///",
         "file:///",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a",
         "file:///a",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a/",
         "file:///a",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      ""
+      "",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a",
         "file:///",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      ".."
+      "..",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a",
         "file:///b",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      "../b"
+      "../b",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a/b",
         "file:///b",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      "../../b"
+      "../../b",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a/b/c",
         "file:///b",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      "../../../b"
+      "../../../b",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a/b/c",
         "file:///b/c",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      "../../../b/c"
+      "../../../b/c",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///a/b/c",
         "file:///a/b",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      ".."
+      "..",
     );
     assert.strictEqual(
       ts.getRelativePathFromDirectory(
         "file:///c:",
         "file:///d:",
-        /*ignoreCase*/ false
+        /*ignoreCase*/ false,
       ),
-      "file:///d:/"
+      "file:///d:/",
     );
   });
   it("toFileNameLowerCase", () => {
     assert.strictEqual(
       ts.toFileNameLowerCase("/user/UserName/projects/Project/file.ts"),
-      "/user/username/projects/project/file.ts"
+      "/user/username/projects/project/file.ts",
     );
     assert.strictEqual(
       ts.toFileNameLowerCase("/user/UserName/projects/projectß/file.ts"),
-      "/user/username/projects/projectß/file.ts"
+      "/user/username/projects/projectß/file.ts",
     );
     assert.strictEqual(
       ts.toFileNameLowerCase("/user/UserName/projects/İproject/file.ts"),
-      "/user/username/projects/İproject/file.ts"
+      "/user/username/projects/İproject/file.ts",
     );
     assert.strictEqual(
       ts.toFileNameLowerCase("/user/UserName/projects/ı/file.ts"),
-      "/user/username/projects/ı/file.ts"
+      "/user/username/projects/ı/file.ts",
     );
   });
 });

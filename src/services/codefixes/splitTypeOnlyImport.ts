@@ -14,7 +14,7 @@ namespace ts.codefix {
         return splitTypeOnlyImport(
           t,
           getImportDeclaration(context.sourceFile, context.span),
-          context
+          context,
         );
       });
       if (changes.length) {
@@ -24,7 +24,7 @@ namespace ts.codefix {
             changes,
             Diagnostics.Split_into_two_separate_import_declarations,
             fixId,
-            Diagnostics.Split_all_invalid_type_only_imports
+            Diagnostics.Split_all_invalid_type_only_imports,
           ),
         ];
       }
@@ -34,7 +34,7 @@ namespace ts.codefix {
         splitTypeOnlyImport(
           changes,
           getImportDeclaration(context.sourceFile, error),
-          context
+          context,
         );
       }),
   });
@@ -42,14 +42,14 @@ namespace ts.codefix {
   function getImportDeclaration(sourceFile: SourceFile, span: TextSpan) {
     return findAncestor(
       getTokenAtPosition(sourceFile, span.start),
-      isImportDeclaration
+      isImportDeclaration,
     );
   }
 
   function splitTypeOnlyImport(
     changes: textChanges.ChangeTracker,
     importDeclaration: ImportDeclaration | undefined,
-    context: CodeFixContextBase
+    context: CodeFixContextBase,
   ) {
     if (!importDeclaration) {
       return;
@@ -66,11 +66,11 @@ namespace ts.codefix {
           importClause,
           importClause.isTypeOnly,
           importClause.name,
-          /*namedBindings*/ undefined
+          /*namedBindings*/ undefined,
         ),
         importDeclaration.moduleSpecifier,
-        importDeclaration.assertClause
-      )
+        importDeclaration.assertClause,
+      ),
     );
 
     changes.insertNodeAfter(
@@ -83,11 +83,11 @@ namespace ts.codefix {
           importClause,
           importClause.isTypeOnly,
           /*name*/ undefined,
-          importClause.namedBindings
+          importClause.namedBindings,
         ),
         importDeclaration.moduleSpecifier,
-        importDeclaration.assertClause
-      )
+        importDeclaration.assertClause,
+      ),
     );
   }
 }

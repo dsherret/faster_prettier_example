@@ -16,19 +16,19 @@ namespace ts.codefix {
           t,
           sourceFile,
           span.start,
-          program.getTypeChecker()
+          program.getTypeChecker(),
         );
       });
       return diagnostic
         ? [
-            createCodeFixAction(
-              fixId,
-              changes,
-              diagnostic,
-              fixId,
-              Diagnostics.Fix_all_implicit_this_errors
-            ),
-          ]
+          createCodeFixAction(
+            fixId,
+            changes,
+            diagnostic,
+            fixId,
+            Diagnostics.Fix_all_implicit_this_errors,
+          ),
+        ]
         : emptyArray;
     },
     fixIds: [fixId],
@@ -38,7 +38,7 @@ namespace ts.codefix {
           changes,
           diag.file,
           diag.start,
-          context.program.getTypeChecker()
+          context.program.getTypeChecker(),
         );
       }),
   });
@@ -47,30 +47,31 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     pos: number,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): DiagnosticAndArguments | undefined {
     const token = getTokenAtPosition(sourceFile, pos);
     if (!isThis(token)) return undefined;
 
     const fn = getThisContainer(token, /*includeArrowFunctions*/ false);
-    if (!isFunctionDeclaration(fn) && !isFunctionExpression(fn))
+    if (!isFunctionDeclaration(fn) && !isFunctionExpression(fn)) {
       return undefined;
+    }
 
     if (!isSourceFile(getThisContainer(fn, /*includeArrowFunctions*/ false))) {
       // 'this' is defined outside, convert to arrow function
       const fnKeyword = Debug.checkDefined(
-        findChildOfKind(fn, SyntaxKind.FunctionKeyword, sourceFile)
+        findChildOfKind(fn, SyntaxKind.FunctionKeyword, sourceFile),
       );
       const { name } = fn;
       const body = Debug.checkDefined(fn.body); // Should be defined because the function contained a 'this' expression
       if (isFunctionExpression(fn)) {
         if (
-          name &&
-          FindAllReferences.Core.isSymbolReferencedInFile(
+          name
+          && FindAllReferences.Core.isSymbolReferencedInFile(
             name,
             checker,
             sourceFile,
-            body
+            body,
           )
         ) {
           // Function expression references itself. To fix we would have to extract it to a const.
@@ -93,7 +94,7 @@ namespace ts.codefix {
         changes.replaceNode(
           sourceFile,
           fnKeyword,
-          factory.createToken(SyntaxKind.ConstKeyword)
+          factory.createToken(SyntaxKind.ConstKeyword),
         );
         changes.insertText(sourceFile, name!.end, " = ");
         changes.insertText(sourceFile, body.pos, " =>");

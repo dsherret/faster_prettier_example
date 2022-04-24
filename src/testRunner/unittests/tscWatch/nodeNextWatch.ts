@@ -55,7 +55,7 @@ namespace ts.tscWatch {
               Utils.dedent`
                             import * as Thing from "thing";
                             Thing.fn();`,
-              {}
+              {},
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },

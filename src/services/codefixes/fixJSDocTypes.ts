@@ -18,7 +18,7 @@ namespace ts.codefix {
         fix(
           type,
           fixIdPlain,
-          Diagnostics.Change_all_jsdoc_style_types_to_TypeScript
+          Diagnostics.Change_all_jsdoc_style_types_to_TypeScript,
         ),
       ];
       if (typeNode.kind === SyntaxKind.JSDocNullableType) {
@@ -28,8 +28,8 @@ namespace ts.codefix {
           fix(
             checker.getNullableType(type, TypeFlags.Undefined),
             fixIdNullable,
-            Diagnostics.Change_all_jsdoc_style_types_to_TypeScript_and_add_undefined_to_nullable_types
-          )
+            Diagnostics.Change_all_jsdoc_style_types_to_TypeScript_and_add_undefined_to_nullable_types,
+          ),
         );
       }
       return actions;
@@ -37,17 +37,18 @@ namespace ts.codefix {
       function fix(
         type: Type,
         fixId: string,
-        fixAllDescription: DiagnosticMessage
+        fixAllDescription: DiagnosticMessage,
       ): CodeFixAction {
-        const changes = textChanges.ChangeTracker.with(context, (t) =>
-          doChange(t, sourceFile, typeNode, type, checker)
+        const changes = textChanges.ChangeTracker.with(
+          context,
+          (t) => doChange(t, sourceFile, typeNode, type, checker),
         );
         return createCodeFixAction(
           "jdocTypes",
           changes,
           [Diagnostics.Change_0_to_1, original, checker.typeToString(type)],
           fixId,
-          fixAllDescription
+          fixAllDescription,
         );
       }
     },
@@ -59,11 +60,10 @@ namespace ts.codefix {
         const info = getInfo(err.file, err.start, checker);
         if (!info) return;
         const { typeNode, type } = info;
-        const fixedType =
-          typeNode.kind === SyntaxKind.JSDocNullableType &&
-          fixId === fixIdNullable
-            ? checker.getNullableType(type, TypeFlags.Undefined)
-            : type;
+        const fixedType = typeNode.kind === SyntaxKind.JSDocNullableType
+            && fixId === fixIdNullable
+          ? checker.getNullableType(type, TypeFlags.Undefined)
+          : type;
         doChange(changes, sourceFile, typeNode, fixedType, checker);
       });
     },
@@ -74,7 +74,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     oldTypeNode: TypeNode,
     newType: Type,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): void {
     changes.replaceNode(
       sourceFile,
@@ -82,19 +82,19 @@ namespace ts.codefix {
       checker.typeToTypeNode(
         newType,
         /*enclosingDeclaration*/ oldTypeNode,
-        /*flags*/ undefined
-      )!
+        /*flags*/ undefined,
+      )!,
     ); // TODO: GH#18217
   }
 
   function getInfo(
     sourceFile: SourceFile,
     pos: number,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): { readonly typeNode: TypeNode; readonly type: Type } | undefined {
     const decl = findAncestor(
       getTokenAtPosition(sourceFile, pos),
-      isTypeContainer
+      isTypeContainer,
     );
     const typeNode = decl && decl.type;
     return (

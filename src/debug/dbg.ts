@@ -61,7 +61,7 @@ namespace Debug {
     getSourceTextOfNodeFromSourceFile(
       sourceFile: SourceFile,
       node: Node,
-      includeTrivia?: boolean
+      includeTrivia?: boolean,
     ): string;
     isDefaultClause(node: Node): node is DefaultClause;
   }
@@ -197,20 +197,18 @@ namespace Debug {
       target: FlowGraphNode;
     }
 
-    const hasAntecedentFlags =
-      FlowFlags.Assignment |
-      FlowFlags.Condition |
-      FlowFlags.SwitchClause |
-      FlowFlags.ArrayMutation |
-      FlowFlags.Call |
-      FlowFlags.ReduceLabel;
+    const hasAntecedentFlags = FlowFlags.Assignment
+      | FlowFlags.Condition
+      | FlowFlags.SwitchClause
+      | FlowFlags.ArrayMutation
+      | FlowFlags.Call
+      | FlowFlags.ReduceLabel;
 
-    const hasNodeFlags =
-      FlowFlags.Start |
-      FlowFlags.Assignment |
-      FlowFlags.Call |
-      FlowFlags.Condition |
-      FlowFlags.ArrayMutation;
+    const hasNodeFlags = FlowFlags.Start
+      | FlowFlags.Assignment
+      | FlowFlags.Call
+      | FlowFlags.Condition
+      | FlowFlags.ArrayMutation;
 
     const links: Record<number, FlowGraphNode> = Object.create(/*o*/ null); // eslint-disable-line no-null/no-null
     const nodes: FlowGraphNode[] = [];
@@ -231,13 +229,13 @@ namespace Debug {
     }
 
     function hasAntecedents(
-      f: FlowNode
+      f: FlowNode,
     ): f is FlowLabel & { antecedents: FlowNode[] } {
       return !!(f.flags & FlowFlags.Label) && !!(f as FlowLabel).antecedents;
     }
 
     function hasAntecedent(
-      f: FlowNode
+      f: FlowNode,
     ): f is Extract<FlowNode, { antecedent: FlowNode }> {
       return !!(f.flags & hasAntecedentFlags);
     }
@@ -268,7 +266,7 @@ namespace Debug {
 
     function buildGraphNode(
       flowNode: FlowNode,
-      seen: Set<FlowNode>
+      seen: Set<FlowNode>,
     ): FlowGraphNode {
       const id = getDebugFlowNodeId(flowNode);
       let graphNode = links[id];
@@ -315,7 +313,7 @@ namespace Debug {
     function buildGraphEdge(
       source: FlowGraphNode,
       antecedent: FlowNode,
-      seen: Set<FlowNode>
+      seen: Set<FlowNode>,
     ) {
       const target = buildGraphNode(antecedent, seen);
       const edge: FlowGraphEdge = { source, target };
@@ -388,13 +386,13 @@ namespace Debug {
       return getSourceTextOfNodeFromSourceFile(
         sourceFile,
         node,
-        /*includeTrivia*/ false
+        /*includeTrivia*/ false,
       );
     }
 
     function renderFlowNode(
       flowNode: FlowNode,
-      circular: boolean | "circularity"
+      circular: boolean | "circularity",
     ) {
       let text = getHeader(flowNode.flags);
       if (circular) {
@@ -423,12 +421,8 @@ namespace Debug {
       const columnCount = columnWidths.length;
       const laneCount = nodes.reduce((x, n) => Math.max(x, n.lane), 0) + 1;
       const lanes: string[] = fill(Array(laneCount), "");
-      const grid: (FlowGraphNode | undefined)[][] = columnWidths.map(() =>
-        Array(laneCount)
-      );
-      const connectors: Connection[][] = columnWidths.map(() =>
-        fill(Array(laneCount), 0)
-      );
+      const grid: (FlowGraphNode | undefined)[][] = columnWidths.map(() => Array(laneCount));
+      const connectors: Connection[][] = columnWidths.map(() => fill(Array(laneCount), 0));
 
       // build connectors
       for (const node of nodes) {
@@ -484,18 +478,18 @@ namespace Debug {
               writeLane(lane, " ");
               writeLane(
                 lane,
-                repeat(fill, columnWidths[column] - node.text.length)
+                repeat(fill, columnWidths[column] - node.text.length),
               );
             }
           }
           writeLane(lane, getBoxCharacter(connector));
           writeLane(
             lane,
-            connector & Connection.Right &&
-              column < columnCount - 1 &&
-              !grid[column + 1][lane]
+            connector & Connection.Right
+              && column < columnCount - 1
+              && !grid[column + 1][lane]
               ? BoxCharacter.lr
-              : " "
+              : " ",
           );
         }
       }

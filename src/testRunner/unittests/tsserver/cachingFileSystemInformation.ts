@@ -1,14 +1,14 @@
 namespace ts.projectSystem {
   function getNumberOfWatchesInvokedForRecursiveWatches(
     recursiveWatchedDirs: string[],
-    file: string
+    file: string,
   ) {
     return countWhere(
       recursiveWatchedDirs,
       (dir) =>
-        file.length > dir.length &&
-        startsWith(file, dir) &&
-        file[dir.length] === directorySeparator
+        file.length > dir.length
+        && startsWith(file, dir)
+        && file[dir.length] === directorySeparator,
     );
   }
 
@@ -27,30 +27,31 @@ namespace ts.projectSystem {
       readonly string[],
       readonly string[],
       readonly string[],
-      number
+      number,
     ];
     function createCallsTrackingHost(host: TestServerHost) {
-      const calledMaps: Record<
-        CalledMapsWithSingleArg,
-        MultiMap<string, true>
-      > &
-        Record<CalledMapsWithFiveArgs, MultiMap<string, CalledWithFiveArgs>> = {
-        fileExists: setCallsTrackingWithSingleArgFn(
-          CalledMapsWithSingleArg.fileExists
-        ),
-        directoryExists: setCallsTrackingWithSingleArgFn(
-          CalledMapsWithSingleArg.directoryExists
-        ),
-        getDirectories: setCallsTrackingWithSingleArgFn(
-          CalledMapsWithSingleArg.getDirectories
-        ),
-        readFile: setCallsTrackingWithSingleArgFn(
-          CalledMapsWithSingleArg.readFile
-        ),
-        readDirectory: setCallsTrackingWithFiveArgFn(
-          CalledMapsWithFiveArgs.readDirectory
-        ),
-      };
+      const calledMaps:
+        & Record<
+          CalledMapsWithSingleArg,
+          MultiMap<string, true>
+        >
+        & Record<CalledMapsWithFiveArgs, MultiMap<string, CalledWithFiveArgs>> = {
+          fileExists: setCallsTrackingWithSingleArgFn(
+            CalledMapsWithSingleArg.fileExists,
+          ),
+          directoryExists: setCallsTrackingWithSingleArgFn(
+            CalledMapsWithSingleArg.directoryExists,
+          ),
+          getDirectories: setCallsTrackingWithSingleArgFn(
+            CalledMapsWithSingleArg.getDirectories,
+          ),
+          readFile: setCallsTrackingWithSingleArgFn(
+            CalledMapsWithSingleArg.readFile,
+          ),
+          readDirectory: setCallsTrackingWithFiveArgFn(
+            CalledMapsWithFiveArgs.readDirectory,
+          ),
+        };
 
       return {
         verifyNoCall,
@@ -73,7 +74,7 @@ namespace ts.projectSystem {
       }
 
       function setCallsTrackingWithFiveArgFn<U, V, W, X>(
-        prop: CalledMapsWithFiveArgs
+        prop: CalledMapsWithFiveArgs,
       ) {
         const calledMap = createMultiMap<[U, V, W, X]>();
         const cb = (host as any)[prop].bind(host);
@@ -82,7 +83,7 @@ namespace ts.projectSystem {
           arg1?: U,
           arg2?: V,
           arg3?: W,
-          arg4?: X
+          arg4?: X,
         ) => {
           calledMap.add(f, [arg1!, arg2!, arg3!, arg4!]); // TODO: GH#18217
           return cb(f, arg1, arg2, arg3, arg4);
@@ -95,9 +96,11 @@ namespace ts.projectSystem {
         const result = calledMap.get(name);
         assert.isTrue(
           result && !!result.length,
-          `${callback} should be called with name: ${name}: ${arrayFrom(
-            calledMap.keys()
-          )}`
+          `${callback} should be called with name: ${name}: ${
+            arrayFrom(
+              calledMap.keys(),
+            )
+          }`,
         );
       }
 
@@ -106,31 +109,31 @@ namespace ts.projectSystem {
         assert.equal(
           calledMap.size,
           0,
-          `${callback} shouldn't be called: ${arrayFrom(calledMap.keys())}`
+          `${callback} shouldn't be called: ${arrayFrom(calledMap.keys())}`,
         );
       }
 
       function verifyCalledOnEachEntry(
         callback: CalledMaps,
-        expectedKeys: ESMap<string, number>
+        expectedKeys: ESMap<string, number>,
       ) {
         TestFSWithWatch.checkMap<true | CalledWithFiveArgs>(
           callback,
           calledMaps[callback],
-          expectedKeys
+          expectedKeys,
         );
       }
 
       function verifyCalledOnEachEntryNTimes(
         callback: CalledMaps,
         expectedKeys: readonly string[],
-        nTimes: number
+        nTimes: number,
       ) {
         TestFSWithWatch.checkMap<true | CalledWithFiveArgs>(
           callback,
           calledMaps[callback],
           expectedKeys,
-          nTimes
+          nTimes,
         );
       }
 
@@ -139,12 +142,12 @@ namespace ts.projectSystem {
       }
 
       function verifyNoHostCallsExceptFileExistsOnce(
-        expectedKeys: readonly string[]
+        expectedKeys: readonly string[],
       ) {
         verifyCalledOnEachEntryNTimes(
           CalledMapsWithSingleArg.fileExists,
           expectedKeys,
-          1
+          1,
         );
         verifyNoCall(CalledMapsWithSingleArg.directoryExists);
         verifyNoCall(CalledMapsWithSingleArg.getDirectories);
@@ -211,21 +214,21 @@ namespace ts.projectSystem {
       } catch (e) {
         assert.isTrue(
           e.message.indexOf(
-            `Could not find source file: '${imported.path}'.`
+            `Could not find source file: '${imported.path}'.`,
           ) === 0,
-          `Actual: ${e.message}`
+          `Actual: ${e.message}`,
         );
       }
       const f2Lookups = getLocationsForModuleLookup("f2");
       callsTrackingHost.verifyCalledOnEachEntryNTimes(
         CalledMapsWithSingleArg.fileExists,
         f2Lookups,
-        1
+        1,
       );
       const f2DirLookups = getLocationsForDirectoryLookup();
       callsTrackingHost.verifyCalledOnEachEntry(
         CalledMapsWithSingleArg.directoryExists,
-        f2DirLookups
+        f2DirLookups,
       );
       callsTrackingHost.verifyNoCall(CalledMapsWithSingleArg.getDirectories);
       callsTrackingHost.verifyNoCall(CalledMapsWithSingleArg.readFile);
@@ -241,7 +244,7 @@ namespace ts.projectSystem {
         ...mapCombinedPathsInAncestor(
           getDirectoryPath(root.path),
           nodeModulesAtTypes,
-          returnTrue
+          returnTrue,
         ),
       ];
       vertifyF1Lookups();
@@ -260,12 +263,12 @@ namespace ts.projectSystem {
         callsTrackingHost.verifyCalledOnEachEntryNTimes(
           CalledMapsWithSingleArg.fileExists,
           f1Lookups,
-          1
+          1,
         );
         callsTrackingHost.verifyCalledOnEachEntryNTimes(
           CalledMapsWithSingleArg.directoryExists,
           f1DirLookups,
-          1
+          1,
         );
         callsTrackingHost.verifyNoCall(CalledMapsWithSingleArg.getDirectories);
         callsTrackingHost.verifyNoCall(CalledMapsWithSingleArg.readFile);
@@ -287,7 +290,7 @@ namespace ts.projectSystem {
         assert.equal(diag.code, Diagnostics.Cannot_find_name_0.code);
         assert.equal(
           flattenDiagnosticMessageText(diag.messageText, "\n"),
-          "Cannot find name 'foo'."
+          "Cannot find name 'foo'.",
         );
       }
 
@@ -297,13 +300,13 @@ namespace ts.projectSystem {
           locations.push(
             combinePaths(ancestor, `${module}.ts`),
             combinePaths(ancestor, `${module}.tsx`),
-            combinePaths(ancestor, `${module}.d.ts`)
+            combinePaths(ancestor, `${module}.d.ts`),
           );
         });
         forEachAncestorDirectory(getDirectoryPath(root.path), (ancestor) => {
           locations.push(
             combinePaths(ancestor, `${module}.js`),
-            combinePaths(ancestor, `${module}.jsx`)
+            combinePaths(ancestor, `${module}.jsx`),
           );
         });
         return locations;
@@ -355,15 +358,15 @@ namespace ts.projectSystem {
         diag.code,
         Diagnostics
           .Cannot_find_module_0_Did_you_mean_to_set_the_moduleResolution_option_to_node_or_to_add_aliases_to_the_paths_option
-          .code
+          .code,
       );
       assert.equal(
         flattenDiagnosticMessageText(diag.messageText, "\n"),
-        "Cannot find module 'bar'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?"
+        "Cannot find module 'bar'. Did you mean to set the 'moduleResolution' option to 'node', or to add aliases to the 'paths' option?",
       );
       callsTrackingHost.verifyCalledOn(
         CalledMapsWithSingleArg.fileExists,
-        imported.path
+        imported.path,
       );
 
       callsTrackingHost.clear();
@@ -373,7 +376,7 @@ namespace ts.projectSystem {
       assert.equal(diags.length, 0);
       callsTrackingHost.verifyCalledOn(
         CalledMapsWithSingleArg.fileExists,
-        imported.path
+        imported.path,
       );
     });
 
@@ -435,35 +438,34 @@ namespace ts.projectSystem {
       const project = projectService.configuredProjects.get(tsconfigFile.path)!;
       checkProjectActualFiles(
         project,
-        map(projectFiles, (f) => f.path)
+        map(projectFiles, (f) => f.path),
       );
 
       const callsTrackingHost = createCallsTrackingHost(host);
 
       // Get definitions shouldnt make host requests
-      const getDefinitionRequest =
-        makeSessionRequest<protocol.FileLocationRequestArgs>(
-          protocol.CommandTypes.Definition,
-          {
-            file: clientFile.path,
-            position: clientFile.content.indexOf("/vessel") + 1,
-            line: undefined!, // TODO: GH#18217
-            offset: undefined!, // TODO: GH#18217
-          }
-        );
+      const getDefinitionRequest = makeSessionRequest<protocol.FileLocationRequestArgs>(
+        protocol.CommandTypes.Definition,
+        {
+          file: clientFile.path,
+          position: clientFile.content.indexOf("/vessel") + 1,
+          line: undefined!, // TODO: GH#18217
+          offset: undefined!, // TODO: GH#18217
+        },
+      );
       const response = session.executeCommand(getDefinitionRequest)
         .response as server.protocol.FileSpan[];
       assert.equal(
         response[0].file,
         moduleFile.path,
-        "Should go to definition of vessel: response: " +
-          JSON.stringify(response)
+        "Should go to definition of vessel: response: "
+          + JSON.stringify(response),
       );
       callsTrackingHost.verifyNoHostCalls();
 
       // Open the file should call only file exists on module directory and use cached value for parental directory
       const { configFileName: config2 } = projectService.openClientFile(
-        moduleFile.path
+        moduleFile.path,
       );
       assert.equal(config2, configFileName);
       callsTrackingHost.verifyNoHostCallsExceptFileExistsOnce([
@@ -474,13 +476,13 @@ namespace ts.projectSystem {
       checkNumberOfConfiguredProjects(projectService, 1);
       assert.strictEqual(
         projectService.configuredProjects.get(tsconfigFile.path),
-        project
+        project,
       );
     });
 
     describe("WatchDirectories for config file with", () => {
       function verifyWatchDirectoriesCaseSensitivity(
-        useCaseSensitiveFileNames: boolean
+        useCaseSensitiveFileNames: boolean,
       ) {
         const frontendDir = "/Users/someuser/work/applications/frontend";
         const toCanonical: (s: string) => Path = useCaseSensitiveFileNames
@@ -541,7 +543,7 @@ namespace ts.projectSystem {
         assert.equal(
           configFileName,
           tsconfigFile.path as server.NormalizedPath,
-          `should find config`
+          `should find config`,
         );
         checkNumberOfConfiguredProjects(projectService, 1);
         const watchingRecursiveDirectories = [
@@ -549,11 +551,10 @@ namespace ts.projectSystem {
           `${canonicalFrontendDir}/types`,
           `${canonicalFrontendDir}/node_modules`,
         ].concat(
-          getNodeModuleDirectories(getDirectoryPath(canonicalFrontendDir))
+          getNodeModuleDirectories(getDirectoryPath(canonicalFrontendDir)),
         );
 
-        const project =
-          projectService.configuredProjects.get(canonicalConfigPath)!;
+        const project = projectService.configuredProjects.get(canonicalConfigPath)!;
         verifyProjectAndWatchedDirectories();
 
         const callsTrackingHost = createCallsTrackingHost(host);
@@ -566,47 +567,46 @@ namespace ts.projectSystem {
         const canonicalFile3Path = useCaseSensitiveFileNames
           ? file3.path
           : file3.path.toLocaleLowerCase();
-        const numberOfTimesWatchInvoked =
-          getNumberOfWatchesInvokedForRecursiveWatches(
-            watchingRecursiveDirectories,
-            canonicalFile3Path
-          );
+        const numberOfTimesWatchInvoked = getNumberOfWatchesInvokedForRecursiveWatches(
+          watchingRecursiveDirectories,
+          canonicalFile3Path,
+        );
         callsTrackingHost.verifyCalledOnEachEntryNTimes(
           CalledMapsWithSingleArg.fileExists,
           [canonicalFile3Path],
-          numberOfTimesWatchInvoked
+          numberOfTimesWatchInvoked,
         );
         callsTrackingHost.verifyCalledOnEachEntryNTimes(
           CalledMapsWithSingleArg.directoryExists,
           [canonicalFile3Path],
-          numberOfTimesWatchInvoked
+          numberOfTimesWatchInvoked,
         );
         callsTrackingHost.verifyNoCall(CalledMapsWithSingleArg.getDirectories);
         callsTrackingHost.verifyCalledOnEachEntryNTimes(
           CalledMapsWithSingleArg.readFile,
           [file3.path],
-          1
+          1,
         );
         callsTrackingHost.verifyNoCall(CalledMapsWithFiveArgs.readDirectory);
 
         checkNumberOfConfiguredProjects(projectService, 1);
         assert.strictEqual(
           projectService.configuredProjects.get(canonicalConfigPath),
-          project
+          project,
         );
         verifyProjectAndWatchedDirectories();
 
         callsTrackingHost.clear();
 
         const { configFileName: configFile2 } = projectService.openClientFile(
-          file3.path
+          file3.path,
         );
         assert.equal(configFile2, configFileName);
 
         checkNumberOfConfiguredProjects(projectService, 1);
         assert.strictEqual(
           projectService.configuredProjects.get(canonicalConfigPath),
-          project
+          project,
         );
         verifyProjectAndWatchedDirectories();
         callsTrackingHost.verifyNoHostCalls();
@@ -620,16 +620,16 @@ namespace ts.projectSystem {
         function verifyProjectAndWatchedDirectories() {
           checkProjectActualFiles(
             project,
-            map(projectFiles, (f) => f.path)
+            map(projectFiles, (f) => f.path),
           );
           checkWatchedFiles(
             host,
-            mapDefined(projectFiles, getFilePathIfNotOpen)
+            mapDefined(projectFiles, getFilePathIfNotOpen),
           );
           checkWatchedDirectories(
             host,
             watchingRecursiveDirectories,
-            /*recursive*/ true
+            /*recursive*/ true,
           );
           checkWatchedDirectories(host, [], /*recursive*/ false);
         }
@@ -637,13 +637,13 @@ namespace ts.projectSystem {
 
       it("case insensitive file system", () => {
         verifyWatchDirectoriesCaseSensitivity(
-          /*useCaseSensitiveFileNames*/ false
+          /*useCaseSensitiveFileNames*/ false,
         );
       });
 
       it("case sensitive file system", () => {
         verifyWatchDirectoriesCaseSensitivity(
-          /*useCaseSensitiveFileNames*/ true
+          /*useCaseSensitiveFileNames*/ true,
         );
       });
     });
@@ -675,21 +675,21 @@ namespace ts.projectSystem {
         const project = service.configuredProjects.get(tsconfig.path)!;
         checkProjectActualFiles(
           project,
-          files.map((f) => f.path)
+          files.map((f) => f.path),
         );
         assert.deepEqual(
           project
             .getLanguageService()
             .getSemanticDiagnostics(file1.path)
             .map((diag) => diag.messageText),
-          ["Cannot find module 'debug' or its corresponding type declarations."]
+          ["Cannot find module 'debug' or its corresponding type declarations."],
         );
         assert.deepEqual(
           project
             .getLanguageService()
             .getSemanticDiagnostics(file2.path)
             .map((diag) => diag.messageText),
-          ["Cannot find module 'debug' or its corresponding type declarations."]
+          ["Cannot find module 'debug' or its corresponding type declarations."],
         );
 
         const debugTypesFile: File = {
@@ -702,21 +702,21 @@ namespace ts.projectSystem {
         host.runQueuedTimeoutCallbacks(); // Actual update
         checkProjectActualFiles(
           project,
-          files.map((f) => f.path)
+          files.map((f) => f.path),
         );
         assert.deepEqual(
           project
             .getLanguageService()
             .getSemanticDiagnostics(file1.path)
             .map((diag) => diag.messageText),
-          []
+          [],
         );
         assert.deepEqual(
           project
             .getLanguageService()
             .getSemanticDiagnostics(file2.path)
             .map((diag) => diag.messageText),
-          []
+          [],
         );
       }
 
@@ -741,7 +741,7 @@ namespace ts.projectSystem {
         });
         const tsconfigJson: File = getRootedFileOrFolder({
           path: "/a/b/tsconfig.json",
-          content: '{ "compilerOptions": { } }',
+          content: "{ \"compilerOptions\": { } }",
         });
         const packageJson: File = getRootedFileOrFolder({
           path: "/a/b/package.json",
@@ -771,7 +771,7 @@ namespace ts.projectSystem {
         const appFolder = getDirectoryPath(app.path);
         const projectFiles = [app, libFile, tsconfigJson];
         const typeRootDirectories = getTypeRootsFromLocation(
-          getDirectoryPath(tsconfigJson.path)
+          getDirectoryPath(tsconfigJson.path),
         );
         const otherFiles = [packageJson];
         const host = createServerHost(projectFiles.concat(otherFiles));
@@ -783,7 +783,7 @@ namespace ts.projectSystem {
         assert.equal(
           configFileName,
           tsconfigJson.path as server.NormalizedPath,
-          `should find config`
+          `should find config`,
         ); // TODO: GH#18217
         const recursiveWatchedDirectories: string[] = [
           `${appFolder}`,
@@ -805,22 +805,22 @@ namespace ts.projectSystem {
           {
             path: "/a/b/node_modules/.staging/symbol-observable-24bcbbff/package.json",
             content:
-              '{\n  "name": "symbol-observable",\n  "version": "1.0.4",\n  "description": "Symbol.observable ponyfill",\n  "license": "MIT",\n  "repository": "blesh/symbol-observable",\n  "author": {\n    "name": "Ben Lesh",\n    "email": "ben@benlesh.com"\n  },\n  "engines": {\n    "node": ">=0.10.0"\n  },\n  "scripts": {\n    "test": "npm run build && mocha && tsc ./ts-test/test.ts && node ./ts-test/test.js && check-es3-syntax -p lib/ --kill",\n    "build": "babel es --out-dir lib",\n    "prepublish": "npm test"\n  },\n  "files": [\n    "',
+              "{\n  \"name\": \"symbol-observable\",\n  \"version\": \"1.0.4\",\n  \"description\": \"Symbol.observable ponyfill\",\n  \"license\": \"MIT\",\n  \"repository\": \"blesh/symbol-observable\",\n  \"author\": {\n    \"name\": \"Ben Lesh\",\n    \"email\": \"ben@benlesh.com\"\n  },\n  \"engines\": {\n    \"node\": \">=0.10.0\"\n  },\n  \"scripts\": {\n    \"test\": \"npm run build && mocha && tsc ./ts-test/test.ts && node ./ts-test/test.js && check-es3-syntax -p lib/ --kill\",\n    \"build\": \"babel es --out-dir lib\",\n    \"prepublish\": \"npm test\"\n  },\n  \"files\": [\n    \"",
           },
           {
             path: "/a/b/node_modules/.staging/lodash-b0733faa/package.json",
             content:
-              '{\n  "name": "lodash",\n  "version": "4.17.4",\n  "description": "Lodash modular utilities.",\n  "keywords": "modules, stdlib, util",\n  "homepage": "https://lodash.com/",\n  "repository": "lodash/lodash",\n  "icon": "https://lodash.com/icon.svg",\n  "license": "MIT",\n  "main": "lodash.js",\n  "author": "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",\n  "contributors": [\n    "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",\n    "Mathias Bynens <mathias@qiwi.',
+              "{\n  \"name\": \"lodash\",\n  \"version\": \"4.17.4\",\n  \"description\": \"Lodash modular utilities.\",\n  \"keywords\": \"modules, stdlib, util\",\n  \"homepage\": \"https://lodash.com/\",\n  \"repository\": \"lodash/lodash\",\n  \"icon\": \"https://lodash.com/icon.svg\",\n  \"license\": \"MIT\",\n  \"main\": \"lodash.js\",\n  \"author\": \"John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)\",\n  \"contributors\": [\n    \"John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)\",\n    \"Mathias Bynens <mathias@qiwi.",
           },
           {
             path: "/a/b/node_modules/.staging/rxjs-22375c61/package.json",
             content:
-              '{\n  "name": "rxjs",\n  "version": "5.4.3",\n  "description": "Reactive Extensions for modern JavaScript",\n  "main": "Rx.js",\n  "config": {\n    "commitizen": {\n      "path": "cz-conventional-changelog"\n    }\n  },\n  "lint-staged": {\n    "*.@(js)": [\n      "eslint --fix",\n      "git add"\n    ],\n    "*.@(ts)": [\n      "eslint -c .eslintrc --ext .ts . --fix",\n      "git add"\n    ]\n  },\n  "scripts-info": {\n    "info": "List available script",\n    "build_all": "Build all packages (ES6, CJS, UMD) and generate packages",\n    "build_cjs": "Build CJS package with clean up existing build, copy source into dist",\n    "build_es6": "Build ES6 package with clean up existing build, copy source into dist",\n    "build_closure_core": "Minify Global core build using closure compiler",\n    "build_global": "Build Global package, then minify build",\n    "build_perf": "Build CJS & Global build, run macro performance test",\n    "build_test": "Build CJS package & test spec, execute mocha test runner",\n    "build_cover": "Run lint to current code, build CJS & test spec, execute test coverage",\n    "build_docs": "Build ES6 & global package, create documentation using it",\n    "build_spec": "Build test specs",\n    "check_circular_dependencies": "Check codebase has circular dependencies",\n    "clean_spec": "Clean up existing test spec build output",\n    "clean_dist_cjs": "Clean up existing CJS package output",\n    "clean_dist_es6": "Clean up existing ES6 package output",\n    "clean_dist_global": "Clean up existing Global package output",\n    "commit": "Run git commit wizard",\n    "compile_dist_cjs": "Compile codebase into CJS module",\n    "compile_module_es6": "Compile codebase into ES6",\n    "cover": "Execute test coverage",\n    "lint_perf": "Run lint against performance test suite",\n    "lint_spec": "Run lint against test spec",\n    "lint_src": "Run lint against source",\n    "lint": "Run lint against everything",\n    "perf": "Run macro performance benchmark",\n    "perf_micro": "Run micro performance benchmark",\n    "test_mocha": "Execute mocha test runner against existing test spec build",\n    "test_browser": "Execute mocha test runner on browser against existing test spec build",\n    "test": "Clean up existing test spec build, build test spec and execute mocha test runner",\n    "tests2png": "Generate marble diagram image from test spec",\n    "watch": "Watch codebase, trigger compile when source code changes"\n  },\n  "repository": {\n    "type": "git",\n    "url": "git@github.com:ReactiveX/RxJS.git"\n  },\n  "keywords": [\n    "Rx",\n    "RxJS",\n    "ReactiveX",\n    "ReactiveExtensions",\n    "Streams",\n    "Observables",\n    "Observable",\n    "Stream",\n    "ES6",\n    "ES2015"\n  ],\n  "author": "Ben Lesh <ben@benlesh.com>",\n  "contributors": [\n    {\n      "name": "Ben Lesh",\n      "email": "ben@benlesh.com"\n    },\n    {\n      "name": "Paul Taylor",\n      "email": "paul.e.taylor@me.com"\n    },\n    {\n      "name": "Jeff Cross",\n      "email": "crossj@google.com"\n    },\n    {\n      "name": "Matthew Podwysocki",\n      "email": "matthewp@microsoft.com"\n    },\n    {\n      "name": "OJ Kwon",\n      "email": "kwon.ohjoong@gmail.com"\n    },\n    {\n      "name": "Andre Staltz",\n      "email": "andre@staltz.com"\n    }\n  ],\n  "license": "Apache-2.0",\n  "bugs": {\n    "url": "https://github.com/ReactiveX/RxJS/issues"\n  },\n  "homepage": "https://github.com/ReactiveX/RxJS",\n  "devDependencies": {\n    "babel-polyfill": "^6.23.0",\n    "benchmark": "^2.1.0",\n    "benchpress": "2.0.0-beta.1",\n    "chai": "^3.5.0",\n    "color": "^0.11.1",\n    "colors": "1.1.2",\n    "commitizen": "^2.8.6",\n    "coveralls": "^2.11.13",\n    "cz-conventional-changelog": "^1.2.0",\n    "danger": "^1.1.0",\n    "doctoc": "^1.0.0",\n    "escape-string-regexp": "^1.0.5 ",\n    "esdoc": "^0.4.7",\n    "eslint": "^3.8.0",\n    "fs-extra": "^2.1.2",\n    "get-folder-size": "^1.0.0",\n    "glob": "^7.0.3",\n    "gm": "^1.22.0",\n    "google-closure-compiler-js": "^20170218.0.0",\n    "gzip-size": "^3.0.0",\n    "http-server": "^0.9.0",\n    "husky": "^0.13.3",\n    "lint-staged": "3.2.5",\n    "lodash": "^4.15.0",\n    "madge": "^1.4.3",\n    "markdown-doctest": "^0.9.1",\n    "minimist": "^1.2.0",\n    "mkdirp": "^0.5.1",\n    "mocha": "^3.0.2",\n    "mocha-in-sauce": "0.0.1",\n    "npm-run-all": "^4.0.2",\n    "npm-scripts-info": "^0.3.4",\n    "nyc": "^10.2.0",\n    "opn-cli": "^3.1.0",\n    "platform": "^1.3.1",\n    "promise": "^7.1.1",\n    "protractor": "^3.1.1",\n    "rollup": "0.36.3",\n    "rollup-plugin-inject": "^2.0.0",\n    "rollup-plugin-node-resolve": "^2.0.0",\n    "rx": "latest",\n    "rxjs": "latest",\n    "shx": "^0.2.2",\n    "sinon": "^2.1.0",\n    "sinon-chai": "^2.9.0",\n    "source-map-support": "^0.4.0",\n    "tslib": "^1.5.0",\n    "eslint": "^4.4.2",\n    "typescript": "~2.0.6",\n    "typings": "^2.0.0",\n    "validate-commit-msg": "^2.14.0",\n    "watch": "^1.0.1",\n    "webpack": "^1.13.1",\n    "xmlhttprequest": "1.8.0"\n  },\n  "engines": {\n    "npm": ">=2.0.0"\n  },\n  "typings": "Rx.d.ts",\n  "dependencies": {\n    "symbol-observable": "^1.0.1"\n  }\n}',
+              "{\n  \"name\": \"rxjs\",\n  \"version\": \"5.4.3\",\n  \"description\": \"Reactive Extensions for modern JavaScript\",\n  \"main\": \"Rx.js\",\n  \"config\": {\n    \"commitizen\": {\n      \"path\": \"cz-conventional-changelog\"\n    }\n  },\n  \"lint-staged\": {\n    \"*.@(js)\": [\n      \"eslint --fix\",\n      \"git add\"\n    ],\n    \"*.@(ts)\": [\n      \"eslint -c .eslintrc --ext .ts . --fix\",\n      \"git add\"\n    ]\n  },\n  \"scripts-info\": {\n    \"info\": \"List available script\",\n    \"build_all\": \"Build all packages (ES6, CJS, UMD) and generate packages\",\n    \"build_cjs\": \"Build CJS package with clean up existing build, copy source into dist\",\n    \"build_es6\": \"Build ES6 package with clean up existing build, copy source into dist\",\n    \"build_closure_core\": \"Minify Global core build using closure compiler\",\n    \"build_global\": \"Build Global package, then minify build\",\n    \"build_perf\": \"Build CJS & Global build, run macro performance test\",\n    \"build_test\": \"Build CJS package & test spec, execute mocha test runner\",\n    \"build_cover\": \"Run lint to current code, build CJS & test spec, execute test coverage\",\n    \"build_docs\": \"Build ES6 & global package, create documentation using it\",\n    \"build_spec\": \"Build test specs\",\n    \"check_circular_dependencies\": \"Check codebase has circular dependencies\",\n    \"clean_spec\": \"Clean up existing test spec build output\",\n    \"clean_dist_cjs\": \"Clean up existing CJS package output\",\n    \"clean_dist_es6\": \"Clean up existing ES6 package output\",\n    \"clean_dist_global\": \"Clean up existing Global package output\",\n    \"commit\": \"Run git commit wizard\",\n    \"compile_dist_cjs\": \"Compile codebase into CJS module\",\n    \"compile_module_es6\": \"Compile codebase into ES6\",\n    \"cover\": \"Execute test coverage\",\n    \"lint_perf\": \"Run lint against performance test suite\",\n    \"lint_spec\": \"Run lint against test spec\",\n    \"lint_src\": \"Run lint against source\",\n    \"lint\": \"Run lint against everything\",\n    \"perf\": \"Run macro performance benchmark\",\n    \"perf_micro\": \"Run micro performance benchmark\",\n    \"test_mocha\": \"Execute mocha test runner against existing test spec build\",\n    \"test_browser\": \"Execute mocha test runner on browser against existing test spec build\",\n    \"test\": \"Clean up existing test spec build, build test spec and execute mocha test runner\",\n    \"tests2png\": \"Generate marble diagram image from test spec\",\n    \"watch\": \"Watch codebase, trigger compile when source code changes\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git@github.com:ReactiveX/RxJS.git\"\n  },\n  \"keywords\": [\n    \"Rx\",\n    \"RxJS\",\n    \"ReactiveX\",\n    \"ReactiveExtensions\",\n    \"Streams\",\n    \"Observables\",\n    \"Observable\",\n    \"Stream\",\n    \"ES6\",\n    \"ES2015\"\n  ],\n  \"author\": \"Ben Lesh <ben@benlesh.com>\",\n  \"contributors\": [\n    {\n      \"name\": \"Ben Lesh\",\n      \"email\": \"ben@benlesh.com\"\n    },\n    {\n      \"name\": \"Paul Taylor\",\n      \"email\": \"paul.e.taylor@me.com\"\n    },\n    {\n      \"name\": \"Jeff Cross\",\n      \"email\": \"crossj@google.com\"\n    },\n    {\n      \"name\": \"Matthew Podwysocki\",\n      \"email\": \"matthewp@microsoft.com\"\n    },\n    {\n      \"name\": \"OJ Kwon\",\n      \"email\": \"kwon.ohjoong@gmail.com\"\n    },\n    {\n      \"name\": \"Andre Staltz\",\n      \"email\": \"andre@staltz.com\"\n    }\n  ],\n  \"license\": \"Apache-2.0\",\n  \"bugs\": {\n    \"url\": \"https://github.com/ReactiveX/RxJS/issues\"\n  },\n  \"homepage\": \"https://github.com/ReactiveX/RxJS\",\n  \"devDependencies\": {\n    \"babel-polyfill\": \"^6.23.0\",\n    \"benchmark\": \"^2.1.0\",\n    \"benchpress\": \"2.0.0-beta.1\",\n    \"chai\": \"^3.5.0\",\n    \"color\": \"^0.11.1\",\n    \"colors\": \"1.1.2\",\n    \"commitizen\": \"^2.8.6\",\n    \"coveralls\": \"^2.11.13\",\n    \"cz-conventional-changelog\": \"^1.2.0\",\n    \"danger\": \"^1.1.0\",\n    \"doctoc\": \"^1.0.0\",\n    \"escape-string-regexp\": \"^1.0.5 \",\n    \"esdoc\": \"^0.4.7\",\n    \"eslint\": \"^3.8.0\",\n    \"fs-extra\": \"^2.1.2\",\n    \"get-folder-size\": \"^1.0.0\",\n    \"glob\": \"^7.0.3\",\n    \"gm\": \"^1.22.0\",\n    \"google-closure-compiler-js\": \"^20170218.0.0\",\n    \"gzip-size\": \"^3.0.0\",\n    \"http-server\": \"^0.9.0\",\n    \"husky\": \"^0.13.3\",\n    \"lint-staged\": \"3.2.5\",\n    \"lodash\": \"^4.15.0\",\n    \"madge\": \"^1.4.3\",\n    \"markdown-doctest\": \"^0.9.1\",\n    \"minimist\": \"^1.2.0\",\n    \"mkdirp\": \"^0.5.1\",\n    \"mocha\": \"^3.0.2\",\n    \"mocha-in-sauce\": \"0.0.1\",\n    \"npm-run-all\": \"^4.0.2\",\n    \"npm-scripts-info\": \"^0.3.4\",\n    \"nyc\": \"^10.2.0\",\n    \"opn-cli\": \"^3.1.0\",\n    \"platform\": \"^1.3.1\",\n    \"promise\": \"^7.1.1\",\n    \"protractor\": \"^3.1.1\",\n    \"rollup\": \"0.36.3\",\n    \"rollup-plugin-inject\": \"^2.0.0\",\n    \"rollup-plugin-node-resolve\": \"^2.0.0\",\n    \"rx\": \"latest\",\n    \"rxjs\": \"latest\",\n    \"shx\": \"^0.2.2\",\n    \"sinon\": \"^2.1.0\",\n    \"sinon-chai\": \"^2.9.0\",\n    \"source-map-support\": \"^0.4.0\",\n    \"tslib\": \"^1.5.0\",\n    \"eslint\": \"^4.4.2\",\n    \"typescript\": \"~2.0.6\",\n    \"typings\": \"^2.0.0\",\n    \"validate-commit-msg\": \"^2.14.0\",\n    \"watch\": \"^1.0.1\",\n    \"webpack\": \"^1.13.1\",\n    \"xmlhttprequest\": \"1.8.0\"\n  },\n  \"engines\": {\n    \"npm\": \">=2.0.0\"\n  },\n  \"typings\": \"Rx.d.ts\",\n  \"dependencies\": {\n    \"symbol-observable\": \"^1.0.1\"\n  }\n}",
           },
           {
             path: "/a/b/node_modules/.staging/typescript-8493ea5d/package.json",
             content:
-              '{\n    "name": "typescript",\n    "author": "Microsoft Corp.",\n    "homepage": "http://typescriptlang.org/",\n    "version": "2.4.2",\n    "license": "Apache-2.0",\n    "description": "TypeScript is a language for application scale JavaScript development",\n    "keywords": [\n        "TypeScript",\n        "Microsoft",\n        "compiler",\n        "language",\n        "javascript"\n    ],\n    "bugs": {\n        "url": "https://github.com/Microsoft/TypeScript/issues"\n    },\n    "repository": {\n        "type": "git",\n        "url": "https://github.com/Microsoft/TypeScript.git"\n    },\n    "main": "./lib/typescript.js",\n    "typings": "./lib/typescript.d.ts",\n    "bin": {\n        "tsc": "./bin/tsc",\n        "tsserver": "./bin/tsserver"\n    },\n    "engines": {\n        "node": ">=4.2.0"\n    },\n    "devDependencies": {\n        "@types/browserify": "latest",\n        "@types/chai": "latest",\n        "@types/convert-source-map": "latest",\n        "@types/del": "latest",\n        "@types/glob": "latest",\n        "@types/gulp": "latest",\n        "@types/gulp-concat": "latest",\n        "@types/gulp-help": "latest",\n        "@types/gulp-newer": "latest",\n        "@types/gulp-sourcemaps": "latest",\n        "@types/merge2": "latest",\n        "@types/minimatch": "latest",\n        "@types/minimist": "latest",\n        "@types/mkdirp": "latest",\n        "@types/mocha": "latest",\n        "@types/node": "latest",\n        "@types/q": "latest",\n        "@types/run-sequence": "latest",\n        "@types/through2": "latest",\n        "browserify": "latest",\n        "chai": "latest",\n        "convert-source-map": "latest",\n        "del": "latest",\n        "gulp": "latest",\n        "gulp-clone": "latest",\n        "gulp-concat": "latest",\n        "gulp-help": "latest",\n        "gulp-insert": "latest",\n        "gulp-newer": "latest",\n        "gulp-sourcemaps": "latest",\n        "gulp-typescript": "latest",\n        "into-stream": "latest",\n        "istanbul": "latest",\n        "jake": "latest",\n        "merge2": "latest",\n        "minimist": "latest",\n        "mkdirp": "latest",\n        "mocha": "latest",\n        "mocha-fivemat-progress-reporter": "latest",\n        "q": "latest",\n        "run-sequence": "latest",\n        "sorcery": "latest",\n        "through2": "latest",\n        "travis-fold": "latest",\n        "ts-node": "latest",\n        "eslint": "5.16.0",\n        "typescript": "^2.4"\n    },\n    "scripts": {\n        "pretest": "jake tests",\n        "test": "jake runtests-parallel",\n        "build": "npm run build:compiler && npm run build:tests",\n        "build:compiler": "jake local",\n        "build:tests": "jake tests",\n        "start": "node lib/tsc",\n        "clean": "jake clean",\n        "gulp": "gulp",\n        "jake": "jake",\n        "lint": "jake lint",\n        "setup-hooks": "node scripts/link-hooks.js"\n    },\n    "browser": {\n        "buffer": false,\n        "fs": false,\n        "os": false,\n        "path": false\n    }\n}',
+              "{\n    \"name\": \"typescript\",\n    \"author\": \"Microsoft Corp.\",\n    \"homepage\": \"http://typescriptlang.org/\",\n    \"version\": \"2.4.2\",\n    \"license\": \"Apache-2.0\",\n    \"description\": \"TypeScript is a language for application scale JavaScript development\",\n    \"keywords\": [\n        \"TypeScript\",\n        \"Microsoft\",\n        \"compiler\",\n        \"language\",\n        \"javascript\"\n    ],\n    \"bugs\": {\n        \"url\": \"https://github.com/Microsoft/TypeScript/issues\"\n    },\n    \"repository\": {\n        \"type\": \"git\",\n        \"url\": \"https://github.com/Microsoft/TypeScript.git\"\n    },\n    \"main\": \"./lib/typescript.js\",\n    \"typings\": \"./lib/typescript.d.ts\",\n    \"bin\": {\n        \"tsc\": \"./bin/tsc\",\n        \"tsserver\": \"./bin/tsserver\"\n    },\n    \"engines\": {\n        \"node\": \">=4.2.0\"\n    },\n    \"devDependencies\": {\n        \"@types/browserify\": \"latest\",\n        \"@types/chai\": \"latest\",\n        \"@types/convert-source-map\": \"latest\",\n        \"@types/del\": \"latest\",\n        \"@types/glob\": \"latest\",\n        \"@types/gulp\": \"latest\",\n        \"@types/gulp-concat\": \"latest\",\n        \"@types/gulp-help\": \"latest\",\n        \"@types/gulp-newer\": \"latest\",\n        \"@types/gulp-sourcemaps\": \"latest\",\n        \"@types/merge2\": \"latest\",\n        \"@types/minimatch\": \"latest\",\n        \"@types/minimist\": \"latest\",\n        \"@types/mkdirp\": \"latest\",\n        \"@types/mocha\": \"latest\",\n        \"@types/node\": \"latest\",\n        \"@types/q\": \"latest\",\n        \"@types/run-sequence\": \"latest\",\n        \"@types/through2\": \"latest\",\n        \"browserify\": \"latest\",\n        \"chai\": \"latest\",\n        \"convert-source-map\": \"latest\",\n        \"del\": \"latest\",\n        \"gulp\": \"latest\",\n        \"gulp-clone\": \"latest\",\n        \"gulp-concat\": \"latest\",\n        \"gulp-help\": \"latest\",\n        \"gulp-insert\": \"latest\",\n        \"gulp-newer\": \"latest\",\n        \"gulp-sourcemaps\": \"latest\",\n        \"gulp-typescript\": \"latest\",\n        \"into-stream\": \"latest\",\n        \"istanbul\": \"latest\",\n        \"jake\": \"latest\",\n        \"merge2\": \"latest\",\n        \"minimist\": \"latest\",\n        \"mkdirp\": \"latest\",\n        \"mocha\": \"latest\",\n        \"mocha-fivemat-progress-reporter\": \"latest\",\n        \"q\": \"latest\",\n        \"run-sequence\": \"latest\",\n        \"sorcery\": \"latest\",\n        \"through2\": \"latest\",\n        \"travis-fold\": \"latest\",\n        \"ts-node\": \"latest\",\n        \"eslint\": \"5.16.0\",\n        \"typescript\": \"^2.4\"\n    },\n    \"scripts\": {\n        \"pretest\": \"jake tests\",\n        \"test\": \"jake runtests-parallel\",\n        \"build\": \"npm run build:compiler && npm run build:tests\",\n        \"build:compiler\": \"jake local\",\n        \"build:tests\": \"jake tests\",\n        \"start\": \"node lib/tsc\",\n        \"clean\": \"jake clean\",\n        \"gulp\": \"gulp\",\n        \"jake\": \"jake\",\n        \"lint\": \"jake lint\",\n        \"setup-hooks\": \"node scripts/link-hooks.js\"\n    },\n    \"browser\": {\n        \"buffer\": false,\n        \"fs\": false,\n        \"os\": false,\n        \"path\": false\n    }\n}",
           },
           {
             path: "/a/b/node_modules/.staging/symbol-observable-24bcbbff/index.js",
@@ -828,8 +828,7 @@ namespace ts.projectSystem {
           },
           {
             path: "/a/b/node_modules/.staging/symbol-observable-24bcbbff/index.d.ts",
-            content:
-              "declare const observableSymbol: symbol;\nexport default observableSymbol;\n",
+            content: "declare const observableSymbol: symbol;\nexport default observableSymbol;\n",
           },
           { path: "/a/b/node_modules/.staging/symbol-observable-24bcbbff/lib" },
           {
@@ -847,7 +846,7 @@ namespace ts.projectSystem {
             {
               path: "/a/b/node_modules/.staging/@types/lodash-e56c4fe7/package.json",
               content:
-                '{\n    "name": "@types/lodash",\n    "version": "4.14.74",\n    "description": "TypeScript definitions for Lo-Dash",\n    "license": "MIT",\n    "contributors": [\n        {\n            "name": "Brian Zengel",\n            "url": "https://github.com/bczengel"\n        },\n        {\n            "name": "Ilya Mochalov",\n            "url": "https://github.com/chrootsu"\n        },\n        {\n            "name": "Stepan Mikhaylyuk",\n            "url": "https://github.com/stepancar"\n        },\n        {\n            "name": "Eric L Anderson",\n            "url": "https://github.com/ericanderson"\n        },\n        {\n            "name": "AJ Richardson",\n            "url": "https://github.com/aj-r"\n        },\n        {\n            "name": "Junyoung Clare Jang",\n            "url": "https://github.com/ailrun"\n        }\n    ],\n    "main": "",\n    "repository": {\n        "type": "git",\n        "url": "https://www.github.com/DefinitelyTyped/DefinitelyTyped.git"\n    },\n    "scripts": {},\n    "dependencies": {},\n    "typesPublisherContentHash": "12af578ffaf8d86d2df37e591857906a86b983fa9258414326544a0fe6af0de8",\n    "typeScriptVersion": "2.2"\n}',
+                "{\n    \"name\": \"@types/lodash\",\n    \"version\": \"4.14.74\",\n    \"description\": \"TypeScript definitions for Lo-Dash\",\n    \"license\": \"MIT\",\n    \"contributors\": [\n        {\n            \"name\": \"Brian Zengel\",\n            \"url\": \"https://github.com/bczengel\"\n        },\n        {\n            \"name\": \"Ilya Mochalov\",\n            \"url\": \"https://github.com/chrootsu\"\n        },\n        {\n            \"name\": \"Stepan Mikhaylyuk\",\n            \"url\": \"https://github.com/stepancar\"\n        },\n        {\n            \"name\": \"Eric L Anderson\",\n            \"url\": \"https://github.com/ericanderson\"\n        },\n        {\n            \"name\": \"AJ Richardson\",\n            \"url\": \"https://github.com/aj-r\"\n        },\n        {\n            \"name\": \"Junyoung Clare Jang\",\n            \"url\": \"https://github.com/ailrun\"\n        }\n    ],\n    \"main\": \"\",\n    \"repository\": {\n        \"type\": \"git\",\n        \"url\": \"https://www.github.com/DefinitelyTyped/DefinitelyTyped.git\"\n    },\n    \"scripts\": {},\n    \"dependencies\": {},\n    \"typesPublisherContentHash\": \"12af578ffaf8d86d2df37e591857906a86b983fa9258414326544a0fe6af0de8\",\n    \"typeScriptVersion\": \"2.2\"\n}",
             },
             {
               path: "/a/b/node_modules/.staging/lodash-b0733faa/index.js",
@@ -857,7 +856,7 @@ namespace ts.projectSystem {
               path: "/a/b/node_modules/.staging/typescript-8493ea5d/package.json.3017591594",
               content: "",
             },
-          ].map(getRootedFileOrFolder)
+          ].map(getRootedFileOrFolder),
         );
         // Since we added/removed in .staging no timeout
         verifyAfterPartialOrCompleteNpmInstall(0);
@@ -879,7 +878,7 @@ namespace ts.projectSystem {
               content:
                 "\n// Stub for lodash\nexport = _;\nexport as namespace _;\ndeclare var _: _.LoDashStatic;\ndeclare namespace _ {\n    interface LoDashStatic {\n        someProp: string;\n    }\n    class SomeClass {\n        someMethod(): void;\n    }\n}",
             },
-          ].map(getRootedFileOrFolder)
+          ].map(getRootedFileOrFolder),
         );
         verifyAfterPartialOrCompleteNpmInstall(0);
 
@@ -892,9 +891,9 @@ namespace ts.projectSystem {
             {
               path: "/a/b/node_modules/.staging/rxjs-22375c61/package.json.2252192041",
               content:
-                '{\n  "_args": [\n    [\n      {\n        "raw": "rxjs@^5.4.2",\n        "scope": null,\n        "escapedName": "rxjs",\n        "name": "rxjs",\n        "rawSpec": "^5.4.2",\n        "spec": ">=5.4.2 <6.0.0",\n        "type": "range"\n      },\n      "C:\\\\Users\\\\shkamat\\\\Desktop\\\\app"\n    ]\n  ],\n  "_from": "rxjs@>=5.4.2 <6.0.0",\n  "_id": "rxjs@5.4.3",\n  "_inCache": true,\n  "_location": "/rxjs",\n  "_nodeVersion": "7.7.2",\n  "_npmOperationalInternal": {\n    "host": "s3://npm-registry-packages",\n    "tmp": "tmp/rxjs-5.4.3.tgz_1502407898166_0.6800217325799167"\n  },\n  "_npmUser": {\n    "name": "blesh",\n    "email": "ben@benlesh.com"\n  },\n  "_npmVersion": "5.3.0",\n  "_phantomChildren": {},\n  "_requested": {\n    "raw": "rxjs@^5.4.2",\n    "scope": null,\n    "escapedName": "rxjs",\n    "name": "rxjs",\n    "rawSpec": "^5.4.2",\n    "spec": ">=5.4.2 <6.0.0",\n    "type": "range"\n  },\n  "_requiredBy": [\n    "/"\n  ],\n  "_resolved": "https://registry.npmjs.org/rxjs/-/rxjs-5.4.3.tgz",\n  "_shasum": "0758cddee6033d68e0fd53676f0f3596ce3d483f",\n  "_shrinkwrap": null,\n  "_spec": "rxjs@^5.4.2",\n  "_where": "C:\\\\Users\\\\shkamat\\\\Desktop\\\\app",\n  "author": {\n    "name": "Ben Lesh",\n    "email": "ben@benlesh.com"\n  },\n  "bugs": {\n    "url": "https://github.com/ReactiveX/RxJS/issues"\n  },\n  "config": {\n    "commitizen": {\n      "path": "cz-conventional-changelog"\n    }\n  },\n  "contributors": [\n    {\n      "name": "Ben Lesh",\n      "email": "ben@benlesh.com"\n    },\n    {\n      "name": "Paul Taylor",\n      "email": "paul.e.taylor@me.com"\n    },\n    {\n      "name": "Jeff Cross",\n      "email": "crossj@google.com"\n    },\n    {\n      "name": "Matthew Podwysocki",\n      "email": "matthewp@microsoft.com"\n    },\n    {\n      "name": "OJ Kwon",\n      "email": "kwon.ohjoong@gmail.com"\n    },\n    {\n      "name": "Andre Staltz",\n      "email": "andre@staltz.com"\n    }\n  ],\n  "dependencies": {\n    "symbol-observable": "^1.0.1"\n  },\n  "description": "Reactive Extensions for modern JavaScript",\n  "devDependencies": {\n    "babel-polyfill": "^6.23.0",\n    "benchmark": "^2.1.0",\n    "benchpress": "2.0.0-beta.1",\n    "chai": "^3.5.0",\n    "color": "^0.11.1",\n    "colors": "1.1.2",\n    "commitizen": "^2.8.6",\n    "coveralls": "^2.11.13",\n    "cz-conventional-changelog": "^1.2.0",\n    "danger": "^1.1.0",\n    "doctoc": "^1.0.0",\n    "escape-string-regexp": "^1.0.5 ",\n    "esdoc": "^0.4.7",\n    "eslint": "^3.8.0",\n    "fs-extra": "^2.1.2",\n    "get-folder-size": "^1.0.0",\n    "glob": "^7.0.3",\n    "gm": "^1.22.0",\n    "google-closure-compiler-js": "^20170218.0.0",\n    "gzip-size": "^3.0.0",\n    "http-server": "^0.9.0",\n    "husky": "^0.13.3",\n    "lint-staged": "3.2.5",\n    "lodash": "^4.15.0",\n    "madge": "^1.4.3",\n    "markdown-doctest": "^0.9.1",\n    "minimist": "^1.2.0",\n    "mkdirp": "^0.5.1",\n    "mocha": "^3.0.2",\n    "mocha-in-sauce": "0.0.1",\n    "npm-run-all": "^4.0.2",\n    "npm-scripts-info": "^0.3.4",\n    "nyc": "^10.2.0",\n    "opn-cli": "^3.1.0",\n    "platform": "^1.3.1",\n    "promise": "^7.1.1",\n    "protractor": "^3.1.1",\n    "rollup": "0.36.3",\n    "rollup-plugin-inject": "^2.0.0",\n    "rollup-plugin-node-resolve": "^2.0.0",\n    "rx": "latest",\n    "rxjs": "latest",\n    "shx": "^0.2.2",\n    "sinon": "^2.1.0",\n    "sinon-chai": "^2.9.0",\n    "source-map-support": "^0.4.0",\n    "tslib": "^1.5.0",\n    "eslint": "^5.16.0",\n    "typescript": "~2.0.6",\n    "typings": "^2.0.0",\n    "validate-commit-msg": "^2.14.0",\n    "watch": "^1.0.1",\n    "webpack": "^1.13.1",\n    "xmlhttprequest": "1.8.0"\n  },\n  "directories": {},\n  "dist": {\n    "integrity": "sha512-fSNi+y+P9ss+EZuV0GcIIqPUK07DEaMRUtLJvdcvMyFjc9dizuDjere+A4V7JrLGnm9iCc+nagV/4QdMTkqC4A==",\n    "shasum": "0758cddee6033d68e0fd53676f0f3596ce3d483f",\n    "tarball": "https://registry.npmjs.org/rxjs/-/rxjs-5.4.3.tgz"\n  },\n  "engines": {\n    "npm": ">=2.0.0"\n  },\n  "homepage": "https://github.com/ReactiveX/RxJS",\n  "keywords": [\n    "Rx",\n    "RxJS",\n    "ReactiveX",\n    "ReactiveExtensions",\n    "Streams",\n    "Observables",\n    "Observable",\n    "Stream",\n    "ES6",\n    "ES2015"\n  ],\n  "license": "Apache-2.0",\n  "lint-staged": {\n    "*.@(js)": [\n      "eslint --fix",\n      "git add"\n    ],\n    "*.@(ts)": [\n      "eslint -c .eslintrc --ext .ts . --fix",\n      "git add"\n    ]\n  },\n  "main": "Rx.js",\n  "maintainers": [\n    {\n      "name": "blesh",\n      "email": "ben@benlesh.com"\n    }\n  ],\n  "name": "rxjs",\n  "optionalDependencies": {},\n  "readme": "ERROR: No README data found!",\n  "repository": {\n    "type": "git",\n    "url": "git+ssh://git@github.com/ReactiveX/RxJS.git"\n  },\n  "scripts-info": {\n    "info": "List available script",\n    "build_all": "Build all packages (ES6, CJS, UMD) and generate packages",\n    "build_cjs": "Build CJS package with clean up existing build, copy source into dist",\n    "build_es6": "Build ES6 package with clean up existing build, copy source into dist",\n    "build_closure_core": "Minify Global core build using closure compiler",\n    "build_global": "Build Global package, then minify build",\n    "build_perf": "Build CJS & Global build, run macro performance test",\n    "build_test": "Build CJS package & test spec, execute mocha test runner",\n    "build_cover": "Run lint to current code, build CJS & test spec, execute test coverage",\n    "build_docs": "Build ES6 & global package, create documentation using it",\n    "build_spec": "Build test specs",\n    "check_circular_dependencies": "Check codebase has circular dependencies",\n    "clean_spec": "Clean up existing test spec build output",\n    "clean_dist_cjs": "Clean up existing CJS package output",\n    "clean_dist_es6": "Clean up existing ES6 package output",\n    "clean_dist_global": "Clean up existing Global package output",\n    "commit": "Run git commit wizard",\n    "compile_dist_cjs": "Compile codebase into CJS module",\n    "compile_module_es6": "Compile codebase into ES6",\n    "cover": "Execute test coverage",\n    "lint_perf": "Run lint against performance test suite",\n    "lint_spec": "Run lint against test spec",\n    "lint_src": "Run lint against source",\n    "lint": "Run lint against everything",\n    "perf": "Run macro performance benchmark",\n    "perf_micro": "Run micro performance benchmark",\n    "test_mocha": "Execute mocha test runner against existing test spec build",\n    "test_browser": "Execute mocha test runner on browser against existing test spec build",\n    "test": "Clean up existing test spec build, build test spec and execute mocha test runner",\n    "tests2png": "Generate marble diagram image from test spec",\n    "watch": "Watch codebase, trigger compile when source code changes"\n  },\n  "typings": "Rx.d.ts",\n  "version": "5.4.3"\n}\n',
+                "{\n  \"_args\": [\n    [\n      {\n        \"raw\": \"rxjs@^5.4.2\",\n        \"scope\": null,\n        \"escapedName\": \"rxjs\",\n        \"name\": \"rxjs\",\n        \"rawSpec\": \"^5.4.2\",\n        \"spec\": \">=5.4.2 <6.0.0\",\n        \"type\": \"range\"\n      },\n      \"C:\\\\Users\\\\shkamat\\\\Desktop\\\\app\"\n    ]\n  ],\n  \"_from\": \"rxjs@>=5.4.2 <6.0.0\",\n  \"_id\": \"rxjs@5.4.3\",\n  \"_inCache\": true,\n  \"_location\": \"/rxjs\",\n  \"_nodeVersion\": \"7.7.2\",\n  \"_npmOperationalInternal\": {\n    \"host\": \"s3://npm-registry-packages\",\n    \"tmp\": \"tmp/rxjs-5.4.3.tgz_1502407898166_0.6800217325799167\"\n  },\n  \"_npmUser\": {\n    \"name\": \"blesh\",\n    \"email\": \"ben@benlesh.com\"\n  },\n  \"_npmVersion\": \"5.3.0\",\n  \"_phantomChildren\": {},\n  \"_requested\": {\n    \"raw\": \"rxjs@^5.4.2\",\n    \"scope\": null,\n    \"escapedName\": \"rxjs\",\n    \"name\": \"rxjs\",\n    \"rawSpec\": \"^5.4.2\",\n    \"spec\": \">=5.4.2 <6.0.0\",\n    \"type\": \"range\"\n  },\n  \"_requiredBy\": [\n    \"/\"\n  ],\n  \"_resolved\": \"https://registry.npmjs.org/rxjs/-/rxjs-5.4.3.tgz\",\n  \"_shasum\": \"0758cddee6033d68e0fd53676f0f3596ce3d483f\",\n  \"_shrinkwrap\": null,\n  \"_spec\": \"rxjs@^5.4.2\",\n  \"_where\": \"C:\\\\Users\\\\shkamat\\\\Desktop\\\\app\",\n  \"author\": {\n    \"name\": \"Ben Lesh\",\n    \"email\": \"ben@benlesh.com\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/ReactiveX/RxJS/issues\"\n  },\n  \"config\": {\n    \"commitizen\": {\n      \"path\": \"cz-conventional-changelog\"\n    }\n  },\n  \"contributors\": [\n    {\n      \"name\": \"Ben Lesh\",\n      \"email\": \"ben@benlesh.com\"\n    },\n    {\n      \"name\": \"Paul Taylor\",\n      \"email\": \"paul.e.taylor@me.com\"\n    },\n    {\n      \"name\": \"Jeff Cross\",\n      \"email\": \"crossj@google.com\"\n    },\n    {\n      \"name\": \"Matthew Podwysocki\",\n      \"email\": \"matthewp@microsoft.com\"\n    },\n    {\n      \"name\": \"OJ Kwon\",\n      \"email\": \"kwon.ohjoong@gmail.com\"\n    },\n    {\n      \"name\": \"Andre Staltz\",\n      \"email\": \"andre@staltz.com\"\n    }\n  ],\n  \"dependencies\": {\n    \"symbol-observable\": \"^1.0.1\"\n  },\n  \"description\": \"Reactive Extensions for modern JavaScript\",\n  \"devDependencies\": {\n    \"babel-polyfill\": \"^6.23.0\",\n    \"benchmark\": \"^2.1.0\",\n    \"benchpress\": \"2.0.0-beta.1\",\n    \"chai\": \"^3.5.0\",\n    \"color\": \"^0.11.1\",\n    \"colors\": \"1.1.2\",\n    \"commitizen\": \"^2.8.6\",\n    \"coveralls\": \"^2.11.13\",\n    \"cz-conventional-changelog\": \"^1.2.0\",\n    \"danger\": \"^1.1.0\",\n    \"doctoc\": \"^1.0.0\",\n    \"escape-string-regexp\": \"^1.0.5 \",\n    \"esdoc\": \"^0.4.7\",\n    \"eslint\": \"^3.8.0\",\n    \"fs-extra\": \"^2.1.2\",\n    \"get-folder-size\": \"^1.0.0\",\n    \"glob\": \"^7.0.3\",\n    \"gm\": \"^1.22.0\",\n    \"google-closure-compiler-js\": \"^20170218.0.0\",\n    \"gzip-size\": \"^3.0.0\",\n    \"http-server\": \"^0.9.0\",\n    \"husky\": \"^0.13.3\",\n    \"lint-staged\": \"3.2.5\",\n    \"lodash\": \"^4.15.0\",\n    \"madge\": \"^1.4.3\",\n    \"markdown-doctest\": \"^0.9.1\",\n    \"minimist\": \"^1.2.0\",\n    \"mkdirp\": \"^0.5.1\",\n    \"mocha\": \"^3.0.2\",\n    \"mocha-in-sauce\": \"0.0.1\",\n    \"npm-run-all\": \"^4.0.2\",\n    \"npm-scripts-info\": \"^0.3.4\",\n    \"nyc\": \"^10.2.0\",\n    \"opn-cli\": \"^3.1.0\",\n    \"platform\": \"^1.3.1\",\n    \"promise\": \"^7.1.1\",\n    \"protractor\": \"^3.1.1\",\n    \"rollup\": \"0.36.3\",\n    \"rollup-plugin-inject\": \"^2.0.0\",\n    \"rollup-plugin-node-resolve\": \"^2.0.0\",\n    \"rx\": \"latest\",\n    \"rxjs\": \"latest\",\n    \"shx\": \"^0.2.2\",\n    \"sinon\": \"^2.1.0\",\n    \"sinon-chai\": \"^2.9.0\",\n    \"source-map-support\": \"^0.4.0\",\n    \"tslib\": \"^1.5.0\",\n    \"eslint\": \"^5.16.0\",\n    \"typescript\": \"~2.0.6\",\n    \"typings\": \"^2.0.0\",\n    \"validate-commit-msg\": \"^2.14.0\",\n    \"watch\": \"^1.0.1\",\n    \"webpack\": \"^1.13.1\",\n    \"xmlhttprequest\": \"1.8.0\"\n  },\n  \"directories\": {},\n  \"dist\": {\n    \"integrity\": \"sha512-fSNi+y+P9ss+EZuV0GcIIqPUK07DEaMRUtLJvdcvMyFjc9dizuDjere+A4V7JrLGnm9iCc+nagV/4QdMTkqC4A==\",\n    \"shasum\": \"0758cddee6033d68e0fd53676f0f3596ce3d483f\",\n    \"tarball\": \"https://registry.npmjs.org/rxjs/-/rxjs-5.4.3.tgz\"\n  },\n  \"engines\": {\n    \"npm\": \">=2.0.0\"\n  },\n  \"homepage\": \"https://github.com/ReactiveX/RxJS\",\n  \"keywords\": [\n    \"Rx\",\n    \"RxJS\",\n    \"ReactiveX\",\n    \"ReactiveExtensions\",\n    \"Streams\",\n    \"Observables\",\n    \"Observable\",\n    \"Stream\",\n    \"ES6\",\n    \"ES2015\"\n  ],\n  \"license\": \"Apache-2.0\",\n  \"lint-staged\": {\n    \"*.@(js)\": [\n      \"eslint --fix\",\n      \"git add\"\n    ],\n    \"*.@(ts)\": [\n      \"eslint -c .eslintrc --ext .ts . --fix\",\n      \"git add\"\n    ]\n  },\n  \"main\": \"Rx.js\",\n  \"maintainers\": [\n    {\n      \"name\": \"blesh\",\n      \"email\": \"ben@benlesh.com\"\n    }\n  ],\n  \"name\": \"rxjs\",\n  \"optionalDependencies\": {},\n  \"readme\": \"ERROR: No README data found!\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+ssh://git@github.com/ReactiveX/RxJS.git\"\n  },\n  \"scripts-info\": {\n    \"info\": \"List available script\",\n    \"build_all\": \"Build all packages (ES6, CJS, UMD) and generate packages\",\n    \"build_cjs\": \"Build CJS package with clean up existing build, copy source into dist\",\n    \"build_es6\": \"Build ES6 package with clean up existing build, copy source into dist\",\n    \"build_closure_core\": \"Minify Global core build using closure compiler\",\n    \"build_global\": \"Build Global package, then minify build\",\n    \"build_perf\": \"Build CJS & Global build, run macro performance test\",\n    \"build_test\": \"Build CJS package & test spec, execute mocha test runner\",\n    \"build_cover\": \"Run lint to current code, build CJS & test spec, execute test coverage\",\n    \"build_docs\": \"Build ES6 & global package, create documentation using it\",\n    \"build_spec\": \"Build test specs\",\n    \"check_circular_dependencies\": \"Check codebase has circular dependencies\",\n    \"clean_spec\": \"Clean up existing test spec build output\",\n    \"clean_dist_cjs\": \"Clean up existing CJS package output\",\n    \"clean_dist_es6\": \"Clean up existing ES6 package output\",\n    \"clean_dist_global\": \"Clean up existing Global package output\",\n    \"commit\": \"Run git commit wizard\",\n    \"compile_dist_cjs\": \"Compile codebase into CJS module\",\n    \"compile_module_es6\": \"Compile codebase into ES6\",\n    \"cover\": \"Execute test coverage\",\n    \"lint_perf\": \"Run lint against performance test suite\",\n    \"lint_spec\": \"Run lint against test spec\",\n    \"lint_src\": \"Run lint against source\",\n    \"lint\": \"Run lint against everything\",\n    \"perf\": \"Run macro performance benchmark\",\n    \"perf_micro\": \"Run micro performance benchmark\",\n    \"test_mocha\": \"Execute mocha test runner against existing test spec build\",\n    \"test_browser\": \"Execute mocha test runner on browser against existing test spec build\",\n    \"test\": \"Clean up existing test spec build, build test spec and execute mocha test runner\",\n    \"tests2png\": \"Generate marble diagram image from test spec\",\n    \"watch\": \"Watch codebase, trigger compile when source code changes\"\n  },\n  \"typings\": \"Rx.d.ts\",\n  \"version\": \"5.4.3\"\n}\n",
             },
-          ].map(getRootedFileOrFolder)
+          ].map(getRootedFileOrFolder),
         );
         verifyAfterPartialOrCompleteNpmInstall(0);
 
@@ -911,7 +910,7 @@ namespace ts.projectSystem {
             { path: "/a/b/node_modules/rxjs" },
             { path: "/a/b/node_modules/typescript" },
             { path: "/a/b/node_modules/.bin" },
-          ].map(getRootedFileOrFolder)
+          ].map(getRootedFileOrFolder),
         );
         // From the type root update
         verifyAfterPartialOrCompleteNpmInstall(2);
@@ -921,18 +920,17 @@ namespace ts.projectSystem {
             .replace("/a/b/node_modules/.staging", "/a/b/node_modules")
             .replace(
               /[\-\.][\d\w][\d\w][\d\w][\d\w][\d\w][\d\w][\d\w][\d\w]/g,
-              ""
+              "",
             );
         });
 
         host.deleteFolder(
           root + "/a/b/node_modules/.staging",
-          /*recursive*/ true
+          /*recursive*/ true,
         );
-        const lodashIndexPath =
-          root + "/a/b/node_modules/@types/lodash/index.d.ts";
+        const lodashIndexPath = root + "/a/b/node_modules/@types/lodash/index.d.ts";
         projectFiles.push(
-          find(filesAndFoldersToAdd, (f) => f.path === lodashIndexPath)!
+          find(filesAndFoldersToAdd, (f) => f.path === lodashIndexPath)!,
         );
         // we would now not have failed lookup in the parent of appFolder since lodash is available
         recursiveWatchedDirectories.length = 2;
@@ -941,19 +939,19 @@ namespace ts.projectSystem {
         verifyAfterPartialOrCompleteNpmInstall(2);
 
         function verifyAfterPartialOrCompleteNpmInstall(
-          timeoutQueueLengthWhenRunningTimeouts: number
+          timeoutQueueLengthWhenRunningTimeouts: number,
         ) {
           filesAndFoldersToAdd.forEach((f) => host.ensureFileOrFolder(f));
           if (npmInstallComplete || timeoutDuringPartialInstallation) {
             if (timeoutQueueLengthWhenRunningTimeouts) {
               // Expected project update
               host.checkTimeoutQueueLengthAndRun(
-                timeoutQueueLengthWhenRunningTimeouts + 1
+                timeoutQueueLengthWhenRunningTimeouts + 1,
               ); // Scheduled invalidation of resolutions
               host.runQueuedTimeoutCallbacks(); // Actual update
             } else {
               host.checkTimeoutQueueLengthAndRun(
-                timeoutQueueLengthWhenRunningTimeouts
+                timeoutQueueLengthWhenRunningTimeouts,
               );
             }
           } else {
@@ -966,20 +964,20 @@ namespace ts.projectSystem {
           checkNumberOfConfiguredProjects(projectService, 1);
 
           const project = projectService.configuredProjects.get(
-            tsconfigJson.path
+            tsconfigJson.path,
           )!;
           const projectFilePaths = map(projectFiles, (f) => f.path);
           checkProjectActualFiles(project, projectFilePaths);
 
           const filesWatched = filter(
             projectFilePaths,
-            (p) => p !== app.path && p.indexOf("/a/b/node_modules") === -1
+            (p) => p !== app.path && p.indexOf("/a/b/node_modules") === -1,
           );
           checkWatchedFiles(host, filesWatched);
           checkWatchedDirectories(
             host,
             typeRootDirectories.concat(recursiveWatchedDirectories),
-            /*recursive*/ true
+            /*recursive*/ true,
           );
           checkWatchedDirectories(host, [], /*recursive*/ false);
         }
@@ -1013,14 +1011,14 @@ namespace ts.projectSystem {
       const project = service.configuredProjects.get(tsconfig.path)!;
       checkProjectActualFiles(
         project,
-        files.map((f) => f.path)
+        files.map((f) => f.path),
       );
       assert.deepEqual(
         project
           .getLanguageService()
           .getSemanticDiagnostics(app.path)
           .map((diag) => diag.messageText),
-        ["Cannot find module 'debug' or its corresponding type declarations."]
+        ["Cannot find module 'debug' or its corresponding type declarations."],
       );
 
       const debugTypesFile: File = {
@@ -1033,7 +1031,7 @@ namespace ts.projectSystem {
       host.invokeFsWatchesRecursiveCallbacks = (
         fullPath,
         eventName,
-        entryFullPath
+        entryFullPath,
       ) => {
         if (fullPath.endsWith("@types")) {
           invoker.call(host, fullPath, eventName, entryFullPath);
@@ -1043,14 +1041,14 @@ namespace ts.projectSystem {
       host.runQueuedTimeoutCallbacks();
       checkProjectActualFiles(
         project,
-        files.map((f) => f.path)
+        files.map((f) => f.path),
       );
       assert.deepEqual(
         project
           .getLanguageService()
           .getSemanticDiagnostics(app.path)
           .map((diag) => diag.messageText),
-        []
+        [],
       );
     });
 
@@ -1088,7 +1086,7 @@ namespace ts.projectSystem {
       service.openClientFile(`${symlink.path}/module2.ts`);
       checkNumberOfProjects(service, { configuredProjects: 1 });
       const project = Debug.checkDefined(
-        service.configuredProjects.get(config.path)
+        service.configuredProjects.get(config.path),
       );
       checkProjectActualFiles(project, [
         module1.path,
@@ -1098,7 +1096,7 @@ namespace ts.projectSystem {
       ]);
       host.writeFile(
         `${symlink.path}/module3.ts`,
-        `import * as M from "folder1/module1";`
+        `import * as M from "folder1/module1";`,
       );
       host.runQueuedTimeoutCallbacks();
       checkNumberOfProjects(service, { configuredProjects: 1 });

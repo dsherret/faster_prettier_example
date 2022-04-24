@@ -23,7 +23,7 @@ namespace ts.projectSystem {
                   return {
                     response: testProtocolCommandResponse,
                   };
-                }
+                },
               );
               return Harness.LanguageService.makeDefaultProxy(info);
             },
@@ -101,8 +101,7 @@ namespace ts.projectSystem {
         }),
       };
 
-      const { host, pluginsLoaded, protocolHandlerRequests } =
-        createHostWithPlugin([aTs, tsconfig, libFile]);
+      const { host, pluginsLoaded, protocolHandlerRequests } = createHostWithPlugin([aTs, tsconfig, libFile]);
       const session = createSession(host);
 
       const service = createProjectService(host, { session });

@@ -12,16 +12,14 @@ namespace ts.codefix {
       const range = getConstTokenRange(sourceFile, span.start, program);
       if (range === undefined) return;
 
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, range)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, range));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Convert_const_to_let,
           fixId,
-          Diagnostics.Convert_const_to_let
+          Diagnostics.Convert_const_to_let,
         ),
       ];
     },
@@ -31,22 +29,22 @@ namespace ts.codefix {
   function getConstTokenRange(
     sourceFile: SourceFile,
     pos: number,
-    program: Program
+    program: Program,
   ) {
     const checker = program.getTypeChecker();
     const symbol = checker.getSymbolAtLocation(
-      getTokenAtPosition(sourceFile, pos)
+      getTokenAtPosition(sourceFile, pos),
     );
     const declaration = tryCast(
       symbol?.valueDeclaration?.parent,
-      isVariableDeclarationList
+      isVariableDeclarationList,
     );
     if (declaration === undefined) return;
 
     const constToken = findChildOfKind(
       declaration,
       SyntaxKind.ConstKeyword,
-      sourceFile
+      sourceFile,
     );
     if (constToken === undefined) return;
 
@@ -56,7 +54,7 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    range: TextRange
+    range: TextRange,
   ) {
     changes.replaceRangeWithText(sourceFile, range, "let");
   }

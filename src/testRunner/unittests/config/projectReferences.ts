@@ -14,18 +14,17 @@ namespace ts {
   function assertHasError(
     message: string,
     errors: readonly Diagnostic[],
-    diag: DiagnosticMessage
+    diag: DiagnosticMessage,
   ) {
     if (!errors.some((e) => e.code === diag.code)) {
       const errorString = errors
         .map(
-          (e) =>
-            `    ${e.file ? e.file.fileName : "[global]"}: ${e.messageText}`
+          (e) => `    ${e.file ? e.file.fileName : "[global]"}: ${e.messageText}`,
         )
         .join("\r\n");
       assert(
         false,
-        `${message}: Did not find any diagnostic for ${diag.message} in:\r\n${errorString}`
+        `${message}: Did not find any diagnostic for ${diag.message} in:\r\n${errorString}`,
       );
     }
   }
@@ -34,9 +33,11 @@ namespace ts {
     if (errors && errors.length > 0) {
       assert(
         false,
-        `${message}: Expected no errors, but found:\r\n${errors
-          .map((e) => `    ${e.messageText}`)
-          .join("\r\n")}`
+        `${message}: Expected no errors, but found:\r\n${
+          errors
+            .map((e) => `    ${e.messageText}`)
+            .join("\r\n")
+        }`,
       );
     }
   }
@@ -62,7 +63,7 @@ namespace ts {
   function testProjectReferences(
     spec: TestSpecification,
     entryPointConfigFileName: string,
-    checkResult: (prog: Program, host: fakes.CompilerHost) => void
+    checkResult: (prog: Program, host: fakes.CompilerHost) => void,
   ) {
     const files = new Map<string, string>();
     for (const key in spec) {
@@ -70,7 +71,7 @@ namespace ts {
       const configFileName = combineAllPaths(
         "/",
         key,
-        sp.configFileName || "tsconfig.json"
+        sp.configFileName || "tsconfig.json",
       );
       const options = {
         compilerOptions: {
@@ -96,7 +97,7 @@ namespace ts {
         for (const outFile of Object.keys(sp.outputFiles)) {
           files.set(
             combineAllPaths("/", key, outDir, outFile),
-            sp.outputFiles[outFile]
+            sp.outputFiles[outFile],
           );
         }
       }
@@ -111,21 +112,19 @@ namespace ts {
     });
     const host = new fakes.CompilerHost(new fakes.System(vfsys));
 
-    const { config, error } = readConfigFile(entryPointConfigFileName, (name) =>
-      host.readFile(name)
-    );
+    const { config, error } = readConfigFile(entryPointConfigFileName, (name) => host.readFile(name));
 
     // We shouldn't have any errors about invalid tsconfig files in these tests
     assert(
       config && !error,
-      flattenDiagnosticMessageText(error && error.messageText, "\n")
+      flattenDiagnosticMessageText(error && error.messageText, "\n"),
     );
     const file = parseJsonConfigFileContent(
       config,
       parseConfigHostFromCompilerHostLike(host),
       getDirectoryPath(entryPointConfigFileName),
       {},
-      entryPointConfigFileName
+      entryPointConfigFileName,
     );
     file.options.configFilePath = entryPointConfigFileName;
     const prog = createProgram({
@@ -153,7 +152,7 @@ namespace ts {
         assert.isTrue(!!prog, "Program should exist");
         assertNoErrors(
           "Sanity check should not produce errors",
-          prog.getOptionsDiagnostics()
+          prog.getOptionsDiagnostics(),
         );
       });
     });
@@ -179,7 +178,7 @@ namespace ts {
         assertHasError(
           "Reports an error about the wrong decl setting",
           errs,
-          Diagnostics.Composite_projects_may_not_disable_declaration_emit
+          Diagnostics.Composite_projects_may_not_disable_declaration_emit,
         );
       });
     });
@@ -206,7 +205,7 @@ namespace ts {
         assertHasError(
           "Reports an error about 'composite' not being set",
           errs,
-          Diagnostics.Referenced_project_0_must_have_setting_composite_Colon_true
+          Diagnostics.Referenced_project_0_must_have_setting_composite_Colon_true,
         );
       });
     });
@@ -229,7 +228,7 @@ namespace ts {
         const errs = program.getOptionsDiagnostics();
         assertNoErrors(
           "Reports an error about 'composite' not being set",
-          errs
+          errs,
         );
       });
     });
@@ -249,12 +248,13 @@ namespace ts {
 
       testProjectReferences(spec, "/primary/tsconfig.json", (program) => {
         const errs = program.getSemanticDiagnostics(
-          program.getSourceFile("/primary/a.ts")
+          program.getSourceFile("/primary/a.ts"),
         );
         assertHasError(
           "Reports an error about b.ts not being in the list",
           errs,
-          Diagnostics.File_0_is_not_listed_within_the_file_list_of_project_1_Projects_must_list_all_files_or_use_an_include_pattern
+          Diagnostics
+            .File_0_is_not_listed_within_the_file_list_of_project_1_Projects_must_list_all_files_or_use_an_include_pattern,
         );
       });
     });
@@ -271,7 +271,7 @@ namespace ts {
         assertHasError(
           "Reports an error about a missing file",
           errs,
-          Diagnostics.File_0_not_found
+          Diagnostics.File_0_not_found,
         );
       });
     });
@@ -291,7 +291,7 @@ namespace ts {
         assertHasError(
           "Reports an error about outFile not being set",
           errs,
-          Diagnostics.Cannot_prepend_project_0_because_it_does_not_have_outFile_set
+          Diagnostics.Cannot_prepend_project_0_because_it_does_not_have_outFile_set,
         );
       });
     });
@@ -312,7 +312,7 @@ namespace ts {
         assertHasError(
           "Reports an error about outFile being missing",
           errs,
-          Diagnostics.Output_file_0_from_project_1_does_not_exist
+          Diagnostics.Output_file_0_from_project_1_does_not_exist,
         );
       });
     });
@@ -337,12 +337,12 @@ namespace ts {
       testProjectReferences(spec, "/beta/tsconfig.json", (program) => {
         assertNoErrors(
           "File setup should be correct",
-          program.getOptionsDiagnostics()
+          program.getOptionsDiagnostics(),
         );
         assertHasError(
           "Found a type error",
           program.getSemanticDiagnostics(),
-          Diagnostics.Module_0_has_no_exported_member_1
+          Diagnostics.Module_0_has_no_exported_member_1,
         );
       });
     });
@@ -364,7 +364,7 @@ namespace ts {
         assertHasError(
           "Issues a useful error",
           program.getSemanticDiagnostics(),
-          Diagnostics.Output_file_0_has_not_been_built_from_source_file_1
+          Diagnostics.Output_file_0_has_not_been_built_from_source_file_1,
         );
       });
     });
@@ -390,7 +390,7 @@ namespace ts {
         assertHasError(
           "Issues a useful error",
           program.getSemanticDiagnostics(),
-          Diagnostics.Output_file_0_has_not_been_built_from_source_file_1
+          Diagnostics.Output_file_0_has_not_been_built_from_source_file_1,
         );
       });
     });
@@ -439,17 +439,18 @@ namespace ts {
       };
       testProjectReferences(spec, "/alpha/tsconfig.json", (program) => {
         const semanticDiagnostics = program.getSemanticDiagnostics(
-          program.getSourceFile("/alpha/src/a.ts")
+          program.getSourceFile("/alpha/src/a.ts"),
         );
         assertHasError(
           "Issues an error about the rootDir",
           semanticDiagnostics,
-          Diagnostics.File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files
+          Diagnostics.File_0_is_not_under_rootDir_1_rootDir_is_expected_to_contain_all_source_files,
         );
         assertHasError(
           "Issues an error about the fileList",
           semanticDiagnostics,
-          Diagnostics.File_0_is_not_listed_within_the_file_list_of_project_1_Projects_must_list_all_files_or_use_an_include_pattern
+          Diagnostics
+            .File_0_is_not_listed_within_the_file_list_of_project_1_Projects_must_list_all_files_or_use_an_include_pattern,
         );
       });
     });

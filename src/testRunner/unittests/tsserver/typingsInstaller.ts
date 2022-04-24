@@ -15,7 +15,7 @@ namespace ts.projectSystem {
         (p && p.throttleLimit) || 5,
         host,
         p && p.typesRegistry,
-        log
+        log,
       );
     }
 
@@ -30,7 +30,7 @@ namespace ts.projectSystem {
     host: TestServerHost,
     installedTypings: string[] | string,
     typingFiles: File[],
-    cb: TI.RequestCompletedAction
+    cb: TI.RequestCompletedAction,
   ): void {
     self.addPostExecAction(installedTypings, (success) => {
       for (const file of typingFiles) {
@@ -91,7 +91,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          _cb: TI.RequestCompletedAction
+          _cb: TI.RequestCompletedAction,
         ) {
           assert(false, "should not be called");
         }
@@ -150,7 +150,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/jquery"];
           const typingFiles = [jquery];
@@ -187,7 +187,7 @@ namespace ts.projectSystem {
       checkWatchedDirectoriesDetailed(
         host,
         expectedWatchedDirectoriesRecursive,
-        /*recursive*/ true
+        /*recursive*/ true,
       );
 
       installer.installAll(/*expectedCount*/ 1);
@@ -201,7 +201,7 @@ namespace ts.projectSystem {
       checkWatchedDirectoriesDetailed(
         host,
         expectedWatchedDirectoriesRecursive,
-        /*recursive*/ true
+        /*recursive*/ true,
       );
     });
 
@@ -233,7 +233,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/jquery"];
           const typingFiles = [jquery];
@@ -272,25 +272,25 @@ namespace ts.projectSystem {
           super(
             host,
             { typesRegistry: createTypesRegistry("jquery") },
-            { isEnabled: () => true, writeLine: (msg) => messages.push(msg) }
+            { isEnabled: () => true, writeLine: (msg) => messages.push(msg) },
           );
         }
         enqueueInstallTypingsRequest(
           project: server.Project,
           typeAcquisition: TypeAcquisition,
-          unresolvedImports: SortedReadonlyArray<string>
+          unresolvedImports: SortedReadonlyArray<string>,
         ) {
           super.enqueueInstallTypingsRequest(
             project,
             typeAcquisition,
-            unresolvedImports
+            unresolvedImports,
           );
         }
         installWorker(
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings: string[] = [];
           const typingFiles: File[] = [];
@@ -319,9 +319,9 @@ namespace ts.projectSystem {
       checkProjectActualFiles(p, [jqueryJs.path]);
       assert.isTrue(
         messages.indexOf(
-          "No new typings were requested as a result of typings discovery"
+          "No new typings were requested as a result of typings discovery",
         ) > 0,
-        "Should not request filename-based typings"
+        "Should not request filename-based typings",
       );
     });
 
@@ -437,20 +437,20 @@ namespace ts.projectSystem {
         enqueueInstallTypingsRequest(
           project: server.Project,
           typeAcquisition: TypeAcquisition,
-          unresolvedImports: SortedReadonlyArray<string>
+          unresolvedImports: SortedReadonlyArray<string>,
         ) {
           enqueueIsCalled = true;
           super.enqueueInstallTypingsRequest(
             project,
             typeAcquisition,
-            unresolvedImports
+            unresolvedImports,
           );
         }
         installWorker(
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings = ["@types/node"];
           const typingFiles = [jquery];
@@ -518,7 +518,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings = ["@types/lodash", "@types/react"];
           const typingFiles = [lodashDts, reactDts];
@@ -577,19 +577,19 @@ namespace ts.projectSystem {
         enqueueInstallTypingsRequest(
           project: server.Project,
           typeAcquisition: TypeAcquisition,
-          unresolvedImports: SortedReadonlyArray<string>
+          unresolvedImports: SortedReadonlyArray<string>,
         ) {
           super.enqueueInstallTypingsRequest(
             project,
             typeAcquisition,
-            unresolvedImports
+            unresolvedImports,
           );
         }
         installWorker(
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings: string[] = [];
           const typingFiles: File[] = [];
@@ -633,25 +633,25 @@ namespace ts.projectSystem {
           super(
             host,
             { typesRegistry: createTypesRegistry("jquery") },
-            { isEnabled: () => true, writeLine: (msg) => messages.push(msg) }
+            { isEnabled: () => true, writeLine: (msg) => messages.push(msg) },
           );
         }
         enqueueInstallTypingsRequest(
           project: server.Project,
           typeAcquisition: TypeAcquisition,
-          unresolvedImports: SortedReadonlyArray<string>
+          unresolvedImports: SortedReadonlyArray<string>,
         ) {
           super.enqueueInstallTypingsRequest(
             project,
             typeAcquisition,
-            unresolvedImports
+            unresolvedImports,
           );
         }
         installWorker(
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings: string[] = [];
           const typingFiles: File[] = [];
@@ -686,9 +686,9 @@ namespace ts.projectSystem {
       checkProjectActualFiles(p, [jqueryJs.path]);
       assert.isTrue(
         messages.indexOf(
-          "No new typings were requested as a result of typings discovery"
+          "No new typings were requested as a result of typings discovery",
         ) > 0,
-        "Should not request filename-based typings"
+        "Should not request filename-based typings",
       );
     });
 
@@ -712,19 +712,19 @@ namespace ts.projectSystem {
         enqueueInstallTypingsRequest(
           project: server.Project,
           typeAcquisition: TypeAcquisition,
-          unresolvedImports: SortedReadonlyArray<string>
+          unresolvedImports: SortedReadonlyArray<string>,
         ) {
           super.enqueueInstallTypingsRequest(
             project,
             typeAcquisition,
-            unresolvedImports
+            unresolvedImports,
           );
         }
         installWorker(
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings: string[] = [];
           const typingFiles: File[] = [];
@@ -818,7 +818,7 @@ namespace ts.projectSystem {
               "jquery",
               "commander",
               "moment",
-              "express"
+              "express",
             ),
           });
         }
@@ -826,7 +826,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings = [
             "@types/commander",
@@ -945,7 +945,7 @@ namespace ts.projectSystem {
               "express",
               "jquery",
               "moment",
-              "lodash"
+              "lodash",
             ),
           });
         }
@@ -953,7 +953,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           const installedTypings = [
             "@types/commander",
@@ -993,7 +993,7 @@ namespace ts.projectSystem {
       for (const f of typingFiles) {
         assert.isTrue(
           host.fileExists(f.path),
-          `expected file ${f.path} to exist`
+          `expected file ${f.path} to exist`,
         );
       }
       host.checkTimeoutQueueLengthAndRun(1);
@@ -1069,7 +1069,7 @@ namespace ts.projectSystem {
               "lodash",
               "cordova",
               "gulp",
-              "grunt"
+              "grunt",
             ),
           });
         }
@@ -1077,7 +1077,7 @@ namespace ts.projectSystem {
           _requestId: number,
           args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ): void {
           let typingFiles: (File & { typings: string })[] = [];
           if (args.indexOf(typingsName("commander")) >= 0) {
@@ -1090,7 +1090,7 @@ namespace ts.projectSystem {
             host,
             typingFiles.map((f) => f.typings),
             typingFiles,
-            cb
+            cb,
           );
         }
       })();
@@ -1118,7 +1118,7 @@ namespace ts.projectSystem {
       assert.equal(
         installer.pendingRunRequests.length,
         0,
-        "expect no throttled requests"
+        "expect no throttled requests",
       );
 
       // Create project #2 with 2 typings
@@ -1135,7 +1135,7 @@ namespace ts.projectSystem {
       assert.equal(
         installer.pendingRunRequests.length,
         1,
-        "expect one throttled request"
+        "expect one throttled request",
       );
 
       const p1 = projectService.externalProjects[0];
@@ -1151,7 +1151,7 @@ namespace ts.projectSystem {
       assert.equal(
         installer.pendingRunRequests.length,
         0,
-        "expected no throttled requests"
+        "expected no throttled requests",
       );
 
       installer.executePendingCommands();
@@ -1222,7 +1222,7 @@ namespace ts.projectSystem {
             typesRegistry: createTypesRegistry(
               "zkat__cacache",
               "nested",
-              "commander"
+              "commander",
             ),
           });
         }
@@ -1230,7 +1230,7 @@ namespace ts.projectSystem {
           _requestId: number,
           args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           assert.deepEqual(args, [
             `@types/zkat__cacache@ts${versionMajorMinor}`,
@@ -1324,7 +1324,7 @@ namespace ts.projectSystem {
           _requestId: number,
           args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           assert.deepEqual(args, [`@types/jquery@ts${versionMajorMinor}`]);
           const installedTypings = ["@types/jquery"];
@@ -1383,7 +1383,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/jquery"];
           const typingFiles = [jqueryDTS];
@@ -1406,7 +1406,7 @@ namespace ts.projectSystem {
       watchedFilesExpected.set(libFile.path, 1); // project files
       watchedFilesExpected.set(
         combinePaths(installer.globalTypingsCacheLocation, "package.json"),
-        1
+        1,
       );
       checkWatchedFilesDetailed(host, watchedFilesExpected);
 
@@ -1416,7 +1416,7 @@ namespace ts.projectSystem {
         host,
         ["/", "/node_modules", "/bower_components"],
         1,
-        /*recursive*/ true
+        /*recursive*/ true,
       );
 
       installer.installAll(/*expectedCount*/ 1);
@@ -1459,7 +1459,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/jquery"];
           const typingFiles = [jqueryDTS];
@@ -1514,7 +1514,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/commander"];
           const typingFiles = [commander];
@@ -1573,7 +1573,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = [
             "@types/node",
@@ -1596,15 +1596,15 @@ namespace ts.projectSystem {
 
       assert.isTrue(
         host.fileExists(node.path),
-        "typings for 'node' should be created"
+        "typings for 'node' should be created",
       );
       assert.isTrue(
         host.fileExists(commander.path),
-        "typings for 'commander' should be created"
+        "typings for 'commander' should be created",
       );
       assert.isTrue(
         host.fileExists(emberComponent.path),
-        "typings for 'commander' should be created"
+        "typings for 'commander' should be created",
       );
 
       host.checkTimeoutQueueLengthAndRun(2);
@@ -1629,8 +1629,7 @@ namespace ts.projectSystem {
       };
 
       const typeNames: readonly string[] = ["commander"];
-      const typePath = (name: string): string =>
-        `${cachePath}/node_modules/@types/${name}/index.d.ts`;
+      const typePath = (name: string): string => `${cachePath}/node_modules/@types/${name}/index.d.ts`;
       const host = createServerHost([file, commanderJS]);
       const installer = new (class extends Installer {
         constructor() {
@@ -1643,14 +1642,14 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = typeNames.map((name) => `@types/${name}`);
           const typingFiles = typeNames.map(
             (name): TestFSWithWatch.File => ({
               path: typePath(name),
               content: "",
-            })
+            }),
           );
           executeCommand(this, host, installedTypings, typingFiles, cb);
         }
@@ -1676,7 +1675,7 @@ namespace ts.projectSystem {
           `${tscWatch.projects}/a/b/node_modules/@types`,
           `${tscWatch.projects}/a/b/bower_components`,
         ],
-        /*recursive*/ true
+        /*recursive*/ true,
       );
 
       service.checkNumberOfProjects({ inferredProjects: 1 });
@@ -1689,7 +1688,7 @@ namespace ts.projectSystem {
       for (const name of typeNames) {
         assert.isTrue(
           host.fileExists(typePath(name)),
-          `typings for '${name}' should be created`
+          `typings for '${name}' should be created`,
         );
       }
       host.checkTimeoutQueueLengthAndRun(2);
@@ -1725,7 +1724,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           executeCommand(this, host, ["foo"], [], cb);
         }
@@ -1741,7 +1740,7 @@ namespace ts.projectSystem {
 
       assert.deepEqual(
         proj.cachedUnresolvedImportsPerFile.get(f1.path as Path),
-        ["foo", "foo", "foo", "@bar/router", "@bar/common", "@bar/common"]
+        ["foo", "foo", "foo", "@bar/router", "@bar/common", "@bar/common"],
       );
 
       installer.installAll(/*expectedCount*/ 1);
@@ -1793,7 +1792,7 @@ namespace ts.projectSystem {
       assert.strictEqual(
         version1,
         version2,
-        "set of unresolved imports should change"
+        "set of unresolved imports should change",
       );
     });
 
@@ -1851,7 +1850,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/jquery"];
           const typingFiles = [jquery];
@@ -1938,7 +1937,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings: string[] = [];
           const typingFiles: File[] = [];
@@ -1971,33 +1970,33 @@ namespace ts.projectSystem {
       }
       assert.equal(
         validatePackageName(packageName),
-        NameValidationResult.NameTooLong
+        NameValidationResult.NameTooLong,
       );
     });
     it("package name cannot start with dot", () => {
       assert.equal(
         validatePackageName(".foo"),
-        NameValidationResult.NameStartsWithDot
+        NameValidationResult.NameStartsWithDot,
       );
     });
     it("package name cannot start with underscore", () => {
       assert.equal(
         validatePackageName("_foo"),
-        NameValidationResult.NameStartsWithUnderscore
+        NameValidationResult.NameStartsWithUnderscore,
       );
     });
     it("package non URI safe characters are not supported", () => {
       assert.equal(
         validatePackageName("  scope  "),
-        NameValidationResult.NameContainsNonURISafeCharacters
+        NameValidationResult.NameContainsNonURISafeCharacters,
       );
       assert.equal(
         validatePackageName("; say ‘Hello from TypeScript!’ #"),
-        NameValidationResult.NameContainsNonURISafeCharacters
+        NameValidationResult.NameContainsNonURISafeCharacters,
       );
       assert.equal(
         validatePackageName("a/b/c"),
-        NameValidationResult.NameContainsNonURISafeCharacters
+        NameValidationResult.NameContainsNonURISafeCharacters,
       );
     });
     it("scoped package name is supported", () => {
@@ -2039,7 +2038,7 @@ namespace ts.projectSystem {
           name: "; say ‘Hello from TypeScript!’ #",
           isScopeName: true,
           result: NameValidationResult.NameContainsNonURISafeCharacters,
-        }
+        },
       );
       assert.deepEqual(validatePackageName("@  scope  /  bar  "), {
         name: "  scope  ",
@@ -2073,7 +2072,7 @@ namespace ts.projectSystem {
           name: "; say ‘Hello from TypeScript!’ #",
           isScopeName: false,
           result: NameValidationResult.NameContainsNonURISafeCharacters,
-        }
+        },
       );
     });
   });
@@ -2099,14 +2098,14 @@ namespace ts.projectSystem {
           super(
             host,
             { globalTypingsCacheLocation: "/tmp" },
-            { isEnabled: () => true, writeLine: (msg) => messages.push(msg) }
+            { isEnabled: () => true, writeLine: (msg) => messages.push(msg) },
           );
         }
         installWorker(
           _requestId: number,
           _args: string[],
           _cwd: string,
-          _cb: TI.RequestCompletedAction
+          _cb: TI.RequestCompletedAction,
         ) {
           assert(false, "runCommand should not be invoked");
         }
@@ -2119,9 +2118,9 @@ namespace ts.projectSystem {
       installer.checkPendingCommands(/*expectedCount*/ 0);
       assert.isTrue(
         messages.indexOf(
-          "'; say ‘Hello from TypeScript!’ #':: Package name '; say ‘Hello from TypeScript!’ #' contains non URI safe characters"
+          "'; say ‘Hello from TypeScript!’ #':: Package name '; say ‘Hello from TypeScript!’ #' contains non URI safe characters",
         ) > 0,
-        "should find package with invalid name"
+        "should find package with invalid name",
       );
     });
   });
@@ -2144,7 +2143,7 @@ namespace ts.projectSystem {
       };
 
       const safeList = new Map(
-        getEntries({ jquery: "jquery", chroma: "chroma-js" })
+        getEntries({ jquery: "jquery", chroma: "chroma-js" }),
       );
 
       const host = createServerHost([app, jquery, chroma]);
@@ -2158,17 +2157,17 @@ namespace ts.projectSystem {
         emptyMap,
         { enable: true },
         emptyArray,
-        emptyMap
+        emptyMap,
       );
       const finish = logger.finish();
       assert.deepEqual(
         finish,
         [
-          'Inferred typings from file names: ["jquery","chroma-js"]',
+          "Inferred typings from file names: [\"jquery\",\"chroma-js\"]",
           "Inferred typings from unresolved imports: []",
-          'Result: {"cachedTypingPaths":[],"newTypingNames":["jquery","chroma-js"],"filesToWatch":["/a/b/bower_components","/a/b/node_modules"]}',
+          "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"jquery\",\"chroma-js\"],\"filesToWatch\":[\"/a/b/bower_components\",\"/a/b/node_modules\"]}",
         ],
-        finish.join("\r\n")
+        finish.join("\r\n"),
       );
       assert.deepEqual(result.newTypingNames, ["jquery", "chroma-js"]);
     });
@@ -2192,11 +2191,11 @@ namespace ts.projectSystem {
           cache,
           { enable: true },
           [name, "somename"],
-          emptyMap
+          emptyMap,
         );
         assert.deepEqual(logger.finish(), [
-          'Inferred typings from unresolved imports: ["node","somename"]',
-          'Result: {"cachedTypingPaths":[],"newTypingNames":["node","somename"],"filesToWatch":["/a/b/bower_components","/a/b/node_modules"]}',
+          "Inferred typings from unresolved imports: [\"node\",\"somename\"]",
+          "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"node\",\"somename\"],\"filesToWatch\":[\"/a/b/bower_components\",\"/a/b/node_modules\"]}",
         ]);
         assert.deepEqual(result.newTypingNames.sort(), ["node", "somename"]);
       }
@@ -2215,7 +2214,7 @@ namespace ts.projectSystem {
       const cache = new Map(
         getEntries<JsTyping.CachedTyping>({
           node: { typingLocation: node.path, version: new Version("1.3.0") },
-        })
+        }),
       );
       const registry = createTypesRegistry("node");
       const logger = trackingLogger();
@@ -2228,11 +2227,11 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         ["fs", "bar"],
-        registry
+        registry,
       );
       assert.deepEqual(logger.finish(), [
-        'Inferred typings from unresolved imports: ["node","bar"]',
-        'Result: {"cachedTypingPaths":["/a/b/node.d.ts"],"newTypingNames":["bar"],"filesToWatch":["/a/b/bower_components","/a/b/node_modules"]}',
+        "Inferred typings from unresolved imports: [\"node\",\"bar\"]",
+        "Result: {\"cachedTypingPaths\":[\"/a/b/node.d.ts\"],\"newTypingNames\":[\"bar\"],\"filesToWatch\":[\"/a/b/bower_components\",\"/a/b/node_modules\"]}",
       ]);
       assert.deepEqual(result.cachedTypingPaths, [node.path]);
       assert.deepEqual(result.newTypingNames, ["bar"]);
@@ -2251,7 +2250,7 @@ namespace ts.projectSystem {
       const cache = new Map(
         getEntries<JsTyping.CachedTyping>({
           node: { typingLocation: node.path, version: new Version("1.3.0") },
-        })
+        }),
       );
       const logger = trackingLogger();
       const result = JsTyping.discoverTypings(
@@ -2263,11 +2262,11 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         ["fs", "bar"],
-        emptyMap
+        emptyMap,
       );
       assert.deepEqual(logger.finish(), [
-        'Inferred typings from unresolved imports: ["node","bar"]',
-        'Result: {"cachedTypingPaths":[],"newTypingNames":["node","bar"],"filesToWatch":["/a/b/bower_components","/a/b/node_modules"]}',
+        "Inferred typings from unresolved imports: [\"node\",\"bar\"]",
+        "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"node\",\"bar\"],\"filesToWatch\":[\"/a/b/bower_components\",\"/a/b/node_modules\"]}",
       ]);
       assert.deepEqual(result.cachedTypingPaths, []);
       assert.deepEqual(result.newTypingNames, ["node", "bar"]);
@@ -2298,13 +2297,13 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         /*unresolvedImports*/ [],
-        emptyMap
+        emptyMap,
       );
       assert.deepEqual(logger.finish(), [
-        'Searching for typing names in /node_modules; all files: ["/node_modules/a/package.json"]',
-        '    Found package names: ["a"]',
+        "Searching for typing names in /node_modules; all files: [\"/node_modules/a/package.json\"]",
+        "    Found package names: [\"a\"]",
         "Inferred typings from unresolved imports: []",
-        'Result: {"cachedTypingPaths":[],"newTypingNames":["a"],"filesToWatch":["/bower_components","/node_modules"]}',
+        "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"a\"],\"filesToWatch\":[\"/bower_components\",\"/node_modules\"]}",
       ]);
       assert.deepEqual(result, {
         cachedTypingPaths: [],
@@ -2334,13 +2333,13 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         /*unresolvedImports*/ [],
-        emptyMap
+        emptyMap,
       );
       assert.deepEqual(logger.finish(), [
-        'Searching for typing names in /node_modules; all files: ["/node_modules/@a/b/package.json"]',
-        '    Found package names: ["@a/b"]',
+        "Searching for typing names in /node_modules; all files: [\"/node_modules/@a/b/package.json\"]",
+        "    Found package names: [\"@a/b\"]",
         "Inferred typings from unresolved imports: []",
-        'Result: {"cachedTypingPaths":[],"newTypingNames":["@a/b"],"filesToWatch":["/bower_components","/node_modules"]}',
+        "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"@a/b\"],\"filesToWatch\":[\"/bower_components\",\"/node_modules\"]}",
       ]);
       assert.deepEqual(result, {
         cachedTypingPaths: [],
@@ -2370,7 +2369,7 @@ namespace ts.projectSystem {
             typingLocation: commander.path,
             version: new Version("1.0.0"),
           },
-        })
+        }),
       );
       const registry = createTypesRegistry("node", "commander");
       const logger = trackingLogger();
@@ -2383,11 +2382,11 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         ["http", "commander"],
-        registry
+        registry,
       );
       assert.deepEqual(logger.finish(), [
-        'Inferred typings from unresolved imports: ["node","commander"]',
-        'Result: {"cachedTypingPaths":["/a/cache/node_modules/@types/node/index.d.ts"],"newTypingNames":["commander"],"filesToWatch":["/a/bower_components","/a/node_modules"]}',
+        "Inferred typings from unresolved imports: [\"node\",\"commander\"]",
+        "Result: {\"cachedTypingPaths\":[\"/a/cache/node_modules/@types/node/index.d.ts\"],\"newTypingNames\":[\"commander\"],\"filesToWatch\":[\"/a/bower_components\",\"/a/node_modules\"]}",
       ]);
       assert.deepEqual(result.cachedTypingPaths, [node.path]);
       assert.deepEqual(result.newTypingNames, ["commander"]);
@@ -2407,7 +2406,7 @@ namespace ts.projectSystem {
       const cache = new Map(
         getEntries<JsTyping.CachedTyping>({
           node: { typingLocation: node.path, version: new Version("1.0.0") },
-        })
+        }),
       );
       const registry = createTypesRegistry("node");
       registry.delete(`ts${versionMajorMinor}`);
@@ -2421,11 +2420,11 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         ["http"],
-        registry
+        registry,
       );
       assert.deepEqual(logger.finish(), [
-        'Inferred typings from unresolved imports: ["node"]',
-        'Result: {"cachedTypingPaths":[],"newTypingNames":["node"],"filesToWatch":["/a/bower_components","/a/node_modules"]}',
+        "Inferred typings from unresolved imports: [\"node\"]",
+        "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"node\"],\"filesToWatch\":[\"/a/bower_components\",\"/a/node_modules\"]}",
       ]);
       assert.deepEqual(result.cachedTypingPaths, []);
       assert.deepEqual(result.newTypingNames, ["node"]);
@@ -2456,7 +2455,7 @@ namespace ts.projectSystem {
             typingLocation: commander.path,
             version: new Version("1.3.0-next.0"),
           },
-        })
+        }),
       );
       const registry = createTypesRegistry("node", "commander");
       registry.get("node")![`ts${versionMajorMinor}`] = "1.3.0-next.1";
@@ -2470,11 +2469,11 @@ namespace ts.projectSystem {
         cache,
         { enable: true },
         ["http", "commander"],
-        registry
+        registry,
       );
       assert.deepEqual(logger.finish(), [
-        'Inferred typings from unresolved imports: ["node","commander"]',
-        'Result: {"cachedTypingPaths":[],"newTypingNames":["node","commander"],"filesToWatch":["/a/bower_components","/a/node_modules"]}',
+        "Inferred typings from unresolved imports: [\"node\",\"commander\"]",
+        "Result: {\"cachedTypingPaths\":[],\"newTypingNames\":[\"node\",\"commander\"],\"filesToWatch\":[\"/a/bower_components\",\"/a/node_modules\"]}",
       ]);
       assert.deepEqual(result.cachedTypingPaths, []);
       assert.deepEqual(result.newTypingNames, ["node", "commander"]);
@@ -2509,7 +2508,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/commander"];
           const typingFiles = [commander];
@@ -2520,7 +2519,7 @@ namespace ts.projectSystem {
             | server.SetTypings
             | server.InvalidateCachedTypings
             | server.BeginInstallTypes
-            | server.EndInstallTypes
+            | server.EndInstallTypes,
         ) {
           if (response.kind === server.EventBeginInstallTypes) {
             return;
@@ -2591,7 +2590,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           const installedTypings = ["@types/commander"];
           const typingFiles = [commander];
@@ -2602,7 +2601,7 @@ namespace ts.projectSystem {
             | server.SetTypings
             | server.InvalidateCachedTypings
             | server.BeginInstallTypes
-            | server.EndInstallTypes
+            | server.EndInstallTypes,
         ) {
           if (response.kind === server.EventBeginInstallTypes) {
             beginEvent = response;
@@ -2658,7 +2657,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           executeCommand(this, host, "", [], cb);
         }
@@ -2667,7 +2666,7 @@ namespace ts.projectSystem {
             | server.SetTypings
             | server.InvalidateCachedTypings
             | server.BeginInstallTypes
-            | server.EndInstallTypes
+            | server.EndInstallTypes,
         ) {
           if (response.kind === server.EventBeginInstallTypes) {
             beginEvent = response;
@@ -3191,13 +3190,13 @@ namespace ts.projectSystem {
         npmPath,
         tsVersion,
         packageNames,
-        packageNames.length
+        packageNames.length,
       ).command,
       TI.getNpmCommandForInstallation(
         npmPath,
         tsVersion,
         packageNames,
-        packageNames.length - Math.ceil(packageNames.length / 2)
+        packageNames.length - Math.ceil(packageNames.length / 2),
       ).command,
     ];
     it("works when the command is too long to install all packages at once", () => {
@@ -3209,7 +3208,7 @@ namespace ts.projectSystem {
         (command) => {
           commands.push(command);
           return false;
-        }
+        },
       );
       assert.isFalse(hasError);
       assert.deepEqual(commands, expectedCommands, "commands");
@@ -3224,7 +3223,7 @@ namespace ts.projectSystem {
         (command) => {
           commands.push(command);
           return commands.length === 1;
-        }
+        },
       );
       assert.isTrue(hasError);
       assert.deepEqual(commands, expectedCommands, "commands");
@@ -3249,7 +3248,7 @@ namespace ts.projectSystem {
     function verifyUnresolvedImportResolutions(
       appContents: string,
       typingNames: string[],
-      typingFiles: File[]
+      typingFiles: File[],
     ) {
       const app: File = {
         path: appPath,
@@ -3272,7 +3271,7 @@ namespace ts.projectSystem {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           executeCommand(this, host, typingNames, typingFiles, cb);
         }
@@ -3291,7 +3290,7 @@ namespace ts.projectSystem {
       host.checkTimeoutQueueLengthAndRun(2);
       checkProjectActualFiles(
         proj,
-        typingFiles.map((f) => f.path).concat(app.path, fooo.path)
+        typingFiles.map((f) => f.path).concat(app.path, fooo.path),
       );
       const foooResolution2 = verifyResolvedModuleOfFooo(proj);
       assert.strictEqual(foooResolution1, foooResolution2);
@@ -3307,28 +3306,28 @@ namespace ts.projectSystem {
               },
             ]),
           },
-        ])
+        ]),
       );
       host.runQueuedTimeoutCallbacks(); // Update the graph
       // Update the typing
       host.checkTimeoutQueueLength(0);
       assert.isFalse(
         proj.resolutionCache.isFileWithInvalidatedNonRelativeUnresolvedImports(
-          app.path as Path
-        )
+          app.path as Path,
+        ),
       );
     }
 
     it("correctly invalidate the resolutions with typing names", () => {
       verifyUnresolvedImportResolutions(
-        'import * as a from "foo";',
+        "import * as a from \"foo\";",
         ["foo"],
         [
           {
             path: `${globalTypingsCacheLocation}/node_modules/foo/index.d.ts`,
             content: "export function a(): void;",
           },
-        ]
+        ],
       );
     });
 
@@ -3356,7 +3355,7 @@ namespace ts.projectSystem {
                     import * as c from "foo/a/c";
             `,
         ["foo"],
-        [fooIndex, fooAA, fooAB, fooAC]
+        [fooIndex, fooAA, fooAB, fooAC],
       );
     });
 
@@ -3391,7 +3390,7 @@ declare module "stream" {
           _requestId: number,
           _args: string[],
           _cwd: string,
-          cb: TI.RequestCompletedAction
+          cb: TI.RequestCompletedAction,
         ) {
           executeCommand(this, host, ["node"], [nodeTyping], cb);
         }
@@ -3423,7 +3422,7 @@ declare module "stream" {
             ]),
           },
         ]),
-        /*closedFiles*/ undefined
+        /*closedFiles*/ undefined,
       );
       // Below timeout Updates the typings to empty array because of "s tream" as unsresolved import
       // and schedules the update graph because of this.
@@ -3445,7 +3444,7 @@ declare module "stream" {
               },
             ]),
           },
-        ])
+        ]),
       );
       proj.updateGraph(); // Update the graph
       checkProjectActualFiles(proj, [file.path, libFile.path, nodeTyping.path]);
@@ -3453,8 +3452,8 @@ declare module "stream" {
       host.checkTimeoutQueueLength(0);
       assert.isFalse(
         proj.resolutionCache.isFileWithInvalidatedNonRelativeUnresolvedImports(
-          file.path as Path
-        )
+          file.path as Path,
+        ),
       );
     });
   });
@@ -3519,7 +3518,7 @@ declare module "stream" {
         typingsCache,
         /*throttleLimit*/ 5,
         host,
-        typesRegistry
+        typesRegistry,
       );
 
       const projectService = createProjectService(host, { typingsInstaller });
@@ -3538,7 +3537,7 @@ declare module "stream" {
         file.path,
         file.content,
         ScriptKind.JS,
-        projectRootPath
+        projectRootPath,
       );
 
       const project = projectService.inferredProjects[0];

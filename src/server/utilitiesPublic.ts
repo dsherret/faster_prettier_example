@@ -6,8 +6,7 @@ namespace ts.server {
     verbose,
   }
 
-  export const emptyArray: SortedReadonlyArray<never> =
-    createSortedArray<never>();
+  export const emptyArray: SortedReadonlyArray<never> = createSortedArray<never>();
 
   export interface Logger {
     close(): void;
@@ -36,14 +35,14 @@ namespace ts.server {
     project: Project,
     typeAcquisition: TypeAcquisition,
     unresolvedImports: SortedReadonlyArray<string>,
-    cachePath?: string
+    cachePath?: string,
   ): DiscoverTypings {
     return {
       projectName: project.getProjectName(),
       fileNames: project
         .getFileNames(
           /*excludeFilesFromExternalLibraries*/ true,
-          /*excludeConfigFiles*/ true
+          /*excludeConfigFiles*/ true,
         )
         .concat(project.getExcludedFiles() as NormalizedPath[]),
       compilerOptions: project.getCompilationSettings(),
@@ -65,10 +64,10 @@ namespace ts.server {
     }
     export function ThrowProjectDoesNotContainDocument(
       fileName: string,
-      project: Project
+      project: Project,
     ): never {
       throw new Error(
-        `Project '${project.getProjectName()}' does not contain document '${fileName}'`
+        `Project '${project.getProjectName()}' does not contain document '${fileName}'`,
       );
     }
   }
@@ -82,7 +81,7 @@ namespace ts.server {
   export function normalizedPathToPath(
     normalizedPath: NormalizedPath,
     currentDirectory: string,
-    getCanonicalFileName: (f: string) => string
+    getCanonicalFileName: (f: string) => string,
   ): Path {
     const f = isRootedDiskPath(normalizedPath)
       ? normalizedPath

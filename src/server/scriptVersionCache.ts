@@ -9,7 +9,7 @@ namespace ts.server {
     walk(
       rangeStart: number,
       rangeLength: number,
-      walkFns: LineIndexWalker
+      walkFns: LineIndexWalker,
     ): void;
   }
 
@@ -33,21 +33,21 @@ namespace ts.server {
     leaf(
       relativeStart: number,
       relativeLength: number,
-      lineCollection: LineLeaf
+      lineCollection: LineLeaf,
     ): void;
     pre?(
       relativeStart: number,
       relativeLength: number,
       lineCollection: LineCollection,
       parent: LineNode,
-      nodeType: CharRangeSection
+      nodeType: CharRangeSection,
     ): void;
     post?(
       relativeStart: number,
       relativeLength: number,
       lineCollection: LineCollection,
       parent: LineNode,
-      nodeType: CharRangeSection
+      nodeType: CharRangeSection,
     ): void;
   }
 
@@ -77,7 +77,7 @@ namespace ts.server {
 
     insertLines(
       insertedText: string | undefined,
-      suppressTrailingText: boolean
+      suppressTrailingText: boolean,
     ) {
       if (suppressTrailingText) {
         this.trailingText = "";
@@ -135,7 +135,7 @@ namespace ts.server {
             newRoot.add(this.lineIndex.root);
             insertedNodes = newRoot.insertAt(
               this.lineIndex.root,
-              insertedNodes
+              insertedNodes,
             );
             insertedNodesLen = insertedNodes.length;
             this.lineIndex.root = newRoot;
@@ -163,7 +163,7 @@ namespace ts.server {
     post(
       _relativeStart: number,
       _relativeLength: number,
-      lineCollection: LineCollection
+      lineCollection: LineCollection,
     ): void {
       // have visited the path for start of range, now looking for end
       // if range is on single line, we will never make this state transition
@@ -179,14 +179,14 @@ namespace ts.server {
       _relativeLength: number,
       lineCollection: LineCollection,
       _parent: LineCollection,
-      nodeType: CharRangeSection
+      nodeType: CharRangeSection,
     ): void {
       // currentNode corresponds to parent, but in the new tree
       const currentNode = this.stack[this.stack.length - 1];
 
       if (
-        this.state === CharRangeSection.Entire &&
-        nodeType === CharRangeSection.Start
+        this.state === CharRangeSection.Entire
+        && nodeType === CharRangeSection.Start
       ) {
         // if range is on single line, we will never make this state transition
         this.state = CharRangeSection.Start;
@@ -273,21 +273,20 @@ namespace ts.server {
     constructor(
       public pos: number,
       public deleteLen: number,
-      public insertedText?: string
+      public insertedText?: string,
     ) {}
 
     getTextChangeRange() {
       return createTextChangeRange(
         createTextSpan(this.pos, this.deleteLen),
-        this.insertedText ? this.insertedText.length : 0
+        this.insertedText ? this.insertedText.length : 0,
       );
     }
   }
 
   export class ScriptVersionCache {
     private changes: TextChange[] = [];
-    private readonly versions: LineIndexSnapshot[] =
-      new Array<LineIndexSnapshot>(ScriptVersionCache.maxVersions);
+    private readonly versions: LineIndexSnapshot[] = new Array<LineIndexSnapshot>(ScriptVersionCache.maxVersions);
     private minVersion = 0; // no versions earlier than min version will maintain change history
 
     private currentVersion = 0;
@@ -311,10 +310,10 @@ namespace ts.server {
     edit(pos: number, deleteLen: number, insertedText?: string) {
       this.changes.push(new TextChange(pos, deleteLen, insertedText));
       if (
-        this.changes.length > ScriptVersionCache.changeNumberThreshold ||
-        deleteLen > ScriptVersionCache.changeLengthThreshold ||
-        (insertedText &&
-          insertedText.length > ScriptVersionCache.changeLengthThreshold)
+        this.changes.length > ScriptVersionCache.changeNumberThreshold
+        || deleteLen > ScriptVersionCache.changeLengthThreshold
+        || (insertedText
+          && insertedText.length > ScriptVersionCache.changeLengthThreshold)
       ) {
         this.getSnapshot();
       }
@@ -332,14 +331,14 @@ namespace ts.server {
           snapIndex = snapIndex.edit(
             change.pos,
             change.deleteLen,
-            change.insertedText
+            change.insertedText,
           );
         }
         snap = new LineIndexSnapshot(
           this.currentVersion + 1,
           this,
           snapIndex,
-          this.changes
+          this.changes,
         );
 
         this.currentVersion = snap.version;
@@ -347,11 +346,10 @@ namespace ts.server {
         this.changes = [];
 
         if (
-          this.currentVersion - this.minVersion >=
-          ScriptVersionCache.maxVersions
+          this.currentVersion - this.minVersion
+            >= ScriptVersionCache.maxVersions
         ) {
-          this.minVersion =
-            this.currentVersion - ScriptVersionCache.maxVersions + 1;
+          this.minVersion = this.currentVersion - ScriptVersionCache.maxVersions + 1;
         }
       }
       return snap;
@@ -362,15 +360,15 @@ namespace ts.server {
     }
 
     getAbsolutePositionAndLineText(
-      oneBasedLine: number
+      oneBasedLine: number,
     ): AbsolutePositionAndLineText {
       return this._getSnapshot().index.lineNumberToInfo(oneBasedLine);
     }
 
     lineOffsetToPosition(line: number, column: number): number {
       return (
-        this._getSnapshot().index.absolutePositionOfStartOfLine(line) +
-        (column - 1)
+        this._getSnapshot().index.absolutePositionOfStartOfLine(line)
+        + (column - 1)
       );
     }
 
@@ -381,10 +379,9 @@ namespace ts.server {
     lineToTextSpan(line: number): TextSpan {
       const index = this._getSnapshot().index;
       const { lineText, absolutePosition } = index.lineNumberToInfo(line + 1);
-      const len =
-        lineText !== undefined
-          ? lineText.length
-          : index.absolutePositionOfStartOfLine(line + 2) - absolutePosition;
+      const len = lineText !== undefined
+        ? lineText.length
+        : index.absolutePositionOfStartOfLine(line + 2) - absolutePosition;
       return createTextSpan(absolutePosition, len);
     }
 
@@ -399,7 +396,7 @@ namespace ts.server {
             }
           }
           return collapseTextChangeRangesAcrossMultipleVersions(
-            textChangeRanges
+            textChangeRanges,
           );
         } else {
           return undefined;
@@ -428,7 +425,7 @@ namespace ts.server {
       readonly version: number,
       readonly cache: ScriptVersionCache,
       readonly index: LineIndex,
-      readonly changesSincePreviousVersion: readonly TextChange[] = emptyArray
+      readonly changesSincePreviousVersion: readonly TextChange[] = emptyArray,
     ) {}
 
     getText(rangeStart: number, rangeEnd: number) {
@@ -441,15 +438,15 @@ namespace ts.server {
 
     getChangeRange(oldSnapshot: IScriptSnapshot): TextChangeRange | undefined {
       if (
-        oldSnapshot instanceof LineIndexSnapshot &&
-        this.cache === oldSnapshot.cache
+        oldSnapshot instanceof LineIndexSnapshot
+        && this.cache === oldSnapshot.cache
       ) {
         if (this.version <= oldSnapshot.version) {
           return unchangedTextChangeRange;
         } else {
           return this.cache.getTextChangesBetweenVersions(
             oldSnapshot.version,
-            this.version
+            this.version,
           );
         }
       }
@@ -468,7 +465,7 @@ namespace ts.server {
     positionToLineOffset(position: number): protocol.Location {
       const { oneBasedLine, zeroBasedColumn } = this.root.charOffsetToLineInfo(
         1,
-        position
+        position,
       );
       return { line: oneBasedLine, offset: zeroBasedColumn + 1 };
     }
@@ -519,10 +516,10 @@ namespace ts.server {
           leaf: (
             relativeStart: number,
             relativeLength: number,
-            ll: LineLeaf
+            ll: LineLeaf,
           ) => {
             accum = accum.concat(
-              ll.text.substring(relativeStart, relativeStart + relativeLength)
+              ll.text.substring(relativeStart, relativeStart + relativeLength),
             );
           },
         });
@@ -537,7 +534,7 @@ namespace ts.server {
     every(
       f: (ll: LineLeaf, s: number, len: number) => boolean,
       rangeStart: number,
-      rangeEnd?: number
+      rangeEnd?: number,
     ) {
       if (!rangeEnd) {
         rangeEnd = this.root.charCount();
@@ -549,7 +546,7 @@ namespace ts.server {
           this: LineIndexWalker,
           relativeStart: number,
           relativeLength: number,
-          ll: LineLeaf
+          ll: LineLeaf,
         ) {
           if (!f(ll, relativeStart, relativeLength)) {
             this.done = true;
@@ -572,8 +569,7 @@ namespace ts.server {
         let checkText: string | undefined;
         if (this.checkEdits) {
           const source = this.getText(0, this.root.charCount());
-          checkText =
-            source.slice(0, pos) + newText + source.slice(pos + deleteLength);
+          checkText = source.slice(0, pos) + newText + source.slice(pos + deleteLength);
         }
         const walker = new EditWalker();
         let suppressTrailingText = false;
@@ -591,8 +587,7 @@ namespace ts.server {
         } else if (deleteLength > 0) {
           // check whether last characters deleted are line break
           const e = pos + deleteLength;
-          const { zeroBasedColumn, lineText } =
-            this.positionToColumnAndLineText(e);
+          const { zeroBasedColumn, lineText } = this.positionToColumnAndLineText(e);
           if (zeroBasedColumn === 0) {
             // move range end just past line that will merge with previous line
             deleteLength += lineText!.length; // TODO: GH#18217
@@ -607,7 +602,7 @@ namespace ts.server {
         if (this.checkEdits) {
           const updatedText = walker.lineIndex.getText(
             0,
-            walker.lineIndex.getLength()
+            walker.lineIndex.getLength(),
           );
           Debug.assert(checkText === updatedText, "buffer edit mismatch");
         }
@@ -622,7 +617,7 @@ namespace ts.server {
       }
 
       const interiorNodes = new Array<LineNode>(
-        Math.ceil(nodes.length / lineCollectionCapacity)
+        Math.ceil(nodes.length / lineCollectionCapacity),
       );
       let nodeIndex = 0;
       for (let i = 0; i < interiorNodes.length; i++) {
@@ -681,7 +676,7 @@ namespace ts.server {
       rangeLength: number,
       walkFns: LineIndexWalker,
       childIndex: number,
-      nodeType: CharRangeSection
+      nodeType: CharRangeSection,
     ) {
       if (walkFns.pre) {
         walkFns.pre(
@@ -689,7 +684,7 @@ namespace ts.server {
           rangeLength,
           this.children[childIndex],
           this,
-          nodeType
+          nodeType,
         );
       }
       if (walkFns.goSubtree) {
@@ -700,7 +695,7 @@ namespace ts.server {
             rangeLength,
             this.children[childIndex],
             this,
-            nodeType
+            nodeType,
           );
         }
       } else {
@@ -714,7 +709,7 @@ namespace ts.server {
       relativeLength: number,
       childIndex: number,
       walkFns: LineIndexWalker,
-      nodeType: CharRangeSection
+      nodeType: CharRangeSection,
     ) {
       if (walkFns.pre && !walkFns.done) {
         walkFns.pre(
@@ -722,7 +717,7 @@ namespace ts.server {
           relativeLength,
           this.children[childIndex],
           this,
-          nodeType
+          nodeType,
         );
         walkFns.goSubtree = true;
       }
@@ -740,7 +735,7 @@ namespace ts.server {
           rangeLength,
           childIndex,
           walkFns,
-          CharRangeSection.PreStart
+          CharRangeSection.PreStart,
         );
         adjustedStart -= childCharCount;
         childIndex++;
@@ -754,7 +749,7 @@ namespace ts.server {
             rangeLength,
             walkFns,
             childIndex,
-            CharRangeSection.Entire
+            CharRangeSection.Entire,
           )
         ) {
           return;
@@ -767,7 +762,7 @@ namespace ts.server {
             childCharCount - adjustedStart,
             walkFns,
             childIndex,
-            CharRangeSection.Start
+            CharRangeSection.Start,
           )
         ) {
           return;
@@ -783,7 +778,7 @@ namespace ts.server {
               childCharCount,
               walkFns,
               childIndex,
-              CharRangeSection.Mid
+              CharRangeSection.Mid,
             )
           ) {
             return;
@@ -799,7 +794,7 @@ namespace ts.server {
               adjustedLength,
               walkFns,
               childIndex,
-              CharRangeSection.End
+              CharRangeSection.End,
             )
           ) {
             return;
@@ -821,7 +816,7 @@ namespace ts.server {
     // Output line number is absolute.
     charOffsetToLineInfo(
       lineNumberAccumulator: number,
-      relativePosition: number
+      relativePosition: number,
     ): {
       oneBasedLine: number;
       zeroBasedColumn: number;
@@ -847,7 +842,7 @@ namespace ts.server {
           } else {
             return (child as LineNode).charOffsetToLineInfo(
               lineNumberAccumulator,
-              relativePosition
+              relativePosition,
             );
           }
         } else {
@@ -877,7 +872,7 @@ namespace ts.server {
      */
     lineNumberToInfo(
       relativeOneBasedLine: number,
-      positionAccumulator: number
+      positionAccumulator: number,
     ): { position: number; leaf: LineLeaf | undefined } {
       for (const child of this.children) {
         const childLineCount = child.lineCount();
@@ -885,9 +880,9 @@ namespace ts.server {
           return child.isLeaf()
             ? { position: positionAccumulator, leaf: child }
             : (child as LineNode).lineNumberToInfo(
-                relativeOneBasedLine,
-                positionAccumulator
-              );
+              relativeOneBasedLine,
+              positionAccumulator,
+            );
         } else {
           relativeOneBasedLine -= childLineCount;
           positionAccumulator += child.charCount();
@@ -937,9 +932,9 @@ namespace ts.server {
       const nodeCount = nodes.length;
       // if child is last and there is more room and only one node to place, place it
       if (
-        clen < lineCollectionCapacity &&
-        childIndex === clen - 1 &&
-        nodeCount === 1
+        clen < lineCollectionCapacity
+        && childIndex === clen - 1
+        && nodeCount === 1
       ) {
         this.add(nodes[0]);
         this.updateCounts();
@@ -957,7 +952,7 @@ namespace ts.server {
         let splitNodeCount = 0;
         if (nodeIndex < nodeCount) {
           splitNodeCount = Math.ceil(
-            (nodeCount - nodeIndex) / lineCollectionCapacity
+            (nodeCount - nodeIndex) / lineCollectionCapacity,
           );
           splitNodes = new Array(splitNodeCount) as LineNode[];
           let splitNodeIndex = 0;

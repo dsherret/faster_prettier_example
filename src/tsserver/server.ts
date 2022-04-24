@@ -31,7 +31,7 @@ namespace ts.server {
     startSession: (
       option: StartSessionOptions,
       logger: Logger,
-      cancellationToken: ServerCancellationToken
+      cancellationToken: ServerCancellationToken,
     ) => void;
   }
   function start(
@@ -43,7 +43,7 @@ namespace ts.server {
       unknownServerMode,
       startSession: startServer,
     }: StartInput,
-    platform: string
+    platform: string,
   ) {
     const syntaxOnly = hasArgument("--syntaxOnly");
 
@@ -51,12 +51,10 @@ namespace ts.server {
     logger.info(`Version: ${version}`);
     logger.info(`Arguments: ${args.join(" ")}`);
     logger.info(
-      `Platform: ${platform} NodeVersion: ${getNodeMajorVersion()} CaseSensitive: ${
-        sys.useCaseSensitiveFileNames
-      }`
+      `Platform: ${platform} NodeVersion: ${getNodeMajorVersion()} CaseSensitive: ${sys.useCaseSensitiveFileNames}`,
     );
     logger.info(
-      `ServerMode: ${serverMode} syntaxOnly: ${syntaxOnly} hasUnknownServerMode: ${unknownServerMode}`
+      `ServerMode: ${serverMode} syntaxOnly: ${syntaxOnly} hasUnknownServerMode: ${unknownServerMode}`,
     );
 
     setStackTraceLimit();
@@ -66,8 +64,8 @@ namespace ts.server {
     }
 
     if (
-      sys.tryEnableSourceMapsForHost &&
-      /^development$/i.test(sys.getEnvironmentVariable("NODE_ENV"))
+      sys.tryEnableSourceMapsForHost
+      && /^development$/i.test(sys.getEnvironmentVariable("NODE_ENV"))
     ) {
       sys.tryEnableSourceMapsForHost();
     }
@@ -76,12 +74,9 @@ namespace ts.server {
     // the log. This is so that language service plugins which use
     // console.log don't break the message passing between tsserver
     // and the client
-    console.log = (...args) =>
-      logger.msg(args.length === 1 ? args[0] : args.join(", "), Msg.Info);
-    console.warn = (...args) =>
-      logger.msg(args.length === 1 ? args[0] : args.join(", "), Msg.Err);
-    console.error = (...args) =>
-      logger.msg(args.length === 1 ? args[0] : args.join(", "), Msg.Err);
+    console.log = (...args) => logger.msg(args.length === 1 ? args[0] : args.join(", "), Msg.Info);
+    console.warn = (...args) => logger.msg(args.length === 1 ? args[0] : args.join(", "), Msg.Err);
+    console.error = (...args) => logger.msg(args.length === 1 ? args[0] : args.join(", "), Msg.Err);
 
     startServer(
       {
@@ -90,7 +85,7 @@ namespace ts.server {
         allowLocalPluginLoads: hasArgument("--allowLocalPluginLoads"),
         useSingleInferredProject: hasArgument("--useSingleInferredProject"),
         useInferredProjectPerProjectRoot: hasArgument(
-          "--useInferredProjectPerProjectRoot"
+          "--useInferredProjectPerProjectRoot",
         ),
         suppressDiagnosticEvents: hasArgument("--suppressDiagnosticEvents"),
         noGetErrOnBackgroundUpdate: hasArgument("--noGetErrOnBackgroundUpdate"),
@@ -98,7 +93,7 @@ namespace ts.server {
         serverMode,
       },
       logger,
-      cancellationToken
+      cancellationToken,
     );
   }
 

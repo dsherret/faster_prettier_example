@@ -11,51 +11,48 @@ namespace ts.codefix {
   const fixId = "fixClassDoesntImplementInheritedAbstractMember";
   registerCodeFix({
     errorCodes,
-    getCodeActions:
-      function getCodeActionsToFixClassNotImplementingInheritedMembers(
-        context
-      ) {
-        const { sourceFile, span } = context;
-        const changes = textChanges.ChangeTracker.with(context, (t) =>
-          addMissingMembers(
-            getClass(sourceFile, span.start),
-            sourceFile,
-            context,
-            t,
-            context.preferences
-          )
-        );
-        return changes.length === 0
-          ? undefined
-          : [
-              createCodeFixAction(
-                fixId,
-                changes,
-                Diagnostics.Implement_inherited_abstract_class,
-                fixId,
-                Diagnostics.Implement_all_inherited_abstract_classes
-              ),
-            ];
-      },
+    getCodeActions: function getCodeActionsToFixClassNotImplementingInheritedMembers(
+      context,
+    ) {
+      const { sourceFile, span } = context;
+      const changes = textChanges.ChangeTracker.with(context, (t) =>
+        addMissingMembers(
+          getClass(sourceFile, span.start),
+          sourceFile,
+          context,
+          t,
+          context.preferences,
+        ));
+      return changes.length === 0
+        ? undefined
+        : [
+          createCodeFixAction(
+            fixId,
+            changes,
+            Diagnostics.Implement_inherited_abstract_class,
+            fixId,
+            Diagnostics.Implement_all_inherited_abstract_classes,
+          ),
+        ];
+    },
     fixIds: [fixId],
-    getAllCodeActions:
-      function getAllCodeActionsToFixClassDoesntImplementInheritedAbstractMember(
-        context
-      ) {
-        const seenClassDeclarations = new Map<number, true>();
-        return codeFixAll(context, errorCodes, (changes, diag) => {
-          const classDeclaration = getClass(diag.file, diag.start);
-          if (addToSeen(seenClassDeclarations, getNodeId(classDeclaration))) {
-            addMissingMembers(
-              classDeclaration,
-              context.sourceFile,
-              context,
-              changes,
-              context.preferences
-            );
-          }
-        });
-      },
+    getAllCodeActions: function getAllCodeActionsToFixClassDoesntImplementInheritedAbstractMember(
+      context,
+    ) {
+      const seenClassDeclarations = new Map<number, true>();
+      return codeFixAll(context, errorCodes, (changes, diag) => {
+        const classDeclaration = getClass(diag.file, diag.start);
+        if (addToSeen(seenClassDeclarations, getNodeId(classDeclaration))) {
+          addMissingMembers(
+            classDeclaration,
+            context.sourceFile,
+            context,
+            changes,
+            context.preferences,
+          );
+        }
+      });
+    },
   });
 
   function getClass(sourceFile: SourceFile, pos: number): ClassLikeDeclaration {
@@ -70,7 +67,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     context: TypeConstructionContext,
     changeTracker: textChanges.ChangeTracker,
-    preferences: UserPreferences
+    preferences: UserPreferences,
   ): void {
     const extendsNode = getEffectiveBaseTypeNode(classDeclaration)!;
     const checker = context.program.getTypeChecker();
@@ -86,7 +83,7 @@ namespace ts.codefix {
       sourceFile,
       context.program,
       preferences,
-      context.host
+      context.host,
     );
     createMissingMemberNodes(
       classDeclaration,
@@ -99,8 +96,8 @@ namespace ts.codefix {
         changeTracker.insertNodeAtClassStart(
           sourceFile,
           classDeclaration,
-          member as ClassElement
-        )
+          member as ClassElement,
+        ),
     );
     importAdder.writeFixes(changeTracker);
   }

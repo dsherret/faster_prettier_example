@@ -9,39 +9,35 @@ namespace ts.codefix {
     errorCodes,
     getCodeActions(context) {
       const { sourceFile, span } = context;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        addMissingNewOperator(t, sourceFile, span)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => addMissingNewOperator(t, sourceFile, span));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Add_missing_new_operator_to_call,
           fixId,
-          Diagnostics.Add_missing_new_operator_to_all_calls
+          Diagnostics.Add_missing_new_operator_to_all_calls,
         ),
       ];
     },
     fixIds: [fixId],
     getAllCodeActions: (context) =>
-      codeFixAll(context, errorCodes, (changes, diag) =>
-        addMissingNewOperator(changes, context.sourceFile, diag)
-      ),
+      codeFixAll(context, errorCodes, (changes, diag) => addMissingNewOperator(changes, context.sourceFile, diag)),
   });
 
   function addMissingNewOperator(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ): void {
     const call = cast(
       findAncestorMatchingSpan(sourceFile, span),
-      isCallExpression
+      isCallExpression,
     );
     const newExpression = factory.createNewExpression(
       call.expression,
       call.typeArguments,
-      call.arguments
+      call.arguments,
     );
 
     changes.replaceNode(sourceFile, call, newExpression);
@@ -49,7 +45,7 @@ namespace ts.codefix {
 
   function findAncestorMatchingSpan(
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ): Node {
     let token = getTokenAtPosition(sourceFile, span.start);
     const end = textSpanEnd(span);

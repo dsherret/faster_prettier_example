@@ -61,7 +61,7 @@ namespace ts.server {
       if (!this.inGroup || this.firstInGroup) {
         const prefix = BaseLogger.padStringRight(
           type + " " + this.seq.toString(),
-          "          "
+          "          ",
         );
         s = prefix + s;
       }
@@ -112,13 +112,13 @@ namespace ts.server {
   export function createWebSystem(
     host: WebHost,
     args: string[],
-    getExecutingFilePath: () => string
+    getExecutingFilePath: () => string,
   ): ServerHost {
     const returnEmptyString = () => "";
     const getExecutingDirectoryPath = memoize(() =>
       memoize(() =>
         ensureTrailingDirectorySeparator(
-          getDirectoryPath(getExecutingFilePath())
+          getDirectoryPath(getExecutingFilePath()),
         )
       )
     );
@@ -200,7 +200,7 @@ namespace ts.server {
       options: StartSessionOptions,
       logger: Logger,
       cancellationToken: ServerCancellationToken,
-      hrtime: SessionOptions["hrtime"]
+      hrtime: SessionOptions["hrtime"],
     ) {
       super({
         host,
@@ -218,9 +218,11 @@ namespace ts.server {
       if (msg.type === "event" && !this.canUseEvents) {
         if (this.logger.hasLevel(LogLevel.verbose)) {
           this.logger.info(
-            `Session does not support events: ignored event: ${JSON.stringify(
-              msg
-            )}`
+            `Session does not support events: ignored event: ${
+              JSON.stringify(
+                msg,
+              )
+            }`,
           );
         }
         return;

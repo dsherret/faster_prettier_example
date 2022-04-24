@@ -77,12 +77,12 @@ namespace ts.projectSystem {
               start: 0,
               length: app.content.length,
             },
-          }).response as protocol.InlayHintItem[] | undefined
+          }).response as protocol.InlayHintItem[] | undefined,
         );
       }
 
       function verifyParamInlayHint(
-        response: protocol.InlayHintItem[] | undefined
+        response: protocol.InlayHintItem[] | undefined,
       ) {
         Debug.assert(response);
         Debug.assert(response[0]);

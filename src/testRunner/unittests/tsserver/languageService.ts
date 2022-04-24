@@ -29,7 +29,8 @@ namespace ts.projectSystem {
         },
         {
           path: `/project/a/tsconfig.json`,
-          content: `{ "compilerOptions": { "paths": { "foo": ["./foo.d.ts"] } }, "files": ["./index.ts", "./foo.d.ts"] }`,
+          content:
+            `{ "compilerOptions": { "paths": { "foo": ["./foo.d.ts"] } }, "files": ["./index.ts", "./foo.d.ts"] }`,
         },
         {
           path: `/project/a/foo.d.ts`,
@@ -43,7 +44,8 @@ namespace ts.projectSystem {
         },
         {
           path: `/project/b/tsconfig.json`,
-          content: `{ "compilerOptions": { "paths": { "foo": ["./foo.d.ts"] } }, "files": ["./index.ts", "./foo.d.ts"] }`,
+          content:
+            `{ "compilerOptions": { "paths": { "foo": ["./foo.d.ts"] } }, "files": ["./index.ts", "./foo.d.ts"] }`,
         },
         {
           path: `/project/b/foo.d.ts`,

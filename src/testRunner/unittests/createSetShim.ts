@@ -49,7 +49,7 @@ namespace ts {
     function testSetIterationAddedValues<K>(
       keys: K[],
       set: Set<K>,
-      useForEach: boolean
+      useForEach: boolean,
     ): string {
       let resultString = "";
 
@@ -130,18 +130,14 @@ namespace ts {
           | readonly any[]
           | ReadonlySet<any>
           | ReadonlyESMap<any, any>
-          | undefined
+          | undefined,
       >(
-        iterable: I
+        iterable: I,
       ): Iterator<
-        I extends ReadonlyESMap<infer K, infer V>
-          ? [K, V]
-          : I extends ReadonlySet<infer T>
-          ? T
-          : I extends readonly (infer T)[]
-          ? T
-          : I extends undefined
-          ? undefined
+        I extends ReadonlyESMap<infer K, infer V> ? [K, V]
+          : I extends ReadonlySet<infer T> ? T
+          : I extends readonly (infer T)[] ? T
+          : I extends undefined ? undefined
           : never
       >;
       function getIterator(
@@ -149,7 +145,7 @@ namespace ts {
           | readonly any[]
           | ReadonlySet<any>
           | ReadonlyESMap<any, any>
-          | undefined
+          | undefined,
       ): Iterator<any> | undefined {
         // override `ts.getIterator` with a version that allows us to iterate over a `SetShim` in an environment with a native `Set`.
         if (iterable instanceof SetShim) return iterable.values();
@@ -170,7 +166,7 @@ namespace ts {
       const nativeSetForEachResult = testSetIterationAddedValues(
         stringKeys,
         nativeSet,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(nativeSetForEachResult, expectedResult, "nativeSet-forEach");
 
@@ -178,12 +174,12 @@ namespace ts {
       const nativeSetIteratorResult = testSetIterationAddedValues(
         stringKeys,
         nativeSet,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(
         nativeSetIteratorResult,
         expectedResult,
-        "nativeSet-iterator"
+        "nativeSet-iterator",
       );
 
       // Then, test the set shim.
@@ -191,7 +187,7 @@ namespace ts {
       const shimSetForEachResult = testSetIterationAddedValues(
         stringKeys,
         localShimSet,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(shimSetForEachResult, expectedResult, "shimSet-forEach");
 
@@ -199,7 +195,7 @@ namespace ts {
       const shimSetIteratorResult = testSetIterationAddedValues(
         stringKeys,
         localShimSet,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(shimSetIteratorResult, expectedResult, "shimSet-iterator");
     });
@@ -212,7 +208,7 @@ namespace ts {
       const nativeSetForEachResult = testSetIterationAddedValues(
         mixedKeys,
         nativeSet,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(nativeSetForEachResult, expectedResult, "nativeSet-forEach");
 
@@ -220,12 +216,12 @@ namespace ts {
       const nativeSetIteratorResult = testSetIterationAddedValues(
         mixedKeys,
         nativeSet,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(
         nativeSetIteratorResult,
         expectedResult,
-        "nativeSet-iterator"
+        "nativeSet-iterator",
       );
 
       // Then, test the set shim.
@@ -233,7 +229,7 @@ namespace ts {
       const shimSetForEachResult = testSetIterationAddedValues(
         mixedKeys,
         localshimSet,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(shimSetForEachResult, expectedResult, "shimSet-forEach");
 
@@ -241,7 +237,7 @@ namespace ts {
       const shimSetIteratorResult = testSetIterationAddedValues(
         mixedKeys,
         localshimSet,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(shimSetIteratorResult, expectedResult, "shimSet-iterator");
     });

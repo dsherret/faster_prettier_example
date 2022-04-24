@@ -53,15 +53,15 @@ namespace Harness {
             if (testIndex >= 0) fn = fn.substr(testIndex);
 
             if (
-              justName &&
-              !justName.match(/fourslash\.ts$/i) &&
-              !justName.match(/\.d\.ts$/i)
+              justName
+              && !justName.match(/fourslash\.ts$/i)
+              && !justName.match(/\.d\.ts$/i)
             ) {
               it(
                 this.testSuiteName + " test " + justName + " runs correctly",
                 () => {
                   FourSlash.runFourSlashTest(this.basePath, this.testType, fn);
-                }
+                },
               );
             }
           });

@@ -275,7 +275,7 @@ interface Array<T> {}`,
   };
 
   function createTestWrapper<T extends any[]>(
-    fn: (it: Mocha.PendingTestFunction, ...args: T) => void
+    fn: (it: Mocha.PendingTestFunction, ...args: T) => void,
   ): WithSkipAndOnly<T> {
     wrapped.skip = (...args: T) => fn(it.skip, ...args);
     wrapped.only = (...args: T) => fn(it.only, ...args);
@@ -303,7 +303,7 @@ interface Array<T> {}`,
     caption: string,
     text: string,
     baselineFolder: string,
-    flags: ConvertToAsyncTestFlags
+    flags: ConvertToAsyncTestFlags,
   ) {
     const includeLib = !!(flags & ConvertToAsyncTestFlags.IncludeLib);
     const includeModule = !!(flags & ConvertToAsyncTestFlags.IncludeModule);
@@ -318,11 +318,11 @@ interface Array<T> {}`,
     const expectFailure = expectNoSuggestionDiagnostic || expectNoAction;
     Debug.assert(
       !(expectSuggestionDiagnostic && expectNoSuggestionDiagnostic),
-      "Cannot combine both 'ExpectSuggestionDiagnostic' and 'ExpectNoSuggestionDiagnostic'"
+      "Cannot combine both 'ExpectSuggestionDiagnostic' and 'ExpectNoSuggestionDiagnostic'",
     );
     Debug.assert(
       !(expectAction && expectNoAction),
-      "Cannot combine both 'ExpectAction' and 'ExpectNoAction'"
+      "Cannot combine both 'ExpectAction' and 'ExpectNoAction'",
     );
 
     const t = extractTest(text);
@@ -335,16 +335,14 @@ interface Array<T> {}`,
       ? [Extension.Ts]
       : [Extension.Ts, Extension.Js];
 
-    extensions.forEach((extension) =>
-      it(`${caption} [${extension}]`, () => runBaseline(extension))
-    );
+    extensions.forEach((extension) => it(`${caption} [${extension}]`, () => runBaseline(extension)));
 
     function runBaseline(extension: Extension) {
       const path = "/a" + extension;
       const languageService = makeLanguageService(
         { path, content: t.source },
         includeLib,
-        includeModule
+        includeModule,
       );
       const program = languageService.getProgram()!;
 
@@ -353,7 +351,7 @@ interface Array<T> {}`,
         assert.equal(
           Extension.Js,
           extension,
-          "Syntactic diagnostics found in non-JS file"
+          "Syntactic diagnostics found in non-JS file",
         );
         return;
       }
@@ -380,7 +378,7 @@ interface Array<T> {}`,
         host: notImplementedHost,
         formatContext: formatting.getFormatContext(
           testFormatSettings,
-          notImplementedHost
+          notImplementedHost,
         ),
       };
 
@@ -388,16 +386,15 @@ interface Array<T> {}`,
       const diagnostic = find(
         diagnostics,
         (diagnostic) =>
-          diagnostic.messageText ===
-            Diagnostics.This_may_be_converted_to_an_async_function.message &&
-          diagnostic.start === context.span.start &&
-          diagnostic.length === context.span.length
+          diagnostic.messageText
+            === Diagnostics.This_may_be_converted_to_an_async_function.message
+          && diagnostic.start === context.span.start
+          && diagnostic.length === context.span.length,
       );
       const actions = codefix.getFixes(context);
       const action = find(
         actions,
-        (action) =>
-          action.description === Diagnostics.Convert_to_async_function.message
+        (action) => action.description === Diagnostics.Convert_to_async_function.message,
       );
 
       let outputText: string | null;
@@ -411,14 +408,14 @@ interface Array<T> {}`,
         data.push(`// ==ASYNC FUNCTION::${action.description}==`);
         const newText = textChanges.applyChanges(
           sourceFile.text,
-          changes[0].textChanges
+          changes[0].textChanges,
         );
         data.push(newText);
 
         const diagProgram = makeLanguageService(
           { path, content: newText },
           includeLib,
-          includeModule
+          includeModule,
         ).getProgram()!;
         assert.isFalse(hasSyntacticDiagnostics(diagProgram));
         outputText = data.join(newLineCharacter);
@@ -429,38 +426,38 @@ interface Array<T> {}`,
 
       Harness.Baseline.runBaseline(
         `${baselineFolder}/${caption}${extension}`,
-        outputText
+        outputText,
       );
 
       if (expectNoSuggestionDiagnostic) {
         assert.isUndefined(
           diagnostic,
-          "Expected code fix to not provide a suggestion diagnostic"
+          "Expected code fix to not provide a suggestion diagnostic",
         );
       } else if (expectSuggestionDiagnostic) {
         assert.exists(
           diagnostic,
-          "Expected code fix to provide a suggestion diagnostic"
+          "Expected code fix to provide a suggestion diagnostic",
         );
       }
 
       if (expectNoAction) {
         assert.isNotTrue(
           !!action?.changes.length,
-          "Expected code fix to not provide an action"
+          "Expected code fix to not provide an action",
         );
         assert.isNotTrue(
           typeof outputText === "string",
-          "Expected code fix to not apply changes"
+          "Expected code fix to not apply changes",
         );
       } else if (expectAction) {
         assert.isTrue(
           !!action?.changes.length,
-          "Expected code fix to provide an action"
+          "Expected code fix to provide an action",
         );
         assert.isTrue(
           typeof outputText === "string",
-          "Expected code fix to apply changes"
+          "Expected code fix to apply changes",
         );
       }
     }
@@ -468,7 +465,7 @@ interface Array<T> {}`,
     function makeLanguageService(
       file: TestFSWithWatch.File,
       includeLib?: boolean,
-      includeModule?: boolean
+      includeModule?: boolean,
     ) {
       const files = [file];
       if (includeLib) {
@@ -496,10 +493,10 @@ interface Array<T> {}`,
         caption,
         text,
         "convertToAsyncFunction",
-        ConvertToAsyncTestFlags.IncludeLib |
-          ConvertToAsyncTestFlags.ExpectSuccess
+        ConvertToAsyncTestFlags.IncludeLib
+          | ConvertToAsyncTestFlags.ExpectSuccess,
       );
-    }
+    },
   );
 
   const _testConvertToAsyncFunctionFailed = createTestWrapper(
@@ -509,10 +506,10 @@ interface Array<T> {}`,
         caption,
         text,
         "convertToAsyncFunction",
-        ConvertToAsyncTestFlags.IncludeLib |
-          ConvertToAsyncTestFlags.ExpectFailed
+        ConvertToAsyncTestFlags.IncludeLib
+          | ConvertToAsyncTestFlags.ExpectFailed,
       );
-    }
+    },
   );
 
   const _testConvertToAsyncFunctionFailedSuggestion = createTestWrapper(
@@ -522,11 +519,11 @@ interface Array<T> {}`,
         caption,
         text,
         "convertToAsyncFunction",
-        ConvertToAsyncTestFlags.IncludeLib |
-          ConvertToAsyncTestFlags.ExpectNoSuggestionDiagnostic |
-          ConvertToAsyncTestFlags.ExpectAction
+        ConvertToAsyncTestFlags.IncludeLib
+          | ConvertToAsyncTestFlags.ExpectNoSuggestionDiagnostic
+          | ConvertToAsyncTestFlags.ExpectAction,
       );
-    }
+    },
   );
 
   const _testConvertToAsyncFunctionFailedAction = createTestWrapper(
@@ -536,11 +533,11 @@ interface Array<T> {}`,
         caption,
         text,
         "convertToAsyncFunction",
-        ConvertToAsyncTestFlags.IncludeLib |
-          ConvertToAsyncTestFlags.ExpectSuggestionDiagnostic |
-          ConvertToAsyncTestFlags.ExpectNoAction
+        ConvertToAsyncTestFlags.IncludeLib
+          | ConvertToAsyncTestFlags.ExpectSuggestionDiagnostic
+          | ConvertToAsyncTestFlags.ExpectNoAction,
       );
-    }
+    },
   );
 
   const _testConvertToAsyncFunctionWithModule = createTestWrapper(
@@ -550,11 +547,11 @@ interface Array<T> {}`,
         caption,
         text,
         "convertToAsyncFunction",
-        ConvertToAsyncTestFlags.IncludeLib |
-          ConvertToAsyncTestFlags.IncludeModule |
-          ConvertToAsyncTestFlags.ExpectSuccess
+        ConvertToAsyncTestFlags.IncludeLib
+          | ConvertToAsyncTestFlags.IncludeModule
+          | ConvertToAsyncTestFlags.ExpectSuccess,
       );
-    }
+    },
   );
 
   describe("unittests:: services:: convertToAsyncFunction", () => {
@@ -563,21 +560,21 @@ interface Array<T> {}`,
       `
 function [#|f|](): Promise<void>{
     return fetch('https://typescriptlang.org').then(result => { console.log(result) });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_arrayBindingPattern",
       `
 function [#|f|](): Promise<void>{
     return fetch('https://typescriptlang.org').then(([result]) => { console.log(result) });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_objectBindingPattern",
       `
 function [#|f|](): Promise<void>{
     return fetch('https://typescriptlang.org').then(({ result }) => { console.log(result) });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_arrayBindingPatternRename",
@@ -585,7 +582,7 @@ function [#|f|](): Promise<void>{
 function [#|f|](): Promise<void>{
     const result = getResult();
     return fetch('https://typescriptlang.org').then(([result]) => { console.log(result) });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_objectBindingPatternRename",
@@ -593,14 +590,14 @@ function [#|f|](): Promise<void>{
 function [#|f|](): Promise<void>{
     const result = getResult();
     return fetch('https://typescriptlang.org').then(({ result }) => { console.log(result) });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_basicNoReturnTypeAnnotation",
       `
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(result => { console.log(result) });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_basicWithComments",
@@ -611,7 +608,7 @@ function [#|f|](): Promise<void>{
     // a
     /*b*/ return /*c*/ fetch( /*d*/ 'https://typescriptlang.org' /*e*/).then( /*f*/ result /*g*/ => { /*h*/ console.log(/*i*/ result /*j*/) /*k*/}/*l*/);
     // m
-}`
+}`,
     );
 
     _testConvertToAsyncFunction(
@@ -619,28 +616,28 @@ function [#|f|](): Promise<void>{
       `
 [#|():Promise<void> => {|]
     return fetch('https://typescriptlang.org').then(result => console.log(result));
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_ArrowFunctionNoAnnotation",
       `
 [#|() => {|]
     return fetch('https://typescriptlang.org').then(result => console.log(result));
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_Catch",
       `
 function [#|f|]():Promise<void> {
     return fetch('https://typescriptlang.org').then(result => { console.log(result); }).catch(err => { console.log(err); });
-}`
+}`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_CatchAndRej",
       `
 function [#|f|]():Promise<void> {
     return fetch('https://typescriptlang.org').then(result => { console.log(result); }, rejection => { console.log("rejected:", rejection); }).catch(err => { console.log(err) });
-}`
+}`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_CatchAndRejRef",
@@ -656,7 +653,7 @@ function rej(rejection){
 }
 function catch_err(err){
     console.log(err);
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_CatchRef",
@@ -670,35 +667,35 @@ function res(result){
 function catch_err(err){
     console.log(err);
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_CatchNoBrackets",
       `
 function [#|f|]():Promise<void> {
     return fetch('https://typescriptlang.org').then(result => console.log(result)).catch(err => console.log(err));
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_IgnoreArgs1",
       `
 function [#|f|](): Promise<void> {
     return fetch('https://typescriptlang.org').then( _ => { console.log("done"); });
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_IgnoreArgs2",
       `
 function [#|f|](): Promise<void> {
     return fetch('https://typescriptlang.org').then( () => console.log("done") );
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_IgnoreArgs3",
       `
 function [#|f|](): Promise<void> {
     return fetch('https://typescriptlang.org').then( () => console.log("almost done") ).then( () => console.log("done") );
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_IgnoreArgs4",
@@ -708,7 +705,7 @@ function [#|f|]() {
 }
 function res(){
     console.log("done");
-}`
+}`,
     );
 
     _testConvertToAsyncFunction(
@@ -718,14 +715,14 @@ class Parser {
     [#|f|]():Promise<void> {
         return fetch('https://typescriptlang.org').then(result => console.log(result));
     }
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_MultipleCatches",
       `
 function [#|f|](): Promise<void> {
     return fetch('https://typescriptlang.org').then(res => console.log(res)).catch(err => console.log("err", err)).catch(err2 => console.log("err2", err2));
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_MultipleThens",
@@ -738,7 +735,7 @@ function res(result){
 }
 function res2(result2){
     console.log(result2);
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_MultipleThensSameVarName",
@@ -752,7 +749,7 @@ function res(result){
 function res2(result){
     return result.bodyUsed;
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_NoRes",
@@ -760,7 +757,7 @@ function res2(result){
 function [#|f|]():Promise<void | Response> {
     return fetch('https://typescriptlang.org').then(null, rejection => console.log("rejected:", rejection));
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_NoRes2",
@@ -768,7 +765,7 @@ function [#|f|]():Promise<void | Response> {
 function [#|f|]():Promise<void | Response> {
     return fetch('https://typescriptlang.org').then(undefined).catch(rej => console.log(rej));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -777,7 +774,7 @@ function [#|f|]():Promise<void | Response> {
 function [#|f|]():Promise<void | Response> {
     return fetch('https://typescriptlang.org').catch(rej => console.log(rej));
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_NoRes4",
@@ -785,7 +782,7 @@ function [#|f|]():Promise<void | Response> {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(undefined, rejection => console.log("rejected:", rejection));
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_NoCatchHandler",
@@ -793,7 +790,7 @@ function [#|f|]() {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(x => x.statusText).catch(undefined);
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_NoSuggestion",
@@ -801,7 +798,7 @@ function [#|f|]() {
 function [#|f|]():Promise<Response> {
     return fetch('https://typescriptlang.org');
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_PromiseDotAll",
@@ -811,14 +808,14 @@ function [#|f|]():Promise<void>{
         vals.forEach(console.log);
     });
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_NoSuggestionNoPromise",
       `
 function [#|f|]():void{
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_Rej",
@@ -826,7 +823,7 @@ function [#|f|]():void{
 function [#|f|]():Promise<void> {
     return fetch('https://typescriptlang.org').then(result => { console.log(result); }, rejection => { console.log("rejected:", rejection); });
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_RejRef",
@@ -840,7 +837,7 @@ function res(result){
 function rej(err){
     console.log(err);
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_RejNoBrackets",
@@ -848,7 +845,7 @@ function rej(err){
 function [#|f|]():Promise<void> {
     return fetch('https://typescriptlang.org').then(result => console.log(result), rejection => console.log("rejected:", rejection));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -860,7 +857,7 @@ function [#|f|]():Promise<boolean> {
 function res(result){
     return result.ok;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -875,7 +872,7 @@ class Foo {
         return res.ok;
     }
 }
-        `
+        `,
     );
 
     _testConvertToAsyncFunction(
@@ -888,7 +885,7 @@ class Foo {
 
     private foo = res => res;
 }
-        `
+        `,
     );
 
     _testConvertToAsyncFunction(
@@ -900,7 +897,7 @@ const res = (result) => {
 function [#|f|](): Promise<boolean> {
     return fetch('https://typescriptlang.org').then(res);
 }
-        `
+        `,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -910,7 +907,7 @@ const res = 1;
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(res);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -922,7 +919,7 @@ class Foo {
         return fetch('a').then(this.foo);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -932,7 +929,7 @@ const res = undefined;
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(res);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -944,7 +941,7 @@ class Foo {
         return fetch('a').then(this.foo);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -956,7 +953,7 @@ function [#|f|]():Promise<void> {
 function res(result){
     console.log(result);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -971,7 +968,7 @@ class Foo {
         console.log(res);
     }
 }
-        `
+        `,
     );
 
     _testConvertToAsyncFunction(
@@ -980,7 +977,7 @@ class Foo {
 function [#|f|]():Promise<void> {
     return fetch('https://typescriptlang.org').then(result => console.log(result));
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_Finally1",
@@ -988,7 +985,7 @@ function [#|f|]():Promise<void> {
 function [#|finallyTest|](): Promise<void> {
     return fetch("https://typescriptlang.org").then(res => console.log(res)).catch(rej => console.log("error", rej)).finally(console.log("finally!"));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -997,7 +994,7 @@ function [#|finallyTest|](): Promise<void> {
 function [#|finallyTest|](): Promise<void> {
     return fetch("https://typescriptlang.org").then(res => console.log(res)).finally(console.log("finally!"));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1006,7 +1003,7 @@ function [#|finallyTest|](): Promise<void> {
 function [#|finallyTest|](): Promise<void> {
     return fetch("https://typescriptlang.org").finally(console.log("finally!"));
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_InnerPromise",
@@ -1019,7 +1016,7 @@ function [#|innerPromise|](): Promise<string> {
         return blob.toString();
     });
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_InnerPromiseRet",
@@ -1031,7 +1028,7 @@ function [#|innerPromise|](): Promise<string> {
         return blob.toString();
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1044,7 +1041,7 @@ function [#|innerPromise|](): Promise<string> {
         return blob.toString();
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1057,7 +1054,7 @@ function [#|innerPromise|](): Promise<string> {
         return x.toString();
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1070,7 +1067,7 @@ function [#|innerPromise|](): Promise<string> {
         return (x || y).toString();
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1083,7 +1080,7 @@ function [#|innerPromise|](): Promise<string> {
         return (x || y).toString();
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1093,7 +1090,7 @@ function [#|f|]() {
     let blob = fetch("https://typescriptlang.org").then(resp => console.log(resp));
     return blob;
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_VarReturn02",
@@ -1103,7 +1100,7 @@ function [#|f|]() {
     blob.then(resp => console.log(resp));
     return blob;
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_VarReturn03",
@@ -1118,7 +1115,7 @@ function [#|f|]() {
 function err (rej) {
     console.log(rej)
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_VarReturn04",
@@ -1130,7 +1127,7 @@ function [#|f|]() {
 function err (rej) {
     console.log(rej)
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1141,7 +1138,7 @@ function [#|f|]() {
     blob.then(x => x);
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1151,7 +1148,7 @@ function [#|f|]() {
     var blob = fetch("https://typescriptlang.org");
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1164,7 +1161,7 @@ function [#|f|]() {
     blob.then(resp => console.log(resp));
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1178,7 +1175,7 @@ function [#|f|]() {
     blob.then(resp => console.log(resp));
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1193,7 +1190,7 @@ function [#|f|]() {
     blob3 = blob2.catch(rej => rej.ok);
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1209,7 +1206,7 @@ function [#|f|]() {
     blob3 = blob2;
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1219,7 +1216,7 @@ function [#|f|]() {
     let blob;
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1235,7 +1232,7 @@ function my_print (resp) {
     return resp;
 }
 
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1252,7 +1249,7 @@ function my_print (resp): Promise<void> {
 }
 
 
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1267,7 +1264,7 @@ function [#|f|](): Promise<void> {
         var blob = resp.blob().then(blob => blob.byteOffset).catch(err => 'Error');
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1283,7 +1280,7 @@ function [#|f|](): Promise<void> {
         return fetch("https://microsoft.com").then(res => console.log("Another one!"));
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1300,7 +1297,7 @@ function [#|f|](): Promise<string> {
 
     return blob;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1313,7 +1310,7 @@ function [#|f|](): Promise<string> {
         return blob.toString();
     });
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_InnerPromiseSimple",
@@ -1325,7 +1322,7 @@ function [#|f|](): Promise<string> {
         return blob.toString();
     });
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_PromiseAllAndThen1",
@@ -1337,7 +1334,7 @@ function [#|f|]() {
               }).then(res => res.toString())]);
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1350,7 +1347,7 @@ function [#|f|]() {
               })]).then(res => res.toString());
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1362,7 +1359,7 @@ function [#|f|]() {
             return fetch("https://github.com");
         }).then(res => res.toString())]));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1374,7 +1371,7 @@ function [#|f|]() {
             return fetch("https://github.com");
         })]).then(res => res.toString()));
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_Scope1",
@@ -1393,7 +1390,7 @@ function [#|f|]() {
   function res(response){
       console.log(response);
   }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1414,7 +1411,7 @@ function [#|f|](){
       }
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1431,7 +1428,7 @@ function res(result){
 function rej(reject){
     return reject;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1448,7 +1445,7 @@ function res(result): number {
 function rej(reject): number {
     return 3;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1465,7 +1462,7 @@ function res(result){
 function rej(reject){
     return 3;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1478,7 +1475,7 @@ function [#|f|](){
 function res(result): number {
     return 5;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1491,7 +1488,7 @@ function [#|f|](){
 function res(result){
     return 5;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1508,7 +1505,7 @@ function res(result){
 function rej(reject){
     return "Error";
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1525,7 +1522,7 @@ function res(result){
 function rej(reject): Response{
     return reject;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1542,7 +1539,7 @@ function res(result){
 function rej(reject){
     return reject;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1559,7 +1556,7 @@ function res(result){
 function rej(reject){
     return Promise.resolve(1);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1586,7 +1583,7 @@ function res(result): b{
 function rej(reject): a{
     return {name: "myName", age: 27};
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1599,7 +1596,7 @@ async function foo<T>(x: T): Promise<T> {
 function [#|bar|]<T>(x: T): Promise<T> {
     return foo(x).then(foo)
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1609,7 +1606,7 @@ function [#|f|](p: Promise<unknown>) {
     return p.catch((error: Error) => {
         return Promise.reject(error);
     });
-}`
+}`,
     );
 
     _testConvertToAsyncFunction(
@@ -1617,7 +1614,7 @@ function [#|f|](p: Promise<unknown>) {
       `
 function [#|f|](p: Promise<unknown>) {
     return p.catch((error: Error) => Promise.reject(error));
-}`
+}`,
     );
 
     _testConvertToAsyncFunction(
@@ -1627,7 +1624,7 @@ function [#|f|](p: Promise<unknown>) {
     return p.catch(function (error: Error) {
         return Promise.reject(error);
     });
-}`
+}`,
     );
 
     _testConvertToAsyncFunction(
@@ -1638,7 +1635,7 @@ function [#|f|]() {
     return x.catch(err => console.log("Error!", err));
 }
 
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_PromiseCallInner",
@@ -1647,7 +1644,7 @@ function [#|f|]() {
     return fetch(Promise.resolve(1).then(res => "https://typescriptlang.org")).catch(err => console.log(err));
 }
 
-`
+`,
     );
     _testConvertToAsyncFunctionFailed(
       "convertToAsyncFunction_CatchFollowedByCall",
@@ -1663,7 +1660,7 @@ function res(result){
 function rej(reject){
     return reject;
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1673,7 +1670,7 @@ function [#|f|](){
     var i:number;
     return fetch("https://typescriptlang.org").then(i => i.ok).then(res => i+1).catch(err => i-1)
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1684,7 +1681,7 @@ function [#|f|](){
         console.log(res);
     }})
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1703,7 +1700,7 @@ function [#|f|](){
 function res_func(result){
     console.log(result);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1719,7 +1716,7 @@ function [#|f|]() {
     };
   });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1734,7 +1731,7 @@ function [#|f|]() {
     }
     return fn2();
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1749,7 +1746,7 @@ function f() {
     }
     return fn2();
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1758,7 +1755,7 @@ function f() {
 function [#|f|]() {
     return Promise.resolve().then(res => console.log(res));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1768,7 +1765,7 @@ function [#|f|]() {
     let i;
     return Promise.resolve().then(res => res ? i = res : i = 100);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1777,7 +1774,7 @@ function [#|f|]() {
     function [#|f|]() {
         return Promise.resolve().then(() => 1, () => "a");
     }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1786,7 +1783,7 @@ function [#|f|]() {
 const [#|foo|] = function () {
     return fetch('https://typescriptlang.org').then(result => { console.log(result) });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1795,7 +1792,7 @@ const [#|foo|] = function () {
 const foo = function [#|f|]() {
     return fetch('https://typescriptlang.org').then(result => { console.log(result) });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1804,7 +1801,7 @@ const foo = function [#|f|]() {
 const { length } = [#|function|] () {
     return fetch('https://typescriptlang.org').then(result => { console.log(result) });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1813,7 +1810,7 @@ const { length } = [#|function|] () {
 function [#|f|]() {
     return Promise.resolve().then(x => 1).catch(x => "a").then(x => !!x);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1822,7 +1819,7 @@ function [#|f|]() {
 function [#|f|]() {
     return Promise.resolve().then(() => ({ x: 3 })).catch(() => ({ x: "a" })).then(({ x }) => !!x);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1834,7 +1831,7 @@ function [#|f|]() {
 function res({ status, trailer }){
     console.log(status);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1847,7 +1844,7 @@ function [#|f|]() {
 function res({ status, trailer }){
     console.log(status);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1856,7 +1853,7 @@ function res({ status, trailer }){
 function [#|f|]() {
     return Promise.resolve().then(f ? (x => x) : (y => y));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -1865,7 +1862,7 @@ function [#|f|]() {
 function [#|f|]() {
     return Promise.resolve().then(f ? (x => x) : (y => y)).then(q => q);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1877,7 +1874,7 @@ function [#|f|]() {
 function res(result) {
     return Promise.resolve().then(x => console.log(result));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1886,7 +1883,7 @@ function res(result) {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(s => Promise.resolve(s.statusText.length)).then(x => console.log(x + 5));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1895,7 +1892,7 @@ function [#|f|]() {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(s => { return Promise.resolve(s.statusText.length) }).then(x => x + 5);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1904,7 +1901,7 @@ function [#|f|]() {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(s => Promise.resolve(s.statusText).then(st => st.length)).then(x => console.log(x + 5));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1913,7 +1910,7 @@ function [#|f|]() {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(s => Promise.resolve(s.statusText.length));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1924,7 +1921,7 @@ function [#|f|]() {
         .then(x => Promise.reject(x))
         .catch(err => console.log(err));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1933,7 +1930,7 @@ function [#|f|]() {
 function [#|f|]() {
     return fetch('https://typescriptlang.org').then(x => Promise.resolve(3).then(y => Promise.resolve(x.statusText.length + y)));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1950,7 +1947,7 @@ function [#|main2|]() {
         .then(() => { console.log("."); return delay(500); })
         .then(() => { console.log("."); return delay(500); })
 }
-        `
+        `,
     );
 
     _testConvertToAsyncFunction(
@@ -1967,7 +1964,7 @@ function [#|main2|]() {
         .then(() => delay(500))
         .then(() => delay(500))
 }
-        `
+        `,
     );
 
     _testConvertToAsyncFunction(
@@ -1976,7 +1973,7 @@ function [#|main2|]() {
 export function [#|foo|]() {
     return fetch('https://typescriptlang.org').then(s => console.log(s));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -1987,7 +1984,7 @@ function [#|foo|]() {
         return fetch('b').then(() => 'c');
     })
 }
-`
+`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_decoratedMethod",
@@ -2001,7 +1998,7 @@ class Foo {
         return fetch('a').then(x => x);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2017,7 +2014,7 @@ class Foo {
         return fetch('a').then(x => x);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2035,7 +2032,7 @@ class Foo {
         return fetch('a').then(x => x);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2050,7 +2047,7 @@ class Foo {
         return fetch('a').then(x => x);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailedSuggestion(
@@ -2061,7 +2058,7 @@ function foo() {
         return fetch('b').then(() => 'c');
     })
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2076,7 +2073,7 @@ function wrapResponse<T>(response: T): APIResponse<T> {
 function [#|get|]() {
     return Promise.resolve(undefined!).then<APIResponse<{ email: string }>>(wrapResponse);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2091,7 +2088,7 @@ function wrapResponse<T>(response: T): APIResponse<T> {
 function [#|get|]() {
     return Promise.resolve(undefined!).then<APIResponse<{ email: string }>>(d => wrapResponse(d));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2109,7 +2106,7 @@ function [#|get|]() {
         return wrapResponse(d);
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2122,7 +2119,7 @@ function [#|get|]() {
         .resolve<APIResponse<{ email: string }>>({ success: true, data: { email: "" } })
         .catch<APIResponse<{ email: string }>>(() => ({ success: false }));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -2130,7 +2127,7 @@ function [#|get|]() {
       `
 function [#|f|]() {
     return Promise.resolve().then(undefined, undefined, () => 1);
-}`
+}`,
     );
 
     _testConvertToAsyncFunction(
@@ -2146,7 +2143,7 @@ const fn = (): Promise<(message: string) => void> =>
 function [#|f|]() {
     return fn().then(res => res("test"));
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2155,7 +2152,7 @@ function [#|f|]() {
 function [#|f|]() {
     return Promise.resolve().catch();
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2164,7 +2161,7 @@ function [#|f|]() {
 function [#|f|]() {
     return Promise.resolve(0).then(x => x).catch();
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionWithModule(
@@ -2174,7 +2171,7 @@ import { fn } from "./module";
 function [#|f|]() {
     return Promise.resolve(0).then(fn);
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -2186,7 +2183,7 @@ function [#|f|](x?: number): Promise<void> | void {
     if (!x) return;
     return fetch('').then(() => {});
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -2198,7 +2195,7 @@ function [#|f|](x?: number): Promise<void> | number {
     if (x) return x;
     return fetch('').then(() => {});
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -2209,7 +2206,7 @@ class Foo {
         return Promise.resolve(1).then(n => n);
     }
 }
-`
+`,
     );
 
     _testConvertToAsyncFunctionFailed(
@@ -2222,7 +2219,7 @@ function [#|foo|](p: Promise<string[]>) {
         }
     });
 }
-`
+`,
     );
 
     _testConvertToAsyncFunction(
@@ -2231,7 +2228,7 @@ function [#|foo|](p: Promise<string[]>) {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().then();
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_catchNoArguments",
@@ -2239,7 +2236,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().catch();
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_chainedThenCatchThen",
@@ -2247,7 +2244,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().then(x => Promise.resolve(x + 1)).catch(() => 1).then(y => y + 2);
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_finally",
@@ -2255,7 +2252,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().finally(() => console.log("done"));
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_finallyNoArguments",
@@ -2263,7 +2260,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().finally();
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_finallyNull",
@@ -2271,7 +2268,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().finally(null);
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_finallyUndefined",
@@ -2279,7 +2276,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().finally(undefined);
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_thenFinally",
@@ -2287,7 +2284,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().then(x => x + 1).finally(() => console.log("done"));
-}`
+}`,
     );
     _testConvertToAsyncFunction(
       "convertToAsyncFunction_thenFinallyThen",
@@ -2295,7 +2292,7 @@ function [#|f|](): Promise<number> {
 declare function foo(): Promise<number>;
 function [#|f|](): Promise<number> {
     return foo().then(x => Promise.resolve(x + 1)).finally(() => console.log("done")).then(y => y + 2);
-}`
+}`,
     );
     _testConvertToAsyncFunctionFailedAction(
       "convertToAsyncFunction_returnInBranch",
@@ -2311,7 +2308,7 @@ function [#|f|](): Promise<number> {
         return a + 1;
     });
 }
-`
+`,
     );
     _testConvertToAsyncFunctionFailedAction(
       "convertToAsyncFunction_partialReturnInBranch",
@@ -2327,7 +2324,7 @@ function [#|f|](): Promise<number> {
         return a + 1;
     });
 }
-`
+`,
     );
   });
 }

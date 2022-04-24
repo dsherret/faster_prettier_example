@@ -23,11 +23,12 @@ namespace Harness.SourceMapRecorder {
     export function decodeNextEncodedSourceMapSpan(): DecodedMapping {
       if (!mappings) return ts.Debug.fail("not initialized");
       const result = mappings.next();
-      if (result.done)
+      if (result.done) {
         return {
           error: mappings.error || "No encoded entry found",
           sourceMapSpan: mappings.state,
         };
+      }
       return { sourceMapSpan: result.value };
     }
 
@@ -59,7 +60,7 @@ namespace Harness.SourceMapRecorder {
     export function initializeSourceMapSpanWriter(
       sourceMapRecordWriter: Compiler.WriterAggregator,
       sourceMap: ts.RawSourceMap,
-      currentJsFile: documents.TextDocument
+      currentJsFile: documents.TextDocument,
     ) {
       sourceMapRecorder = sourceMapRecordWriter;
       sourceMapSources = sourceMap.sources;
@@ -75,53 +76,51 @@ namespace Harness.SourceMapRecorder {
 
       SourceMapDecoder.initializeSourceMapDecoding(sourceMap);
       sourceMapRecorder.WriteLine(
-        "==================================================================="
+        "===================================================================",
       );
       sourceMapRecorder.WriteLine("JsFile: " + sourceMap.file);
       sourceMapRecorder.WriteLine(
-        "mapUrl: " +
-          ts.tryGetSourceMappingURL(ts.getLineInfo(jsFile.text, jsLineMap))
+        "mapUrl: "
+          + ts.tryGetSourceMappingURL(ts.getLineInfo(jsFile.text, jsLineMap)),
       );
       sourceMapRecorder.WriteLine("sourceRoot: " + sourceMap.sourceRoot);
       sourceMapRecorder.WriteLine("sources: " + sourceMap.sources);
       if (sourceMap.sourcesContent) {
         sourceMapRecorder.WriteLine(
-          "sourcesContent: " + JSON.stringify(sourceMap.sourcesContent)
+          "sourcesContent: " + JSON.stringify(sourceMap.sourcesContent),
         );
       }
       sourceMapRecorder.WriteLine(
-        "==================================================================="
+        "===================================================================",
       );
     }
 
     function getSourceMapSpanString(
       mapEntry: ts.Mapping,
-      getAbsentNameIndex?: boolean
+      getAbsentNameIndex?: boolean,
     ) {
-      let mapString =
-        "Emitted(" +
-        (mapEntry.generatedLine + 1) +
-        ", " +
-        (mapEntry.generatedCharacter + 1) +
-        ")";
+      let mapString = "Emitted("
+        + (mapEntry.generatedLine + 1)
+        + ", "
+        + (mapEntry.generatedCharacter + 1)
+        + ")";
       if (ts.isSourceMapping(mapEntry)) {
-        mapString +=
-          " Source(" +
-          (mapEntry.sourceLine + 1) +
-          ", " +
-          (mapEntry.sourceCharacter + 1) +
-          ") + SourceIndex(" +
-          mapEntry.sourceIndex +
-          ")";
+        mapString += " Source("
+          + (mapEntry.sourceLine + 1)
+          + ", "
+          + (mapEntry.sourceCharacter + 1)
+          + ") + SourceIndex("
+          + mapEntry.sourceIndex
+          + ")";
         if (
-          mapEntry.nameIndex! >= 0 &&
-          mapEntry.nameIndex! < sourceMapNames!.length
+          mapEntry.nameIndex! >= 0
+          && mapEntry.nameIndex! < sourceMapNames!.length
         ) {
           mapString += " name (" + sourceMapNames![mapEntry.nameIndex!] + ")";
         } else {
           if (
-            (mapEntry.nameIndex && mapEntry.nameIndex !== -1) ||
-            getAbsentNameIndex
+            (mapEntry.nameIndex && mapEntry.nameIndex !== -1)
+            || getAbsentNameIndex
           ) {
             mapString += " nameIndex (" + mapEntry.nameIndex + ")";
           }
@@ -136,13 +135,13 @@ namespace Harness.SourceMapRecorder {
       const decodeResult = SourceMapDecoder.decodeNextEncodedSourceMapSpan();
       let decodeErrors: string[] | undefined;
       if (
-        typeof decodeResult.error === "string" ||
-        !ts.sameMapping(decodeResult.sourceMapSpan, sourceMapSpan)
+        typeof decodeResult.error === "string"
+        || !ts.sameMapping(decodeResult.sourceMapSpan, sourceMapSpan)
       ) {
         if (decodeResult.error) {
           decodeErrors = [
-            "!!^^ !!^^ There was decoding error in the sourcemap at this location: " +
-              decodeResult.error,
+            "!!^^ !!^^ There was decoding error in the sourcemap at this location: "
+            + decodeResult.error,
           ];
         } else {
           decodeErrors = [
@@ -150,20 +149,20 @@ namespace Harness.SourceMapRecorder {
           ];
         }
         decodeErrors.push(
-          "!!^^ !!^^ Decoded span from sourcemap's mappings entry: " +
-            getSourceMapSpanString(
+          "!!^^ !!^^ Decoded span from sourcemap's mappings entry: "
+            + getSourceMapSpanString(
               decodeResult.sourceMapSpan,
-              /*getAbsentNameIndex*/ true
-            ) +
-            " Span encoded by the emitter:" +
-            getSourceMapSpanString(sourceMapSpan, /*getAbsentNameIndex*/ true)
+              /*getAbsentNameIndex*/ true,
+            )
+            + " Span encoded by the emitter:"
+            + getSourceMapSpanString(sourceMapSpan, /*getAbsentNameIndex*/ true),
         );
       }
 
       if (
-        spansOnSingleLine.length &&
-        spansOnSingleLine[0].sourceMapSpan.generatedLine !==
-          sourceMapSpan.generatedLine
+        spansOnSingleLine.length
+        && spansOnSingleLine[0].sourceMapSpan.generatedLine
+          !== sourceMapSpan.generatedLine
       ) {
         // On different line from the one that we have been recording till now,
         writeRecordedSpans();
@@ -174,13 +173,13 @@ namespace Harness.SourceMapRecorder {
 
     export function recordNewSourceFileSpan(
       sourceMapSpan: ts.Mapping,
-      newSourceFileCode: string
+      newSourceFileCode: string,
     ) {
       let continuesLine = false;
       if (
-        spansOnSingleLine.length > 0 &&
-        spansOnSingleLine[0].sourceMapSpan.generatedCharacter ===
-          sourceMapSpan.generatedLine
+        spansOnSingleLine.length > 0
+        && spansOnSingleLine[0].sourceMapSpan.generatedCharacter
+          === sourceMapSpan.generatedLine
       ) {
         writeRecordedSpans();
         spansOnSingleLine = [];
@@ -192,23 +191,21 @@ namespace Harness.SourceMapRecorder {
 
       assert.isTrue(spansOnSingleLine.length === 1);
       sourceMapRecorder.WriteLine(
-        "-------------------------------------------------------------------"
+        "-------------------------------------------------------------------",
       );
       sourceMapRecorder.WriteLine(
-        "emittedFile:" +
-          jsFile.file +
-          (continuesLine
-            ? ` (${sourceMapSpan.generatedLine + 1}, ${
-                sourceMapSpan.generatedCharacter + 1
-              })`
-            : "")
+        "emittedFile:"
+          + jsFile.file
+          + (continuesLine
+            ? ` (${sourceMapSpan.generatedLine + 1}, ${sourceMapSpan.generatedCharacter + 1})`
+            : ""),
       );
       sourceMapRecorder.WriteLine(
-        "sourceFile:" +
-          sourceMapSources[spansOnSingleLine[0].sourceMapSpan.sourceIndex!]
+        "sourceFile:"
+          + sourceMapSources[spansOnSingleLine[0].sourceMapSpan.sourceIndex!],
       );
       sourceMapRecorder.WriteLine(
-        "-------------------------------------------------------------------"
+        "-------------------------------------------------------------------",
       );
 
       tsLineMap = ts.computeLineStarts(newSourceFileCode);
@@ -222,11 +219,11 @@ namespace Harness.SourceMapRecorder {
 
       if (!SourceMapDecoder.hasCompletedDecoding()) {
         sourceMapRecorder.WriteLine(
-          "!!!! **** There are more source map entries in the sourceMap's mapping than what was encoded"
+          "!!!! **** There are more source map entries in the sourceMap's mapping than what was encoded",
         );
         sourceMapRecorder.WriteLine(
-          "!!!! **** Remaining decoded string: " +
-            SourceMapDecoder.getRemainingDecodeString()
+          "!!!! **** Remaining decoded string: "
+            + SourceMapDecoder.getRemainingDecodeString(),
         );
       }
 
@@ -237,7 +234,7 @@ namespace Harness.SourceMapRecorder {
     function getTextOfLine(
       line: number,
       lineMap: readonly number[],
-      code: string
+      code: string,
     ) {
       const startPos = lineMap[line];
       const endPos = lineMap[line + 1];
@@ -248,7 +245,7 @@ namespace Harness.SourceMapRecorder {
     function writeJsFileLines(endJsLine: number) {
       for (; nextJsLineToWrite < endJsLine; nextJsLineToWrite++) {
         sourceMapRecorder.Write(
-          ">>>" + getTextOfLine(nextJsLineToWrite, jsLineMap, jsFile.text)
+          ">>>" + getTextOfLine(nextJsLineToWrite, jsLineMap, jsFile.text),
         );
       }
     }
@@ -273,19 +270,18 @@ namespace Harness.SourceMapRecorder {
 
       let prevEmittedCol!: number;
       function iterateSpans(
-        fn: (currentSpan: SourceMapSpanWithDecodeErrors, index: number) => void
+        fn: (currentSpan: SourceMapSpanWithDecodeErrors, index: number) => void,
       ) {
         prevEmittedCol = 0;
         for (let i = 0; i < spansOnSingleLine.length; i++) {
           fn(spansOnSingleLine[i], i);
-          prevEmittedCol =
-            spansOnSingleLine[i].sourceMapSpan.generatedCharacter;
+          prevEmittedCol = spansOnSingleLine[i].sourceMapSpan.generatedCharacter;
         }
       }
 
       function writeSourceMapIndent(
         indentLength: number,
-        indentPrefix: string
+        indentPrefix: string,
       ) {
         sourceMapRecorder.Write(indentPrefix);
         for (let i = 0; i < indentLength; i++) {
@@ -297,7 +293,7 @@ namespace Harness.SourceMapRecorder {
         currentSpan: SourceMapSpanWithDecodeErrors,
         index: number,
         endColumn = currentSpan.sourceMapSpan.generatedCharacter,
-        endContinues = false
+        endContinues = false,
       ) {
         const markerId = getMarkerId(index);
         markerIds.push(markerId);
@@ -316,11 +312,10 @@ namespace Harness.SourceMapRecorder {
 
       function writeSourceMapSourceText(
         currentSpan: SourceMapSpanWithDecodeErrors,
-        index: number
+        index: number,
       ) {
-        const sourcePos =
-          tsLineMap[currentSpan.sourceMapSpan.sourceLine!] +
-          currentSpan.sourceMapSpan.sourceCharacter!;
+        const sourcePos = tsLineMap[currentSpan.sourceMapSpan.sourceLine!]
+          + currentSpan.sourceMapSpan.sourceCharacter!;
         let sourceText = "";
         if (prevWrittenSourcePos < sourcePos) {
           // Position that goes forward, get text
@@ -339,7 +334,7 @@ namespace Harness.SourceMapRecorder {
         for (let i = 0; i < tsCodeLineMap.length; i++) {
           writeSourceMapIndent(
             prevEmittedCol,
-            i === 0 ? markerIds[index] : "  >"
+            i === 0 ? markerIds[index] : "  >",
           );
           sourceMapRecorder.Write(getTextOfLine(i, tsCodeLineMap, sourceText));
           if (i === tsCodeLineMap.length - 1) {
@@ -352,10 +347,10 @@ namespace Harness.SourceMapRecorder {
 
       function writeSpanDetails(
         currentSpan: SourceMapSpanWithDecodeErrors,
-        index: number
+        index: number,
       ) {
         sourceMapRecorder.WriteLine(
-          markerIds[index] + getSourceMapSpanString(currentSpan.sourceMapSpan)
+          markerIds[index] + getSourceMapSpanString(currentSpan.sourceMapSpan),
         );
       }
 
@@ -371,7 +366,7 @@ namespace Harness.SourceMapRecorder {
         const jsFileText = getTextOfLine(
           currentJsLine + 1,
           jsLineMap,
-          jsFile.text
+          jsFile.text,
         );
         if (prevEmittedCol < jsFileText.length - 1) {
           // There is remaining text on this line that will be part of next source span so write marker that continues
@@ -379,7 +374,7 @@ namespace Harness.SourceMapRecorder {
             /*currentSpan*/ undefined!,
             spansOnSingleLine.length,
             /*endColumn*/ jsFileText.length - 1,
-            /*endContinues*/ true
+            /*endContinues*/ true,
           ); // TODO: GH#18217
         }
 
@@ -398,7 +393,7 @@ namespace Harness.SourceMapRecorder {
     sourceMapDataList: readonly ts.SourceMapEmitResult[],
     program: ts.Program,
     jsFiles: readonly documents.TextDocument[],
-    declarationFiles: readonly documents.TextDocument[]
+    declarationFiles: readonly documents.TextDocument[],
   ) {
     const sourceMapRecorder = new Compiler.WriterAggregator();
 
@@ -423,7 +418,7 @@ namespace Harness.SourceMapRecorder {
       SourceMapSpanWriter.initializeSourceMapSpanWriter(
         sourceMapRecorder,
         sourceMapData.sourceMap,
-        currentFile
+        currentFile,
       );
       const mapper = ts.decodeMappings(sourceMapData.sourceMap.mappings);
       for (
@@ -434,16 +429,16 @@ namespace Harness.SourceMapRecorder {
         const decodedSourceMapping = iterResult.value;
         const currentSourceFile = ts.isSourceMapping(decodedSourceMapping)
           ? program.getSourceFile(
-              sourceMapData.inputSourceFileNames[
-                decodedSourceMapping.sourceIndex
-              ]
-            )
+            sourceMapData.inputSourceFileNames[
+              decodedSourceMapping.sourceIndex
+            ],
+          )
           : undefined;
         if (currentSourceFile !== prevSourceFile) {
           if (currentSourceFile) {
             SourceMapSpanWriter.recordNewSourceFileSpan(
               decodedSourceMapping,
-              currentSourceFile.text
+              currentSourceFile.text,
             );
           }
           prevSourceFile = currentSourceFile;
@@ -459,13 +454,13 @@ namespace Harness.SourceMapRecorder {
 
   export function getSourceMapRecordWithSystem(
     sys: ts.System,
-    sourceMapFile: string
+    sourceMapFile: string,
   ) {
     const sourceMapRecorder = new Compiler.WriterAggregator();
     let prevSourceFile: documents.TextDocument | undefined;
     const files = new ts.Map<string, documents.TextDocument>();
     const sourceMap = ts.tryParseRawSourceMap(
-      sys.readFile(sourceMapFile, "utf8")!
+      sys.readFile(sourceMapFile, "utf8")!,
     );
     if (sourceMap) {
       const mapDirectory = ts.getDirectoryPath(sourceMapFile);
@@ -474,7 +469,7 @@ namespace Harness.SourceMapRecorder {
         : mapDirectory;
       const generatedAbsoluteFilePath = ts.getNormalizedAbsolutePath(
         sourceMap.file,
-        mapDirectory
+        mapDirectory,
       );
       const sourceFileAbsolutePaths = sourceMap.sources.map((source) =>
         ts.getNormalizedAbsolutePath(source, sourceRoot)
@@ -484,7 +479,7 @@ namespace Harness.SourceMapRecorder {
       SourceMapSpanWriter.initializeSourceMapSpanWriter(
         sourceMapRecorder,
         sourceMap,
-        currentFile
+        currentFile,
       );
       const mapper = ts.decodeMappings(sourceMap.mappings);
       for (
@@ -500,7 +495,7 @@ namespace Harness.SourceMapRecorder {
           if (currentSourceFile) {
             SourceMapSpanWriter.recordNewSourceFileSpan(
               decodedSourceMapping,
-              currentSourceFile.text
+              currentSourceFile.text,
             );
           }
           prevSourceFile = currentSourceFile;
@@ -518,7 +513,7 @@ namespace Harness.SourceMapRecorder {
       if (existing) return existing;
       const value = new documents.TextDocument(
         path,
-        sys.readFile(path, "utf8")!
+        sys.readFile(path, "utf8")!,
       );
       files.set(path, value);
       return value;

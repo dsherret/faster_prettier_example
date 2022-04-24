@@ -6,15 +6,15 @@ namespace ts {
     function getClassificationsForLine(
       text: string,
       lexState: EndOfLineState,
-      syntacticClassifierAbsent: boolean
+      syntacticClassifierAbsent: boolean,
     ): ClassificationResult {
       return convertClassificationsToResult(
         getEncodedLexicalClassifications(
           text,
           lexState,
-          syntacticClassifierAbsent
+          syntacticClassifierAbsent,
         ),
-        text
+        text,
       );
     }
 
@@ -23,7 +23,7 @@ namespace ts {
     function getEncodedLexicalClassifications(
       text: string,
       lexState: EndOfLineState,
-      syntacticClassifierAbsent: boolean
+      syntacticClassifierAbsent: boolean,
     ): Classifications {
       let token = SyntaxKind.Unknown;
       let lastNonTriviaToken = SyntaxKind.Unknown;
@@ -95,13 +95,13 @@ namespace ts {
           end,
           offset,
           classFromKind(token),
-          spans
+          spans,
         );
         if (end >= text.length) {
           const end = getNewEndOfLineState(
             scanner,
             token,
-            lastOrUndefined(templateStack)
+            lastOrUndefined(templateStack),
           );
           if (end !== undefined) {
             endOfLineState = end;
@@ -114,8 +114,8 @@ namespace ts {
           case SyntaxKind.SlashToken:
           case SyntaxKind.SlashEqualsToken:
             if (
-              !noRegexTable[lastNonTriviaToken] &&
-              scanner.reScanSlashToken() === SyntaxKind.RegularExpressionLiteral
+              !noRegexTable[lastNonTriviaToken]
+              && scanner.reScanSlashToken() === SyntaxKind.RegularExpressionLiteral
             ) {
               token = SyntaxKind.RegularExpressionLiteral;
             }
@@ -164,7 +164,7 @@ namespace ts {
 
               if (lastTemplateStackToken === SyntaxKind.TemplateHead) {
                 token = scanner.reScanTemplateToken(
-                  /* isTaggedTemplate */ false
+                  /* isTaggedTemplate */ false,
                 );
 
                 // Only pop on a TemplateTail; a TemplateMiddle indicates there is more for us.
@@ -174,14 +174,14 @@ namespace ts {
                   Debug.assertEqual(
                     token,
                     SyntaxKind.TemplateMiddle,
-                    "Should have been a template middle."
+                    "Should have been a template middle.",
                   );
                 }
               } else {
                 Debug.assertEqual(
                   lastTemplateStackToken,
                   SyntaxKind.OpenBraceToken,
-                  "Should have been an open brace"
+                  "Should have been an open brace",
                 );
                 templateStack.pop();
               }
@@ -195,9 +195,9 @@ namespace ts {
             if (lastNonTriviaToken === SyntaxKind.DotToken) {
               token = SyntaxKind.Identifier;
             } else if (
-              isKeyword(lastNonTriviaToken) &&
-              isKeyword(token) &&
-              !canFollow(lastNonTriviaToken, token)
+              isKeyword(lastNonTriviaToken)
+              && isKeyword(token)
+              && !canFollow(lastNonTriviaToken, token)
             ) {
               // We have two keywords in a row.  Only treat the second as a keyword if
               // it's a sequence that could legally occur in the language.  Otherwise
@@ -235,13 +235,13 @@ namespace ts {
       SyntaxKind.FalseKeyword,
     ],
     (token) => token,
-    () => true
+    () => true,
   );
 
   function getNewEndOfLineState(
     scanner: Scanner,
     token: SyntaxKind,
-    lastOnTemplateStack: SyntaxKind | undefined
+    lastOnTemplateStack: SyntaxKind | undefined,
   ): EndOfLineState | undefined {
     switch (token) {
       case SyntaxKind.StringLiteral: {
@@ -252,8 +252,8 @@ namespace ts {
         const lastCharIndex = tokenText.length - 1;
         let numBackslashes = 0;
         while (
-          tokenText.charCodeAt(lastCharIndex - numBackslashes) ===
-          CharacterCodes.backslash
+          tokenText.charCodeAt(lastCharIndex - numBackslashes)
+            === CharacterCodes.backslash
         ) {
           numBackslashes++;
         }
@@ -281,8 +281,8 @@ namespace ts {
               return EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate;
             default:
               return Debug.fail(
-                "Only 'NoSubstitutionTemplateLiteral's and 'TemplateTail's can be unterminated; got SyntaxKind #" +
-                  token
+                "Only 'NoSubstitutionTemplateLiteral's and 'TemplateTail's can be unterminated; got SyntaxKind #"
+                  + token,
               );
           }
         }
@@ -297,7 +297,7 @@ namespace ts {
     end: number,
     offset: number,
     classification: ClassificationType,
-    result: Push<number>
+    result: Push<number>,
   ): void {
     if (classification === ClassificationType.whiteSpace) {
       // Don't bother with whitespace classifications.  They're not needed.
@@ -320,7 +320,7 @@ namespace ts {
 
   function convertClassificationsToResult(
     classifications: Classifications,
-    text: string
+    text: string,
   ): ClassificationResult {
     const entries: ClassificationInfo[] = [];
     const dense = classifications.spans;
@@ -419,7 +419,7 @@ namespace ts {
     // (and a newline).  That way when we lex we'll think we're still in a multiline comment.
     switch (lexState) {
       case EndOfLineState.InDoubleQuoteStringLiteral:
-        return { prefix: '"\\\n' };
+        return { prefix: "\"\\\n" };
       case EndOfLineState.InSingleQuoteStringLiteral:
         return { prefix: "'\\\n" };
       case EndOfLineState.InMultiLineCommentTrivia:
@@ -504,13 +504,13 @@ namespace ts {
     if (isKeyword(token)) {
       return ClassificationType.keyword;
     } else if (
-      isBinaryExpressionOperatorToken(token) ||
-      isPrefixUnaryExpressionOperatorToken(token)
+      isBinaryExpressionOperatorToken(token)
+      || isPrefixUnaryExpressionOperatorToken(token)
     ) {
       return ClassificationType.operator;
     } else if (
-      token >= SyntaxKind.FirstPunctuation &&
-      token <= SyntaxKind.LastPunctuation
+      token >= SyntaxKind.FirstPunctuation
+      && token <= SyntaxKind.LastPunctuation
     ) {
       return ClassificationType.punctuation;
     }
@@ -546,7 +546,7 @@ namespace ts {
     cancellationToken: CancellationToken,
     sourceFile: SourceFile,
     classifiableNames: ReadonlySet<__String>,
-    span: TextSpan
+    span: TextSpan,
   ): ClassifiedSpan[] {
     return convertClassificationsToSpans(
       getEncodedSemanticClassifications(
@@ -554,14 +554,14 @@ namespace ts {
         cancellationToken,
         sourceFile,
         classifiableNames,
-        span
-      )
+        span,
+      ),
     );
   }
 
   function checkForClassificationCancellation(
     cancellationToken: CancellationToken,
-    kind: SyntaxKind
+    kind: SyntaxKind,
   ) {
     // We don't want to actually call back into our host on every node to find out if we've
     // been canceled.  That would be an enormous amount of chattyness, along with the all
@@ -591,14 +591,14 @@ namespace ts {
     cancellationToken: CancellationToken,
     sourceFile: SourceFile,
     classifiableNames: ReadonlySet<__String>,
-    span: TextSpan
+    span: TextSpan,
   ): Classifications {
     const spans: number[] = [];
     sourceFile.forEachChild(function cb(node: Node): void {
       // Only walk into nodes that intersect the requested span.
       if (
-        !node ||
-        !textSpanIntersectsWith(span, node.pos, node.getFullWidth())
+        !node
+        || !textSpanIntersectsWith(span, node.pos, node.getFullWidth())
       ) {
         return;
       }
@@ -608,14 +608,13 @@ namespace ts {
       // could possibly resolve to a type name.  This makes classification run
       // in a third of the time it would normally take.
       if (
-        isIdentifier(node) &&
-        !nodeIsMissing(node) &&
-        classifiableNames.has(node.escapedText)
+        isIdentifier(node)
+        && !nodeIsMissing(node)
+        && classifiableNames.has(node.escapedText)
       ) {
         const symbol = typeChecker.getSymbolAtLocation(node);
-        const type =
-          symbol &&
-          classifySymbol(symbol, getMeaningFromLocation(node), typeChecker);
+        const type = symbol
+          && classifySymbol(symbol, getMeaningFromLocation(node), typeChecker);
         if (type) {
           pushClassification(node.getStart(sourceFile), node.getEnd(), type);
         }
@@ -628,12 +627,12 @@ namespace ts {
     function pushClassification(
       start: number,
       end: number,
-      type: ClassificationType
+      type: ClassificationType,
     ): void {
       const length = end - start;
       Debug.assert(
         length > 0,
-        `Classification had non-positive length of ${length}`
+        `Classification had non-positive length of ${length}`,
       );
       spans.push(start);
       spans.push(length);
@@ -644,7 +643,7 @@ namespace ts {
   function classifySymbol(
     symbol: Symbol,
     meaningAtPosition: SemanticMeaning,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): ClassificationType | undefined {
     const flags = symbol.getFlags();
     if ((flags & SymbolFlags.Classifiable) === SymbolFlags.None) {
@@ -659,16 +658,16 @@ namespace ts {
       // Only classify a module as such if
       //  - It appears in a namespace context.
       //  - There exists a module declaration which actually impacts the value side.
-      return meaningAtPosition & SemanticMeaning.Namespace ||
-        (meaningAtPosition & SemanticMeaning.Value &&
-          hasValueSideModule(symbol))
+      return meaningAtPosition & SemanticMeaning.Namespace
+          || (meaningAtPosition & SemanticMeaning.Value
+            && hasValueSideModule(symbol))
         ? ClassificationType.moduleName
         : undefined;
     } else if (flags & SymbolFlags.Alias) {
       return classifySymbol(
         checker.getAliasedSymbol(symbol),
         meaningAtPosition,
-        checker
+        checker,
       );
     } else if (meaningAtPosition & SemanticMeaning.Type) {
       return flags & SymbolFlags.Interface
@@ -686,13 +685,13 @@ namespace ts {
     return some(
       symbol.declarations,
       (declaration) =>
-        isModuleDeclaration(declaration) &&
-        getModuleInstanceState(declaration) === ModuleInstanceState.Instantiated
+        isModuleDeclaration(declaration)
+        && getModuleInstanceState(declaration) === ModuleInstanceState.Instantiated,
     );
   }
 
   function getClassificationTypeName(
-    type: ClassificationType
+    type: ClassificationType,
   ): ClassificationTypeNames {
     switch (type) {
       case ClassificationType.comment:
@@ -749,7 +748,7 @@ namespace ts {
   }
 
   function convertClassificationsToSpans(
-    classifications: Classifications
+    classifications: Classifications,
   ): ClassifiedSpan[] {
     Debug.assert(classifications.spans.length % 3 === 0);
     const dense = classifications.spans;
@@ -768,10 +767,10 @@ namespace ts {
   export function getSyntacticClassifications(
     cancellationToken: CancellationToken,
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ): ClassifiedSpan[] {
     return convertClassificationsToSpans(
-      getEncodedSyntacticClassifications(cancellationToken, sourceFile, span)
+      getEncodedSyntacticClassifications(cancellationToken, sourceFile, span),
     );
   }
 
@@ -779,7 +778,7 @@ namespace ts {
   export function getEncodedSyntacticClassifications(
     cancellationToken: CancellationToken,
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ): Classifications {
     const spanStart = span.start;
     const spanLength = span.length;
@@ -789,13 +788,13 @@ namespace ts {
       ScriptTarget.Latest,
       /*skipTrivia*/ false,
       sourceFile.languageVariant,
-      sourceFile.text
+      sourceFile.text,
     );
     const mergeConflictScanner = createScanner(
       ScriptTarget.Latest,
       /*skipTrivia*/ false,
       sourceFile.languageVariant,
-      sourceFile.text
+      sourceFile.text,
     );
 
     const result: number[] = [];
@@ -806,7 +805,7 @@ namespace ts {
     function pushClassification(
       start: number,
       length: number,
-      type: ClassificationType
+      type: ClassificationType,
     ) {
       result.push(start);
       result.push(length);
@@ -855,8 +854,8 @@ namespace ts {
             // for the <<<<<<< and >>>>>>> markers, we just add them in as comments
             // in the classification stream.
             if (
-              ch === CharacterCodes.lessThan ||
-              ch === CharacterCodes.greaterThan
+              ch === CharacterCodes.lessThan
+              || ch === CharacterCodes.greaterThan
             ) {
               pushClassification(start, width, ClassificationType.comment);
               continue;
@@ -865,7 +864,7 @@ namespace ts {
             // for the ||||||| and ======== markers, add a comment for the first line,
             // and then lex all subsequent lines up until the end of the conflict marker.
             Debug.assert(
-              ch === CharacterCodes.bar || ch === CharacterCodes.equals
+              ch === CharacterCodes.bar || ch === CharacterCodes.equals,
             );
             classifyDisabledMergeCode(text, start, end);
             break;
@@ -884,7 +883,7 @@ namespace ts {
       token: Node,
       kind: SyntaxKind,
       start: number,
-      width: number
+      width: number,
     ) {
       if (kind === SyntaxKind.MultiLineCommentTrivia) {
         // See if this is a doc comment.  If so, we'll classify certain portions of it
@@ -892,7 +891,7 @@ namespace ts {
         const docCommentAndDiagnostics = parseIsolatedJSDocComment(
           sourceFile.text,
           start,
-          width
+          width,
         );
         if (docCommentAndDiagnostics && docCommentAndDiagnostics.jsDoc) {
           // TODO: This should be predicated on `token["kind"]` being compatible with `HasJSDoc["kind"]`
@@ -929,7 +928,7 @@ namespace ts {
           pushClassification(
             tag.tagName.pos,
             tag.tagName.end - tag.tagName.pos,
-            ClassificationType.docCommentTagName
+            ClassificationType.docCommentTagName,
           ); // e.g. "param"
 
           pos = tag.tagName.end;
@@ -939,14 +938,12 @@ namespace ts {
             case SyntaxKind.JSDocParameterTag:
               const param = tag as JSDocParameterTag;
               processJSDocParameterTag(param);
-              commentStart =
-                (param.isNameFirst && param.typeExpression?.end) ||
-                param.name.end;
+              commentStart = (param.isNameFirst && param.typeExpression?.end)
+                || param.name.end;
               break;
             case SyntaxKind.JSDocPropertyTag:
               const prop = tag as JSDocPropertyTag;
-              commentStart =
-                (prop.isNameFirst && prop.typeExpression?.end) || prop.name.end;
+              commentStart = (prop.isNameFirst && prop.typeExpression?.end) || prop.name.end;
               break;
             case SyntaxKind.JSDocTemplateTag:
               processJSDocTemplateTag(tag as JSDocTemplateTag);
@@ -955,11 +952,10 @@ namespace ts {
               break;
             case SyntaxKind.JSDocTypedefTag:
               const type = tag as JSDocTypedefTag;
-              commentStart =
-                (type.typeExpression?.kind === SyntaxKind.JSDocTypeExpression &&
-                  type.fullName?.end) ||
-                type.typeExpression?.end ||
-                commentStart;
+              commentStart = (type.typeExpression?.kind === SyntaxKind.JSDocTypeExpression
+                && type.fullName?.end)
+                || type.typeExpression?.end
+                || commentStart;
               break;
             case SyntaxKind.JSDocCallbackTag:
               commentStart = (tag as JSDocCallbackTag).typeExpression.end;
@@ -977,8 +973,7 @@ namespace ts {
             case SyntaxKind.JSDocReturnTag:
               processElement((tag as JSDocReturnTag).typeExpression);
               pos = tag.end;
-              commentStart =
-                (tag as JSDocReturnTag).typeExpression?.end || commentStart;
+              commentStart = (tag as JSDocReturnTag).typeExpression?.end || commentStart;
               break;
             case SyntaxKind.JSDocSeeTag:
               commentStart = (tag as JSDocSeeTag).name?.end || commentStart;
@@ -992,7 +987,7 @@ namespace ts {
           if (typeof tag.comment === "object") {
             pushCommentRange(
               tag.comment.pos,
-              tag.comment.end - tag.comment.pos
+              tag.comment.end - tag.comment.pos,
             );
           } else if (typeof tag.comment === "string") {
             pushCommentRange(commentStart, tag.end - commentStart);
@@ -1012,7 +1007,7 @@ namespace ts {
           pushClassification(
             tag.name.pos,
             tag.name.end - tag.name.pos,
-            ClassificationType.parameterName
+            ClassificationType.parameterName,
           );
           pos = tag.name.end;
         }
@@ -1028,7 +1023,7 @@ namespace ts {
           pushClassification(
             tag.name.pos,
             tag.name.end - tag.name.pos,
-            ClassificationType.parameterName
+            ClassificationType.parameterName,
           );
           pos = tag.name.end;
         }
@@ -1037,10 +1032,9 @@ namespace ts {
 
     function tryClassifyTripleSlashComment(
       start: number,
-      width: number
+      width: number,
     ): boolean {
-      const tripleSlashXMLCommentRegEx =
-        /^(\/\/\/\s*)(<)(?:(\S+)((?:[^/]|\/[^>])*)(\/>)?)?/im;
+      const tripleSlashXMLCommentRegEx = /^(\/\/\/\s*)(<)(?:(\S+)((?:[^/]|\/[^>])*)(\/>)?)?/im;
       // Require a leading whitespace character (the parser already does) to prevent terrible backtracking performance
       const attributeRegex = /(\s)(\S+)(\s*)(=)(\s*)('[^']+'|"[^"]+")/gim;
 
@@ -1070,7 +1064,7 @@ namespace ts {
       pushClassification(
         pos,
         match[3].length,
-        ClassificationType.jsxSelfClosingTagName
+        ClassificationType.jsxSelfClosingTagName,
       ); // element name
       pos += match[3].length;
 
@@ -1091,7 +1085,7 @@ namespace ts {
         pushClassification(
           attrPos,
           attrMatch[2].length,
-          ClassificationType.jsxAttribute
+          ClassificationType.jsxAttribute,
         ); // attribute name
         attrPos += attrMatch[2].length;
 
@@ -1103,7 +1097,7 @@ namespace ts {
         pushClassification(
           attrPos,
           attrMatch[4].length,
-          ClassificationType.operator
+          ClassificationType.operator,
         ); // =
         attrPos += attrMatch[4].length;
 
@@ -1115,7 +1109,7 @@ namespace ts {
         pushClassification(
           attrPos,
           attrMatch[6].length,
-          ClassificationType.jsxAttributeStringLiteralValue
+          ClassificationType.jsxAttributeStringLiteralValue,
         ); // attribute value
         attrPos += attrMatch[6].length;
       }
@@ -1130,7 +1124,7 @@ namespace ts {
         pushClassification(
           pos,
           match[5].length,
-          ClassificationType.punctuation
+          ClassificationType.punctuation,
         ); // />
         pos += match[5].length;
       }
@@ -1152,7 +1146,7 @@ namespace ts {
     function classifyDisabledMergeCode(
       text: string,
       start: number,
-      end: number
+      end: number,
     ) {
       // Classify the line that the ||||||| or ======= marker is on as a comment.
       // Then just lex all further tokens and add them to the result.
@@ -1196,23 +1190,21 @@ namespace ts {
 
       const classifiedElementName = tryClassifyJsxElementName(node);
       if (
-        !isToken(node) &&
-        node.kind !== SyntaxKind.JsxText &&
-        classifiedElementName === undefined
+        !isToken(node)
+        && node.kind !== SyntaxKind.JsxText
+        && classifiedElementName === undefined
       ) {
         return false;
       }
 
-      const tokenStart =
-        node.kind === SyntaxKind.JsxText
-          ? node.pos
-          : classifyLeadingTriviaAndGetTokenStart(node);
+      const tokenStart = node.kind === SyntaxKind.JsxText
+        ? node.pos
+        : classifyLeadingTriviaAndGetTokenStart(node);
 
       const tokenWidth = node.end - tokenStart;
       Debug.assert(tokenWidth >= 0);
       if (tokenWidth > 0) {
-        const type =
-          classifiedElementName || classifyTokenType(node.kind, node);
+        const type = classifiedElementName || classifyTokenType(node.kind, node);
         if (type) {
           pushClassification(tokenStart, tokenWidth, type);
         }
@@ -1222,7 +1214,7 @@ namespace ts {
     }
 
     function tryClassifyJsxElementName(
-      token: Node
+      token: Node,
     ): ClassificationType | undefined {
       switch (token.parent && token.parent.kind) {
         case SyntaxKind.JsxOpeningElement:
@@ -1254,7 +1246,7 @@ namespace ts {
     // classify based on that instead.
     function classifyTokenType(
       tokenKind: SyntaxKind,
-      token?: Node
+      token?: Node,
     ): ClassificationType | undefined {
       if (isKeyword(tokenKind)) {
         return ClassificationType.keyword;
@@ -1263,8 +1255,8 @@ namespace ts {
       // Special case `<` and `>`: If they appear in a generic context they are punctuation,
       // not operators.
       if (
-        tokenKind === SyntaxKind.LessThanToken ||
-        tokenKind === SyntaxKind.GreaterThanToken
+        tokenKind === SyntaxKind.LessThanToken
+        || tokenKind === SyntaxKind.GreaterThanToken
       ) {
         // If the node owning the token has a type argument list or type parameter list, then
         // we can effectively assume that a '<' and '>' belong to those lists.
@@ -1279,20 +1271,20 @@ namespace ts {
           if (tokenKind === SyntaxKind.EqualsToken) {
             // the '=' in a variable declaration is special cased here.
             if (
-              parent.kind === SyntaxKind.VariableDeclaration ||
-              parent.kind === SyntaxKind.PropertyDeclaration ||
-              parent.kind === SyntaxKind.Parameter ||
-              parent.kind === SyntaxKind.JsxAttribute
+              parent.kind === SyntaxKind.VariableDeclaration
+              || parent.kind === SyntaxKind.PropertyDeclaration
+              || parent.kind === SyntaxKind.Parameter
+              || parent.kind === SyntaxKind.JsxAttribute
             ) {
               return ClassificationType.operator;
             }
           }
 
           if (
-            parent.kind === SyntaxKind.BinaryExpression ||
-            parent.kind === SyntaxKind.PrefixUnaryExpression ||
-            parent.kind === SyntaxKind.PostfixUnaryExpression ||
-            parent.kind === SyntaxKind.ConditionalExpression
+            parent.kind === SyntaxKind.BinaryExpression
+            || parent.kind === SyntaxKind.PrefixUnaryExpression
+            || parent.kind === SyntaxKind.PostfixUnaryExpression
+            || parent.kind === SyntaxKind.ConditionalExpression
           ) {
             return ClassificationType.operator;
           }
@@ -1371,7 +1363,7 @@ namespace ts {
           spanStart,
           spanLength,
           element.pos,
-          element.getFullWidth()
+          element.getFullWidth(),
         )
       ) {
         checkForClassificationCancellation(cancellationToken, element.kind);

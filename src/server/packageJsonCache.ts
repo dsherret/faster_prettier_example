@@ -11,7 +11,7 @@ namespace ts.server {
   }
 
   export function createPackageJsonCache(
-    host: ProjectService
+    host: ProjectService,
   ): PackageJsonCache {
     const packageJsons = new Map<string, PackageJsonInfo>();
     const directoriesWithoutPackageJson = new Map<string, true>();
@@ -35,7 +35,7 @@ namespace ts.server {
             return true;
           }
           const packageJsonFileName = host.toPath(
-            combinePaths(ancestor, "package.json")
+            combinePaths(ancestor, "package.json"),
           );
           if (tryFileExists(host, packageJsonFileName)) {
             addOrUpdate(packageJsonFileName);
@@ -48,7 +48,7 @@ namespace ts.server {
 
     function addOrUpdate(fileName: Path) {
       const packageJsonInfo = Debug.checkDefined(
-        createPackageJsonInfo(fileName, host.host)
+        createPackageJsonInfo(fileName, host.host),
       );
       packageJsons.set(fileName, packageJsonInfo);
       directoriesWithoutPackageJson.delete(getDirectoryPath(fileName));

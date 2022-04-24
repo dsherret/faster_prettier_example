@@ -13,6 +13,6 @@ interface String {
    */
   replaceAll(
     searchValue: string | RegExp,
-    replacer: (substring: string, ...args: any[]) => string
+    replacer: (substring: string, ...args: any[]) => string,
   ): string;
 }

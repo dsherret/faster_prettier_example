@@ -3,7 +3,7 @@ interface AggregateError extends Error {
 }
 
 interface AggregateErrorConstructor {
-  new (errors: Iterable<any>, message?: string): AggregateError;
+  new(errors: Iterable<any>, message?: string): AggregateError;
   (errors: Iterable<any>, message?: string): AggregateError;
   readonly prototype: AggregateError;
 }
@@ -20,7 +20,7 @@ interface PromiseConstructor {
    * @returns A new Promise.
    */
   any<T extends readonly unknown[] | []>(
-    values: T
+    values: T,
   ): Promise<Awaited<T[number]>>;
 
   /**

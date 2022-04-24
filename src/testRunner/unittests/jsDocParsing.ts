@@ -6,12 +6,12 @@ namespace ts {
           const typeAndDiagnostics = parseJSDocTypeExpressionForTests(content);
           assert.isTrue(
             typeAndDiagnostics && typeAndDiagnostics.diagnostics.length === 0,
-            "no errors issued"
+            "no errors issued",
           );
 
           Harness.Baseline.runBaseline(
             "JSDocParsing/TypeExpressions.parsesCorrectly." + name + ".json",
-            Utils.sourceFileToJSON(typeAndDiagnostics!.jsDocTypeExpression.type)
+            Utils.sourceFileToJSON(typeAndDiagnostics!.jsDocTypeExpression.type),
           );
         });
       }
@@ -44,11 +44,11 @@ namespace ts {
         parsesCorrectly("unionType", "{(number|string)}");
         parsesCorrectly(
           "unionTypeWithLeadingOperator",
-          "{( | number | string )}"
+          "{( | number | string )}",
         );
         parsesCorrectly(
           "unionTypeWithOneElementAndLeadingOperator",
-          "{( | number )}"
+          "{( | number )}",
         );
         parsesCorrectly("topLevelNoParenUnionType", "{number|string}");
         parsesCorrectly("functionType1", "{function()}");
@@ -105,8 +105,8 @@ namespace ts {
           }
           if (comment.diagnostics.length > 0) {
             Debug.fail(
-              "Comment has at least one diagnostic: " +
-                comment.diagnostics[0].messageText
+              "Comment has at least one diagnostic: "
+                + comment.diagnostics[0].messageText,
             );
           }
 
@@ -118,8 +118,8 @@ namespace ts {
                 v && v.pos !== undefined
                   ? JSON.parse(Utils.sourceFileToJSON(v))
                   : v,
-              4
-            )
+              4,
+            ),
           );
         });
       }
@@ -137,52 +137,52 @@ namespace ts {
           `/**
   * @type {number}
   * @type {string}
-  */`
+  */`,
         );
         parsesIncorrectly(
           "multipleReturnTypes",
           `/**
   * @return {number}
   * @return {string}
-  */`
+  */`,
         );
         parsesIncorrectly(
           "noTypeParameters",
           `/**
   * @template
-  */`
+  */`,
         );
         parsesIncorrectly(
           "trailingTypeParameterComma",
           `/**
   * @template T,
-  */`
+  */`,
         );
         parsesIncorrectly(
           "paramWithoutName",
           `/**
   * @param {number}
-  */`
+  */`,
         );
         parsesIncorrectly(
           "paramWithoutTypeOrName",
           `/**
   * @param
-  */`
+  */`,
         );
 
         parsesIncorrectly(
           "noType",
           `/**
 * @type
-*/`
+*/`,
         );
 
         parsesIncorrectly(
           "@augments with no type",
           `/**
  * @augments
- */`
+ */`,
         );
       });
 
@@ -193,21 +193,21 @@ namespace ts {
           "noLeadingAsterisk",
           `/**
     @type {number}
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "noReturnType",
           `/**
   * @return
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "leadingAsterisk",
           `/**
   * @type {number}
-  */`
+  */`,
         );
 
         parsesCorrectly("asteriskAfterPreamble", "/** * @type {number} */");
@@ -216,35 +216,35 @@ namespace ts {
           "typeTag",
           `/**
   * @type {number}
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "returnTag1",
           `/**
   * @return {number}
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "returnTag2",
           `/**
   * @return {number} Description text follows
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "returnsTag1",
           `/**
   * @returns {number}
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "oneParamTag",
           `/**
   * @param {number} name1
-  */`
+  */`,
         );
 
         parsesCorrectly(
@@ -252,112 +252,112 @@ namespace ts {
           `/**
   * @param {number} name1
   * @param {number} name2
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "paramTag1",
           `/**
   * @param {number} name1 Description text follows
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "paramTagBracketedName1",
           `/**
   * @param {number} [name1] Description text follows
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "paramTagBracketedName2",
           `/**
   * @param {number} [ name1 = 1] Description text follows
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "twoParamTagOnSameLine",
           `/**
   * @param {number} name1 @param {number} name2
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "paramTagNameThenType1",
           `/**
   * @param name1 {number}
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "paramTagNameThenType2",
           `/**
   * @param name1 {number} Description
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "argSynonymForParamTag",
           `/**
   * @arg {number} name1 Description
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "argumentSynonymForParamTag",
           `/**
   * @argument {number} name1 Description
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "templateTag",
           `/**
   * @template T
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "templateTag2",
           `/**
   * @template K,V
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "templateTag3",
           `/**
   * @template K ,V
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "templateTag4",
           `/**
   * @template K, V
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "templateTag5",
           `/**
   * @template K , V
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "templateTag6",
           `/**
   * @template K , V Description of type parameters.
-  */`
+  */`,
         );
 
         parsesCorrectly(
           "paramWithoutType",
           `/**
   * @param foo
-  */`
+  */`,
         );
         parsesCorrectly(
           "typedefTagWithChildrenTags",
@@ -366,14 +366,14 @@ namespace ts {
   * @type {Object}
   * @property {number} age
   * @property {string} name
-  */`
+  */`,
         );
         parsesCorrectly(
           "less-than and greater-than characters",
           `/**
  * @param x hi
 < > still part of the previous comment
- */`
+ */`,
         );
 
         parsesCorrectly(
@@ -381,7 +381,7 @@ namespace ts {
           `/**
 * @param {object} o Doc doc
 * @param {string} o.f Doc for f
-*/`
+*/`,
         );
         parsesCorrectly(
           "@link tags",
@@ -403,7 +403,7 @@ oh.no
  * nope
  * }, because of the intermediate asterisks.
  * @author Alfa Romero <a@parsing.com> See my home page: {@link https://example.com}
- */`
+ */`,
         );
         parsesCorrectly(
           "authorTag",
@@ -425,7 +425,7 @@ oh.no
  *   <the email @address> must be on the same line to parse
  * @author Long Comment <long@comment.org> I
  *  want to keep commenting down here, I dunno.
- */`
+ */`,
         );
 
         parsesCorrectly(
@@ -433,17 +433,17 @@ oh.no
           `/**
  * @example
  * Some\n\n * text\r\n * with newlines.
- */`
+ */`,
         );
         parsesCorrectly(
           "Chained tags, no leading whitespace",
-          `/**@a @b @c@d*/`
+          `/**@a @b @c@d*/`,
         );
         parsesCorrectly("Initial star is not a tag", `/***@a*/`);
         parsesCorrectly("Initial star space is not a tag", `/*** @a*/`);
         parsesCorrectly(
           "Initial email address is not a tag",
-          `/**bill@example.com*/`
+          `/**bill@example.com*/`,
         );
         parsesCorrectly(
           "no space before @ is not a new tag",
@@ -453,13 +453,13 @@ oh.no
 @zerowidth
 *@singlestar
 **@doublestar
- */`
+ */`,
         );
         parsesCorrectly(
           "@@ does not start a new tag",
           `/**
  * @param this is (@@fine@@and) is one comment
- */`
+ */`,
         );
       });
     });
@@ -469,7 +469,7 @@ oh.no
           "foo.ts",
           "/** comment */var a = true;",
           ScriptTarget.ES5,
-          /*setParentNodes*/ true
+          /*setParentNodes*/ true,
         );
         assert.isDefined(root);
         assert.equal(root.kind, SyntaxKind.SourceFile);
@@ -484,7 +484,7 @@ oh.no
           "foo.ts",
           "var a = true;/** comment */",
           ScriptTarget.ES5,
-          /*setParentNodes*/ true
+          /*setParentNodes*/ true,
         );
         assert.isDefined(root);
         const last = root.getLastToken();
@@ -498,7 +498,7 @@ oh.no
           "foo.ts",
           "/** */var a = true;",
           ScriptTarget.ES5,
-          /*setParentNodes*/ false
+          /*setParentNodes*/ false,
         );
         root.statements[0].getStart(root, /*includeJsdocComment*/ true);
       });
@@ -508,7 +508,7 @@ oh.no
         const doc = parseIsolatedJSDocComment("/**\n    @template\n*/");
         assert.equal(
           (doc?.jsDoc.tags?.[0] as JSDocTemplateTag).typeParameters.length,
-          0
+          0,
         );
       });
     });

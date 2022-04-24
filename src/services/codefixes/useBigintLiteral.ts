@@ -10,9 +10,7 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToUseBigintLiteral(context) {
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        makeChange(t, context.sourceFile, context.span)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => makeChange(t, context.sourceFile, context.span));
       if (changes.length > 0) {
         return [
           createCodeFixAction(
@@ -20,27 +18,25 @@ namespace ts.codefix {
             changes,
             Diagnostics.Convert_to_a_bigint_numeric_literal,
             fixId,
-            Diagnostics.Convert_all_to_bigint_numeric_literals
+            Diagnostics.Convert_all_to_bigint_numeric_literals,
           ),
         ];
       }
     },
     fixIds: [fixId],
     getAllCodeActions: (context) => {
-      return codeFixAll(context, errorCodes, (changes, diag) =>
-        makeChange(changes, diag.file, diag)
-      );
+      return codeFixAll(context, errorCodes, (changes, diag) => makeChange(changes, diag.file, diag));
     },
   });
 
   function makeChange(
     changeTracker: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    span: TextSpan
+    span: TextSpan,
   ) {
     const numericLiteral = tryCast(
       getTokenAtPosition(sourceFile, span.start),
-      isNumericLiteral
+      isNumericLiteral,
     );
     if (!numericLiteral) {
       return;
@@ -52,7 +48,7 @@ namespace ts.codefix {
     changeTracker.replaceNode(
       sourceFile,
       numericLiteral,
-      factory.createBigIntLiteral(newText)
+      factory.createBigIntLiteral(newText),
     );
   }
 }

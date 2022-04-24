@@ -9,15 +9,14 @@ interface ClassificationEntry {
 
 describe("unittests:: services:: Colorization", () => {
   // Use the shim adapter to ensure test coverage of the shim layer for the classifier
-  const languageServiceAdapter =
-    new Harness.LanguageService.ShimLanguageServiceAdapter(
-      /*preprocessToResolve*/ false
-    );
+  const languageServiceAdapter = new Harness.LanguageService.ShimLanguageServiceAdapter(
+    /*preprocessToResolve*/ false,
+  );
   const classifier = languageServiceAdapter.getClassifier();
 
   function getEntryAtPosition(
     result: ts.ClassificationResult,
-    position: number
+    position: number,
   ) {
     let entryPosition = 0;
     for (const entry of result.entries) {
@@ -60,7 +59,7 @@ describe("unittests:: services:: Colorization", () => {
   function createClassification(
     value: string,
     classification: ts.TokenClass,
-    position?: number
+    position?: number,
   ): ClassificationEntry {
     return { value, classification, position };
   }
@@ -73,7 +72,7 @@ describe("unittests:: services:: Colorization", () => {
     const result = classifier.getClassificationsForLine(
       text,
       initialEndOfLineState,
-      /*syntacticClassifierAbsent*/ false
+      /*syntacticClassifierAbsent*/ false,
     );
 
     for (const expectedEntry of expectedEntries) {
@@ -81,46 +80,45 @@ describe("unittests:: services:: Colorization", () => {
         assert.equal(
           result.finalLexState,
           expectedEntry.value,
-          "final endOfLineState does not match expected."
+          "final endOfLineState does not match expected.",
         );
       } else {
-        const actualEntryPosition =
-          expectedEntry.position !== undefined
-            ? expectedEntry.position
-            : text.indexOf(expectedEntry.value);
+        const actualEntryPosition = expectedEntry.position !== undefined
+          ? expectedEntry.position
+          : text.indexOf(expectedEntry.value);
         assert(
           actualEntryPosition >= 0,
-          "token: '" +
-            expectedEntry.value +
-            "' does not exit in text: '" +
-            text +
-            "'."
+          "token: '"
+            + expectedEntry.value
+            + "' does not exit in text: '"
+            + text
+            + "'.",
         );
 
         const actualEntry = getEntryAtPosition(result, actualEntryPosition)!;
 
         assert(
           actualEntry,
-          "Could not find classification entry for '" +
-            expectedEntry.value +
-            "' at position: " +
-            actualEntryPosition
+          "Could not find classification entry for '"
+            + expectedEntry.value
+            + "' at position: "
+            + actualEntryPosition,
         );
         assert.equal(
           actualEntry.classification,
           expectedEntry.classification,
-          "Classification class does not match expected. Expected: " +
-            ts.TokenClass[expectedEntry.classification] +
-            ", Actual: " +
-            ts.TokenClass[actualEntry.classification]
+          "Classification class does not match expected. Expected: "
+            + ts.TokenClass[expectedEntry.classification]
+            + ", Actual: "
+            + ts.TokenClass[actualEntry.classification],
         );
         assert.equal(
           actualEntry.length,
           expectedEntry.value.length,
-          "Classification length does not match expected. Expected: " +
-            ts.TokenClass[expectedEntry.value.length] +
-            ", Actual: " +
-            ts.TokenClass[actualEntry.length]
+          "Classification length does not match expected. Expected: "
+            + ts.TokenClass[expectedEntry.value.length]
+            + ", Actual: "
+            + ts.TokenClass[actualEntry.length],
         );
       }
     }
@@ -129,7 +127,7 @@ describe("unittests:: services:: Colorization", () => {
   describe("test getClassifications", () => {
     it("returns correct token classes", () => {
       testLexicalClassification(
-        'var x: string = "foo" ?? "bar"; //Hello',
+        "var x: string = \"foo\" ?? \"bar\"; //Hello",
         ts.EndOfLineState.None,
         keyword("var"),
         whitespace(" "),
@@ -137,12 +135,12 @@ describe("unittests:: services:: Colorization", () => {
         punctuation(":"),
         keyword("string"),
         operator("="),
-        stringLiteral('"foo"'),
+        stringLiteral("\"foo\""),
         whitespace(" "),
         operator("??"),
-        stringLiteral('"foo"'),
+        stringLiteral("\"foo\""),
         comment("//Hello"),
-        punctuation(";")
+        punctuation(";"),
       );
     });
 
@@ -154,7 +152,7 @@ describe("unittests:: services:: Colorization", () => {
         whitespace(" "),
         operator("/"),
         numberLiteral("2"),
-        comment("// comment")
+        comment("// comment"),
       );
     });
 
@@ -168,7 +166,7 @@ describe("unittests:: services:: Colorization", () => {
         numberLiteral("2"),
         numberLiteral("3"),
         numberLiteral("4"),
-        operator(",")
+        operator(","),
       );
     });
 
@@ -177,7 +175,7 @@ describe("unittests:: services:: Colorization", () => {
         "'line1\\",
         ts.EndOfLineState.None,
         stringLiteral("'line1\\"),
-        finalEndOfLineState(ts.EndOfLineState.InSingleQuoteStringLiteral)
+        finalEndOfLineState(ts.EndOfLineState.InSingleQuoteStringLiteral),
       );
     });
 
@@ -186,7 +184,7 @@ describe("unittests:: services:: Colorization", () => {
         "'line1\\\\\\",
         ts.EndOfLineState.None,
         stringLiteral("'line1\\\\\\"),
-        finalEndOfLineState(ts.EndOfLineState.InSingleQuoteStringLiteral)
+        finalEndOfLineState(ts.EndOfLineState.InSingleQuoteStringLiteral),
       );
     });
 
@@ -195,7 +193,7 @@ describe("unittests:: services:: Colorization", () => {
         "'line1",
         ts.EndOfLineState.None,
         stringLiteral("'line1"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -204,7 +202,7 @@ describe("unittests:: services:: Colorization", () => {
         "'line1\\\\",
         ts.EndOfLineState.None,
         stringLiteral("'line1\\\\"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -213,7 +211,7 @@ describe("unittests:: services:: Colorization", () => {
         "'line1\\\\\\\\",
         ts.EndOfLineState.None,
         stringLiteral("'line1\\\\\\\\"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -222,7 +220,7 @@ describe("unittests:: services:: Colorization", () => {
         "\\",
         ts.EndOfLineState.InDoubleQuoteStringLiteral,
         stringLiteral("\\"),
-        finalEndOfLineState(ts.EndOfLineState.InDoubleQuoteStringLiteral)
+        finalEndOfLineState(ts.EndOfLineState.InDoubleQuoteStringLiteral),
       );
     });
 
@@ -231,7 +229,7 @@ describe("unittests:: services:: Colorization", () => {
         "\\",
         ts.EndOfLineState.InDoubleQuoteStringLiteral,
         stringLiteral("\\"),
-        finalEndOfLineState(ts.EndOfLineState.InDoubleQuoteStringLiteral)
+        finalEndOfLineState(ts.EndOfLineState.InDoubleQuoteStringLiteral),
       );
     });
 
@@ -240,7 +238,7 @@ describe("unittests:: services:: Colorization", () => {
         "  ",
         ts.EndOfLineState.InDoubleQuoteStringLiteral,
         stringLiteral("  "),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -249,7 +247,7 @@ describe("unittests:: services:: Colorization", () => {
         "\\\\",
         ts.EndOfLineState.InDoubleQuoteStringLiteral,
         stringLiteral("\\\\"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -258,7 +256,7 @@ describe("unittests:: services:: Colorization", () => {
         "\\\\\\\\",
         ts.EndOfLineState.InDoubleQuoteStringLiteral,
         stringLiteral("\\\\\\\\"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -267,7 +265,7 @@ describe("unittests:: services:: Colorization", () => {
         "'",
         ts.EndOfLineState.InSingleQuoteStringLiteral,
         stringLiteral("'"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -276,7 +274,7 @@ describe("unittests:: services:: Colorization", () => {
         "/*",
         ts.EndOfLineState.None,
         comment("/*"),
-        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia)
+        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia),
       );
     });
 
@@ -285,7 +283,7 @@ describe("unittests:: services:: Colorization", () => {
         "   */     ",
         ts.EndOfLineState.InMultiLineCommentTrivia,
         comment("   */"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -294,7 +292,7 @@ describe("unittests:: services:: Colorization", () => {
         "LOREM IPSUM DOLOR   ",
         ts.EndOfLineState.InMultiLineCommentTrivia,
         comment("LOREM IPSUM DOLOR   "),
-        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia)
+        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia),
       );
     });
 
@@ -303,7 +301,7 @@ describe("unittests:: services:: Colorization", () => {
         "   /*/",
         ts.EndOfLineState.None,
         comment("/*/"),
-        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia)
+        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia),
       );
     });
 
@@ -312,7 +310,7 @@ describe("unittests:: services:: Colorization", () => {
         "/* ",
         ts.EndOfLineState.None,
         comment("/* "),
-        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia)
+        finalEndOfLineState(ts.EndOfLineState.InMultiLineCommentTrivia),
       );
     });
 
@@ -320,15 +318,15 @@ describe("unittests:: services:: Colorization", () => {
       testLexicalClassification(
         "a.var",
         ts.EndOfLineState.None,
-        identifier("var")
+        identifier("var"),
       );
     });
 
     it("correctly classifies a string literal after a dot", () => {
       testLexicalClassification(
-        'a."var"',
+        "a.\"var\"",
         ts.EndOfLineState.None,
-        stringLiteral('"var"')
+        stringLiteral("\"var\""),
       );
     });
 
@@ -339,7 +337,7 @@ describe("unittests:: services:: Colorization", () => {
         identifier("a"),
         punctuation("."),
         comment("/*hello world*/"),
-        identifier("var")
+        identifier("var"),
       );
     });
 
@@ -348,7 +346,7 @@ describe("unittests:: services:: Colorization", () => {
         "   x  .\tfoo ()",
         ts.EndOfLineState.None,
         identifier("x"),
-        identifier("foo")
+        identifier("foo"),
       );
     });
 
@@ -357,7 +355,7 @@ describe("unittests:: services:: Colorization", () => {
         "var",
         ts.EndOfLineState.None,
         keyword("var"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -367,7 +365,7 @@ describe("unittests:: services:: Colorization", () => {
         ts.EndOfLineState.None,
         keyword("public"),
         keyword("static"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       testLexicalClassification(
@@ -375,7 +373,7 @@ describe("unittests:: services:: Colorization", () => {
         ts.EndOfLineState.None,
         keyword("public"),
         identifier("var"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -384,7 +382,7 @@ describe("unittests:: services:: Colorization", () => {
         "`number number public string`",
         ts.EndOfLineState.None,
         stringLiteral("`number number public string`"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
     it("classifies substitution parts of a template string correctly", () => {
@@ -398,7 +396,7 @@ describe("unittests:: services:: Colorization", () => {
         stringLiteral("}' string '${"),
         stringLiteral("'hello'"),
         stringLiteral("}'`"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
     it("classifies an unterminated no substitution template string correctly", () => {
@@ -407,8 +405,8 @@ describe("unittests:: services:: Colorization", () => {
         ts.EndOfLineState.None,
         stringLiteral("`hello world"),
         finalEndOfLineState(
-          ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate
-        )
+          ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate,
+        ),
       );
     });
     it("classifies the entire line of an unterminated multiline no-substitution/head template", () => {
@@ -417,8 +415,8 @@ describe("unittests:: services:: Colorization", () => {
         ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate,
         stringLiteral("..."),
         finalEndOfLineState(
-          ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate
-        )
+          ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate,
+        ),
       );
     });
     it("classifies the entire line of an unterminated multiline template middle/end", () => {
@@ -426,7 +424,7 @@ describe("unittests:: services:: Colorization", () => {
         "...",
         ts.EndOfLineState.InTemplateMiddleOrTail,
         stringLiteral("..."),
-        finalEndOfLineState(ts.EndOfLineState.InTemplateMiddleOrTail)
+        finalEndOfLineState(ts.EndOfLineState.InTemplateMiddleOrTail),
       );
     });
     it("classifies a termination of a multiline template head", () => {
@@ -434,7 +432,7 @@ describe("unittests:: services:: Colorization", () => {
         "...${",
         ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate,
         stringLiteral("...${"),
-        finalEndOfLineState(ts.EndOfLineState.InTemplateSubstitutionPosition)
+        finalEndOfLineState(ts.EndOfLineState.InTemplateSubstitutionPosition),
       );
     });
     it("classifies the termination of a multiline no substitution template", () => {
@@ -442,7 +440,7 @@ describe("unittests:: services:: Colorization", () => {
         "...`",
         ts.EndOfLineState.InTemplateHeadOrNoSubstitutionTemplate,
         stringLiteral("...`"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
     it("classifies the substitution parts and middle/tail of a multiline template string", () => {
@@ -454,7 +452,7 @@ describe("unittests:: services:: Colorization", () => {
         operator("+"),
         numberLiteral("1"),
         stringLiteral("}...`"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
     it("classifies a template middle and propagates the end of line state", () => {
@@ -466,7 +464,7 @@ describe("unittests:: services:: Colorization", () => {
         operator("+"),
         numberLiteral("1"),
         stringLiteral("}...`"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
     it("classifies substitution expressions with curly braces appropriately", () => {
@@ -489,7 +487,7 @@ describe("unittests:: services:: Colorization", () => {
         stringLiteral(track(" ", "`1`"), pos),
         punctuation(track(" ", "}"), pos),
         stringLiteral(track(" ", "}...`"), pos),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       // Adjusts 'pos' by accounting for the length of each portion of the string,
@@ -510,7 +508,7 @@ describe("unittests:: services:: Colorization", () => {
         identifier("Foo"),
         operator("<"),
         identifier("number"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       // Looks like a cast, should get classified as a keyword.
@@ -519,7 +517,7 @@ describe("unittests:: services:: Colorization", () => {
         ts.EndOfLineState.None,
         operator("<"),
         keyword("number"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       // handle nesting properly.
@@ -533,14 +531,14 @@ describe("unittests:: services:: Colorization", () => {
         identifier("Foo"),
         operator("<"),
         identifier("number"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
     it("LexicallyClassifiesConflictTokens", () => {
       // Test conflict markers.
       testLexicalClassification(
-        "class C {\r\n\
+"class C {\r\n\
 <<<<<<< HEAD\r\n\
     v = 1;\r\n\
 =======\r\n\
@@ -559,11 +557,11 @@ describe("unittests:: services:: Colorization", () => {
         comment("=======\r\n    v = 2;\r\n"),
         comment(">>>>>>> Branch - a"),
         punctuation("}"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       testLexicalClassification(
-        "<<<<<<< HEAD\r\n\
+"<<<<<<< HEAD\r\n\
 class C { }\r\n\
 =======\r\n\
 class D { }\r\n\
@@ -576,11 +574,11 @@ class D { }\r\n\
         punctuation("}"),
         comment("=======\r\nclass D { }\r\n"),
         comment(">>>>>>> Branch - a"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       testLexicalClassification(
-        "class C {\r\n\
+"class C {\r\n\
 <<<<<<< HEAD\r\n\
     v = 1;\r\n\
 ||||||| merged common ancestors\r\n\
@@ -602,11 +600,11 @@ class D { }\r\n\
         comment("=======\r\n    v = 2;\r\n"),
         comment(">>>>>>> Branch - a"),
         punctuation("}"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
 
       testLexicalClassification(
-        "<<<<<<< HEAD\r\n\
+"<<<<<<< HEAD\r\n\
 class C { }\r\n\
 ||||||| merged common ancestors\r\n\
 class E { }\r\n\
@@ -622,7 +620,7 @@ class D { }\r\n\
         comment("||||||| merged common ancestors\r\nclass E { }\r\n"),
         comment("=======\r\nclass D { }\r\n"),
         comment(">>>>>>> Branch - a"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
 
@@ -639,7 +637,7 @@ class D { }\r\n\
         punctuation(")"),
         punctuation("{"),
         punctuation("}"),
-        finalEndOfLineState(ts.EndOfLineState.None)
+        finalEndOfLineState(ts.EndOfLineState.None),
       );
     });
   });

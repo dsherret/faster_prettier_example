@@ -25,7 +25,7 @@ namespace ts.formatting {
     constructor(
       public readonly sourceFile: SourceFileLike,
       public formattingRequestKind: FormattingRequestKind,
-      public options: FormatCodeSettings
+      public options: FormatCodeSettings,
     ) {}
 
     public updateContext(
@@ -33,7 +33,7 @@ namespace ts.formatting {
       currentTokenParent: Node,
       nextRange: TextRangeWithKind,
       nextTokenParent: Node,
-      commonParent: Node
+      commonParent: Node,
     ) {
       this.currentTokenSpan = Debug.checkDefined(currentRange);
       this.currentTokenParent = Debug.checkDefined(currentTokenParent);
@@ -68,10 +68,10 @@ namespace ts.formatting {
     public TokensAreOnSameLine(): boolean {
       if (this.tokensAreOnSameLine === undefined) {
         const startLine = this.sourceFile.getLineAndCharacterOfPosition(
-          this.currentTokenSpan.pos
+          this.currentTokenSpan.pos,
         ).line;
         const endLine = this.sourceFile.getLineAndCharacterOfPosition(
-          this.nextTokenSpan.pos
+          this.nextTokenSpan.pos,
         ).line;
         this.tokensAreOnSameLine = startLine === endLine;
       }
@@ -82,7 +82,7 @@ namespace ts.formatting {
     public ContextNodeBlockIsOnOneLine() {
       if (this.contextNodeBlockIsOnOneLine === undefined) {
         this.contextNodeBlockIsOnOneLine = this.BlockIsOnOneLine(
-          this.contextNode
+          this.contextNode,
         );
       }
 
@@ -92,7 +92,7 @@ namespace ts.formatting {
     public NextNodeBlockIsOnOneLine() {
       if (this.nextNodeBlockIsOnOneLine === undefined) {
         this.nextNodeBlockIsOnOneLine = this.BlockIsOnOneLine(
-          this.nextTokenParent
+          this.nextTokenParent,
         );
       }
 
@@ -101,10 +101,10 @@ namespace ts.formatting {
 
     private NodeIsOnOneLine(node: Node): boolean {
       const startLine = this.sourceFile.getLineAndCharacterOfPosition(
-        node.getStart(this.sourceFile)
+        node.getStart(this.sourceFile),
       ).line;
       const endLine = this.sourceFile.getLineAndCharacterOfPosition(
-        node.getEnd()
+        node.getEnd(),
       ).line;
       return startLine === endLine;
     }
@@ -113,19 +113,19 @@ namespace ts.formatting {
       const openBrace = findChildOfKind(
         node,
         SyntaxKind.OpenBraceToken,
-        this.sourceFile
+        this.sourceFile,
       );
       const closeBrace = findChildOfKind(
         node,
         SyntaxKind.CloseBraceToken,
-        this.sourceFile
+        this.sourceFile,
       );
       if (openBrace && closeBrace) {
         const startLine = this.sourceFile.getLineAndCharacterOfPosition(
-          openBrace.getEnd()
+          openBrace.getEnd(),
         ).line;
         const endLine = this.sourceFile.getLineAndCharacterOfPosition(
-          closeBrace.getStart(this.sourceFile)
+          closeBrace.getStart(this.sourceFile),
         ).line;
         return startLine === endLine;
       }

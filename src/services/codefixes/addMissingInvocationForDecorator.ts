@@ -9,10 +9,11 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToAddMissingInvocationForDecorator(
-      context
+      context,
     ) {
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        makeChange(t, context.sourceFile, context.span.start)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => makeChange(t, context.sourceFile, context.span.start),
       );
       return [
         createCodeFixAction(
@@ -20,21 +21,19 @@ namespace ts.codefix {
           changes,
           Diagnostics.Call_decorator_expression,
           fixId,
-          Diagnostics.Add_to_all_uncalled_decorators
+          Diagnostics.Add_to_all_uncalled_decorators,
         ),
       ];
     },
     fixIds: [fixId],
     getAllCodeActions: (context) =>
-      codeFixAll(context, errorCodes, (changes, diag) =>
-        makeChange(changes, diag.file, diag.start)
-      ),
+      codeFixAll(context, errorCodes, (changes, diag) => makeChange(changes, diag.file, diag.start)),
   });
 
   function makeChange(
     changeTracker: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ) {
     const token = getTokenAtPosition(sourceFile, pos);
     const decorator = findAncestor(token, isDecorator)!;
@@ -42,7 +41,7 @@ namespace ts.codefix {
     const replacement = factory.createCallExpression(
       decorator.expression,
       /*typeArguments*/ undefined,
-      /*argumentsArray*/ undefined
+      /*argumentsArray*/ undefined,
     );
     changeTracker.replaceNode(sourceFile, decorator.expression, replacement);
   }

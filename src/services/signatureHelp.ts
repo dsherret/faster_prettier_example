@@ -35,7 +35,7 @@ namespace ts.SignatureHelp {
     sourceFile: SourceFile,
     position: number,
     triggerReason: SignatureHelpTriggerReason | undefined,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): SignatureHelpItems | undefined {
     const typeChecker = program.getTypeChecker();
 
@@ -47,26 +47,24 @@ namespace ts.SignatureHelp {
     }
 
     // Only need to be careful if the user typed a character and signature help wasn't showing.
-    const onlyUseSyntacticOwners =
-      !!triggerReason && triggerReason.kind === "characterTyped";
+    const onlyUseSyntacticOwners = !!triggerReason && triggerReason.kind === "characterTyped";
 
     // Bail out quickly in the middle of a string or comment, don't provide signature help unless the user explicitly requested it.
     if (
-      onlyUseSyntacticOwners &&
-      (isInString(sourceFile, position, startingToken) ||
-        isInComment(sourceFile, position))
+      onlyUseSyntacticOwners
+      && (isInString(sourceFile, position, startingToken)
+        || isInComment(sourceFile, position))
     ) {
       return undefined;
     }
 
-    const isManuallyInvoked =
-      !!triggerReason && triggerReason.kind === "invoked";
+    const isManuallyInvoked = !!triggerReason && triggerReason.kind === "invoked";
     const argumentInfo = getContainingArgumentInfo(
       startingToken,
       position,
       sourceFile,
       typeChecker,
-      isManuallyInvoked
+      isManuallyInvoked,
     );
     if (!argumentInfo) return undefined;
 
@@ -78,7 +76,7 @@ namespace ts.SignatureHelp {
       typeChecker,
       sourceFile,
       startingToken,
-      onlyUseSyntacticOwners
+      onlyUseSyntacticOwners,
     );
     cancellationToken.throwIfCancellationRequested();
 
@@ -95,18 +93,18 @@ namespace ts.SignatureHelp {
       (typeChecker) =>
         candidateInfo.kind === CandidateOrTypeKind.Candidate
           ? createSignatureHelpItems(
-              candidateInfo.candidates,
-              candidateInfo.resolvedSignature,
-              argumentInfo,
-              sourceFile,
-              typeChecker
-            )
+            candidateInfo.candidates,
+            candidateInfo.resolvedSignature,
+            argumentInfo,
+            sourceFile,
+            typeChecker,
+          )
           : createTypeHelpItems(
-              candidateInfo.symbol,
-              argumentInfo,
-              sourceFile,
-              typeChecker
-            )
+            candidateInfo.symbol,
+            argumentInfo,
+            sourceFile,
+            typeChecker,
+          ),
     );
   }
 
@@ -129,13 +127,13 @@ namespace ts.SignatureHelp {
     checker: TypeChecker,
     sourceFile: SourceFile,
     startingToken: Node,
-    onlyUseSyntacticOwners: boolean
+    onlyUseSyntacticOwners: boolean,
   ): CandidateInfo | TypeInfo | undefined {
     switch (invocation.kind) {
       case InvocationKind.Call: {
         if (
-          onlyUseSyntacticOwners &&
-          !isSyntacticOwner(startingToken, invocation.node, sourceFile)
+          onlyUseSyntacticOwners
+          && !isSyntacticOwner(startingToken, invocation.node, sourceFile)
         ) {
           return undefined;
         }
@@ -143,24 +141,24 @@ namespace ts.SignatureHelp {
         const resolvedSignature = checker.getResolvedSignatureForSignatureHelp(
           invocation.node,
           candidates,
-          argumentCount
+          argumentCount,
         )!; // TODO: GH#18217
         return candidates.length === 0
           ? undefined
           : {
-              kind: CandidateOrTypeKind.Candidate,
-              candidates,
-              resolvedSignature,
-            };
+            kind: CandidateOrTypeKind.Candidate,
+            candidates,
+            resolvedSignature,
+          };
       }
       case InvocationKind.TypeArgs: {
         const { called } = invocation;
         if (
-          onlyUseSyntacticOwners &&
-          !containsPrecedingToken(
+          onlyUseSyntacticOwners
+          && !containsPrecedingToken(
             startingToken,
             sourceFile,
-            isIdentifier(called) ? called.parent : called
+            isIdentifier(called) ? called.parent : called,
           )
         ) {
           return undefined;
@@ -168,14 +166,15 @@ namespace ts.SignatureHelp {
         const candidates = getPossibleGenericSignatures(
           called,
           argumentCount,
-          checker
+          checker,
         );
-        if (candidates.length !== 0)
+        if (candidates.length !== 0) {
           return {
             kind: CandidateOrTypeKind.Candidate,
             candidates,
             resolvedSignature: first(candidates),
           };
+        }
 
         const symbol = checker.getSymbolAtLocation(called);
         return symbol && { kind: CandidateOrTypeKind.Type, symbol };
@@ -194,7 +193,7 @@ namespace ts.SignatureHelp {
   function isSyntacticOwner(
     startingToken: Node,
     node: CallLikeExpression,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): boolean {
     if (!isCallOrNewExpression(node)) return false;
     const invocationChildren = node.getChildren(sourceFile);
@@ -209,7 +208,7 @@ namespace ts.SignatureHelp {
         return containsPrecedingToken(
           startingToken,
           sourceFile,
-          node.expression
+          node.expression,
         );
       default:
         return false;
@@ -219,10 +218,11 @@ namespace ts.SignatureHelp {
   function createJSSignatureHelpItems(
     argumentInfo: ArgumentListInfo,
     program: Program,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): SignatureHelpItems | undefined {
-    if (argumentInfo.invocation.kind === InvocationKind.Contextual)
+    if (argumentInfo.invocation.kind === InvocationKind.Contextual) {
       return undefined;
+    }
     // See if we can find some symbol with the call expression name that has call signatures.
     const expression = getExpressionFromInvocation(argumentInfo.invocation);
     const name = isPropertyAccessExpression(expression)
@@ -232,39 +232,37 @@ namespace ts.SignatureHelp {
     return name === undefined
       ? undefined
       : firstDefined(program.getSourceFiles(), (sourceFile) =>
-          firstDefined(
-            sourceFile.getNamedDeclarations().get(name),
-            (declaration) => {
-              const type =
-                declaration.symbol &&
-                typeChecker.getTypeOfSymbolAtLocation(
-                  declaration.symbol,
-                  declaration
-                );
-              const callSignatures = type && type.getCallSignatures();
-              if (callSignatures && callSignatures.length) {
-                return typeChecker.runWithCancellationToken(
-                  cancellationToken,
-                  (typeChecker) =>
-                    createSignatureHelpItems(
-                      callSignatures,
-                      callSignatures[0],
-                      argumentInfo,
-                      sourceFile,
-                      typeChecker,
-                      /*useFullPrefix*/ true
-                    )
-                );
-              }
+        firstDefined(
+          sourceFile.getNamedDeclarations().get(name),
+          (declaration) => {
+            const type = declaration.symbol
+              && typeChecker.getTypeOfSymbolAtLocation(
+                declaration.symbol,
+                declaration,
+              );
+            const callSignatures = type && type.getCallSignatures();
+            if (callSignatures && callSignatures.length) {
+              return typeChecker.runWithCancellationToken(
+                cancellationToken,
+                (typeChecker) =>
+                  createSignatureHelpItems(
+                    callSignatures,
+                    callSignatures[0],
+                    argumentInfo,
+                    sourceFile,
+                    typeChecker,
+                    /*useFullPrefix*/ true,
+                  ),
+              );
             }
-          )
-        );
+          },
+        ));
   }
 
   function containsPrecedingToken(
     startingToken: Node,
     sourceFile: SourceFile,
-    container: Node
+    container: Node,
   ) {
     const pos = startingToken.getFullStart();
     // There’s a possibility that `startingToken.parent` contains only `startingToken` and
@@ -278,7 +276,7 @@ namespace ts.SignatureHelp {
         pos,
         sourceFile,
         currentParent,
-        /*excludeJsdoc*/ true
+        /*excludeJsdoc*/ true,
       );
       if (precedingToken) {
         return rangeContainsRange(container, precedingToken);
@@ -296,43 +294,44 @@ namespace ts.SignatureHelp {
   export function getArgumentInfoForCompletions(
     node: Node,
     position: number,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): ArgumentInfoForCompletions | undefined {
     const info = getImmediatelyContainingArgumentInfo(
       node,
       position,
-      sourceFile
+      sourceFile,
     );
-    return !info ||
-      info.isTypeParameterList ||
-      info.invocation.kind !== InvocationKind.Call
+    return !info
+        || info.isTypeParameterList
+        || info.invocation.kind !== InvocationKind.Call
       ? undefined
       : {
-          invocation: info.invocation.node,
-          argumentCount: info.argumentCount,
-          argumentIndex: info.argumentIndex,
-        };
+        invocation: info.invocation.node,
+        argumentCount: info.argumentCount,
+        argumentIndex: info.argumentIndex,
+      };
   }
 
   function getArgumentOrParameterListInfo(
     node: Node,
     position: number,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ):
     | {
-        readonly list: Node;
-        readonly argumentIndex: number;
-        readonly argumentCount: number;
-        readonly argumentsSpan: TextSpan;
-      }
-    | undefined {
+      readonly list: Node;
+      readonly argumentIndex: number;
+      readonly argumentCount: number;
+      readonly argumentsSpan: TextSpan;
+    }
+    | undefined
+  {
     const info = getArgumentOrParameterListAndIndex(node, sourceFile);
     if (!info) return undefined;
     const { list, argumentIndex } = info;
 
     const argumentCount = getArgumentCount(
       list,
-      /*ignoreTrailingComma*/ isInString(sourceFile, position, node)
+      /*ignoreTrailingComma*/ isInString(sourceFile, position, node),
     );
     if (argumentIndex !== 0) {
       Debug.assertLessThan(argumentIndex, argumentCount);
@@ -342,11 +341,11 @@ namespace ts.SignatureHelp {
   }
   function getArgumentOrParameterListAndIndex(
     node: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): { readonly list: Node; readonly argumentIndex: number } | undefined {
     if (
-      node.kind === SyntaxKind.LessThanToken ||
-      node.kind === SyntaxKind.OpenParenToken
+      node.kind === SyntaxKind.LessThanToken
+      || node.kind === SyntaxKind.OpenParenToken
     ) {
       // Find the list that starts right *after* the < or ( token.
       // If the user has just opened a list, consider this item 0.
@@ -354,7 +353,7 @@ namespace ts.SignatureHelp {
         list: getChildListThatStartsWithOpenerToken(
           node.parent,
           node,
-          sourceFile
+          sourceFile,
         ),
         argumentIndex: 0,
       };
@@ -377,7 +376,7 @@ namespace ts.SignatureHelp {
   function getImmediatelyContainingArgumentInfo(
     node: Node,
     position: number,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): ArgumentListInfo | undefined {
     const { parent } = node;
     if (isCallOrNewExpression(parent)) {
@@ -400,8 +399,7 @@ namespace ts.SignatureHelp {
       const info = getArgumentOrParameterListInfo(node, position, sourceFile);
       if (!info) return undefined;
       const { list, argumentIndex, argumentCount, argumentsSpan } = info;
-      const isTypeParameterList =
-        !!parent.typeArguments && parent.typeArguments.pos === list.pos;
+      const isTypeParameterList = !!parent.typeArguments && parent.typeArguments.pos === list.pos;
       return {
         isTypeParameterList,
         invocation: { kind: InvocationKind.Call, node: invocation },
@@ -410,8 +408,8 @@ namespace ts.SignatureHelp {
         argumentCount,
       };
     } else if (
-      isNoSubstitutionTemplateLiteral(node) &&
-      isTaggedTemplateExpression(parent)
+      isNoSubstitutionTemplateLiteral(node)
+      && isTaggedTemplateExpression(parent)
     ) {
       // Check if we're actually inside the template;
       // otherwise we'll fall out and return undefined.
@@ -419,17 +417,16 @@ namespace ts.SignatureHelp {
         return getArgumentListInfoForTemplate(
           parent,
           /*argumentIndex*/ 0,
-          sourceFile
+          sourceFile,
         );
       }
       return undefined;
     } else if (
-      isTemplateHead(node) &&
-      parent.parent.kind === SyntaxKind.TaggedTemplateExpression
+      isTemplateHead(node)
+      && parent.parent.kind === SyntaxKind.TaggedTemplateExpression
     ) {
       const templateExpression = parent as TemplateExpression;
-      const tagExpression =
-        templateExpression.parent as TaggedTemplateExpression;
+      const tagExpression = templateExpression.parent as TaggedTemplateExpression;
       Debug.assert(templateExpression.kind === SyntaxKind.TemplateExpression);
 
       const argumentIndex = isInsideTemplateLiteral(node, position, sourceFile)
@@ -439,19 +436,19 @@ namespace ts.SignatureHelp {
       return getArgumentListInfoForTemplate(
         tagExpression,
         argumentIndex,
-        sourceFile
+        sourceFile,
       );
     } else if (
-      isTemplateSpan(parent) &&
-      isTaggedTemplateExpression(parent.parent.parent)
+      isTemplateSpan(parent)
+      && isTaggedTemplateExpression(parent.parent.parent)
     ) {
       const templateSpan = parent;
       const tagExpression = parent.parent.parent;
 
       // If we're just after a template tail, don't show signature help.
       if (
-        isTemplateTail(node) &&
-        !isInsideTemplateLiteral(node, position, sourceFile)
+        isTemplateTail(node)
+        && !isInsideTemplateLiteral(node, position, sourceFile)
       ) {
         return undefined;
       }
@@ -461,13 +458,13 @@ namespace ts.SignatureHelp {
         spanIndex,
         node,
         position,
-        sourceFile
+        sourceFile,
       );
 
       return getArgumentListInfoForTemplate(
         tagExpression,
         argumentIndex,
-        sourceFile
+        sourceFile,
       );
     } else if (isJsxOpeningLikeElement(parent)) {
       // Provide a signature help for JSX opening element or JSX self-closing element.
@@ -479,14 +476,14 @@ namespace ts.SignatureHelp {
       const attributeSpanEnd = skipTrivia(
         sourceFile.text,
         parent.attributes.end,
-        /*stopAfterLineBreak*/ false
+        /*stopAfterLineBreak*/ false,
       );
       return {
         isTypeParameterList: false,
         invocation: { kind: InvocationKind.Call, node: parent },
         argumentsSpan: createTextSpan(
           attributeSpanStart,
-          attributeSpanEnd - attributeSpanStart
+          attributeSpanEnd - attributeSpanStart,
         ),
         argumentIndex: 0,
         argumentCount: 1,
@@ -501,7 +498,7 @@ namespace ts.SignatureHelp {
         };
         const argumentsSpan = createTextSpanFromBounds(
           called.getStart(sourceFile),
-          node.end
+          node.end,
         );
         return {
           isTypeParameterList: true,
@@ -519,11 +516,11 @@ namespace ts.SignatureHelp {
     node: Node,
     position: number,
     sourceFile: SourceFile,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): ArgumentListInfo | undefined {
     return (
-      tryGetParameterInfo(node, position, sourceFile, checker) ||
-      getImmediatelyContainingArgumentInfo(node, position, sourceFile)
+      tryGetParameterInfo(node, position, sourceFile, checker)
+      || getImmediatelyContainingArgumentInfo(node, position, sourceFile)
     );
   }
 
@@ -541,17 +538,16 @@ namespace ts.SignatureHelp {
     startingToken: Node,
     position: number,
     sourceFile: SourceFile,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): ArgumentListInfo | undefined {
     const info = getContextualSignatureLocationInfo(
       startingToken,
       sourceFile,
       position,
-      checker
+      checker,
     );
     if (!info) return undefined;
-    const { contextualType, argumentIndex, argumentCount, argumentsSpan } =
-      info;
+    const { contextualType, argumentIndex, argumentCount, argumentsSpan } = info;
 
     // for optional function condition.
     const nonNullableContextualType = contextualType.getNonNullableType();
@@ -584,13 +580,14 @@ namespace ts.SignatureHelp {
     startingToken: Node,
     sourceFile: SourceFile,
     position: number,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): ContextualSignatureLocationInfo | undefined {
     if (
-      startingToken.kind !== SyntaxKind.OpenParenToken &&
-      startingToken.kind !== SyntaxKind.CommaToken
-    )
+      startingToken.kind !== SyntaxKind.OpenParenToken
+      && startingToken.kind !== SyntaxKind.CommaToken
+    ) {
       return undefined;
+    }
     const { parent } = startingToken;
     switch (parent.kind) {
       case SyntaxKind.ParenthesizedExpression:
@@ -600,18 +597,18 @@ namespace ts.SignatureHelp {
         const info = getArgumentOrParameterListInfo(
           startingToken,
           position,
-          sourceFile
+          sourceFile,
         );
         if (!info) return undefined;
         const { argumentIndex, argumentCount, argumentsSpan } = info;
         const contextualType = isMethodDeclaration(parent)
           ? checker.getContextualTypeForObjectLiteralElement(parent)
           : checker.getContextualType(
-              parent as
-                | ParenthesizedExpression
-                | FunctionExpression
-                | ArrowFunction
-            );
+            parent as
+              | ParenthesizedExpression
+              | FunctionExpression
+              | ArrowFunction,
+          );
         return (
           contextualType && {
             contextualType,
@@ -623,10 +620,9 @@ namespace ts.SignatureHelp {
       case SyntaxKind.BinaryExpression: {
         const highestBinary = getHighestBinary(parent as BinaryExpression);
         const contextualType = checker.getContextualType(highestBinary);
-        const argumentIndex =
-          startingToken.kind === SyntaxKind.OpenParenToken
-            ? 0
-            : countBinaryExpressionParameters(parent as BinaryExpression) - 1;
+        const argumentIndex = startingToken.kind === SyntaxKind.OpenParenToken
+          ? 0
+          : countBinaryExpressionParameters(parent as BinaryExpression) - 1;
         const argumentCount = countBinaryExpressionParameters(highestBinary);
         return (
           contextualType && {
@@ -645,9 +641,7 @@ namespace ts.SignatureHelp {
   // The type of a function type node has a symbol at that node, but it's better to use the symbol for a parameter or type alias.
   function chooseBetterSymbol(s: Symbol): Symbol {
     return s.name === InternalSymbolName.Type
-      ? firstDefined(s.declarations, (d) =>
-          isFunctionTypeNode(d) ? d.parent.symbol : undefined
-        ) || s
+      ? firstDefined(s.declarations, (d) => isFunctionTypeNode(d) ? d.parent.symbol : undefined) || s
       : s;
   }
 
@@ -692,12 +686,12 @@ namespace ts.SignatureHelp {
 
     let argumentCount = countWhere(
       listChildren,
-      (arg) => arg.kind !== SyntaxKind.CommaToken
+      (arg) => arg.kind !== SyntaxKind.CommaToken,
     );
     if (
-      !ignoreTrailingComma &&
-      listChildren.length > 0 &&
-      last(listChildren).kind === SyntaxKind.CommaToken
+      !ignoreTrailingComma
+      && listChildren.length > 0
+      && last(listChildren).kind === SyntaxKind.CommaToken
     ) {
       argumentCount++;
     }
@@ -710,7 +704,7 @@ namespace ts.SignatureHelp {
     spanIndex: number,
     node: Node,
     position: number,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): number {
     // Because the TemplateStringsArray is the first argument, we have to offset each substitution expression by 1.
     // There are three cases we can encounter:
@@ -727,7 +721,7 @@ namespace ts.SignatureHelp {
     /* eslint-enable no-double-space */
     Debug.assert(
       position >= node.getStart(),
-      "Assumed 'position' could not occur before node."
+      "Assumed 'position' could not occur before node.",
     );
     if (isTemplateLiteralToken(node)) {
       if (isInsideTemplateLiteral(node, position, sourceFile)) {
@@ -741,12 +735,12 @@ namespace ts.SignatureHelp {
   function getArgumentListInfoForTemplate(
     tagExpression: TaggedTemplateExpression,
     argumentIndex: number,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): ArgumentListInfo {
     // argumentCount is either 1 or (numSpans + 1) to account for the template strings array argument.
     const argumentCount = isNoSubstitutionTemplateLiteral(
-      tagExpression.template
-    )
+        tagExpression.template,
+      )
       ? 1
       : tagExpression.template.templateSpans.length + 1;
     if (argumentIndex !== 0) {
@@ -757,7 +751,7 @@ namespace ts.SignatureHelp {
       invocation: { kind: InvocationKind.Call, node: tagExpression },
       argumentsSpan: getApplicableSpanForTaggedTemplate(
         tagExpression,
-        sourceFile
+        sourceFile,
       ),
       argumentIndex,
       argumentCount,
@@ -766,7 +760,7 @@ namespace ts.SignatureHelp {
 
   function getApplicableSpanForArguments(
     argumentsList: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): TextSpan {
     // We use full start and skip trivia on the end because we want to include trivia on
     // both sides. For example,
@@ -780,17 +774,17 @@ namespace ts.SignatureHelp {
     const applicableSpanEnd = skipTrivia(
       sourceFile.text,
       argumentsList.getEnd(),
-      /*stopAfterLineBreak*/ false
+      /*stopAfterLineBreak*/ false,
     );
     return createTextSpan(
       applicableSpanStart,
-      applicableSpanEnd - applicableSpanStart
+      applicableSpanEnd - applicableSpanStart,
     );
   }
 
   function getApplicableSpanForTaggedTemplate(
     taggedTemplate: TaggedTemplateExpression,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): TextSpan {
     const template = taggedTemplate.template;
     const applicableSpanStart = template.getStart();
@@ -810,14 +804,14 @@ namespace ts.SignatureHelp {
         applicableSpanEnd = skipTrivia(
           sourceFile.text,
           applicableSpanEnd,
-          /*stopAfterLineBreak*/ false
+          /*stopAfterLineBreak*/ false,
         );
       }
     }
 
     return createTextSpan(
       applicableSpanStart,
-      applicableSpanEnd - applicableSpanStart
+      applicableSpanEnd - applicableSpanStart,
     );
   }
 
@@ -826,7 +820,7 @@ namespace ts.SignatureHelp {
     position: number,
     sourceFile: SourceFile,
     checker: TypeChecker,
-    isManuallyInvoked: boolean
+    isManuallyInvoked: boolean,
   ): ArgumentListInfo | undefined {
     for (
       let n = node;
@@ -839,17 +833,18 @@ namespace ts.SignatureHelp {
         rangeContainsRange(n.parent, n),
         "Not a subspan",
         () =>
-          `Child: ${Debug.formatSyntaxKind(
-            n.kind
-          )}, parent: ${Debug.formatSyntaxKind(n.parent.kind)}`
+          `Child: ${
+            Debug.formatSyntaxKind(
+              n.kind,
+            )
+          }, parent: ${Debug.formatSyntaxKind(n.parent.kind)}`,
       );
-      const argumentInfo =
-        getImmediatelyContainingArgumentOrContextualParameterInfo(
-          n,
-          position,
-          sourceFile,
-          checker
-        );
+      const argumentInfo = getImmediatelyContainingArgumentOrContextualParameterInfo(
+        n,
+        position,
+        sourceFile,
+        checker,
+      );
       if (argumentInfo) {
         return argumentInfo;
       }
@@ -860,18 +855,18 @@ namespace ts.SignatureHelp {
   function getChildListThatStartsWithOpenerToken(
     parent: Node,
     openerToken: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): Node {
     const children = parent.getChildren(sourceFile);
     const indexOfOpenerToken = children.indexOf(openerToken);
     Debug.assert(
-      indexOfOpenerToken >= 0 && children.length > indexOfOpenerToken + 1
+      indexOfOpenerToken >= 0 && children.length > indexOfOpenerToken + 1,
     );
     return children[indexOfOpenerToken + 1];
   }
 
   function getExpressionFromInvocation(
-    invocation: CallInvocation | TypeArgsInvocation
+    invocation: CallInvocation | TypeArgsInvocation,
   ): Expression {
     return invocation.kind === InvocationKind.Call
       ? getInvokedExpression(invocation.node)
@@ -886,10 +881,9 @@ namespace ts.SignatureHelp {
       : invocation.node;
   }
 
-  const signatureHelpNodeBuilderFlags =
-    NodeBuilderFlags.OmitParameterModifiers |
-    NodeBuilderFlags.IgnoreErrors |
-    NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope;
+  const signatureHelpNodeBuilderFlags = NodeBuilderFlags.OmitParameterModifiers
+    | NodeBuilderFlags.IgnoreErrors
+    | NodeBuilderFlags.UseAliasDefinedOutsideCurrentScope;
   function createSignatureHelpItems(
     candidates: readonly Signature[],
     resolvedSignature: Signature,
@@ -902,24 +896,22 @@ namespace ts.SignatureHelp {
     }: ArgumentListInfo,
     sourceFile: SourceFile,
     typeChecker: TypeChecker,
-    useFullPrefix?: boolean
+    useFullPrefix?: boolean,
   ): SignatureHelpItems {
-    const enclosingDeclaration =
-      getEnclosingDeclarationFromInvocation(invocation);
-    const callTargetSymbol =
-      invocation.kind === InvocationKind.Contextual
-        ? invocation.symbol
-        : typeChecker.getSymbolAtLocation(
-            getExpressionFromInvocation(invocation)
-          ) ||
-          (useFullPrefix && resolvedSignature.declaration?.symbol);
+    const enclosingDeclaration = getEnclosingDeclarationFromInvocation(invocation);
+    const callTargetSymbol = invocation.kind === InvocationKind.Contextual
+      ? invocation.symbol
+      : typeChecker.getSymbolAtLocation(
+        getExpressionFromInvocation(invocation),
+      )
+        || (useFullPrefix && resolvedSignature.declaration?.symbol);
     const callTargetDisplayParts = callTargetSymbol
       ? symbolToDisplayParts(
-          typeChecker,
-          callTargetSymbol,
-          useFullPrefix ? sourceFile : undefined,
-          /*meaning*/ undefined
-        )
+        typeChecker,
+        callTargetSymbol,
+        useFullPrefix ? sourceFile : undefined,
+        /*meaning*/ undefined,
+      )
       : emptyArray;
     const items = map(candidates, (candidateSignature) =>
       getSignatureHelpItem(
@@ -928,9 +920,8 @@ namespace ts.SignatureHelp {
         isTypeParameterList,
         typeChecker,
         enclosingDeclaration,
-        sourceFile
-      )
-    );
+        sourceFile,
+      ));
 
     if (argumentIndex !== 0) {
       Debug.assertLessThan(argumentIndex, argumentCount);
@@ -974,7 +965,7 @@ namespace ts.SignatureHelp {
       } else {
         help.argumentIndex = Math.min(
           help.argumentIndex,
-          selected.parameters.length - 1
+          selected.parameters.length - 1,
         );
       }
     }
@@ -990,10 +981,9 @@ namespace ts.SignatureHelp {
       argumentIndex,
     }: ArgumentListInfo,
     sourceFile: SourceFile,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): SignatureHelpItems | undefined {
-    const typeParameters =
-      checker.getLocalTypeParametersOfClassOrInterfaceOrTypeAlias(symbol);
+    const typeParameters = checker.getLocalTypeParametersOfClassOrInterfaceOrTypeAlias(symbol);
     if (!typeParameters) return undefined;
     const items = [
       getTypeHelpItem(
@@ -1001,7 +991,7 @@ namespace ts.SignatureHelp {
         typeParameters,
         checker,
         getEnclosingDeclarationFromInvocation(invocation),
-        sourceFile
+        sourceFile,
       ),
     ];
     return {
@@ -1018,7 +1008,7 @@ namespace ts.SignatureHelp {
     typeParameters: readonly TypeParameter[],
     checker: TypeChecker,
     enclosingDeclaration: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): SignatureHelpItem {
     const typeSymbolDisplay = symbolToDisplayParts(checker, symbol);
 
@@ -1029,7 +1019,7 @@ namespace ts.SignatureHelp {
         checker,
         enclosingDeclaration,
         sourceFile,
-        printer
+        printer,
       )
     );
 
@@ -1061,7 +1051,7 @@ namespace ts.SignatureHelp {
     isTypeParameterList: boolean,
     checker: TypeChecker,
     enclosingDeclaration: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): SignatureHelpItem[] {
     const infos = (
       isTypeParameterList ? itemInfoForTypeParameters : itemInfoForParameters
@@ -1073,7 +1063,7 @@ namespace ts.SignatureHelp {
         ...returnTypeToDisplayParts(
           candidateSignature,
           enclosingDeclaration,
-          checker
+          checker,
         ),
       ];
       const documentation = candidateSignature.getDocumentationComment(checker);
@@ -1093,7 +1083,7 @@ namespace ts.SignatureHelp {
   function returnTypeToDisplayParts(
     candidateSignature: Signature,
     enclosingDeclaration: Node,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): readonly SymbolDisplayPart[] {
     return mapToDisplayParts((writer) => {
       writer.writePunctuation(":");
@@ -1104,14 +1094,14 @@ namespace ts.SignatureHelp {
           predicate,
           enclosingDeclaration,
           /*flags*/ undefined,
-          writer
+          writer,
         );
       } else {
         checker.writeType(
           checker.getReturnTypeOfSignature(candidateSignature),
           enclosingDeclaration,
           /*flags*/ undefined,
-          writer
+          writer,
         );
       }
     });
@@ -1128,7 +1118,7 @@ namespace ts.SignatureHelp {
     candidateSignature: Signature,
     checker: TypeChecker,
     enclosingDeclaration: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): SignatureHelpItemInfo[] {
     const typeParameters = (candidateSignature.target || candidateSignature)
       .typeParameters;
@@ -1139,17 +1129,17 @@ namespace ts.SignatureHelp {
         checker,
         enclosingDeclaration,
         sourceFile,
-        printer
+        printer,
       )
     );
     const thisParameter = candidateSignature.thisParameter
       ? [
-          checker.symbolToParameterDeclaration(
-            candidateSignature.thisParameter,
-            enclosingDeclaration,
-            signatureHelpNodeBuilderFlags
-          )!,
-        ]
+        checker.symbolToParameterDeclaration(
+          candidateSignature.thisParameter,
+          enclosingDeclaration,
+          signatureHelpNodeBuilderFlags,
+        )!,
+      ]
       : [];
 
     return checker
@@ -1163,8 +1153,8 @@ namespace ts.SignatureHelp {
               checker.symbolToParameterDeclaration(
                 param,
                 enclosingDeclaration,
-                signatureHelpNodeBuilderFlags
-              )!
+                signatureHelpNodeBuilderFlags,
+              )!,
           ),
         ]);
         const parameterParts = mapToDisplayParts((writer) => {
@@ -1172,7 +1162,7 @@ namespace ts.SignatureHelp {
             ListFormat.CallExpressionArguments,
             params,
             sourceFile,
-            writer
+            writer,
           );
         });
         return {
@@ -1191,13 +1181,13 @@ namespace ts.SignatureHelp {
     candidateSignature: Signature,
     checker: TypeChecker,
     enclosingDeclaration: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): SignatureHelpItemInfo[] {
     const printer = createPrinter({ removeComments: true });
     const typeParameterParts = mapToDisplayParts((writer) => {
       if (
-        candidateSignature.typeParameters &&
-        candidateSignature.typeParameters.length
+        candidateSignature.typeParameters
+        && candidateSignature.typeParameters.length
       ) {
         const args = factory.createNodeArray(
           candidateSignature.typeParameters.map(
@@ -1205,9 +1195,9 @@ namespace ts.SignatureHelp {
               checker.typeParameterToDeclaration(
                 p,
                 enclosingDeclaration,
-                signatureHelpNodeBuilderFlags
-              )!
-          )
+                signatureHelpNodeBuilderFlags,
+              )!,
+          ),
         );
         printer.writeList(ListFormat.TypeParameters, args, sourceFile, writer);
       }
@@ -1219,11 +1209,11 @@ namespace ts.SignatureHelp {
         : lists.length === 1
         ? (_) => true
         : (pList) =>
-            !!(
-              pList.length &&
-              (pList[pList.length - 1] as TransientSymbol).checkFlags &
-                CheckFlags.RestParameter
-            );
+          !!(
+            pList.length
+            && (pList[pList.length - 1] as TransientSymbol).checkFlags
+              & CheckFlags.RestParameter
+          );
     return lists.map((parameterList) => ({
       isVariadic: isVariadic(parameterList),
       parameters: parameterList.map((p) =>
@@ -1232,7 +1222,7 @@ namespace ts.SignatureHelp {
           checker,
           enclosingDeclaration,
           sourceFile,
-          printer
+          printer,
         )
       ),
       prefix: [
@@ -1248,18 +1238,18 @@ namespace ts.SignatureHelp {
     checker: TypeChecker,
     enclosingDeclaration: Node,
     sourceFile: SourceFile,
-    printer: Printer
+    printer: Printer,
   ): SignatureHelpParameter {
     const displayParts = mapToDisplayParts((writer) => {
       const param = checker.symbolToParameterDeclaration(
         parameter,
         enclosingDeclaration,
-        signatureHelpNodeBuilderFlags
+        signatureHelpNodeBuilderFlags,
       )!;
       printer.writeNode(EmitHint.Unspecified, param, sourceFile, writer);
     });
     const isOptional = checker.isOptionalParameter(
-      parameter.valueDeclaration as ParameterDeclaration
+      parameter.valueDeclaration as ParameterDeclaration,
     );
     const isRest = !!(
       (parameter as TransientSymbol).checkFlags & CheckFlags.RestParameter
@@ -1278,13 +1268,13 @@ namespace ts.SignatureHelp {
     checker: TypeChecker,
     enclosingDeclaration: Node,
     sourceFile: SourceFile,
-    printer: Printer
+    printer: Printer,
   ): SignatureHelpParameter {
     const displayParts = mapToDisplayParts((writer) => {
       const param = checker.typeParameterToDeclaration(
         typeParameter,
         enclosingDeclaration,
-        signatureHelpNodeBuilderFlags
+        signatureHelpNodeBuilderFlags,
       )!;
       printer.writeNode(EmitHint.Unspecified, param, sourceFile, writer);
     });

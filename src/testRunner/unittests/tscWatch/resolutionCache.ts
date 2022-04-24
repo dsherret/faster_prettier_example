@@ -20,10 +20,10 @@ namespace ts.tscWatch {
       const f1IsNotModule = getDiagnosticOfFileFromProgram(
         watch.getCurrentProgram().getProgram(),
         root.path,
-        root.content.indexOf('"f1"'),
-        '"f1"'.length,
+        root.content.indexOf("\"f1\""),
+        "\"f1\"".length,
         Diagnostics.File_0_is_not_a_module,
-        imported.path
+        imported.path,
       );
       const cannotFindFoo = getDiagnosticOfFileFromProgram(
         watch.getCurrentProgram().getProgram(),
@@ -31,7 +31,7 @@ namespace ts.tscWatch {
         imported.content.indexOf("foo"),
         "foo".length,
         Diagnostics.Cannot_find_name_0,
-        "foo"
+        "foo",
       );
 
       // ensure that imported file was found
@@ -60,7 +60,7 @@ namespace ts.tscWatch {
             "x".length,
             Diagnostics.Type_0_is_not_assignable_to_type_1,
             "number",
-            "string"
+            "string",
           ),
           cannotFindFoo,
         ]);
@@ -87,7 +87,7 @@ namespace ts.tscWatch {
           getDiagnosticModuleNotFoundOfFile(
             watch.getCurrentProgram().getProgram(),
             root,
-            "f2"
+            "f2",
           ),
         ]);
 
@@ -151,7 +151,7 @@ namespace ts.tscWatch {
         getDiagnosticModuleNotFoundOfFile(
           watch.getCurrentProgram().getProgram(),
           root,
-          "bar"
+          "bar",
         ),
       ]);
 
@@ -204,7 +204,7 @@ namespace ts.tscWatch {
         getDiagnosticModuleNotFoundOfFile(
           watch.getCurrentProgram().getProgram(),
           root,
-          "bar"
+          "bar",
         ),
       ]);
 
@@ -229,7 +229,7 @@ namespace ts.tscWatch {
             },
             libFile,
           ],
-          { currentDirectory: "/a/b" }
+          { currentDirectory: "/a/b" },
         ),
       changes: [
         {
@@ -297,7 +297,7 @@ declare module "fs" {
         isFile(): boolean;
     }
 }
-`
+`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -306,18 +306,17 @@ declare module "fs" {
 
     verifyTscWatch({
       scenario,
-      subScenario:
-        "works when reusing program with files from external library",
+      subScenario: "works when reusing program with files from external library",
       commandLineArgs: ["--w", "-p", "/a/b/projects/myProject/src"],
       sys: () => {
         const configDir = "/a/b/projects/myProject/src/";
         const file1: File = {
           path: configDir + "file1.ts",
-          content: 'import module1 = require("module1");\nmodule1("hello");',
+          content: "import module1 = require(\"module1\");\nmodule1(\"hello\");",
         };
         const file2: File = {
           path: configDir + "file2.ts",
-          content: 'import module11 = require("module1");\nmodule11("hello");',
+          content: "import module11 = require(\"module1\");\nmodule11(\"hello\");",
         };
         const module1: File = {
           path: "/a/b/projects/myProject/node_modules/module1/index.js",
@@ -339,14 +338,13 @@ declare module "fs" {
           [file1, file2, module1, libFile, configFile],
           {
             currentDirectory: "/a/b/projects/myProject/",
-          }
+          },
         );
       },
       changes: [
         {
           caption: "Add new line to file1",
-          change: (sys) =>
-            sys.appendFile("/a/b/projects/myProject/src/file1.ts", "\n;"),
+          change: (sys) => sys.appendFile("/a/b/projects/myProject/src/file1.ts", "\n;"),
           timeouts: runQueuedTimeoutCallbacks,
         },
       ],
@@ -354,8 +352,7 @@ declare module "fs" {
 
     verifyTscWatch({
       scenario,
-      subScenario:
-        "works when renaming node_modules folder that already contains @types folder",
+      subScenario: "works when renaming node_modules folder that already contains @types folder",
       commandLineArgs: ["--w", `${projectRoot}/a.ts`],
       sys: () => {
         const file: File = {
@@ -376,7 +373,7 @@ declare module "fs" {
           change: (sys) =>
             sys.renameFolder(
               `${projectRoot}/node_modules2`,
-              `${projectRoot}/node_modules`
+              `${projectRoot}/node_modules`,
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },
@@ -386,7 +383,7 @@ declare module "fs" {
     describe("ignores files/folder changes in node_modules that start with '.'", () => {
       function verifyIgnore(
         subScenario: string,
-        commandLineArgs: readonly string[]
+        commandLineArgs: readonly string[],
       ) {
         verifyTscWatch({
           scenario,
@@ -433,8 +430,7 @@ declare module "fs" {
 
     verifyTscWatch({
       scenario,
-      subScenario:
-        "when types in compiler option are global and installed at later point",
+      subScenario: "when types in compiler option are global and installed at later point",
       commandLineArgs: ["--w", "-p", `${projectRoot}/tsconfig.json`],
       sys: () => {
         const app: File = {
@@ -482,19 +478,19 @@ declare namespace myapp {
           timeouts: (
             sys,
             [[oldProgram, oldBuilderProgram]],
-            watchorSolution
+            watchorSolution,
           ) => {
             sys.checkTimeoutQueueLength(0);
             const newProgram = (watchorSolution as Watch).getProgram();
             assert.strictEqual(
               newProgram,
               oldBuilderProgram,
-              "No change so builder program should be same"
+              "No change so builder program should be same",
             );
             assert.strictEqual(
               newProgram.getProgram(),
               oldProgram,
-              "No change so program should be same"
+              "No change so program should be same",
             );
           },
         },
@@ -543,7 +539,7 @@ declare namespace myapp {
         };
         const linkedPackageOther: File = {
           path: `${linkedPackageRoot}/dist/other.d.ts`,
-          content: 'export declare const Foo = "BAR";',
+          content: "export declare const Foo = \"BAR\";",
         };
         const files = [
           libFile,
@@ -622,7 +618,7 @@ declare namespace NodeJS {
               nodeAtTypes36Base,
               nodeAtTypesGlobals,
             ],
-            { currentDirectory: projectRoot }
+            { currentDirectory: projectRoot },
           );
         },
         changes: [
@@ -631,7 +627,7 @@ declare namespace NodeJS {
             change: (sys) =>
               sys.deleteFolder(
                 `${projectRoot}/node_modules/@types`,
-                /*recursive*/ true
+                /*recursive*/ true,
               ),
             timeouts: runQueuedTimeoutCallbacks,
           },
@@ -664,15 +660,15 @@ declare namespace NodeJS {
               sys.ensureFileOrFolder(nodeAtTypesBase);
               sys.ensureFileOrFolder(
                 nodeAtTypesIndex,
-                /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true
+                /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true,
               );
               sys.ensureFileOrFolder(
                 nodeAtTypes36Base,
-                /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true
+                /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true,
               );
               sys.ensureFileOrFolder(
                 nodeAtTypesGlobals,
-                /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true
+                /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true,
               );
             },
             timeouts: (sys) => {

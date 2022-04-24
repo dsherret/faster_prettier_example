@@ -11,14 +11,14 @@ namespace ts {
         file,
         4,
         (
-          service // Two calls are top-level in services, one is the root type, and the second should be for the parameter type
+          service, // Two calls are top-level in services, one is the root type, and the second should be for the parameter type
         ) =>
           service.getSignatureHelpItems(
             "file.ts",
             file.lastIndexOf("f"),
-            emptyOptions
+            emptyOptions,
           )!,
-        (r) => assert.exists(r.items[0])
+        (r) => assert.exists(r.items[0]),
       );
     });
 
@@ -27,9 +27,9 @@ namespace ts {
         file,
         3,
         (
-          service // Two calls are top-level in services, one is the root type
+          service, // Two calls are top-level in services, one is the root type
         ) => service.findReferences("file.ts", file.lastIndexOf("o"))!,
-        (r) => assert.exists(r[0].definition)
+        (r) => assert.exists(r[0].definition),
       );
     });
 
@@ -38,9 +38,9 @@ namespace ts {
         file,
         1,
         (
-          service // The LS doesn't do any top-level checks on the token for quickinfo, so the first check is within the checker
+          service, // The LS doesn't do any top-level checks on the token for quickinfo, so the first check is within the checker
         ) => service.getQuickInfoAtPosition("file.ts", file.lastIndexOf("o"))!,
-        (r) => assert.exists(r.displayParts)
+        (r) => assert.exists(r.displayParts),
       );
     });
 
@@ -70,7 +70,7 @@ namespace ts {
         file,
         1,
         (
-          service // The LS doesn't do any top-level checks on the token for completion entry details, so the first check is within the checker
+          service, // The LS doesn't do any top-level checks on the token for completion entry details, so the first check is within the checker
         ) =>
           service.getCompletionEntryDetails(
             "file.ts",
@@ -79,9 +79,9 @@ namespace ts {
             options,
             /*source*/ undefined,
             {},
-            /*data*/ undefined
+            /*data*/ undefined,
           )!,
-        (r) => assert.exists(r.displayParts)
+        (r) => assert.exists(r.displayParts),
       );
     });
 
@@ -90,12 +90,12 @@ namespace ts {
         file,
         1,
         (
-          service // The LS doesn't do any top-level checks on the token for suggestion diagnostics, so the first check is within the checker
+          service, // The LS doesn't do any top-level checks on the token for suggestion diagnostics, so the first check is within the checker
         ) => service.getSuggestionDiagnostics("file.js"),
         (r) => assert.notEqual(r.length, 0),
         "file.js",
         "function foo() { let a = 10; }",
-        { allowJs: true }
+        { allowJs: true },
       );
     });
   });
@@ -107,7 +107,7 @@ namespace ts {
     validator: (arg: T) => void,
     fileName?: string,
     fileContent?: string,
-    options?: CompilerOptions
+    options?: CompilerOptions,
   ) {
     let checks = 0;
     const token: HostCancellationToken = {
@@ -122,13 +122,13 @@ namespace ts {
     };
     const adapter = new Harness.LanguageService.NativeLanguageServiceAdapter(
       token,
-      options
+      options,
     );
     const host = adapter.getHost();
     host.addScript(
       fileName || "file.ts",
       fileContent || content,
-      /*isRootFile*/ true
+      /*isRootFile*/ true,
     );
     const service = adapter.getLanguageService();
     assertCancelled(() => operation(service));

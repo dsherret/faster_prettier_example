@@ -43,7 +43,7 @@ namespace Harness {
 
     constructor(
       private program: ts.Program,
-      private hadErrorBaseline: boolean
+      private hadErrorBaseline: boolean,
     ) {
       // Consider getting both the diagnostics checker and the non-diagnostics checker to verify
       // they are consistent.
@@ -51,7 +51,7 @@ namespace Harness {
     }
 
     public *getSymbols(
-      fileName: string
+      fileName: string,
     ): IterableIterator<TypeWriterSymbolResult> {
       const sourceFile = this.program.getSourceFile(fileName)!;
       this.currentSourceFile = sourceFile;
@@ -80,16 +80,16 @@ namespace Harness {
 
     private *visitNode(
       node: ts.Node,
-      isSymbolWalk: boolean
+      isSymbolWalk: boolean,
     ): IterableIterator<TypeWriterResult> {
       const gen = forEachASTNode(node);
       let res = gen.next();
       for (; !res.done; res = gen.next()) {
         const { value: node } = res;
         if (
-          ts.isExpressionNode(node) ||
-          node.kind === ts.SyntaxKind.Identifier ||
-          ts.isDeclarationName(node)
+          ts.isExpressionNode(node)
+          || node.kind === ts.SyntaxKind.Identifier
+          || ts.isDeclarationName(node)
         ) {
           const result = this.writeTypeOrSymbol(node, isSymbolWalk);
           if (result) {
@@ -101,28 +101,33 @@ namespace Harness {
 
     private isImportStatementName(node: ts.Node) {
       if (
-        ts.isImportSpecifier(node.parent) &&
-        (node.parent.name === node || node.parent.propertyName === node)
-      )
+        ts.isImportSpecifier(node.parent)
+        && (node.parent.name === node || node.parent.propertyName === node)
+      ) {
         return true;
-      if (ts.isImportClause(node.parent) && node.parent.name === node)
+      }
+      if (ts.isImportClause(node.parent) && node.parent.name === node) {
         return true;
+      }
       if (
-        ts.isImportEqualsDeclaration(node.parent) &&
-        node.parent.name === node
-      )
+        ts.isImportEqualsDeclaration(node.parent)
+        && node.parent.name === node
+      ) {
         return true;
+      }
       return false;
     }
 
     private isExportStatementName(node: ts.Node) {
-      if (ts.isExportAssignment(node.parent) && node.parent.expression === node)
+      if (ts.isExportAssignment(node.parent) && node.parent.expression === node) {
         return true;
+      }
       if (
-        ts.isExportSpecifier(node.parent) &&
-        (node.parent.name === node || node.parent.propertyName === node)
-      )
+        ts.isExportSpecifier(node.parent)
+        && (node.parent.name === node || node.parent.propertyName === node)
+      ) {
         return true;
+      }
       return false;
     }
 
@@ -130,41 +135,41 @@ namespace Harness {
       const p = node.parent;
       if (
         !(
-          ts.isJsxOpeningElement(p) ||
-          ts.isJsxClosingElement(p) ||
-          ts.isJsxSelfClosingElement(p)
+          ts.isJsxOpeningElement(p)
+          || ts.isJsxClosingElement(p)
+          || ts.isJsxSelfClosingElement(p)
         )
-      )
+      ) {
         return false;
+      }
       if (p.tagName !== node) return false;
       return ts.isIntrinsicJsxName(node.getText());
     }
 
     private writeTypeOrSymbol(
       node: ts.Node,
-      isSymbolWalk: boolean
+      isSymbolWalk: boolean,
     ): TypeWriterResult | undefined {
       const actualPos = ts.skipTrivia(this.currentSourceFile.text, node.pos);
-      const lineAndCharacter =
-        this.currentSourceFile.getLineAndCharacterOfPosition(actualPos);
+      const lineAndCharacter = this.currentSourceFile.getLineAndCharacterOfPosition(actualPos);
       const sourceText = ts.getSourceTextOfNodeFromSourceFile(
         this.currentSourceFile,
-        node
+        node,
       );
 
       if (!isSymbolWalk) {
         // Don't try to get the type of something that's already a type.
         // Exception for `T` in `type T = something` because that may evaluate to some interesting type.
         if (
-          ts.isPartOfTypeNode(node) ||
-          (ts.isIdentifier(node) &&
-            !(
-              ts.getMeaningFromDeclaration(node.parent) &
-              ts.SemanticMeaning.Value
-            ) &&
-            !(
-              ts.isTypeAliasDeclaration(node.parent) &&
-              node.parent.name === node
+          ts.isPartOfTypeNode(node)
+          || (ts.isIdentifier(node)
+            && !(
+              ts.getMeaningFromDeclaration(node.parent)
+              & ts.SemanticMeaning.Value
+            )
+            && !(
+              ts.isTypeAliasDeclaration(node.parent)
+              && node.parent.name === node
             ))
         ) {
           return undefined;
@@ -173,12 +178,13 @@ namespace Harness {
         // Workaround to ensure we output 'C' instead of 'typeof C' for base class expressions
         // let type = this.checker.getTypeAtLocation(node);
         let type = ts.isExpressionWithTypeArgumentsInClassExtendsClause(
-          node.parent
-        )
+            node.parent,
+          )
           ? this.checker.getTypeAtLocation(node.parent)
           : undefined;
-        if (!type || type.flags & ts.TypeFlags.Any)
+        if (!type || type.flags & ts.TypeFlags.Any) {
           type = this.checker.getTypeAtLocation(node);
+        }
         const typeString =
           // Distinguish `errorType`s from `any`s; but only if the file has no errors.
           // Additionally,
@@ -192,26 +198,26 @@ namespace Harness {
           // * and intrinsic jsx tag names
           // return `error`s via `getTypeAtLocation`
           // But this is generally expected, so we don't call those out, either
-          !this.hadErrorBaseline &&
-          type.flags & ts.TypeFlags.Any &&
-          !ts.isBindingElement(node.parent) &&
-          !ts.isPropertyAccessOrQualifiedName(node.parent) &&
-          !ts.isLabelName(node) &&
-          !(
-            ts.isModuleDeclaration(node.parent) &&
-            ts.isGlobalScopeAugmentation(node.parent)
-          ) &&
-          !ts.isMetaProperty(node.parent) &&
-          !this.isImportStatementName(node) &&
-          !this.isExportStatementName(node) &&
-          !this.isIntrinsicJsxTag(node)
+          !this.hadErrorBaseline
+            && type.flags & ts.TypeFlags.Any
+            && !ts.isBindingElement(node.parent)
+            && !ts.isPropertyAccessOrQualifiedName(node.parent)
+            && !ts.isLabelName(node)
+            && !(
+              ts.isModuleDeclaration(node.parent)
+              && ts.isGlobalScopeAugmentation(node.parent)
+            )
+            && !ts.isMetaProperty(node.parent)
+            && !this.isImportStatementName(node)
+            && !this.isExportStatementName(node)
+            && !this.isIntrinsicJsxTag(node)
             ? (type as ts.IntrinsicType).intrinsicName
             : this.checker.typeToString(
-                type,
-                node.parent,
-                ts.TypeFormatFlags.NoTruncation |
-                  ts.TypeFormatFlags.AllowUniqueESSymbolType
-              );
+              type,
+              node.parent,
+              ts.TypeFormatFlags.NoTruncation
+                | ts.TypeFormatFlags.AllowUniqueESSymbolType,
+            );
         return {
           line: lineAndCharacter.line,
           syntaxKind: node.kind,
@@ -223,15 +229,12 @@ namespace Harness {
       if (!symbol) {
         return;
       }
-      let symbolString =
-        "Symbol(" + this.checker.symbolToString(symbol, node.parent);
+      let symbolString = "Symbol(" + this.checker.symbolToString(symbol, node.parent);
       if (symbol.declarations) {
         let count = 0;
         for (const declaration of symbol.declarations) {
           if (count >= 5) {
-            symbolString += ` ... and ${
-              symbol.declarations.length - count
-            } more`;
+            symbolString += ` ... and ${symbol.declarations.length - count} more`;
             break;
           }
           count++;
@@ -241,13 +244,12 @@ namespace Harness {
             continue;
           }
           const declSourceFile = declaration.getSourceFile();
-          const declLineAndCharacter =
-            declSourceFile.getLineAndCharacterOfPosition(declaration.pos);
+          const declLineAndCharacter = declSourceFile.getLineAndCharacterOfPosition(declaration.pos);
           const fileName = ts.getBaseFileName(declSourceFile.fileName);
           const isLibFile = /lib(.*)\.d\.ts/i.test(fileName);
-          const declText = `Decl(${fileName}, ${
-            isLibFile ? "--" : declLineAndCharacter.line
-          }, ${isLibFile ? "--" : declLineAndCharacter.character})`;
+          const declText = `Decl(${fileName}, ${isLibFile ? "--" : declLineAndCharacter.line}, ${
+            isLibFile ? "--" : declLineAndCharacter.character
+          })`;
           symbolString += declText;
           (declaration as any).__symbolTestOutputCache = declText;
         }

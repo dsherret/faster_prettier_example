@@ -6,7 +6,7 @@ namespace ts.projectSystem {
 
     function createSessionWithEventHandler(
       files: File[],
-      useLargeTsFile: boolean
+      useLargeTsFile: boolean,
     ) {
       const largeFile: File = {
         path: `${tscWatch.projectRoot}/${getLargeFile(useLargeTsFile)}`,
@@ -15,18 +15,19 @@ namespace ts.projectSystem {
       };
       files.push(largeFile);
       const host = createServerHost(files);
-      const { session, events: largeFileReferencedEvents } =
-        createSessionWithEventTracking<server.LargeFileReferencedEvent>(
-          host,
-          server.LargeFileReferencedEvent
-        );
+      const { session, events: largeFileReferencedEvents } = createSessionWithEventTracking<
+        server.LargeFileReferencedEvent
+      >(
+        host,
+        server.LargeFileReferencedEvent,
+      );
 
       return { session, verifyLargeFile };
 
       function verifyLargeFile(project: server.Project) {
         checkProjectActualFiles(
           project,
-          files.map((f) => f.path)
+          files.map((f) => f.path),
         );
 
         // large file for non ts file should be empty and for ts file should have content
@@ -34,7 +35,7 @@ namespace ts.projectSystem {
         const info = service.getScriptInfo(largeFile.path)!;
         assert.equal(
           info.cacheSourceFile!.sourceFile.text,
-          useLargeTsFile ? largeFile.content : ""
+          useLargeTsFile ? largeFile.content : "",
         );
 
         assert.deepEqual(
@@ -42,15 +43,15 @@ namespace ts.projectSystem {
           useLargeTsFile
             ? emptyArray
             : [
-                {
-                  eventName: server.LargeFileReferencedEvent,
-                  data: {
-                    file: largeFile.path,
-                    fileSize: largeFile.fileSize,
-                    maxFileSize: server.maxFileSize,
-                  },
+              {
+                eventName: server.LargeFileReferencedEvent,
+                data: {
+                  file: largeFile.path,
+                  fileSize: largeFile.fileSize,
+                  maxFileSize: server.maxFileSize,
                 },
-              ]
+              },
+            ],
         );
       }
     }
@@ -71,7 +72,7 @@ namespace ts.projectSystem {
         const files = [file, libFile, tsconfig];
         const { session, verifyLargeFile } = createSessionWithEventHandler(
           files,
-          useLargeTsFile
+          useLargeTsFile,
         );
         const service = session.getProjectService();
         openFilesForSession([file], session);
@@ -87,7 +88,7 @@ namespace ts.projectSystem {
         const files = [file, libFile];
         const { session, verifyLargeFile } = createSessionWithEventHandler(
           files,
-          useLargeTsFile
+          useLargeTsFile,
         );
         const service = session.getProjectService();
         openFilesForSession([file], session);

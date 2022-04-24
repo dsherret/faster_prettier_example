@@ -15,7 +15,7 @@ namespace ts.projectSystem {
         f1.path,
         /*fileContent*/ undefined,
         /*scriptKind*/ undefined,
-        "/a"
+        "/a",
       );
 
       checkNumberOfConfiguredProjects(service, 0);
@@ -48,7 +48,7 @@ namespace ts.projectSystem {
         f1.path,
         /*fileContent*/ undefined,
         /*scriptKind*/ undefined,
-        projectDir
+        projectDir,
       );
       checkNumberOfProjects(service, { configuredProjects: 1 });
       assert.isDefined(service.configuredProjects.get(configFile.path));
@@ -58,7 +58,7 @@ namespace ts.projectSystem {
       checkWatchedDirectories(
         host,
         typeRootLocations.concat(configFileLocation),
-        /*recursive*/ true
+        /*recursive*/ true,
       );
 
       // Delete config file - should create inferred project and not configured project
@@ -100,7 +100,7 @@ namespace ts.projectSystem {
         f1.path,
         /*fileContent*/ undefined,
         /*scriptKind*/ undefined,
-        projectDir
+        projectDir,
       );
       checkNumberOfProjects(service, { configuredProjects: 1 });
       assert.isDefined(service.configuredProjects.get(configFile.path));
@@ -109,7 +109,7 @@ namespace ts.projectSystem {
       checkWatchedDirectories(
         host,
         getTypeRootsFromLocation(configFileLocation).concat(configFileLocation),
-        /*recursive*/ true
+        /*recursive*/ true,
       );
 
       // Delete config file - should create inferred project with project root path set
@@ -128,7 +128,7 @@ namespace ts.projectSystem {
       checkWatchedDirectories(
         host,
         getTypeRootsFromLocation(projectDir),
-        /*recursive*/ true
+        /*recursive*/ true,
       );
     });
 
@@ -152,7 +152,7 @@ namespace ts.projectSystem {
           file.path,
           /*fileContent*/ undefined,
           /*scriptKind*/ undefined,
-          "/a/b/projects/proj"
+          "/a/b/projects/proj",
         );
         return { host, projectService };
       }
@@ -160,14 +160,14 @@ namespace ts.projectSystem {
       function verifyConfiguredProject(
         host: TestServerHost,
         projectService: TestProjectService,
-        orphanInferredProject?: boolean
+        orphanInferredProject?: boolean,
       ) {
         projectService.checkNumberOfProjects({
           configuredProjects: 1,
           inferredProjects: orphanInferredProject ? 1 : 0,
         });
         const project = Debug.checkDefined(
-          projectService.configuredProjects.get(tsconfig.path)
+          projectService.configuredProjects.get(tsconfig.path),
         );
 
         if (orphanInferredProject) {
@@ -186,15 +186,14 @@ namespace ts.projectSystem {
           host,
           (orphanInferredProject
             ? [projectRoot, `${dirOfFile}/node_modules/@types`]
-            : [projectRoot]
-          ).concat(getTypeRootsFromLocation(projectRoot)),
-          /*recursive*/ true
+            : [projectRoot]).concat(getTypeRootsFromLocation(projectRoot)),
+          /*recursive*/ true,
         );
       }
 
       function verifyInferredProject(
         host: TestServerHost,
-        projectService: TestProjectService
+        projectService: TestProjectService,
       ) {
         projectService.checkNumberOfProjects({ inferredProjects: 1 });
         const project = projectService.inferredProjects[0];
@@ -211,7 +210,7 @@ namespace ts.projectSystem {
         checkWatchedDirectories(
           host,
           getTypeRootsFromLocation(dirOfFile),
-          /*recursive*/ true
+          /*recursive*/ true,
         );
       }
 
@@ -232,7 +231,7 @@ namespace ts.projectSystem {
         verifyConfiguredProject(
           host,
           projectService,
-          /*orphanInferredProject*/ true
+          /*orphanInferredProject*/ true,
         );
       });
 
@@ -245,7 +244,7 @@ namespace ts.projectSystem {
         verifyConfiguredProject(
           host,
           projectService,
-          /*orphanInferredProject*/ true
+          /*orphanInferredProject*/ true,
         );
 
         host.deleteFile(tsconfig.path);
@@ -255,22 +254,21 @@ namespace ts.projectSystem {
     });
 
     describe("should not search and watch config files from directories that cannot be watched", () => {
-      const root =
-        "/root/teams/VSCode68/Shared Documents/General/jt-ts-test-workspace";
+      const root = "/root/teams/VSCode68/Shared Documents/General/jt-ts-test-workspace";
       function verifyConfigFileWatch(projectRootPath: string | undefined) {
         const path = `${root}/x.js`;
         const host = createServerHost(
           [libFile, { path, content: "const x = 10" }],
           {
             useCaseSensitiveFileNames: true,
-          }
+          },
         );
         const service = createProjectService(host);
         service.openClientFile(
           path,
           /*fileContent*/ undefined,
           /*scriptKind*/ undefined,
-          projectRootPath
+          projectRootPath,
         );
         checkNumberOfProjects(service, { inferredProjects: 1 });
         checkProjectActualFiles(service.inferredProjects[0], [
@@ -280,7 +278,7 @@ namespace ts.projectSystem {
         checkWatchedFilesDetailed(
           host,
           [libFile.path, ...getConfigFilesToWatch(root)],
-          1
+          1,
         );
       }
 

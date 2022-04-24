@@ -4,7 +4,7 @@ namespace ts.tscWatch {
     function verifyOutAndOutFileSetting(
       subScenario: string,
       out?: string,
-      outFile?: string
+      outFile?: string,
     ) {
       verifyTscWatch({
         scenario,
@@ -44,7 +44,7 @@ namespace ts.tscWatch {
     verifyOutAndOutFileSetting(
       "config has outFile",
       /*out*/ undefined,
-      "/a/out.js"
+      "/a/out.js",
     );
 
     function verifyFilesEmittedOnce(subScenario: string, useOutFile: boolean) {
@@ -60,8 +60,7 @@ namespace ts.tscWatch {
           };
           const file2: File = {
             path: "/a/b/dependencies/file2.d.ts",
-            content:
-              "declare namespace Dependencies.SomeComponent { export class SomeClass { version: string; } }",
+            content: "declare namespace Dependencies.SomeComponent { export class SomeClass { version: string; } }",
           };
           const file3: File = {
             path: "/a/b/project/src/main.ts",
@@ -95,11 +94,11 @@ namespace ts.tscWatch {
     }
     verifyFilesEmittedOnce(
       "with --outFile and multiple declaration files in the program",
-      /*useOutFile*/ true
+      /*useOutFile*/ true,
     );
     verifyFilesEmittedOnce(
       "without --outFile and multiple declaration files in the program",
-      /*useOutFile*/ false
+      /*useOutFile*/ false,
     );
   });
 
@@ -174,10 +173,10 @@ namespace ts.tscWatch {
           return createWatchedSystem(
             firstReloadFileList
               ? map(
-                  firstReloadFileList,
-                  (fileName) => find(files, (file) => file.path === fileName)!
-                )
-              : files
+                firstReloadFileList,
+                (fileName) => find(files, (file) => file.path === fileName)!,
+              )
+              : files,
           );
         },
         changes,
@@ -187,12 +186,11 @@ namespace ts.tscWatch {
     function modifyModuleFile1Shape(sys: WatchedSystem) {
       sys.writeFile(
         moduleFile1Path,
-        `export var T: number;export function Foo() { };`
+        `export var T: number;export function Foo() { };`,
       );
     }
     const changeModuleFile1Shape: TscWatchCompileChange = {
-      caption:
-        "Change the content of moduleFile1 to `export var T: number;export function Foo() { };`",
+      caption: "Change the content of moduleFile1 to `export var T: number;export function Foo() { };`",
       change: modifyModuleFile1Shape,
       timeouts: checkSingleTimeoutQueueLengthAndRun,
     };
@@ -208,7 +206,7 @@ namespace ts.tscWatch {
           change: (sys) =>
             sys.writeFile(
               moduleFile1Path,
-              `export var T: number;export function Foo() { console.log('hi'); };`
+              `export var T: number;export function Foo() { console.log('hi'); };`,
             ),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
@@ -220,8 +218,7 @@ namespace ts.tscWatch {
       changes: [
         {
           caption: "Change file1Consumer1 content to `export let y = Foo();`",
-          change: (sys) =>
-            sys.writeFile(file1Consumer1Path, `export let y = Foo();`),
+          change: (sys) => sys.writeFile(file1Consumer1Path, `export let y = Foo();`),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
         changeModuleFile1Shape,
@@ -230,15 +227,14 @@ namespace ts.tscWatch {
           change: (sys) =>
             sys.writeFile(
               file1Consumer1Path,
-              `import {Foo} from "./moduleFile1";let y = Foo();`
+              `import {Foo} from "./moduleFile1";let y = Foo();`,
             ),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
         {
           caption:
             "Change the content of moduleFile1 to `export var T: number;export var T2: string;export function Foo() { };`",
-          change: (sys) =>
-            sys.writeFile(moduleFile1Path, `export let y = Foo();`),
+          change: (sys) => sys.writeFile(moduleFile1Path, `export let y = Foo();`),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
         {
@@ -248,7 +244,7 @@ namespace ts.tscWatch {
           change: (sys) => {
             sys.writeFile(
               file1Consumer1Path,
-              `import {Foo} from "./moduleFile1";let y = Foo();`
+              `import {Foo} from "./moduleFile1";let y = Foo();`,
             );
             modifyModuleFile1Shape(sys);
           },
@@ -279,7 +275,7 @@ namespace ts.tscWatch {
           change: (sys) => {
             sys.writeFile(
               "/a/b/file1Consumer3.ts",
-              `import {Foo} from "./moduleFile1"; let y = Foo();`
+              `import {Foo} from "./moduleFile1"; let y = Foo();`,
             );
             modifyModuleFile1Shape(sys);
           },
@@ -313,15 +309,13 @@ namespace ts.tscWatch {
     });
 
     verifyTscWatchEmit({
-      subScenario:
-        "should always return the file itself if '--isolatedModules' is specified",
+      subScenario: "should always return the file itself if '--isolatedModules' is specified",
       configObj: { compilerOptions: { isolatedModules: true } },
       changes: [changeModuleFile1Shape],
     });
 
     verifyTscWatchEmit({
-      subScenario:
-        "should always return the file itself if '--out' or '--outFile' is specified",
+      subScenario: "should always return the file itself if '--out' or '--outFile' is specified",
       configObj: {
         compilerOptions: { module: "system", outFile: "/a/b/out.js" },
       },
@@ -339,8 +333,7 @@ namespace ts.tscWatch {
       changes: [
         {
           caption: "change file1Consumer1",
-          change: (sys) =>
-            sys.appendFile(file1Consumer1Path, "export var T: number;"),
+          change: (sys) => sys.appendFile(file1Consumer1Path, "export var T: number;"),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
         changeModuleFile1Shape,
@@ -350,7 +343,7 @@ namespace ts.tscWatch {
             sys.appendFile(file1Consumer1Path, "export var T2: number;");
             sys.writeFile(
               moduleFile1Path,
-              `export var T2: number;export function Foo() { };`
+              `export var T2: number;export function Foo() { };`,
             );
           },
           timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -381,8 +374,7 @@ export var t2 = 10;`,
       changes: [
         {
           caption: "change file1",
-          change: (sys) =>
-            sys.appendFile("/a/b/file1.ts", "export var t3 = 10;"),
+          change: (sys) => sys.appendFile("/a/b/file1.ts", "export var t3 = 10;"),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
       ],
@@ -429,14 +421,12 @@ export var x = Foo();`,
       changes: [
         {
           caption: "edit refereceFile1",
-          change: (sys) =>
-            sys.appendFile("/a/b/referenceFile1.ts", "export var yy = Foo();"),
+          change: (sys) => sys.appendFile("/a/b/referenceFile1.ts", "export var yy = Foo();"),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
         {
           caption: "create moduleFile2",
-          change: (sys) =>
-            sys.writeFile(moduleFile2Path, "export var Foo4 = 10;"),
+          change: (sys) => sys.writeFile(moduleFile2Path, "export var Foo4 = 10;"),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
       ],
@@ -458,13 +448,12 @@ export var x = Foo();`,
               },
               libFile,
             ],
-            { newLine }
+            { newLine },
           ),
         changes: [
           {
             caption: "Append a line",
-            change: (sys) =>
-              sys.appendFile("/a/app.ts", newLine + "var z = 3;"),
+            change: (sys) => sys.appendFile("/a/app.ts", newLine + "var z = 3;"),
             timeouts: checkSingleTimeoutQueueLengthAndRun,
           },
         ],
@@ -505,7 +494,7 @@ export var x = Foo();`,
           change: (sys) =>
             sys.appendFile(
               "/a/b/f1.ts",
-              "export function foo2() { return 2; }"
+              "export function foo2() { return 2; }",
             ),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
@@ -514,7 +503,7 @@ export var x = Foo();`,
           change: (sys) =>
             sys.appendFile(
               "/a/b/f1.ts",
-              "export function fooN() { return 2; }"
+              "export function fooN() { return 2; }",
             ),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
@@ -523,8 +512,7 @@ export var x = Foo();`,
 
     verifyTscWatch({
       scenario,
-      subScenario:
-        "emit file content/elides const enums correctly in incremental compilation",
+      subScenario: "emit file content/elides const enums correctly in incremental compilation",
       commandLineArgs: ["-w", "/user/someone/projects/myproject/file3.ts"],
       sys: () => {
         const currentDirectory = "/user/someone/projects/myproject";
@@ -548,7 +536,7 @@ export var x = Foo();`,
           change: (sys) =>
             sys.appendFile(
               "/user/someone/projects/myproject/file3.ts",
-              "function foo2() { return 2; }"
+              "function foo2() { return 2; }",
             ),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
@@ -557,8 +545,7 @@ export var x = Foo();`,
 
     verifyTscWatch({
       scenario,
-      subScenario:
-        "emit file content/file is deleted and created as part of change",
+      subScenario: "emit file content/file is deleted and created as part of change",
       commandLineArgs: ["-w"],
       sys: () => {
         const projectLocation = "/home/username/project";
@@ -587,7 +574,7 @@ export var x = Foo();`,
               "\nvar b = 10;",
               {
                 invokeFileDeleteCreateAsPartInsteadOfChange: true,
-              }
+              },
             ),
           timeouts: checkSingleTimeoutQueueLengthAndRun,
         },
@@ -632,7 +619,7 @@ export var x = Foo();`,
               "var zz30 = 100;",
               {
                 invokeDirectoryWatcherInsteadOfFileChanged: true,
-              }
+              },
             ),
           timeouts: runQueuedTimeoutCallbacks,
         },

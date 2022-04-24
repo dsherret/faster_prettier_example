@@ -20,10 +20,10 @@ namespace ts.projectSystem {
         verifyProjectLoadEvents: (
           expected: [
             server.ProjectLoadingStartEvent,
-            server.ProjectLoadingFinishEvent
-          ]
+            server.ProjectLoadingFinishEvent,
+          ],
         ) => void;
-      }
+      },
     ) {
       function createSessionToVerifyEvent(files: readonly File[]) {
         const host = createServerHost(files);
@@ -39,7 +39,7 @@ namespace ts.projectSystem {
             assert.equal(
               getNumberOfEvents(),
               1,
-              "Event for loading is sent before reading config file"
+              "Event for loading is sent before reading config file",
             );
           }
           return originalReadFile.call(host, file);
@@ -68,7 +68,7 @@ namespace ts.projectSystem {
         function verifyEventWithOpenTs(
           file: File,
           configPath: string,
-          configuredProjects: number
+          configuredProjects: number,
         ) {
           openFilesForSession([file], session);
           checkNumberOfProjects(service, { configuredProjects });
@@ -76,7 +76,7 @@ namespace ts.projectSystem {
           assert.isDefined(project);
           verifyEvent(
             project,
-            `Creating possible configured project for ${file.path} to open`
+            `Creating possible configured project for ${file.path} to open`,
           );
         }
       }
@@ -91,15 +91,14 @@ namespace ts.projectSystem {
           content: "{}",
         };
         const { verifyEventWithOpenTs } = createSessionToVerifyEvent(
-          files.concat(bTs, configB)
+          files.concat(bTs, configB),
         );
         verifyEventWithOpenTs(aTs, configA.path, 1);
         verifyEventWithOpenTs(bTs, configB.path, 2);
       });
 
       it("when change is detected in the config file", () => {
-        const { host, verifyEvent, verifyEventWithOpenTs, service } =
-          createSessionToVerifyEvent(files);
+        const { host, verifyEvent, verifyEventWithOpenTs, service } = createSessionToVerifyEvent(files);
         verifyEventWithOpenTs(aTs, configA.path, 1);
 
         host.writeFile(configA.path, configA.content);
@@ -119,8 +118,9 @@ namespace ts.projectSystem {
             extends: "../a/tsconfig.json",
           }),
         };
-        const { host, verifyEvent, verifyEventWithOpenTs, service } =
-          createSessionToVerifyEvent(files.concat(bTs, configB));
+        const { host, verifyEvent, verifyEventWithOpenTs, service } = createSessionToVerifyEvent(
+          files.concat(bTs, configB),
+        );
         verifyEventWithOpenTs(bTs, configB.path, 1);
 
         host.writeFile(configA.path, configA.content);
@@ -128,7 +128,7 @@ namespace ts.projectSystem {
         const project = service.configuredProjects.get(configB.path)!;
         verifyEvent(
           project,
-          `Change in extended config file ${configA.path} detected`
+          `Change in extended config file ${configA.path} detected`,
         );
       });
 
@@ -151,7 +151,8 @@ namespace ts.projectSystem {
           };
           const aDTsMap: File = {
             path: `${tscWatch.projects}/a/a.d.ts.map`,
-            content: `{"version":3,"file":"a.d.ts","sourceRoot":"","sources":["./a.ts"],"names":[],"mappings":"AAAA,qBAAa,CAAC;CAAI"}`,
+            content:
+              `{"version":3,"file":"a.d.ts","sourceRoot":"","sources":["./a.ts"],"names":[],"mappings":"AAAA,qBAAa,CAAC;CAAI"}`,
           };
           const bTs: File = {
             path: bTsPath,
@@ -169,10 +170,9 @@ namespace ts.projectSystem {
             }),
           };
 
-          const { service, session, verifyEventWithOpenTs, verifyEvent } =
-            createSessionToVerifyEvent(
-              files.concat(aDTs, aDTsMap, bTs, configB)
-            );
+          const { service, session, verifyEventWithOpenTs, verifyEvent } = createSessionToVerifyEvent(
+            files.concat(aDTs, aDTsMap, bTs, configB),
+          );
           verifyEventWithOpenTs(bTs, configB.path, 1);
 
           session.executeCommandSeq<protocol.ReferencesRequest>({
@@ -190,7 +190,7 @@ namespace ts.projectSystem {
             project,
             disableSourceOfProjectReferenceRedirect
               ? `Creating project for original file: ${aTs.path} for location: ${aDTs.path}`
-              : `Creating project for original file: ${aTs.path}`
+              : `Creating project for original file: ${aTs.path}`,
           );
         }
       });
@@ -199,7 +199,7 @@ namespace ts.projectSystem {
         const projectFileName = `${tscWatch.projects}/a/project.csproj`;
 
         function createSession(
-          lazyConfiguredProjectsFromExternalProject: boolean
+          lazyConfiguredProjectsFromExternalProject: boolean,
         ) {
           const {
             session,
@@ -223,21 +223,21 @@ namespace ts.projectSystem {
             assert.isDefined(projectA);
             verifyEventWorker(
               projectA,
-              `Creating configured project in external project: ${projectFileName}`
+              `Creating configured project in external project: ${projectFileName}`,
             );
           }
         }
 
         it("when lazyConfiguredProjectsFromExternalProject is false", () => {
           const { verifyEvent } = createSession(
-            /*lazyConfiguredProjectsFromExternalProject*/ false
+            /*lazyConfiguredProjectsFromExternalProject*/ false,
           );
           verifyEvent();
         });
 
         it("when lazyConfiguredProjectsFromExternalProject is true and file is opened", () => {
           const { verifyEvent, getNumberOfEvents, session } = createSession(
-            /*lazyConfiguredProjectsFromExternalProject*/ true
+            /*lazyConfiguredProjectsFromExternalProject*/ true,
           );
           assert.equal(getNumberOfEvents(), 0);
 
@@ -247,7 +247,7 @@ namespace ts.projectSystem {
 
         it("when lazyConfiguredProjectsFromExternalProject is disabled", () => {
           const { verifyEvent, getNumberOfEvents, service } = createSession(
-            /*lazyConfiguredProjectsFromExternalProject*/ true
+            /*lazyConfiguredProjectsFromExternalProject*/ true,
           );
           assert.equal(getNumberOfEvents(), 0);
 
@@ -266,28 +266,26 @@ namespace ts.projectSystem {
         >(
           host,
           server.ProjectLoadingStartEvent,
-          server.ProjectLoadingFinishEvent
+          server.ProjectLoadingFinishEvent,
         );
         return {
           session,
           getNumberOfEvents: () => events.length,
           clearEvents: () => (events.length = 0),
-          verifyProjectLoadEvents: (expected) =>
-            assert.deepEqual(events, expected),
+          verifyProjectLoadEvents: (expected) => assert.deepEqual(events, expected),
         };
       });
     });
 
     describe("when using default event handler", () => {
       verifyProjectLoadingStartAndFinish((host) => {
-        const { session, getEvents, clearEvents } =
-          createSessionWithDefaultEventHandler<
-            | protocol.ProjectLoadingStartEvent
-            | protocol.ProjectLoadingFinishEvent
-          >(host, [
-            server.ProjectLoadingStartEvent,
-            server.ProjectLoadingFinishEvent,
-          ]);
+        const { session, getEvents, clearEvents } = createSessionWithDefaultEventHandler<
+          | protocol.ProjectLoadingStartEvent
+          | protocol.ProjectLoadingFinishEvent
+        >(host, [
+          server.ProjectLoadingStartEvent,
+          server.ProjectLoadingFinishEvent,
+        ]);
         return {
           session,
           getNumberOfEvents: () => getEvents().length,
@@ -298,8 +296,8 @@ namespace ts.projectSystem {
         function verifyProjectLoadEvents(
           expected: [
             server.ProjectLoadingStartEvent,
-            server.ProjectLoadingFinishEvent
-          ]
+            server.ProjectLoadingFinishEvent,
+          ],
         ) {
           const actual = getEvents().map((e) => ({
             eventName: e.event,

@@ -65,7 +65,7 @@ import { something } from "something";
             arguments: protocolFileLocationFromSubstring(file1, "prop", {
               index: 1,
             }),
-          }
+          },
         ).response as protocol.CompletionEntry[];
         assert.deepEqual(response, [
           completionEntry("foo", ScriptElementKind.memberFunctionElement),
@@ -75,7 +75,7 @@ import { something } from "something";
 
       function completionEntry(
         name: string,
-        kind: ScriptElementKind
+        kind: ScriptElementKind,
       ): protocol.CompletionEntry {
         return {
           name,
@@ -112,7 +112,7 @@ import { something } from "something";
       } catch (e) {
         assert.equal(
           e.message,
-          `Request: semanticDiagnosticsSync not allowed in LanguageServiceMode.PartialSemantic`
+          `Request: semanticDiagnosticsSync not allowed in LanguageServiceMode.PartialSemantic`,
         );
         hasException = true;
       }
@@ -125,7 +125,7 @@ import { something } from "something";
       } catch (e) {
         assert.equal(
           e.message,
-          `LanguageService Operation: getSemanticDiagnostics not allowed in LanguageServiceMode.PartialSemantic`
+          `LanguageService Operation: getSemanticDiagnostics not allowed in LanguageServiceMode.PartialSemantic`,
         );
         hasException = true;
       }
@@ -164,7 +164,7 @@ import { something } from "something";
       assert.equal(response!.length, 1);
       assert.equal(
         (response![0] as protocol.Diagnostic).text,
-        expectedErrorMessage
+        expectedErrorMessage,
       );
 
       const project = service.inferredProjects[0];
@@ -183,7 +183,7 @@ import { something } from "something";
       baselineTsserverLogs(
         "partialSemanticServer",
         "syntactic diagnostics are returned with no error",
-        session
+        session,
       );
     });
 
@@ -307,11 +307,10 @@ function fooB() { }`,
     it("should support go-to-definition on module specifiers", () => {
       const { session, file1, file2 } = setup();
       openFilesForSession([file1], session);
-      const response =
-        session.executeCommandSeq<protocol.DefinitionAndBoundSpanRequest>({
-          command: protocol.CommandTypes.DefinitionAndBoundSpan,
-          arguments: protocolFileLocationFromSubstring(file1, `"./b"`),
-        }).response as protocol.DefinitionInfoAndBoundSpan;
+      const response = session.executeCommandSeq<protocol.DefinitionAndBoundSpanRequest>({
+        command: protocol.CommandTypes.DefinitionAndBoundSpan,
+        arguments: protocolFileLocationFromSubstring(file1, `"./b"`),
+      }).response as protocol.DefinitionInfoAndBoundSpan;
       assert.isDefined(response);
       assert.deepEqual(response.definitions, [
         {

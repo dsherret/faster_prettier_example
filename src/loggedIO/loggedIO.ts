@@ -131,12 +131,12 @@ namespace Playback {
   export function newStyleLogIntoOldStyleLog(
     log: IoLog,
     host: ts.System | Harness.IO,
-    baseName: string
+    baseName: string,
   ) {
     for (const file of log.filesAppended) {
       if (file.contentsPath) {
         file.contents = host.readFile(
-          ts.combinePaths(baseName, file.contentsPath)
+          ts.combinePaths(baseName, file.contentsPath),
         );
         delete file.contentsPath;
       }
@@ -144,7 +144,7 @@ namespace Playback {
     for (const file of log.filesWritten) {
       if (file.contentsPath) {
         file.contents = host.readFile(
-          ts.combinePaths(baseName, file.contentsPath)
+          ts.combinePaths(baseName, file.contentsPath),
         );
         delete file.contentsPath;
       }
@@ -154,9 +154,8 @@ namespace Playback {
       if (result.contentsPath) {
         // `readFile` strips away a BOM (and actually reinerprets the file contents according to the correct encoding)
         // - but this has the unfortunate sideeffect of removing the BOM from any outputs based on the file, so we readd it here.
-        result.contents =
-          (result.bom || "") +
-          host.readFile(ts.combinePaths(baseName, result.contentsPath));
+        result.contents = (result.bom || "")
+          + host.readFile(ts.combinePaths(baseName, result.contentsPath));
         delete result.contentsPath;
       }
     }
@@ -164,7 +163,7 @@ namespace Playback {
   }
 
   const canonicalizeForHarness = ts.createGetCanonicalFileName(
-    /*caseSensitive*/ false
+    /*caseSensitive*/ false,
   ); // This is done so tests work on windows _and_ linux
   function sanitizeTestFilePath(name: string) {
     const path = ts.toPath(
@@ -172,7 +171,7 @@ namespace Playback {
         .normalizeSlashes(name.replace(/[\^<>:"|?*%]/g, "_"))
         .replace(/\.\.\//g, "__dotdot/"),
       "",
-      canonicalizeForHarness
+      canonicalizeForHarness,
     );
     if (ts.startsWith(path, "/")) {
       return path.substring(1);
@@ -183,18 +182,18 @@ namespace Playback {
   export function oldStyleLogIntoNewStyleLog(
     log: IoLog,
     writeFile: typeof Harness.IO.writeFile,
-    baseTestName: string
+    baseTestName: string,
   ) {
     if (log.filesAppended) {
       for (const file of log.filesAppended) {
         if (file.contents !== undefined) {
           file.contentsPath = ts.combinePaths(
             "appended",
-            sanitizeTestFilePath(file.path)
+            sanitizeTestFilePath(file.path),
           );
           writeFile(
             ts.combinePaths(baseTestName, file.contentsPath),
-            file.contents
+            file.contents,
           );
           delete file.contents;
         }
@@ -205,11 +204,11 @@ namespace Playback {
         if (file.contents !== undefined) {
           file.contentsPath = ts.combinePaths(
             "written",
-            sanitizeTestFilePath(file.path)
+            sanitizeTestFilePath(file.path),
           );
           writeFile(
             ts.combinePaths(baseTestName, file.contentsPath),
-            file.contents
+            file.contents,
           );
           delete file.contents;
         }
@@ -222,11 +221,11 @@ namespace Playback {
         if (contents !== undefined) {
           result.contentsPath = ts.combinePaths(
             "read",
-            sanitizeTestFilePath(file.path)
+            sanitizeTestFilePath(file.path),
           );
           writeFile(
             ts.combinePaths(baseTestName, result.contentsPath),
-            contents
+            contents,
           );
           const len = contents.length;
           if (len >= 2 && contents.charCodeAt(0) === 0xfeff) {
@@ -236,9 +235,9 @@ namespace Playback {
             result.bom = "\ufffe";
           }
           if (
-            len >= 3 &&
-            contents.charCodeAt(0) === 0xefbb &&
-            contents.charCodeAt(1) === 0xbf
+            len >= 3
+            && contents.charCodeAt(0) === 0xefbb
+            && contents.charCodeAt(1) === 0xbf
           ) {
             result.bom = "\uefbb\xbf";
           }
@@ -265,7 +264,7 @@ namespace Playback {
       replayLog = log;
       // Remove non-found files from the log (shouldn't really need them, but we still record them for diagnostic purposes)
       replayLog.filesRead = replayLog.filesRead.filter(
-        (f) => f.result!.contents !== undefined
+        (f) => f.result!.contents !== undefined,
       );
       replayFilesRead = new ts.Map();
       for (const file of replayLog.filesRead) {
@@ -281,10 +280,9 @@ namespace Playback {
     wrapper.startRecord = (fileNameBase) => {
       recordLogFileNameBase = fileNameBase;
       recordLog = createEmptyLog();
-      recordLog.useCaseSensitiveFileNames =
-        typeof underlying.useCaseSensitiveFileNames === "function"
-          ? underlying.useCaseSensitiveFileNames()
-          : underlying.useCaseSensitiveFileNames;
+      recordLog.useCaseSensitiveFileNames = typeof underlying.useCaseSensitiveFileNames === "function"
+        ? underlying.useCaseSensitiveFileNames()
+        : underlying.useCaseSensitiveFileNames;
       if (typeof underlying.args !== "function") {
         recordLog.arguments = underlying.args;
       }
@@ -297,22 +295,23 @@ namespace Playback {
       if (recordLog !== undefined) {
         let i = 0;
         const getBase = () => recordLogFileNameBase + i;
-        while (underlying.fileExists(ts.combinePaths(getBase(), "test.json")))
+        while (underlying.fileExists(ts.combinePaths(getBase(), "test.json"))) {
           i++;
+        }
         const newLog = oldStyleLogIntoNewStyleLog(
           recordLog,
           (path, str) => underlying.writeFile(path, str),
-          getBase()
+          getBase(),
         );
         underlying.writeFile(
           ts.combinePaths(getBase(), "test.json"),
-          JSON.stringify(newLog, null, 4)
+          JSON.stringify(newLog, null, 4),
         ); // eslint-disable-line no-null/no-null
         const syntheticTsconfig = generateTsconfig(newLog);
         if (syntheticTsconfig) {
           underlying.writeFile(
             ts.combinePaths(getBase(), "tsconfig.json"),
-            JSON.stringify(syntheticTsconfig, null, 4)
+            JSON.stringify(syntheticTsconfig, null, 4),
           ); // eslint-disable-line no-null/no-null
         }
         recordLog = undefined;
@@ -320,7 +319,7 @@ namespace Playback {
     };
 
     function generateTsconfig(
-      newLog: IoLog
+      newLog: IoLog,
     ): undefined | { compilerOptions: ts.CompilerOptions; files: string[] } {
       if (newLog.filesRead.some((file) => /tsconfig.+json$/.test(file.path))) {
         return;
@@ -329,9 +328,9 @@ namespace Playback {
       for (const file of newLog.filesRead) {
         const result = file.result!;
         if (
-          result.contentsPath &&
-          Harness.isDefaultLibraryFile(result.contentsPath) &&
-          /\.[tj]s$/.test(result.contentsPath)
+          result.contentsPath
+          && Harness.isDefaultLibraryFile(result.contentsPath)
+          && /\.[tj]s$/.test(result.contentsPath)
         ) {
           files.push(result.contentsPath);
         }
@@ -355,10 +354,10 @@ namespace Playback {
           return findResultByFields(
             replayLog!.fileExists,
             { path },
-            /*defaultValue*/ false
+            /*defaultValue*/ false,
           )!;
         }
-      })
+      }),
     );
 
     wrapper.getExecutingFilePath = () => {
@@ -390,12 +389,12 @@ namespace Playback {
         findResultByFields(
           replayLog!.pathsResolved,
           { path },
-          !ts.isRootedDiskPath(ts.normalizeSlashes(path)) &&
-            replayLog!.currentDirectory
+          !ts.isRootedDiskPath(ts.normalizeSlashes(path))
+            && replayLog!.currentDirectory
             ? replayLog!.currentDirectory + "/" + path
-            : ts.normalizeSlashes(path)
+            : ts.normalizeSlashes(path),
         )
-      )
+      ),
     );
 
     wrapper.readFile = recordReplay(wrapper.readFile, underlying)(
@@ -410,9 +409,8 @@ namespace Playback {
         return result;
       },
       memoize(
-        (path) =>
-          findFileByPath(path, /*throwFileNotFoundError*/ true)!.contents
-      )
+        (path) => findFileByPath(path, /*throwFileNotFoundError*/ true)!.contents,
+      ),
     );
 
     wrapper.readDirectory = recordReplay(wrapper.readDirectory, underlying)(
@@ -422,7 +420,7 @@ namespace Playback {
           extensions,
           exclude,
           include,
-          depth
+          depth,
         );
         recordLog!.directoriesRead.push({
           path,
@@ -447,7 +445,7 @@ namespace Playback {
             return directory.result;
           }
         });
-      }
+      },
     );
 
     wrapper.writeFile = recordReplay(wrapper.writeFile, underlying)(
@@ -455,9 +453,9 @@ namespace Playback {
         callAndRecord(
           underlying.writeFile(path, contents),
           recordLog!.filesWritten,
-          { path, contents, bom: false }
+          { path, contents, bom: false },
         ),
-      () => noOpReplay("writeFile")
+      () => noOpReplay("writeFile"),
     );
 
     wrapper.exit = (exitCode) => {
@@ -479,11 +477,11 @@ namespace Playback {
 
   function recordReplay<T extends ts.AnyFunction>(
     original: T,
-    underlying: any
+    underlying: any,
   ) {
     function createWrapper(record: T, replay: T): T {
       // eslint-disable-next-line only-arrow-functions
-      return function () {
+      return function() {
         if (replayLog !== undefined) {
           return replay.apply(undefined, arguments);
         } else if (recordLog !== undefined) {
@@ -499,7 +497,7 @@ namespace Playback {
   function callAndRecord<T, U>(
     underlyingResult: T,
     logArray: U[],
-    logEntry: U
+    logEntry: U,
   ): T {
     if (underlyingResult !== undefined) {
       (logEntry as any).result = underlyingResult;
@@ -511,11 +509,11 @@ namespace Playback {
   function findResultByFields<T>(
     logArray: { result?: T }[],
     expectedFields: {},
-    defaultValue?: T
+    defaultValue?: T,
   ): T | undefined {
     const predicate = (entry: { result?: T }) => {
       return Object.getOwnPropertyNames(expectedFields).every(
-        (name) => (entry as any)[name] === (expectedFields as any)[name]
+        (name) => (entry as any)[name] === (expectedFields as any)[name],
       );
     };
     const results = logArray.filter((entry) => predicate(entry));
@@ -524,8 +522,8 @@ namespace Playback {
         return defaultValue;
       } else {
         throw new Error(
-          "No matching result in log array for: " +
-            JSON.stringify(expectedFields)
+          "No matching result in log array for: "
+            + JSON.stringify(expectedFields),
         );
       }
     }
@@ -534,7 +532,7 @@ namespace Playback {
 
   function findFileByPath(
     expectedPath: string,
-    throwFileNotFoundError: boolean
+    throwFileNotFoundError: boolean,
   ): FileInformation | undefined {
     const normalizedName = ts.normalizePath(expectedPath).toLowerCase();
     // Try to find the result through normal fileName
@@ -546,7 +544,7 @@ namespace Playback {
     // If we got here, we didn't find a match
     if (throwFileNotFoundError) {
       throw new Error(
-        "No matching result in log array for path: " + expectedPath
+        "No matching result in log array for path: " + expectedPath,
       );
     } else {
       return undefined;

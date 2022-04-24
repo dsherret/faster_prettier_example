@@ -13,13 +13,13 @@ declare namespace ts.server {
       path: string,
       callback: FileWatcherCallback,
       pollingInterval?: number,
-      options?: WatchOptions
+      options?: WatchOptions,
     ): FileWatcher;
     watchDirectory(
       path: string,
       callback: DirectoryWatcherCallback,
       recursive?: boolean,
-      options?: WatchOptions
+      options?: WatchOptions,
     ): FileWatcher;
     setTimeout(
       callback: (...args: any[]) => void,

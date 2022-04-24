@@ -27,12 +27,11 @@ namespace Harness {
      */
     initializeTests(): void {
       // Read in and evaluate the test list
-      const testList =
-        this.tests && this.tests.length ? this.tests : this.getTestFiles();
+      const testList = this.tests && this.tests.length ? this.tests : this.getTestFiles();
 
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const cls = this;
-      describe(`${this.kind()} code samples`, function (this: Mocha.Suite) {
+      describe(`${this.kind()} code samples`, function(this: Mocha.Suite) {
         this.timeout(600_000); // 10 minutes
         for (const test of testList) {
           cls.runTest(typeof test === "string" ? test : test.file);
@@ -43,7 +42,7 @@ namespace Harness {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const cls = this;
       const timeout = 600_000; // 10 minutes
-      describe(directoryName, function (this: Mocha.Suite) {
+      describe(directoryName, function(this: Mocha.Suite) {
         this.timeout(timeout);
         const cp: typeof import("child_process") = require("child_process");
 
@@ -51,22 +50,22 @@ namespace Harness {
           let cwd = path.join(
             IO.getWorkspaceRoot(),
             cls.testDir,
-            directoryName
+            directoryName,
           );
           const originalCwd = cwd;
           const stdio = isWorker ? "pipe" : "inherit";
           let types: string[] | undefined;
           if (fs.existsSync(path.join(cwd, "test.json"))) {
             const config = JSON.parse(
-              fs.readFileSync(path.join(cwd, "test.json"), { encoding: "utf8" })
+              fs.readFileSync(path.join(cwd, "test.json"), { encoding: "utf8" }),
             ) as UserConfig;
             ts.Debug.assert(
               !!config.types,
-              "Bad format from test.json: Types field must be present."
+              "Bad format from test.json: Types field must be present.",
             );
             ts.Debug.assert(
               !!config.cloneUrl,
-              "Bad format from test.json: cloneUrl field must be present."
+              "Bad format from test.json: cloneUrl field must be present.",
             );
             const submoduleDir = path.join(cwd, directoryName);
             if (!fs.existsSync(submoduleDir)) {
@@ -81,7 +80,7 @@ namespace Harness {
                   config.cloneUrl,
                   path.join(submoduleDir, ".git"),
                 ],
-                { cwd }
+                { cwd },
               );
             } else {
               exec(
@@ -94,7 +93,7 @@ namespace Harness {
                   "checkout",
                   config.branch || "master",
                 ],
-                { cwd: submoduleDir }
+                { cwd: submoduleDir },
               );
               exec(
                 "git",
@@ -107,7 +106,7 @@ namespace Harness {
                   "HEAD",
                   "--hard",
                 ],
-                { cwd: submoduleDir }
+                { cwd: submoduleDir },
               );
               exec(
                 "git",
@@ -121,7 +120,7 @@ namespace Harness {
                 ],
                 {
                   cwd: submoduleDir,
-                }
+                },
               );
               exec(
                 "git",
@@ -135,7 +134,7 @@ namespace Harness {
                 ],
                 {
                   cwd: submoduleDir,
-                }
+                },
               );
             }
 
@@ -168,7 +167,7 @@ namespace Harness {
               {
                 cwd,
                 timeout: timeout / 2,
-              }
+              },
             ); // NPM shouldn't take the entire timeout - if it takes a long time, it should be terminated and we should log the failure
           }
           const args = [path.join(IO.getWorkspaceRoot(), "built/local/tsc.js")];
@@ -185,7 +184,7 @@ namespace Harness {
                   "--ignore-scripts",
                   ...(isV7OrLater ? ["--legacy-peer-deps"] : []),
                 ],
-                { cwd: originalCwd, timeout: timeout / 2 }
+                { cwd: originalCwd, timeout: timeout / 2 },
               ); // NPM shouldn't take the entire timeout - if it takes a long time, it should be terminated and we should log the failure
             }
           }
@@ -194,8 +193,8 @@ namespace Harness {
             `${cls.kind()}/${directoryName}.log`,
             cls.report(
               cp.spawnSync(`node`, args, { cwd, timeout, shell: true }),
-              cwd
-            )
+              cwd,
+            ),
           );
 
           function exec(
@@ -205,18 +204,16 @@ namespace Harness {
               cwd: string;
               timeout?: number;
               stdio?: import("child_process").StdioOptions;
-            }
+            },
           ): string | undefined {
             const res = cp.spawnSync(
               isWorker ? `${command} 2>&1` : command,
               args,
-              { shell: true, stdio, ...options }
+              { shell: true, stdio, ...options },
             );
             if (res.status !== 0) {
               throw new Error(
-                `${command} ${args.join(" ")} for ${directoryName} failed: ${
-                  res.stdout && res.stdout.toString()
-                }`
+                `${command} ${args.join(" ")} for ${directoryName} failed: ${res.stdout && res.stdout.toString()}`,
               );
             }
             return options.stdio === "pipe"
@@ -235,15 +232,17 @@ namespace Harness {
     }
     report(result: ExecResult) {
       // eslint-disable-next-line no-null/no-null
-      return result.status === 0 &&
-        !result.stdout.length &&
-        !result.stderr.length
+      return result.status === 0
+          && !result.stdout.length
+          && !result.stderr.length
         ? null
         : `Exit Code: ${result.status}
 Standard output:
-${sortErrors(
-  stripAbsoluteImportPaths(result.stdout.toString().replace(/\r\n/g, "\n"))
-)}
+${
+          sortErrors(
+            stripAbsoluteImportPaths(result.stdout.toString().replace(/\r\n/g, "\n")),
+          )
+        }
 
 
 Standard error:
@@ -258,12 +257,11 @@ ${stripAbsoluteImportPaths(result.stderr.toString().replace(/\r\n/g, "\n"))}`;
     }
     initializeTests(): void {
       // Read in and evaluate the test list
-      const testList =
-        this.tests && this.tests.length ? this.tests : this.getTestFiles();
+      const testList = this.tests && this.tests.length ? this.tests : this.getTestFiles();
 
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const cls = this;
-      describe(`${this.kind()} code samples`, function (this: Mocha.Suite) {
+      describe(`${this.kind()} code samples`, function(this: Mocha.Suite) {
         this.timeout(cls.timeout); // 20 minutes
         before(() => {
           cls.exec("docker", ["build", ".", "-t", "typescript/typescript"], {
@@ -286,8 +284,8 @@ ${stripAbsoluteImportPaths(result.stderr.toString().replace(/\r\n/g, "\n"))}`;
                   cwd,
                   timeout: cls.timeout,
                   shell: true,
-                })
-              )
+                }),
+              ),
             );
           });
         }
@@ -298,7 +296,7 @@ ${stripAbsoluteImportPaths(result.stderr.toString().replace(/\r\n/g, "\n"))}`;
     private exec(
       command: string,
       args: string[],
-      options: { cwd: string }
+      options: { cwd: string },
     ): void {
       const cp: typeof import("child_process") = require("child_process");
       const stdio = isWorker ? "pipe" : "inherit";
@@ -310,17 +308,15 @@ ${stripAbsoluteImportPaths(result.stderr.toString().replace(/\r\n/g, "\n"))}`;
       });
       if (res.status !== 0) {
         throw new Error(
-          `${command} ${args.join(" ")} for ${options.cwd} failed: ${
-            res.stdout && res.stdout.toString()
-          }`
+          `${command} ${args.join(" ")} for ${options.cwd} failed: ${res.stdout && res.stdout.toString()}`,
         );
       }
     }
     report(result: ExecResult) {
       // eslint-disable-next-line no-null/no-null
-      return result.status === 0 &&
-        !result.stdout.length &&
-        !result.stderr.length
+      return result.status === 0
+          && !result.stdout.length
+          && !result.stderr.length
         ? null
         : `Exit Code: ${result.status}
 Standard output:
@@ -395,11 +391,11 @@ ${sanitizeDockerfileOutput(result.stderr.toString())}`;
     return result
       .replace(
         /\d+.\d+.\d+-insiders.\d\d\d\d\d\d\d\d/g,
-        "X.X.X-insiders.xxxxxxxx"
+        "X.X.X-insiders.xxxxxxxx",
       )
       .replace(
         /Rush Multi-Project Build Tool (\d+)\.\d+\.\d+/g,
-        "Rush Multi-Project Build Tool $1.X.X"
+        "Rush Multi-Project Build Tool $1.X.X",
       )
       .replace(/([@v\()])\d+\.\d+\.\d+/g, "$1X.X.X")
       .replace(/webpack (\d+)\.\d+\.\d+/g, "webpack $1.X.X")
@@ -413,7 +409,7 @@ ${sanitizeDockerfileOutput(result.stderr.toString())}`;
   function stripAbsoluteImportPaths(result: string) {
     const workspaceRegexp = new RegExp(
       IO.getWorkspaceRoot().replace(/\\/g, "\\\\"),
-      "g"
+      "g",
     );
     return result
       .replace(/import\(".*?\/tests\/cases\/user\//g, `import("/`)
@@ -425,8 +421,8 @@ ${sanitizeDockerfileOutput(result.stderr.toString())}`;
     return ts
       .flatten(
         splitBy(result.split("\n"), (s) => /^\S+/.test(s)).sort(
-          compareErrorStrings
-        )
+          compareErrorStrings,
+        ),
       )
       .join("\n");
   }
@@ -443,24 +439,22 @@ ${sanitizeDockerfileOutput(result.stderr.toString())}`;
     if (!matchB) {
       return 1;
     }
-    const [, errorFileA, lineNumberStringA, columnNumberStringA, remainderA] =
-      matchA;
-    const [, errorFileB, lineNumberStringB, columnNumberStringB, remainderB] =
-      matchB;
+    const [, errorFileA, lineNumberStringA, columnNumberStringA, remainderA] = matchA;
+    const [, errorFileB, lineNumberStringB, columnNumberStringB, remainderB] = matchB;
     return (
-      ts.comparePathsCaseSensitive(errorFileA, errorFileB) ||
-      ts.compareValues(
+      ts.comparePathsCaseSensitive(errorFileA, errorFileB)
+      || ts.compareValues(
         parseInt(lineNumberStringA),
-        parseInt(lineNumberStringB)
-      ) ||
-      ts.compareValues(
+        parseInt(lineNumberStringB),
+      )
+      || ts.compareValues(
         parseInt(columnNumberStringA),
-        parseInt(columnNumberStringB)
-      ) ||
-      ts.compareStringsCaseSensitive(remainderA, remainderB) ||
-      ts.compareStringsCaseSensitive(
+        parseInt(columnNumberStringB),
+      )
+      || ts.compareStringsCaseSensitive(remainderA, remainderB)
+      || ts.compareStringsCaseSensitive(
         a.slice(1).join("\n"),
-        b.slice(1).join("\n")
+        b.slice(1).join("\n"),
       )
     );
   }
@@ -492,8 +486,8 @@ ${stderr.replace(/\r\n/g, "\n")}`;
     return ts
       .flatten(
         splitBy(errors.split("\n"), (s) => /^\S+/.test(s)).filter(
-          isUnexpectedError(cwd)
-        )
+          isUnexpectedError(cwd),
+        ),
       )
       .join("\n");
   }
@@ -519,8 +513,8 @@ ${stderr.replace(/\r\n/g, "\n")}`;
       ts.Debug.assertLessThan(lineNumber, lines.length);
       const previousLine = lineNumber - 1 > 0 ? lines[lineNumber - 1] : "";
       return (
-        !ts.stringContains(lines[lineNumber], "$ExpectError") &&
-        !ts.stringContains(previousLine, "$ExpectError")
+        !ts.stringContains(lines[lineNumber], "$ExpectError")
+        && !ts.stringContains(previousLine, "$ExpectError")
       );
     };
   }

@@ -6,14 +6,14 @@ namespace ts {
       assert.equal(
         actual,
         expected,
-        "Encoded string using convertToBase64 does not match buffer.toString('base64')"
+        "Encoded string using convertToBase64 does not match buffer.toString('base64')",
       );
     }
 
     if (Buffer) {
       it("Converts ASCII charaters correctly", () => {
         runTest(
-          " !\"#$ %&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+          " !\"#$ %&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
         );
       });
 

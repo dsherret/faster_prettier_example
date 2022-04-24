@@ -27,14 +27,14 @@ namespace ts {
 
   function isNamedDefaultReference(e: ImportSpecifier): boolean {
     return (
-      e.propertyName !== undefined &&
-      e.propertyName.escapedText === InternalSymbolName.Default
+      e.propertyName !== undefined
+      && e.propertyName.escapedText === InternalSymbolName.Default
     );
   }
 
   export function chainBundle(
     context: CoreTransformationContext,
-    transformSourceFile: (x: SourceFile) => SourceFile
+    transformSourceFile: (x: SourceFile) => SourceFile,
   ): (x: SourceFile | Bundle) => SourceFile | Bundle {
     return transformSourceFileOrBundle;
 
@@ -47,19 +47,19 @@ namespace ts {
     function transformBundle(node: Bundle) {
       return context.factory.createBundle(
         map(node.sourceFiles, transformSourceFile),
-        node.prepends
+        node.prepends,
       );
     }
   }
 
   export function getExportNeedsImportStarHelper(
-    node: ExportDeclaration
+    node: ExportDeclaration,
   ): boolean {
     return !!getNamespaceDeclarationNode(node);
   }
 
   export function getImportNeedsImportStarHelper(
-    node: ImportDeclaration
+    node: ImportDeclaration,
   ): boolean {
     if (!!getNamespaceDeclarationNode(node)) {
       return true;
@@ -77,21 +77,21 @@ namespace ts {
     }
     // Import star is required if there's default named refs mixed with non-default refs, or if theres non-default refs and it has a default import
     return (
-      (defaultRefCount > 0 && defaultRefCount !== bindings.elements.length) ||
-      (!!(bindings.elements.length - defaultRefCount) && isDefaultImport(node))
+      (defaultRefCount > 0 && defaultRefCount !== bindings.elements.length)
+      || (!!(bindings.elements.length - defaultRefCount) && isDefaultImport(node))
     );
   }
 
   export function getImportNeedsImportDefaultHelper(
-    node: ImportDeclaration
+    node: ImportDeclaration,
   ): boolean {
     // Import default is needed if there's a default import or a default ref and no other refs (meaning an import star helper wasn't requested)
     return (
-      !getImportNeedsImportStarHelper(node) &&
-      (isDefaultImport(node) ||
-        (!!node.importClause &&
-          isNamedImports(node.importClause.namedBindings!) &&
-          containsDefaultReference(node.importClause.namedBindings)))
+      !getImportNeedsImportStarHelper(node)
+      && (isDefaultImport(node)
+        || (!!node.importClause
+          && isNamedImports(node.importClause.namedBindings!)
+          && containsDefaultReference(node.importClause.namedBindings)))
     ); // TODO: GH#18217
   }
 
@@ -99,7 +99,7 @@ namespace ts {
     context: TransformationContext,
     sourceFile: SourceFile,
     resolver: EmitResolver,
-    compilerOptions: CompilerOptions
+    compilerOptions: CompilerOptions,
   ): ExternalModuleInfo {
     const externalImports: (
       | ImportDeclaration
@@ -125,14 +125,14 @@ namespace ts {
           // import { x, y } from "mod"
           externalImports.push(node as ImportDeclaration);
           if (
-            !hasImportStar &&
-            getImportNeedsImportStarHelper(node as ImportDeclaration)
+            !hasImportStar
+            && getImportNeedsImportStarHelper(node as ImportDeclaration)
           ) {
             hasImportStar = true;
           }
           if (
-            !hasImportDefault &&
-            getImportNeedsImportDefaultHelper(node as ImportDeclaration)
+            !hasImportDefault
+            && getImportNeedsImportDefaultHelper(node as ImportDeclaration)
           ) {
             hasImportDefault = true;
           }
@@ -140,8 +140,8 @@ namespace ts {
 
         case SyntaxKind.ImportEqualsDeclaration:
           if (
-            (node as ImportEqualsDeclaration).moduleReference.kind ===
-            SyntaxKind.ExternalModuleReference
+            (node as ImportEqualsDeclaration).moduleReference.kind
+              === SyntaxKind.ExternalModuleReference
           ) {
             // import x = require("mod")
             externalImports.push(node as ImportEqualsDeclaration);
@@ -169,7 +169,7 @@ namespace ts {
                   multiMapSparseArrayAdd(
                     exportedBindings,
                     getOriginalNodeId(node),
-                    name
+                    name,
                   );
                   uniqueExports.set(idText(name), true);
                   exportedNames = append(exportedNames, name);
@@ -193,12 +193,14 @@ namespace ts {
 
         case SyntaxKind.VariableStatement:
           if (hasSyntacticModifier(node, ModifierFlags.Export)) {
-            for (const decl of (node as VariableStatement).declarationList
-              .declarations) {
+            for (
+              const decl of (node as VariableStatement).declarationList
+                .declarations
+            ) {
               exportedNames = collectExportedVariableInfo(
                 decl,
                 uniqueExports,
-                exportedNames
+                exportedNames,
               );
             }
           }
@@ -213,8 +215,8 @@ namespace ts {
                   exportedBindings,
                   getOriginalNodeId(node),
                   context.factory.getDeclarationName(
-                    node as FunctionDeclaration
-                  )
+                    node as FunctionDeclaration,
+                  ),
                 );
                 hasExportDefault = true;
               }
@@ -225,7 +227,7 @@ namespace ts {
                 multiMapSparseArrayAdd(
                   exportedBindings,
                   getOriginalNodeId(node),
-                  name
+                  name,
                 );
                 uniqueExports.set(idText(name), true);
                 exportedNames = append(exportedNames, name);
@@ -242,7 +244,7 @@ namespace ts {
                 multiMapSparseArrayAdd(
                   exportedBindings,
                   getOriginalNodeId(node),
-                  context.factory.getDeclarationName(node as ClassDeclaration)
+                  context.factory.getDeclarationName(node as ClassDeclaration),
                 );
                 hasExportDefault = true;
               }
@@ -253,7 +255,7 @@ namespace ts {
                 multiMapSparseArrayAdd(
                   exportedBindings,
                   getOriginalNodeId(node),
-                  name
+                  name,
                 );
                 uniqueExports.set(idText(name), true);
                 exportedNames = append(exportedNames, name);
@@ -264,16 +266,15 @@ namespace ts {
       }
     }
 
-    const externalHelpersImportDeclaration =
-      createExternalHelpersImportDeclarationIfNeeded(
-        context.factory,
-        context.getEmitHelperFactory(),
-        sourceFile,
-        compilerOptions,
-        hasExportStarsToExportValues,
-        hasImportStar,
-        hasImportDefault
-      );
+    const externalHelpersImportDeclaration = createExternalHelpersImportDeclarationIfNeeded(
+      context.factory,
+      context.getEmitHelperFactory(),
+      sourceFile,
+      compilerOptions,
+      hasExportStarsToExportValues,
+      hasImportStar,
+      hasImportDefault,
+    );
     if (externalHelpersImportDeclaration) {
       externalImports.unshift(externalHelpersImportDeclaration);
     }
@@ -289,23 +290,24 @@ namespace ts {
     };
 
     function addExportedNamesForExportDeclaration(node: ExportDeclaration) {
-      for (const specifier of cast(node.exportClause, isNamedExports)
-        .elements) {
+      for (
+        const specifier of cast(node.exportClause, isNamedExports)
+          .elements
+      ) {
         if (!uniqueExports.get(idText(specifier.name))) {
           const name = specifier.propertyName || specifier.name;
           if (!node.moduleSpecifier) {
             exportSpecifiers.add(idText(name), specifier);
           }
 
-          const decl =
-            resolver.getReferencedImportDeclaration(name) ||
-            resolver.getReferencedValueDeclaration(name);
+          const decl = resolver.getReferencedImportDeclaration(name)
+            || resolver.getReferencedValueDeclaration(name);
 
           if (decl) {
             multiMapSparseArrayAdd(
               exportedBindings,
               getOriginalNodeId(decl),
-              specifier.name
+              specifier.name,
             );
           }
 
@@ -319,7 +321,7 @@ namespace ts {
   function collectExportedVariableInfo(
     decl: VariableDeclaration | BindingElement,
     uniqueExports: ESMap<string, boolean>,
-    exportedNames: Identifier[] | undefined
+    exportedNames: Identifier[] | undefined,
   ) {
     if (isBindingPattern(decl.name)) {
       for (const element of decl.name.elements) {
@@ -327,7 +329,7 @@ namespace ts {
           exportedNames = collectExportedVariableInfo(
             element,
             uniqueExports,
-            exportedNames
+            exportedNames,
           );
         }
       }
@@ -359,10 +361,10 @@ namespace ts {
    */
   export function isSimpleCopiableExpression(expression: Expression) {
     return (
-      isStringLiteralLike(expression) ||
-      expression.kind === SyntaxKind.NumericLiteral ||
-      isKeyword(expression.kind) ||
-      isIdentifier(expression)
+      isStringLiteralLike(expression)
+      || expression.kind === SyntaxKind.NumericLiteral
+      || isKeyword(expression.kind)
+      || isIdentifier(expression)
     );
   }
 
@@ -376,16 +378,16 @@ namespace ts {
   }
 
   export function isCompoundAssignment(
-    kind: BinaryOperator
+    kind: BinaryOperator,
   ): kind is CompoundAssignmentOperator {
     return (
-      kind >= SyntaxKind.FirstCompoundAssignment &&
-      kind <= SyntaxKind.LastCompoundAssignment
+      kind >= SyntaxKind.FirstCompoundAssignment
+      && kind <= SyntaxKind.LastCompoundAssignment
     );
   }
 
   export function getNonAssignmentOperatorForCompoundAssignment(
-    kind: CompoundAssignmentOperator
+    kind: CompoundAssignmentOperator,
   ): LogicalOperatorOrHigher | SyntaxKind.QuestionQuestionToken {
     switch (kind) {
       case SyntaxKind.PlusEqualsToken:
@@ -438,7 +440,7 @@ namespace ts {
    */
   export function findSuperStatementIndex(
     statements: NodeArray<Statement>,
-    indexAfterLastPrologueStatement: number
+    indexAfterLastPrologueStatement: number,
   ) {
     for (
       let i = indexAfterLastPrologueStatement;
@@ -464,44 +466,45 @@ namespace ts {
   export function getProperties(
     node: ClassExpression | ClassDeclaration,
     requireInitializer: true,
-    isStatic: boolean
+    isStatic: boolean,
   ): readonly InitializedPropertyDeclaration[];
   export function getProperties(
     node: ClassExpression | ClassDeclaration,
     requireInitializer: boolean,
-    isStatic: boolean
+    isStatic: boolean,
   ): readonly PropertyDeclaration[];
   export function getProperties(
     node: ClassExpression | ClassDeclaration,
     requireInitializer: boolean,
-    isStatic: boolean
+    isStatic: boolean,
   ): readonly PropertyDeclaration[] {
-    return filter(node.members, (m) =>
-      isInitializedOrStaticProperty(m, requireInitializer, isStatic)
+    return filter(
+      node.members,
+      (m) => isInitializedOrStaticProperty(m, requireInitializer, isStatic),
     ) as PropertyDeclaration[];
   }
 
   function isStaticPropertyDeclarationOrClassStaticBlockDeclaration(
-    element: ClassElement
+    element: ClassElement,
   ): element is PropertyDeclaration | ClassStaticBlockDeclaration {
     return (
-      isStaticPropertyDeclaration(element) ||
-      isClassStaticBlockDeclaration(element)
+      isStaticPropertyDeclaration(element)
+      || isClassStaticBlockDeclaration(element)
     );
   }
 
   export function getStaticPropertiesAndClassStaticBlock(
-    node: ClassExpression | ClassDeclaration
+    node: ClassExpression | ClassDeclaration,
   ): readonly (PropertyDeclaration | ClassStaticBlockDeclaration)[];
   export function getStaticPropertiesAndClassStaticBlock(
-    node: ClassExpression | ClassDeclaration
+    node: ClassExpression | ClassDeclaration,
   ): readonly (PropertyDeclaration | ClassStaticBlockDeclaration)[];
   export function getStaticPropertiesAndClassStaticBlock(
-    node: ClassExpression | ClassDeclaration
+    node: ClassExpression | ClassDeclaration,
   ): readonly (PropertyDeclaration | ClassStaticBlockDeclaration)[] {
     return filter(
       node.members,
-      isStaticPropertyDeclarationOrClassStaticBlockDeclaration
+      isStaticPropertyDeclarationOrClassStaticBlockDeclaration,
     );
   }
 
@@ -514,12 +517,12 @@ namespace ts {
   function isInitializedOrStaticProperty(
     member: ClassElement,
     requireInitializer: boolean,
-    isStatic: boolean
+    isStatic: boolean,
   ) {
     return (
-      isPropertyDeclaration(member) &&
-      (!!member.initializer || !requireInitializer) &&
-      hasStaticModifier(member) === isStatic
+      isPropertyDeclaration(member)
+      && (!!member.initializer || !requireInitializer)
+      && hasStaticModifier(member) === isStatic
     );
   }
 
@@ -534,11 +537,11 @@ namespace ts {
    * @param isStatic A value indicating whether the member should be a static or instance member.
    */
   export function isInitializedProperty(
-    member: ClassElement
+    member: ClassElement,
   ): member is PropertyDeclaration & { initializer: Expression } {
     return (
-      member.kind === SyntaxKind.PropertyDeclaration &&
-      (member as PropertyDeclaration).initializer !== undefined
+      member.kind === SyntaxKind.PropertyDeclaration
+      && (member as PropertyDeclaration).initializer !== undefined
     );
   }
 
@@ -548,14 +551,15 @@ namespace ts {
    * @param member The class element node.
    */
   export function isNonStaticMethodOrAccessorWithPrivateName(
-    member: ClassElement
+    member: ClassElement,
   ): member is
     | PrivateIdentifierMethodDeclaration
-    | PrivateIdentifierAccessorDeclaration {
+    | PrivateIdentifierAccessorDeclaration
+  {
     return (
-      !isStatic(member) &&
-      isMethodOrAccessor(member) &&
-      isPrivateIdentifier(member.name)
+      !isStatic(member)
+      && isMethodOrAccessor(member)
+      && isPrivateIdentifier(member.name)
     );
   }
 }

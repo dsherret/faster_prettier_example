@@ -13,20 +13,18 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToFixIncorrectNamedTupleSyntax(
-      context
+      context,
     ) {
       const { sourceFile, span } = context;
       const namedTupleMember = getNamedTupleMember(sourceFile, span.start);
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, namedTupleMember)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, namedTupleMember));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Move_labeled_tuple_element_modifiers_to_labels,
           fixId,
-          Diagnostics.Move_labeled_tuple_element_modifiers_to_labels
+          Diagnostics.Move_labeled_tuple_element_modifiers_to_labels,
         ),
       ];
     },
@@ -37,13 +35,13 @@ namespace ts.codefix {
     const token = getTokenAtPosition(sourceFile, pos);
     return findAncestor(
       token,
-      (t) => t.kind === SyntaxKind.NamedTupleMember
+      (t) => t.kind === SyntaxKind.NamedTupleMember,
     ) as NamedTupleMember | undefined;
   }
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    namedTupleMember?: NamedTupleMember
+    namedTupleMember?: NamedTupleMember,
   ) {
     if (!namedTupleMember) {
       return;
@@ -52,9 +50,9 @@ namespace ts.codefix {
     let sawOptional = false;
     let sawRest = false;
     while (
-      unwrappedType.kind === SyntaxKind.OptionalType ||
-      unwrappedType.kind === SyntaxKind.RestType ||
-      unwrappedType.kind === SyntaxKind.ParenthesizedType
+      unwrappedType.kind === SyntaxKind.OptionalType
+      || unwrappedType.kind === SyntaxKind.RestType
+      || unwrappedType.kind === SyntaxKind.ParenthesizedType
     ) {
       if (unwrappedType.kind === SyntaxKind.OptionalType) {
         sawOptional = true;
@@ -67,14 +65,14 @@ namespace ts.codefix {
     }
     const updated = factory.updateNamedTupleMember(
       namedTupleMember,
-      namedTupleMember.dotDotDotToken ||
-        (sawRest ? factory.createToken(SyntaxKind.DotDotDotToken) : undefined),
+      namedTupleMember.dotDotDotToken
+        || (sawRest ? factory.createToken(SyntaxKind.DotDotDotToken) : undefined),
       namedTupleMember.name,
-      namedTupleMember.questionToken ||
-        (sawOptional
+      namedTupleMember.questionToken
+        || (sawOptional
           ? factory.createToken(SyntaxKind.QuestionToken)
           : undefined),
-      unwrappedType
+      unwrappedType,
     );
     if (updated === namedTupleMember) {
       return;

@@ -26,16 +26,16 @@ namespace ts {
         assert.equal(
           OrganizeImports.compareModuleSpecifiers(
             moduleSpecifier1,
-            moduleSpecifier2
+            moduleSpecifier2,
           ),
-          Comparison.LessThan
+          Comparison.LessThan,
         );
         assert.equal(
           OrganizeImports.compareModuleSpecifiers(
             moduleSpecifier2,
-            moduleSpecifier1
+            moduleSpecifier1,
           ),
-          Comparison.GreaterThan
+          Comparison.GreaterThan,
         );
       }
     });
@@ -47,20 +47,18 @@ namespace ts {
 
       it("Sort specifiers - case-insensitive", () => {
         const sortedImports = parseImports(
-          `import { default as M, a as n, B, y, Z as O } from "lib";`
+          `import { default as M, a as n, B, y, Z as O } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
-          `import { a as n, B, default as M, y, Z as O } from "lib";`
+          `import { a as n, B, default as M, y, Z as O } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
 
       it("Combine side-effect-only imports", () => {
         const sortedImports = parseImports(`import "lib";`, `import "lib";`);
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(`import "lib";`);
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -68,10 +66,9 @@ namespace ts {
       it("Combine namespace imports", () => {
         const sortedImports = parseImports(
           `import * as x from "lib";`,
-          `import * as y from "lib";`
+          `import * as y from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = sortedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -79,12 +76,11 @@ namespace ts {
       it("Combine default imports", () => {
         const sortedImports = parseImports(
           `import x from "lib";`,
-          `import y from "lib";`
+          `import y from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
-          `import { default as x, default as y } from "lib";`
+          `import { default as x, default as y } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -92,12 +88,11 @@ namespace ts {
       it("Combine property imports", () => {
         const sortedImports = parseImports(
           `import { x } from "lib";`,
-          `import { y as z } from "lib";`
+          `import { y as z } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
-          `import { x, y as z } from "lib";`
+          `import { x, y as z } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -105,10 +100,9 @@ namespace ts {
       it("Combine side-effect-only import with namespace import", () => {
         const sortedImports = parseImports(
           `import "lib";`,
-          `import * as x from "lib";`
+          `import * as x from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = sortedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -116,10 +110,9 @@ namespace ts {
       it("Combine side-effect-only import with default import", () => {
         const sortedImports = parseImports(
           `import "lib";`,
-          `import x from "lib";`
+          `import x from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = sortedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -127,10 +120,9 @@ namespace ts {
       it("Combine side-effect-only import with property import", () => {
         const sortedImports = parseImports(
           `import "lib";`,
-          `import { x } from "lib";`
+          `import { x } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = sortedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -138,12 +130,11 @@ namespace ts {
       it("Combine namespace import with default import", () => {
         const sortedImports = parseImports(
           `import * as x from "lib";`,
-          `import y from "lib";`
+          `import y from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
-          `import y, * as x from "lib";`
+          `import y, * as x from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -151,10 +142,9 @@ namespace ts {
       it("Combine namespace import with property import", () => {
         const sortedImports = parseImports(
           `import * as x from "lib";`,
-          `import { y } from "lib";`
+          `import { y } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = sortedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -162,12 +152,11 @@ namespace ts {
       it("Combine default import with property import", () => {
         const sortedImports = parseImports(
           `import x from "lib";`,
-          `import { y } from "lib";`
+          `import { y } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
-          `import x, { y } from "lib";`
+          `import x, { y } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -181,15 +170,14 @@ namespace ts {
           `import "lib";`,
           `import * as x from "lib";`,
           `import z from "lib";`,
-          `import { a } from "lib";`
+          `import { a } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
           `import "lib";`,
           `import * as x from "lib";`,
           `import * as y from "lib";`,
-          `import { a, b, default as w, default as z } from "lib";`
+          `import { a, b, default as w, default as z } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -199,10 +187,9 @@ namespace ts {
         const sortedImports = parseImports(
           `import * as x from "lib";`,
           `import * as y from "lib";`,
-          `import z from "lib";`
+          `import z from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = sortedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -211,13 +198,12 @@ namespace ts {
         const sortedImports = parseImports(
           `import type { x } from "lib";`,
           `import type { y } from "lib";`,
-          `import { z } from "lib";`
+          `import { z } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
           `import { z } from "lib";`,
-          `import type { x, y } from "lib";`
+          `import type { x, y } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -226,12 +212,11 @@ namespace ts {
         const sortedImports = parseImports(
           `import type { x } from "lib";`,
           `import type * as y from "lib";`,
-          `import type z from "lib";`
+          `import type z from "lib";`,
         );
         // Default import could be rewritten as a named import to combine with `x`,
         // but seems of debatable merit.
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = actualCoalescedImports;
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -244,24 +229,22 @@ namespace ts {
 
       it("Sort specifiers - case-insensitive", () => {
         const sortedExports = parseExports(
-          `export { default as M, a as n, B, y, Z as O } from "lib";`
+          `export { default as M, a as n, B, y, Z as O } from "lib";`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(
-          `export { a as n, B, default as M, y, Z as O } from "lib";`
+          `export { a as n, B, default as M, y, Z as O } from "lib";`,
         );
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
 
       it("Sort specifiers - type-only", () => {
         const sortedImports = parseImports(
-          `import { type z, y, type x, c, type b, a } from "lib";`
+          `import { type z, y, type x, c, type b, a } from "lib";`,
         );
-        const actualCoalescedImports =
-          OrganizeImports.coalesceImports(sortedImports);
+        const actualCoalescedImports = OrganizeImports.coalesceImports(sortedImports);
         const expectedCoalescedImports = parseImports(
-          `import { a, c, y, type b, type x, type z } from "lib";`
+          `import { a, c, y, type b, type x, type z } from "lib";`,
         );
         assertListEqual(actualCoalescedImports, expectedCoalescedImports);
       });
@@ -269,10 +252,9 @@ namespace ts {
       it("Combine namespace re-exports", () => {
         const sortedExports = parseExports(
           `export * from "lib";`,
-          `export * from "lib";`
+          `export * from "lib";`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(`export * from "lib";`);
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -280,10 +262,9 @@ namespace ts {
       it("Combine property exports", () => {
         const sortedExports = parseExports(
           `export { x };`,
-          `export { y as z };`
+          `export { y as z };`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(`export { x, y as z };`);
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -291,12 +272,11 @@ namespace ts {
       it("Combine property re-exports", () => {
         const sortedExports = parseExports(
           `export { x } from "lib";`,
-          `export { y as z } from "lib";`
+          `export { y as z } from "lib";`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(
-          `export { x, y as z } from "lib";`
+          `export { x, y as z } from "lib";`,
         );
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -304,10 +284,9 @@ namespace ts {
       it("Combine namespace re-export with property re-export", () => {
         const sortedExports = parseExports(
           `export * from "lib";`,
-          `export { y } from "lib";`
+          `export { y } from "lib";`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = sortedExports;
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -316,12 +295,11 @@ namespace ts {
         const sortedExports = parseExports(
           `export { x };`,
           `export { y as w, z as default };`,
-          `export { w as q };`
+          `export { w as q };`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(
-          `export { w as q, x, y as w, z as default };`
+          `export { w as q, x, y as w, z as default };`,
         );
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -330,13 +308,12 @@ namespace ts {
         const sortedExports = parseExports(
           `export { x as a, y } from "lib";`,
           `export * from "lib";`,
-          `export { z as b } from "lib";`
+          `export { z as b } from "lib";`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(
           `export * from "lib";`,
-          `export { x as a, y, z as b } from "lib";`
+          `export { x as a, y, z as b } from "lib";`,
         );
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -344,10 +321,9 @@ namespace ts {
       it("Keep type-only exports separate", () => {
         const sortedExports = parseExports(
           `export { x };`,
-          `export type { y };`
+          `export type { y };`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = sortedExports;
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -355,10 +331,9 @@ namespace ts {
       it("Combine type-only exports", () => {
         const sortedExports = parseExports(
           `export type { x };`,
-          `export type { y };`
+          `export type { y };`,
         );
-        const actualCoalescedExports =
-          OrganizeImports.coalesceExports(sortedExports);
+        const actualCoalescedExports = OrganizeImports.coalesceExports(sortedExports);
         const expectedCoalescedExports = parseExports(`export type { x, y };`);
         assertListEqual(actualCoalescedExports, expectedCoalescedExports);
       });
@@ -394,7 +369,7 @@ export const Other = 1;
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -408,7 +383,7 @@ export const Other = 1;
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -422,7 +397,7 @@ export const Other = 1;
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -437,7 +412,7 @@ import { F1 as EffOne, F2 as EffTwo } from "lib";
 EffOne();
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -456,7 +431,7 @@ F1();
 F2();
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -472,7 +447,7 @@ import D from "lib";
 D();
 `,
         },
-        libFile
+        libFile,
       );
 
       describe("skipDestructiveCodeActions=true", () => {
@@ -490,7 +465,7 @@ class class class;
 D;
 `,
           },
-          libFile
+          libFile,
         );
       });
 
@@ -508,7 +483,7 @@ import D from "lib";
 D;
 `,
         },
-        libFile
+        libFile,
       );
 
       describe("skipDestructiveCodeActions=false", () => {
@@ -526,7 +501,7 @@ class class class;
 D;
 `,
           },
-          libFile
+          libFile,
         );
 
         testOrganizeImports(
@@ -543,7 +518,7 @@ import D from "lib";
 D;
 `,
           },
-          libFile
+          libFile,
         );
       });
 
@@ -556,7 +531,7 @@ D;
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -572,7 +547,7 @@ import * as NS from "lib";
 import D from "lib";
 `,
         },
-        libFile
+        libFile,
       );
 
       it("Unused_Empty", () => {
@@ -586,7 +561,7 @@ import { } from "lib";
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -606,7 +581,7 @@ declare module 'caseless' {
         test(name: KeyType): boolean;
     }
 }`,
-        }
+        },
       );
 
       testOrganizeImports(
@@ -624,7 +599,7 @@ declare module 'caseless' {
         test(name: KeyType): boolean;
     }
 }`,
-        }
+        },
       );
 
       it("Unused_false_positive_shorthand_assignment", () => {
@@ -639,7 +614,7 @@ const o = { x };
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -656,7 +631,7 @@ export { x };
         const changes = languageService.organizeImports(
           { type: "file", fileName: testFile.path },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.isEmpty(changes);
       });
@@ -676,7 +651,7 @@ import D from "lib";
 D();
 `,
         },
-        libFile
+        libFile,
       );
 
       /* eslint-disable no-template-curly-in-string */
@@ -697,7 +672,7 @@ import D from "lib";
 D();
 `,
         },
-        libFile
+        libFile,
       );
       /* eslint-enable no-template-curly-in-string */
 
@@ -726,7 +701,7 @@ a + b + c + d;
 `,
         },
         { path: "/lib1.ts", content: "export const b = 1, d = 2;" },
-        { path: "/lib2.ts", content: "export const a = 3, c = 4;" }
+        { path: "/lib2.ts", content: "export const a = 3, c = 4;" },
       );
 
       testOrganizeImports(
@@ -742,7 +717,7 @@ F1();
 F2();
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -756,7 +731,7 @@ F2();
 `,
         },
         { path: "/lib1.ts", content: "" },
-        { path: "/lib2.ts", content: "" }
+        { path: "/lib2.ts", content: "" },
       );
 
       testOrganizeImports(
@@ -768,7 +743,7 @@ F2();
 /*A*/import /*B*/ { /*C*/ F1 /*D*/ } /*E*/ from /*F*/ "lib" /*G*/;/*H*/ //I
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -782,7 +757,7 @@ F2();
 F1();
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -795,7 +770,7 @@ F1();
 import { F1 } from "lib";
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -810,7 +785,7 @@ import "lib1";
 `,
         },
         { path: "/lib1.ts", content: "" },
-        { path: "/lib2.ts", content: "" }
+        { path: "/lib2.ts", content: "" },
       );
 
       testOrganizeImports(
@@ -829,7 +804,7 @@ import "lib1";
         },
         { path: "/lib1.ts", content: "" },
         { path: "/lib2.ts", content: "" },
-        { path: "/lib3.ts", content: "" }
+        { path: "/lib3.ts", content: "" },
       );
 
       testOrganizeImports(
@@ -847,7 +822,7 @@ declare module "mod" {
 }
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -872,7 +847,7 @@ import "lib";
 D();
 `,
         },
-        libFile
+        libFile,
       );
 
       testOrganizeImports(
@@ -886,7 +861,7 @@ import { React, Other } from "react";
 <div/>;
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       testOrganizeImports(
@@ -900,7 +875,7 @@ import { React, Other } from "react";
 <div/>;
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       testOrganizeImports(
@@ -914,7 +889,7 @@ import { React, Other } from "react";
 <div/>;
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       // TS files are not JSX contexts, so the parser does not treat
@@ -930,7 +905,7 @@ import { React, Other } from "react";
 <div/>;
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       testOrganizeImports(
@@ -942,7 +917,7 @@ import { React, Other } from "react";
 import { React, Other } from "react";
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       // Note: Since the file extension does not end with "x", the jsx compiler option
@@ -956,7 +931,7 @@ import { React, Other } from "react";
 import { React, Other } from "react";
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       testOrganizeImports(
@@ -968,7 +943,7 @@ import { React, Other } from "react";
 import { React, Other } from "react";
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       testOrganizeImports(
@@ -980,7 +955,7 @@ import { React, Other } from "react";
 import { React, Other } from "react";
 `,
         },
-        reactLibFile
+        reactLibFile,
       );
 
       testOrganizeImports(
@@ -1010,7 +985,7 @@ export namespace React {
     }
 }
 `,
-        }
+        },
       );
 
       testOrganizeImports(
@@ -1030,7 +1005,7 @@ const elem = <><div>Foo</div></>;
           content: `export function h(): void;
 export function frag(): void;
 `,
-        }
+        },
       );
 
       describe("Exports", () => {
@@ -1045,7 +1020,7 @@ export * from "lib";
 2;
 `,
           },
-          libFile
+          libFile,
         );
 
         /* eslint-disable no-template-curly-in-string */
@@ -1064,7 +1039,7 @@ export { D } from "lib";
 3;
 `,
           },
-          libFile
+          libFile,
         );
         /* eslint-enable no-template-curly-in-string */
 
@@ -1084,7 +1059,7 @@ export * from "lib";
 F1(); F2(); NS.F1();
 `,
           },
-          libFile
+          libFile,
         );
 
         testOrganizeExports(
@@ -1103,7 +1078,7 @@ import * as NS from "lib";
 F1(); F2(); NS.F1();
 `,
           },
-          libFile
+          libFile,
         );
 
         testOrganizeExports(
@@ -1118,7 +1093,7 @@ export { a } from "lib2";
 `,
           },
           { path: "/lib1.ts", content: "export const b = 1, d = 2;" },
-          { path: "/lib2.ts", content: "export const a = 3, c = 4;" }
+          { path: "/lib2.ts", content: "export const a = 3, c = 4;" },
         );
 
         testOrganizeExports(
@@ -1130,7 +1105,7 @@ export { a } from "lib2";
 /*J*/export /*K*/ { /*L*/ F1 /*M*/ } /*N*/ from /*O*/ "lib" /*P*/;/*Q*/ //R
 `,
           },
-          libFile
+          libFile,
         );
 
         testOrganizeExports(
@@ -1143,7 +1118,7 @@ export { a } from "lib2";
 `,
           },
           { path: "/lib1.ts", content: "" },
-          { path: "/lib2.ts", content: "" }
+          { path: "/lib2.ts", content: "" },
         );
 
         testOrganizeExports(
@@ -1157,7 +1132,7 @@ export * from "lib1";
 `,
           },
           { path: "/lib1.ts", content: "" },
-          { path: "/lib2.ts", content: "" }
+          { path: "/lib2.ts", content: "" },
         );
 
         testOrganizeExports(
@@ -1172,7 +1147,7 @@ declare module "mod" {
 }
     `,
           },
-          libFile
+          libFile,
         );
 
         testOrganizeExports(
@@ -1192,7 +1167,7 @@ export { E } from "lib";
 export * from "lib";
 `,
           },
-          libFile
+          libFile,
         );
       });
 
@@ -1205,7 +1180,7 @@ export * from "lib";
           `${testName}.exports`,
           /*skipDestructiveCodeActions*/ true,
           testFile,
-          ...otherFiles
+          ...otherFiles,
         );
       }
 
@@ -1220,9 +1195,8 @@ export * from "lib";
             `organizeImports/${testName}.ts`,
             skipDestructiveCodeActions,
             testFile,
-            ...otherFiles
-          )
-        );
+            ...otherFiles,
+          ));
       }
 
       function runBaseline(
@@ -1236,20 +1210,20 @@ export * from "lib";
         const changes = languageService.organizeImports(
           { skipDestructiveCodeActions, type: "file", fileName: testPath },
           testFormatSettings,
-          emptyOptions
+          emptyOptions,
         );
         assert.equal(changes.length, 1);
         assert.equal(changes[0].fileName, testPath);
 
         const newText = textChanges.applyChanges(
           testContent,
-          changes[0].textChanges
+          changes[0].textChanges,
         );
         Harness.Baseline.runBaseline(
           baselinePath,
           ["// ==ORIGINAL==", testContent, "// ==ORGANIZED==", newText].join(
-            newLineCharacter
-          )
+            newLineCharacter,
+          ),
         );
       }
 
@@ -1276,7 +1250,7 @@ export * from "lib";
         importStrings.join("\n"),
         ScriptTarget.ES2015,
         /*setParentNodes*/ true,
-        ScriptKind.TS
+        ScriptKind.TS,
       );
       const imports = filter(sourceFile.statements, isImportDeclaration);
       assert.equal(imports.length, importStrings.length);
@@ -1291,7 +1265,7 @@ export * from "lib";
         exportStrings.join("\n"),
         ScriptTarget.ES2015,
         /*setParentNodes*/ true,
-        ScriptKind.TS
+        ScriptKind.TS,
       );
       const exports = filter(sourceFile.statements, isExportDeclaration);
       assert.equal(exports.length, exportStrings.length);

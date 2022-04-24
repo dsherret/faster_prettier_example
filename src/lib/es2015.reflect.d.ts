@@ -9,7 +9,7 @@ declare namespace Reflect {
   function apply(
     target: Function,
     thisArgument: any,
-    argumentsList: ArrayLike<any>
+    argumentsList: ArrayLike<any>,
   ): any;
 
   /**
@@ -22,7 +22,7 @@ declare namespace Reflect {
   function construct(
     target: Function,
     argumentsList: ArrayLike<any>,
-    newTarget?: Function
+    newTarget?: Function,
   ): any;
 
   /**
@@ -35,7 +35,7 @@ declare namespace Reflect {
   function defineProperty(
     target: object,
     propertyKey: PropertyKey,
-    attributes: PropertyDescriptor & ThisType<any>
+    attributes: PropertyDescriptor & ThisType<any>,
   ): boolean;
 
   /**
@@ -63,7 +63,7 @@ declare namespace Reflect {
    */
   function getOwnPropertyDescriptor(
     target: object,
-    propertyKey: PropertyKey
+    propertyKey: PropertyKey,
   ): PropertyDescriptor | undefined;
 
   /**
@@ -110,7 +110,7 @@ declare namespace Reflect {
     target: object,
     propertyKey: PropertyKey,
     value: any,
-    receiver?: any
+    receiver?: any,
   ): boolean;
 
   /**

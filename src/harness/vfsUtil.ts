@@ -109,7 +109,7 @@ namespace vfs {
     public get meta(): collections.Metadata {
       if (!this._lazy.meta) {
         this._lazy.meta = new collections.Metadata(
-          this._shadowRoot ? this._shadowRoot.meta : undefined
+          this._shadowRoot ? this._shadowRoot.meta : undefined,
         );
       }
       return this._lazy.meta;
@@ -161,12 +161,14 @@ namespace vfs {
      * of the same data.
      */
     public shadow(ignoreCase = this.ignoreCase) {
-      if (!this.isReadonly)
+      if (!this.isReadonly) {
         throw new Error("Cannot shadow a mutable file system.");
-      if (ignoreCase && !this.ignoreCase)
+      }
+      if (ignoreCase && !this.ignoreCase) {
         throw new Error(
-          "Cannot create a case-insensitive file system from a case-sensitive one."
+          "Cannot create a case-insensitive file system from a case-sensitive one.",
         );
+      }
       const fs = new FileSystem(ignoreCase, { time: this._time });
       fs._shadowRoot = this;
       fs._cwd = this._cwd;
@@ -202,10 +204,9 @@ namespace vfs {
 
     private _filemeta(node: Inode): collections.Metadata {
       if (!node.meta) {
-        const parentMeta =
-          node.shadowRoot &&
-          this._shadowRoot &&
-          this._shadowRoot._filemeta(node.shadowRoot);
+        const parentMeta = node.shadowRoot
+          && this._shadowRoot
+          && this._shadowRoot._filemeta(node.shadowRoot);
         node.meta = new collections.Metadata(parentMeta);
       }
       return node.meta;
@@ -217,8 +218,9 @@ namespace vfs {
      * @link - http://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
      */
     public cwd() {
-      if (!this._cwd)
+      if (!this._cwd) {
         throw new Error("The current working directory has not been set.");
+      }
       const { node } = this._walk(this._cwd);
       if (!node) throw createIOError("ENOENT");
       if (!isDirectory(node)) throw createIOError("ENOTDIR");
@@ -287,7 +289,7 @@ namespace vfs {
         axis,
         traversal,
         /*noFollow*/ false,
-        results
+        results,
       );
       return results;
     }
@@ -307,7 +309,7 @@ namespace vfs {
         axis,
         traversal,
         /*noFollow*/ true,
-        results
+        results,
       );
       return results;
     }
@@ -318,12 +320,12 @@ namespace vfs {
       axis: Axis,
       traversal: Traversal,
       noFollow: boolean,
-      results: string[]
+      results: string[],
     ) {
       if (
-        axis === "ancestors-or-self" ||
-        axis === "self" ||
-        axis === "descendants-or-self"
+        axis === "ancestors-or-self"
+        || axis === "self"
+        || axis === "descendants-or-self"
       ) {
         if (!traversal.accept || traversal.accept(path, stats)) {
           results.push(path);
@@ -341,7 +343,7 @@ namespace vfs {
                 "ancestors-or-self",
                 traversal,
                 noFollow,
-                results
+                results,
               );
             }
           } catch {
@@ -351,8 +353,8 @@ namespace vfs {
       }
       if (axis === "descendants-or-self" || axis === "descendants") {
         if (
-          stats.isDirectory() &&
-          (!traversal.traverse || traversal.traverse(path, stats))
+          stats.isDirectory()
+          && (!traversal.traverse || traversal.traverse(path, stats))
         ) {
           for (const file of this.readdirSync(path)) {
             try {
@@ -364,7 +366,7 @@ namespace vfs {
                 "descendants-or-self",
                 traversal,
                 noFollow,
-                results
+                results,
               );
             } catch {
               /*ignored*/
@@ -384,7 +386,7 @@ namespace vfs {
     public mountSync(
       source: string,
       target: string,
-      resolver: FileSystemResolver
+      resolver: FileSystemResolver,
     ) {
       if (this.isReadonly) throw createIOError("EROFS");
 
@@ -403,7 +405,7 @@ namespace vfs {
         parent ? parent.dev : ++devCount,
         S_IFDIR,
         /*mode*/ 0o777,
-        time
+        time,
       );
       node.source = source;
       node.resolver = resolver;
@@ -450,7 +452,7 @@ namespace vfs {
       let result = "";
       const printLinks = (
         dirname: string | undefined,
-        links: collections.SortedMap<string, Inode>
+        links: collections.SortedMap<string, Inode>,
       ) => {
         const iterator = collections.getIterator(links);
         try {
@@ -461,8 +463,7 @@ namespace vfs {
           ) {
             const [name, node] = i.value;
             const path = dirname ? vpath.combine(dirname, name) : name;
-            const marker =
-              vpath.compare(this._cwd, path, this.ignoreCase) === 0 ? "*" : " ";
+            const marker = vpath.compare(this._cwd, path, this.ignoreCase) === 0 ? "*" : " ";
             if (result) result += "\n";
             result += marker;
             if (isDirectory(node)) {
@@ -498,7 +499,7 @@ namespace vfs {
       const result = this._walk(
         this._resolve(path),
         /*noFollow*/ true,
-        () => "stop"
+        () => "stop",
       );
       return result !== undefined && result.node !== undefined;
     }
@@ -562,7 +563,7 @@ namespace vfs {
         node.atimeMs,
         node.mtimeMs,
         node.ctimeMs,
-        node.birthtimeMs
+        node.birthtimeMs,
       );
     }
 
@@ -605,7 +606,7 @@ namespace vfs {
         parent ? parent.dev : ++devCount,
         S_IFDIR,
         /*mode*/ 0o777,
-        time
+        time,
       );
       this._addLink(parent, links, basename, node, time);
     }
@@ -623,7 +624,7 @@ namespace vfs {
 
       const { parent, links, node, basename } = this._walk(
         path,
-        /*noFollow*/ true
+        /*noFollow*/ true,
       );
       if (!parent) throw createIOError("EPERM");
       if (!isDirectory(node)) throw createIOError("ENOTDIR");
@@ -670,7 +671,7 @@ namespace vfs {
 
       const { parent, links, node, basename } = this._walk(
         this._resolve(path),
-        /*noFollow*/ true
+        /*noFollow*/ true,
       );
       if (!parent) throw createIOError("EPERM");
       if (!node) throw createIOError("ENOENT");
@@ -713,10 +714,11 @@ namespace vfs {
           // if both old and new arguments point to the same directory, just pass. So we could rename /src/a/1 to /src/A/1 in Win.
           // if not and the directory pointed by the new path is not empty, throw an error.
           if (
-            this.stringComparer(oldpath, newpath) !== 0 &&
-            this._getLinks(existingNode).size > 0
-          )
+            this.stringComparer(oldpath, newpath) !== 0
+            && this._getLinks(existingNode).size > 0
+          ) {
             throw createIOError("ENOTEMPTY");
+          }
         } else {
           if (isDirectory(existingNode)) throw createIOError("EISDIR");
         }
@@ -725,7 +727,7 @@ namespace vfs {
           newParentLinks,
           newBasename,
           existingNode,
-          time
+          time,
         );
       }
 
@@ -737,7 +739,7 @@ namespace vfs {
         newParentLinks,
         newBasename,
         node,
-        time
+        time,
       );
     }
 
@@ -764,7 +766,7 @@ namespace vfs {
       const node = this._mknod(parent.dev, S_IFLNK, /*mode*/ 0o666, time);
       node.symlink = vpath.validate(
         target,
-        vpath.ValidationFlags.RelativeOrAbsolute
+        vpath.ValidationFlags.RelativeOrAbsolute,
       );
       this._addLink(parent, links, basename, node, time);
     }
@@ -800,7 +802,7 @@ namespace vfs {
      */
     public readFileSync(
       path: string,
-      encoding?: BufferEncoding | null
+      encoding?: BufferEncoding | null,
     ): string | Buffer;
     public readFileSync(path: string, encoding: BufferEncoding | null = null) {
       // eslint-disable-line no-null/no-null
@@ -822,7 +824,7 @@ namespace vfs {
     public writeFileSync(
       path: string,
       data: string | Buffer,
-      encoding: string | null = null
+      encoding: string | null = null,
     ) {
       if (this.isReadonly) throw createIOError("EROFS");
 
@@ -861,10 +863,10 @@ namespace vfs {
       const hasDifferences = base
         ? FileSystem.rootDiff(differences, this, base, options)
         : FileSystem.trackCreatedInodes(
-            differences,
-            this,
-            this._getRootLinks()
-          );
+          differences,
+          this,
+          this._getRootLinks(),
+        );
       return hasDifferences ? differences : undefined;
     }
 
@@ -874,7 +876,7 @@ namespace vfs {
     public static diff(
       changed: FileSystem,
       base: FileSystem,
-      options: DiffOptions = {}
+      options: DiffOptions = {},
     ) {
       const differences: FileSet = {};
       return FileSystem.rootDiff(differences, changed, base, options)
@@ -888,12 +890,14 @@ namespace vfs {
       changedLinks: ReadonlyMap<string, Inode> | undefined,
       base: FileSystem,
       baseLinks: ReadonlyMap<string, Inode> | undefined,
-      options: DiffOptions
+      options: DiffOptions,
     ) {
-      if (changedLinks && !baseLinks)
+      if (changedLinks && !baseLinks) {
         return FileSystem.trackCreatedInodes(container, changed, changedLinks);
-      if (baseLinks && !changedLinks)
+      }
+      if (baseLinks && !changedLinks) {
         return FileSystem.trackDeletedInodes(container, baseLinks);
+      }
       if (changedLinks && baseLinks) {
         let hasChanges = false;
         // track base items missing in changed
@@ -910,46 +914,42 @@ namespace vfs {
           const baseNode = baseLinks.get(basename);
           if (baseNode) {
             if (isDirectory(changedNode) && isDirectory(baseNode)) {
-              return (hasChanges =
-                FileSystem.directoryDiff(
-                  container,
-                  basename,
-                  changed,
-                  changedNode,
-                  base,
-                  baseNode,
-                  options
-                ) || hasChanges);
+              return (hasChanges = FileSystem.directoryDiff(
+                container,
+                basename,
+                changed,
+                changedNode,
+                base,
+                baseNode,
+                options,
+              ) || hasChanges);
             }
             if (isFile(changedNode) && isFile(baseNode)) {
-              return (hasChanges =
-                FileSystem.fileDiff(
-                  container,
-                  basename,
-                  changed,
-                  changedNode,
-                  base,
-                  baseNode,
-                  options
-                ) || hasChanges);
+              return (hasChanges = FileSystem.fileDiff(
+                container,
+                basename,
+                changed,
+                changedNode,
+                base,
+                baseNode,
+                options,
+              ) || hasChanges);
             }
             if (isSymlink(changedNode) && isSymlink(baseNode)) {
-              return (hasChanges =
-                FileSystem.symlinkDiff(
-                  container,
-                  basename,
-                  changedNode,
-                  baseNode
-                ) || hasChanges);
+              return (hasChanges = FileSystem.symlinkDiff(
+                container,
+                basename,
+                changedNode,
+                baseNode,
+              ) || hasChanges);
             }
           }
-          return (hasChanges =
-            FileSystem.trackCreatedInode(
-              container,
-              basename,
-              changed,
-              changedNode
-            ) || hasChanges);
+          return (hasChanges = FileSystem.trackCreatedInode(
+            container,
+            basename,
+            changed,
+            changedNode,
+          ) || hasChanges);
         });
         return hasChanges;
       }
@@ -960,10 +960,11 @@ namespace vfs {
       container: FileSet,
       changed: FileSystem,
       base: FileSystem,
-      options: DiffOptions
+      options: DiffOptions,
     ) {
-      while (!changed._lazy.links && changed._shadowRoot)
+      while (!changed._lazy.links && changed._shadowRoot) {
         changed = changed._shadowRoot;
+      }
       while (!base._lazy.links && base._shadowRoot) base = base._shadowRoot;
 
       // no difference if the file systems are the same reference
@@ -971,12 +972,13 @@ namespace vfs {
 
       // no difference if the root links are empty and unshadowed
       if (
-        !changed._lazy.links &&
-        !changed._shadowRoot &&
-        !base._lazy.links &&
-        !base._shadowRoot
-      )
+        !changed._lazy.links
+        && !changed._shadowRoot
+        && !base._lazy.links
+        && !base._shadowRoot
+      ) {
         return false;
+      }
 
       return FileSystem.diffWorker(
         container,
@@ -984,7 +986,7 @@ namespace vfs {
         changed._getRootLinks(),
         base,
         base._getRootLinks(),
-        options
+        options,
       );
     }
 
@@ -995,33 +997,37 @@ namespace vfs {
       changedNode: DirectoryInode,
       base: FileSystem,
       baseNode: DirectoryInode,
-      options: DiffOptions
+      options: DiffOptions,
     ) {
-      while (!changedNode.links && changedNode.shadowRoot)
+      while (!changedNode.links && changedNode.shadowRoot) {
         changedNode = changedNode.shadowRoot;
-      while (!baseNode.links && baseNode.shadowRoot)
+      }
+      while (!baseNode.links && baseNode.shadowRoot) {
         baseNode = baseNode.shadowRoot;
+      }
 
       // no difference if the nodes are the same reference
       if (changedNode === baseNode) return false;
 
       // no difference if both nodes are non shadowed and have no entries
       if (
-        isEmptyNonShadowedDirectory(changedNode) &&
-        isEmptyNonShadowedDirectory(baseNode)
-      )
+        isEmptyNonShadowedDirectory(changedNode)
+        && isEmptyNonShadowedDirectory(baseNode)
+      ) {
         return false;
+      }
 
       // no difference if both nodes are unpopulated and point to the same mounted file system
       if (
-        !changedNode.links &&
-        !baseNode.links &&
-        changedNode.resolver &&
-        changedNode.source !== undefined &&
-        baseNode.resolver === changedNode.resolver &&
-        baseNode.source === changedNode.source
-      )
+        !changedNode.links
+        && !baseNode.links
+        && changedNode.resolver
+        && changedNode.source !== undefined
+        && baseNode.resolver === changedNode.resolver
+        && baseNode.source === changedNode.source
+      ) {
         return false;
+      }
 
       // no difference if both nodes have identical children
       const children: FileSet = {};
@@ -1032,7 +1038,7 @@ namespace vfs {
           changed._getLinks(changedNode),
           base,
           base._getLinks(baseNode),
-          options
+          options,
         )
       ) {
         return false;
@@ -1049,33 +1055,37 @@ namespace vfs {
       changedNode: FileInode,
       base: FileSystem,
       baseNode: FileInode,
-      options: DiffOptions
+      options: DiffOptions,
     ) {
-      while (!changedNode.buffer && changedNode.shadowRoot)
+      while (!changedNode.buffer && changedNode.shadowRoot) {
         changedNode = changedNode.shadowRoot;
-      while (!baseNode.buffer && baseNode.shadowRoot)
+      }
+      while (!baseNode.buffer && baseNode.shadowRoot) {
         baseNode = baseNode.shadowRoot;
+      }
 
       // no difference if the nodes are the same reference
       if (changedNode === baseNode) return false;
 
       // no difference if both nodes are non shadowed and have no entries
       if (
-        isEmptyNonShadowedFile(changedNode) &&
-        isEmptyNonShadowedFile(baseNode)
-      )
+        isEmptyNonShadowedFile(changedNode)
+        && isEmptyNonShadowedFile(baseNode)
+      ) {
         return false;
+      }
 
       // no difference if both nodes are unpopulated and point to the same mounted file system
       if (
-        !changedNode.buffer &&
-        !baseNode.buffer &&
-        changedNode.resolver &&
-        changedNode.source !== undefined &&
-        baseNode.resolver === changedNode.resolver &&
-        baseNode.source === changedNode.source
-      )
+        !changedNode.buffer
+        && !baseNode.buffer
+        && changedNode.resolver
+        && changedNode.source !== undefined
+        && baseNode.resolver === changedNode.resolver
+        && baseNode.source === changedNode.source
+      ) {
         return false;
+      }
 
       const changedBuffer = changed._getBuffer(changedNode);
       const baseBuffer = base._getBuffer(baseNode);
@@ -1098,7 +1108,7 @@ namespace vfs {
       container: FileSet,
       basename: string,
       changedNode: SymlinkInode,
-      baseNode: SymlinkInode
+      baseNode: SymlinkInode,
     ) {
       // no difference if the nodes are the same reference
       if (changedNode.symlink === baseNode.symlink) return false;
@@ -1110,14 +1120,14 @@ namespace vfs {
       container: FileSet,
       basename: string,
       changed: FileSystem,
-      node: Inode
+      node: Inode,
     ) {
       if (isDirectory(node)) {
         const children: FileSet = {};
         FileSystem.trackCreatedInodes(
           children,
           changed,
-          changed._getLinks(node)
+          changed._getLinks(node),
         );
         container[basename] = new Directory(children);
       } else if (isSymlink(node)) {
@@ -1131,7 +1141,7 @@ namespace vfs {
     private static trackCreatedInodes(
       container: FileSet,
       changed: FileSystem,
-      changedLinks: ReadonlyMap<string, Inode>
+      changedLinks: ReadonlyMap<string, Inode>,
     ) {
       // no difference if links are empty
       if (!changedLinks.size) return false;
@@ -1144,7 +1154,7 @@ namespace vfs {
 
     private static trackDeletedInodes(
       container: FileSet,
-      baseLinks: ReadonlyMap<string, Inode>
+      baseLinks: ReadonlyMap<string, Inode>,
     ) {
       // no difference if links are empty
       if (!baseLinks.size) return false;
@@ -1158,25 +1168,25 @@ namespace vfs {
       dev: number,
       type: typeof S_IFREG,
       mode: number,
-      time?: number
+      time?: number,
     ): FileInode;
     private _mknod(
       dev: number,
       type: typeof S_IFDIR,
       mode: number,
-      time?: number
+      time?: number,
     ): DirectoryInode;
     private _mknod(
       dev: number,
       type: typeof S_IFLNK,
       mode: number,
-      time?: number
+      time?: number,
     ): SymlinkInode;
     private _mknod(
       dev: number,
       type: number,
       mode: number,
-      time = this.time()
+      time = this.time(),
     ) {
       return {
         dev,
@@ -1195,7 +1205,7 @@ namespace vfs {
       links: collections.SortedMap<string, Inode>,
       name: string,
       node: Inode,
-      time = this.time()
+      time = this.time(),
     ) {
       links.set(name, node);
       node.nlink++;
@@ -1209,7 +1219,7 @@ namespace vfs {
       links: collections.SortedMap<string, Inode>,
       name: string,
       node: Inode,
-      time = this.time()
+      time = this.time(),
     ) {
       links.delete(name);
       node.nlink--;
@@ -1225,7 +1235,7 @@ namespace vfs {
       newLinks: collections.SortedMap<string, Inode>,
       newName: string,
       node: Inode,
-      time: number
+      time: number,
     ) {
       if (oldParent !== newParent) {
         this._removeLink(oldParent, oldLinks, oldName, node, time);
@@ -1241,12 +1251,12 @@ namespace vfs {
     private _getRootLinks() {
       if (!this._lazy.links) {
         this._lazy.links = new collections.SortedMap<string, Inode>(
-          this.stringComparer
+          this.stringComparer,
         );
         if (this._shadowRoot) {
           this._copyShadowLinks(
             this._shadowRoot._getRootLinks(),
-            this._lazy.links
+            this._lazy.links,
           );
         }
         this._lazy.links = this._lazy.links;
@@ -1257,7 +1267,7 @@ namespace vfs {
     private _getLinks(node: DirectoryInode) {
       if (!node.links) {
         const links = new collections.SortedMap<string, Inode>(
-          this.stringComparer
+          this.stringComparer,
         );
         const { source, resolver } = node;
         if (source && resolver) {
@@ -1285,7 +1295,7 @@ namespace vfs {
         } else if (this._shadowRoot && node.shadowRoot) {
           this._copyShadowLinks(
             this._shadowRoot._getLinks(node.shadowRoot),
-            links
+            links,
           );
         }
         node.links = links;
@@ -1296,8 +1306,7 @@ namespace vfs {
     private _getShadow(root: DirectoryInode): DirectoryInode;
     private _getShadow(root: Inode): Inode;
     private _getShadow(root: Inode) {
-      const shadows =
-        this._lazy.shadows || (this._lazy.shadows = new Map<number, Inode>());
+      const shadows = this._lazy.shadows || (this._lazy.shadows = new Map<number, Inode>());
 
       let shadow = shadows.get(root.ino);
       if (!shadow) {
@@ -1322,7 +1331,7 @@ namespace vfs {
 
     private _copyShadowLinks(
       source: ReadonlyMap<string, Inode>,
-      target: collections.SortedMap<string, Inode>
+      target: collections.SortedMap<string, Inode>,
     ) {
       const iterator = collections.getIterator(source);
       try {
@@ -1342,10 +1351,12 @@ namespace vfs {
     private _getSize(node: FileInode): number {
       if (node.buffer) return node.buffer.byteLength;
       if (node.size !== undefined) return node.size;
-      if (node.source && node.resolver)
+      if (node.source && node.resolver) {
         return (node.size = node.resolver.statSync(node.source).size);
-      if (this._shadowRoot && node.shadowRoot)
+      }
+      if (this._shadowRoot && node.shadowRoot) {
         return (node.size = this._shadowRoot._getSize(node.shadowRoot));
+      }
       return 0;
     }
 
@@ -1380,24 +1391,24 @@ namespace vfs {
       noFollow?: boolean,
       onError?: (
         error: NodeJS.ErrnoException,
-        fragment: WalkResult
-      ) => "retry" | "throw"
+        fragment: WalkResult,
+      ) => "retry" | "throw",
     ): WalkResult;
     private _walk(
       path: string,
       noFollow?: boolean,
       onError?: (
         error: NodeJS.ErrnoException,
-        fragment: WalkResult
-      ) => "stop" | "retry" | "throw"
+        fragment: WalkResult,
+      ) => "stop" | "retry" | "throw",
     ): WalkResult | undefined;
     private _walk(
       path: string,
       noFollow?: boolean,
       onError?: (
         error: NodeJS.ErrnoException,
-        fragment: WalkResult
-      ) => "stop" | "retry" | "throw"
+        fragment: WalkResult,
+      ) => "stop" | "retry" | "throw",
     ): WalkResult | undefined {
       let links = this._getRootLinks();
       let parent: DirectoryInode | undefined;
@@ -1452,10 +1463,9 @@ namespace vfs {
       function trapError(error: NodeJS.ErrnoException, node?: Inode) {
         const realpath = vpath.format(components.slice(0, step + 1));
         const basename = components[step];
-        const result =
-          !retry && onError
-            ? onError(error, { realpath, basename, parent, links, node })
-            : "throw";
+        const result = !retry && onError
+          ? onError(error, { realpath, basename, parent, links, node })
+          : "throw";
         if (result === "stop") return false;
         if (result === "retry") {
           retry = true;
@@ -1471,17 +1481,17 @@ namespace vfs {
     private _resolve(path: string) {
       return this._cwd
         ? vpath.resolve(
-            this._cwd,
-            vpath.validate(
-              path,
-              vpath.ValidationFlags.RelativeOrAbsolute |
-                vpath.ValidationFlags.AllowWildcard
-            )
-          )
-        : vpath.validate(
+          this._cwd,
+          vpath.validate(
             path,
-            vpath.ValidationFlags.Absolute | vpath.ValidationFlags.AllowWildcard
-          );
+            vpath.ValidationFlags.RelativeOrAbsolute
+              | vpath.ValidationFlags.AllowWildcard,
+          ),
+        )
+        : vpath.validate(
+          path,
+          vpath.ValidationFlags.Absolute | vpath.ValidationFlags.AllowWildcard,
+        );
     }
 
     private _applyFiles(files: FileSet, dirname: string) {
@@ -1511,7 +1521,7 @@ namespace vfs {
 
     private _applyFileExtendedOptions(
       path: string,
-      entry: Directory | File | Symlink | Mount
+      entry: Directory | File | Symlink | Mount,
     ) {
       const { meta } = entry;
       if (meta !== undefined) {
@@ -1525,7 +1535,7 @@ namespace vfs {
     private _applyFilesWorker(
       files: FileSet,
       dirname: string,
-      deferred: [Symlink | Link | Mount, string][]
+      deferred: [Symlink | Link | Mount, string][],
     ) {
       for (const key of Object.keys(files)) {
         const value = normalizeFileSetEntry(files[key]);
@@ -1534,10 +1544,10 @@ namespace vfs {
 
         // eslint-disable-next-line no-null/no-null
         if (
-          value === null ||
-          value === undefined ||
-          value instanceof Rmdir ||
-          value instanceof Unlink
+          value === null
+          || value === undefined
+          || value instanceof Rmdir
+          || value instanceof Unlink
         ) {
           if (this.stringComparer(vpath.dirname(path), path) === 0) {
             throw new TypeError("Roots cannot be deleted.");
@@ -1612,12 +1622,11 @@ namespace vfs {
   }
 
   export function createResolver(
-    host: FileSystemResolverHost
+    host: FileSystemResolverHost,
   ): FileSystemResolver {
     return {
       readdirSync(path: string): string[] {
-        const { files, directories } =
-          host.getAccessibleFileSystemEntries(path);
+        const { files, directories } = host.getAccessibleFileSystemEntries(path);
         return directories.concat(files);
       },
       statSync(path: string): { mode: number; size: number } {
@@ -1647,7 +1656,7 @@ namespace vfs {
   export function createFromFileSystem(
     host: FileSystemResolverHost,
     ignoreCase: boolean,
-    { documents, files, cwd, time, meta }: FileSystemCreateOptions = {}
+    { documents, files, cwd, time, meta }: FileSystemCreateOptions = {},
   ) {
     const fs = getBuiltLocal(host, ignoreCase).shadow();
     if (meta) {
@@ -1716,7 +1725,7 @@ namespace vfs {
       atimeMs: number,
       mtimeMs: number,
       ctimeMs: number,
-      birthtimeMs: number
+      birthtimeMs: number,
     );
     constructor(
       dev = 0,
@@ -1730,7 +1739,7 @@ namespace vfs {
       atimeMs = 0,
       mtimeMs = 0,
       ctimeMs = 0,
-      birthtimeMs = 0
+      birthtimeMs = 0,
     ) {
       this.dev = dev;
       this.ino = ino;
@@ -1792,10 +1801,10 @@ namespace vfs {
 
   export function createIOError(
     code: keyof typeof IOErrorMessages,
-    details = ""
+    details = "",
   ) {
     const err: NodeJS.ErrnoException = new Error(
-      `${code}: ${IOErrorMessages[code]} ${details}`
+      `${code}: ${IOErrorMessages[code]} ${details}`,
     );
     err.code = code;
     if (Error.captureStackTrace) Error.captureStackTrace(err, createIOError);
@@ -1838,7 +1847,7 @@ namespace vfs {
     public readonly meta: Record<string, any> | undefined;
     constructor(
       data: Buffer | string,
-      { meta, encoding }: { encoding?: string; meta?: Record<string, any> } = {}
+      { meta, encoding }: { encoding?: string; meta?: Record<string, any> } = {},
     ) {
       this.data = data;
       this.encoding = encoding;
@@ -1849,7 +1858,7 @@ namespace vfs {
   export class SameFileContentFile extends File {
     constructor(
       data: Buffer | string,
-      metaAndEncoding?: { encoding?: string; meta?: Record<string, any> }
+      metaAndEncoding?: { encoding?: string; meta?: Record<string, any> },
     ) {
       super(data, metaAndEncoding);
     }
@@ -1879,7 +1888,7 @@ namespace vfs {
     public readonly meta: Record<string, any> | undefined;
     constructor(
       symlink: string,
-      { meta }: { meta?: Record<string, any> } = {}
+      { meta }: { meta?: Record<string, any> } = {},
     ) {
       this.symlink = symlink;
       this.meta = meta;
@@ -1894,7 +1903,7 @@ namespace vfs {
     constructor(
       source: string,
       resolver: FileSystemResolver,
-      { meta }: { meta?: Record<string, any> } = {}
+      { meta }: { meta?: Record<string, any> } = {},
     ) {
       this.source = source;
       this.resolver = resolver;
@@ -1986,7 +1995,7 @@ namespace vfs {
 
   function getBuiltLocal(
     host: FileSystemResolverHost,
-    ignoreCase: boolean
+    ignoreCase: boolean,
   ): FileSystem {
     if (builtLocalHost !== host) {
       builtLocalCI = undefined;
@@ -1999,15 +2008,15 @@ namespace vfs {
         files: {
           [builtFolder]: new Mount(
             vpath.resolve(host.getWorkspaceRoot(), "built/local"),
-            resolver
+            resolver,
           ),
           [testLibFolder]: new Mount(
             vpath.resolve(host.getWorkspaceRoot(), "tests/lib"),
-            resolver
+            resolver,
           ),
           [projectsFolder]: new Mount(
             vpath.resolve(host.getWorkspaceRoot(), "tests/projects"),
-            resolver
+            resolver,
           ),
           [srcFolder]: {},
         },
@@ -2027,15 +2036,15 @@ namespace vfs {
   /* eslint-disable no-null/no-null */
   function normalizeFileSetEntry(value: FileSet[string]) {
     if (
-      value === undefined ||
-      value === null ||
-      value instanceof Directory ||
-      value instanceof File ||
-      value instanceof Link ||
-      value instanceof Symlink ||
-      value instanceof Mount ||
-      value instanceof Rmdir ||
-      value instanceof Unlink
+      value === undefined
+      || value === null
+      || value instanceof Directory
+      || value instanceof File
+      || value instanceof Link
+      || value instanceof Symlink
+      || value instanceof Mount
+      || value instanceof Rmdir
+      || value instanceof Unlink
     ) {
       return value;
     }
@@ -2058,10 +2067,10 @@ namespace vfs {
       const file = dirname ? vpath.combine(dirname, name) : name;
       // eslint-disable-next-line no-null/no-null
       if (
-        entry === null ||
-        entry === undefined ||
-        entry instanceof Unlink ||
-        entry instanceof Rmdir
+        entry === null
+        || entry === undefined
+        || entry instanceof Unlink
+        || entry instanceof Rmdir
       ) {
         text += `//// [${file}] unlink\r\n`;
       } else if (entry instanceof Rmdir) {
@@ -2071,10 +2080,9 @@ namespace vfs {
       } else if (entry instanceof SameFileContentFile) {
         text += `//// [${file}] file written with same contents\r\n`;
       } else if (entry instanceof File) {
-        const content =
-          typeof entry.data === "string"
-            ? entry.data
-            : entry.data.toString("utf8");
+        const content = typeof entry.data === "string"
+          ? entry.data
+          : entry.data.toString("utf8");
         text += `//// [${file}]\r\n${content}\r\n\r\n`;
       } else if (entry instanceof Link) {
         text += `//// [${file}] link(${entry.path})\r\n`;
@@ -2088,7 +2096,7 @@ namespace vfs {
   }
 
   export function iteratePatch(
-    patch: FileSet | undefined
+    patch: FileSet | undefined,
   ): IterableIterator<[string, string]> | null {
     // eslint-disable-next-line no-null/no-null
     return patch
@@ -2098,7 +2106,7 @@ namespace vfs {
 
   function* iteratePatchWorker(
     dirname: string,
-    container: FileSet
+    container: FileSet,
   ): IterableIterator<documents.TextDocument> {
     for (const name of Object.keys(container)) {
       const entry = normalizeFileSetEntry(container[name]);
@@ -2106,10 +2114,9 @@ namespace vfs {
       if (entry instanceof Directory) {
         yield* ts.arrayFrom(iteratePatchWorker(file, entry.files));
       } else if (entry instanceof File) {
-        const content =
-          typeof entry.data === "string"
-            ? entry.data
-            : entry.data.toString("utf8");
+        const content = typeof entry.data === "string"
+          ? entry.data
+          : entry.data.toString("utf8");
         yield new documents.TextDocument(file, content);
       }
     }

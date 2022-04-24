@@ -6,7 +6,7 @@ interface ObjectConstructor {
    * @param entries An iterable object that contains key-value entries for properties and methods.
    */
   fromEntries<T = any>(
-    entries: Iterable<readonly [PropertyKey, T]>
+    entries: Iterable<readonly [PropertyKey, T]>,
   ): { [k: string]: T };
 
   /**

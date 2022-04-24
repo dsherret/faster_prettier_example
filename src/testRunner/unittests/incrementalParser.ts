@@ -3,17 +3,16 @@ namespace ts {
     text: IScriptSnapshot,
     start: number,
     length: number,
-    newText: string
+    newText: string,
   ): { text: IScriptSnapshot; textChangeRange: TextChangeRange } {
     const contents = getSnapshotText(text);
-    const newContents =
-      contents.substr(0, start) + newText + contents.substring(start + length);
+    const newContents = contents.substr(0, start) + newText + contents.substring(start + length);
 
     return {
       text: ScriptSnapshot.fromString(newContents),
       textChangeRange: createTextChangeRange(
         createTextSpan(start, length),
-        newText.length
+        newText.length,
       ),
     };
   }
@@ -21,7 +20,7 @@ namespace ts {
   function withInsert(
     text: IScriptSnapshot,
     start: number,
-    newText: string
+    newText: string,
   ): { text: IScriptSnapshot; textChangeRange: TextChangeRange } {
     return withChange(text, start, 0, newText);
   }
@@ -29,7 +28,7 @@ namespace ts {
   function withDelete(
     text: IScriptSnapshot,
     start: number,
-    length: number
+    length: number,
   ): { text: IScriptSnapshot; textChangeRange: TextChangeRange } {
     return withChange(text, start, length, "");
   }
@@ -40,7 +39,7 @@ namespace ts {
       text,
       ScriptTarget.Latest,
       version,
-      /*setNodeParents:*/ true
+      /*setNodeParents:*/ true,
     );
   }
 
@@ -51,7 +50,7 @@ namespace ts {
     assert.equal(
       diagnostics1.length,
       diagnostics2.length,
-      "diagnostics1.length !== diagnostics2.length"
+      "diagnostics1.length !== diagnostics2.length",
     );
     for (let i = 0; i < diagnostics1.length; i++) {
       const d1 = diagnostics1[i];
@@ -64,7 +63,7 @@ namespace ts {
       assert.equal(
         d1.messageText,
         d2.messageText,
-        "d1.messageText !== d2.messageText"
+        "d1.messageText !== d2.messageText",
       );
       assert.equal(d1.category, d2.category, "d1.category !== d2.category");
       assert.equal(d1.code, d2.code, "d1.code !== d2.code");
@@ -81,7 +80,7 @@ namespace ts {
     newText: IScriptSnapshot,
     textChangeRange: TextChangeRange,
     expectedReusedElements: number,
-    oldTree?: SourceFile
+    oldTree?: SourceFile,
   ) {
     oldTree = oldTree || createTree(oldText, /*version:*/ ".");
     Utils.assertInvariants(oldTree, /*parent:*/ undefined);
@@ -95,7 +94,7 @@ namespace ts {
       oldTree,
       newText,
       oldTree.version + ".",
-      textChangeRange
+      textChangeRange,
     );
     Utils.assertInvariants(incrementalNewTree, /*parent:*/ undefined);
 
@@ -111,12 +110,12 @@ namespace ts {
     assert.equal(
       newTree.fileName,
       incrementalNewTree.fileName,
-      "newTree.fileName !== incrementalNewTree.fileName"
+      "newTree.fileName !== incrementalNewTree.fileName",
     );
     assert.equal(
       newTree.text,
       incrementalNewTree.text,
-      "newTree.text !== incrementalNewTree.text"
+      "newTree.text !== incrementalNewTree.text",
     );
 
     if (expectedReusedElements !== -1) {
@@ -124,7 +123,7 @@ namespace ts {
       assert.equal(
         actualReusedCount,
         expectedReusedElements,
-        actualReusedCount + " !== " + expectedReusedElements
+        actualReusedCount + " !== " + expectedReusedElements,
       );
     }
 
@@ -153,7 +152,7 @@ namespace ts {
     const repeat = toDelete.length;
     let oldTree = createTree(
       ScriptSnapshot.fromString(source),
-      /*version:*/ "."
+      /*version:*/ ".",
     );
     for (let i = 0; i < repeat; i++) {
       const oldText = ScriptSnapshot.fromString(source);
@@ -163,7 +162,7 @@ namespace ts {
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
         -1,
-        oldTree
+        oldTree,
       ).incrementalNewTree;
 
       source = getSnapshotText(newTextAndChange.text);
@@ -175,21 +174,21 @@ namespace ts {
     const repeat = toInsert.length;
     let oldTree = createTree(
       ScriptSnapshot.fromString(source),
-      /*version:*/ "."
+      /*version:*/ ".",
     );
     for (let i = 0; i < repeat; i++) {
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withInsert(
         oldText,
         index + i,
-        toInsert.charAt(i)
+        toInsert.charAt(i),
       );
       const newTree = compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
         -1,
-        oldTree
+        oldTree,
       ).incrementalNewTree;
 
       source = getSnapshotText(newTextAndChange.text);
@@ -199,14 +198,13 @@ namespace ts {
 
   describe("unittests:: Incremental Parser", () => {
     it("Inserting into method", () => {
-      const source =
-        "class C {\r\n" +
-        "    public foo1() { }\r\n" +
-        "    public foo2() {\r\n" +
-        "        return 1;\r\n" +
-        "    }\r\n" +
-        "    public foo3() { }\r\n" +
-        "}";
+      const source = "class C {\r\n"
+        + "    public foo1() { }\r\n"
+        + "    public foo2() {\r\n"
+        + "        return 1;\r\n"
+        + "    }\r\n"
+        + "    public foo3() { }\r\n"
+        + "}";
 
       const oldText = ScriptSnapshot.fromString(source);
       const semicolonIndex = source.indexOf(";");
@@ -216,19 +214,18 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        8
+        8,
       );
     });
 
     it("Deleting from method", () => {
-      const source =
-        "class C {\r\n" +
-        "    public foo1() { }\r\n" +
-        "    public foo2() {\r\n" +
-        "        return 1 + 1;\r\n" +
-        "    }\r\n" +
-        "    public foo3() { }\r\n" +
-        "}";
+      const source = "class C {\r\n"
+        + "    public foo1() { }\r\n"
+        + "    public foo2() {\r\n"
+        + "        return 1 + 1;\r\n"
+        + "    }\r\n"
+        + "    public foo3() { }\r\n"
+        + "}";
 
       const index = source.indexOf("+ 1");
       const oldText = ScriptSnapshot.fromString(source);
@@ -238,13 +235,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        8
+        8,
       );
     });
 
     it("Regular expression 1", () => {
-      const source =
-        "class C { public foo1() { /; } public foo2() { return 1;} public foo3() { } }";
+      const source = "class C { public foo1() { /; } public foo2() { return 1;} public foo3() { } }";
 
       const semicolonIndex = source.indexOf(";}");
       const oldText = ScriptSnapshot.fromString(source);
@@ -254,13 +250,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Regular expression 2", () => {
-      const source =
-        "class C { public foo1() { ; } public foo2() { return 1/;} public foo3() { } }";
+      const source = "class C { public foo1() { ; } public foo2() { return 1/;} public foo3() { } }";
 
       const semicolonIndex = source.indexOf(";");
       const oldText = ScriptSnapshot.fromString(source);
@@ -270,13 +265,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        4
+        4,
       );
     });
 
     it("Comment 1", () => {
-      const source =
-        "class C { public foo1() { /; } public foo2() { return 1; } public foo3() { } }";
+      const source = "class C { public foo1() { /; } public foo2() { return 1; } public foo3() { } }";
 
       const semicolonIndex = source.indexOf(";");
       const oldText = ScriptSnapshot.fromString(source);
@@ -286,13 +280,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Comment 2", () => {
-      const source =
-        "class C { public foo1() { /; } public foo2() { return 1; } public foo3() { } }";
+      const source = "class C { public foo1() { /; } public foo2() { return 1; } public foo3() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withInsert(oldText, 0, "//");
@@ -301,13 +294,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Comment 3", () => {
-      const source =
-        "//class C { public foo1() { /; } public foo2() { return 1; } public foo3() { } }";
+      const source = "//class C { public foo1() { /; } public foo2() { return 1; } public foo3() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withDelete(oldText, 0, 2);
@@ -316,13 +308,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Comment 4", () => {
-      const source =
-        "class C { public foo1() { /; } public foo2() { */ return 1; } public foo3() { } }";
+      const source = "class C { public foo1() { /; } public foo2() { */ return 1; } public foo3() { } }";
 
       const index = source.indexOf(";");
       const oldText = ScriptSnapshot.fromString(source);
@@ -332,18 +323,17 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        4
+        4,
       );
     });
 
     it("Parameter 1", () => {
       // Should be able to reuse all the parameters.
-      const source =
-        "class C {\r\n" +
-        "    public foo2(a, b, c, d) {\r\n" +
-        "        return 1;\r\n" +
-        "    }\r\n" +
-        "}";
+      const source = "class C {\r\n"
+        + "    public foo2(a, b, c, d) {\r\n"
+        + "        return 1;\r\n"
+        + "    }\r\n"
+        + "}";
 
       const semicolonIndex = source.indexOf(";");
       const oldText = ScriptSnapshot.fromString(source);
@@ -353,14 +343,13 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        8
+        8,
       );
     });
 
     it("Type member 1", () => {
       // Should be able to reuse most of the type members.
-      const source =
-        "interface I { a: number; b: string; (c): d; new (e): f; g(): h }";
+      const source = "interface I { a: number; b: string; (c): d; new (e): f; g(): h }";
 
       const index = source.indexOf(": string");
       const oldText = ScriptSnapshot.fromString(source);
@@ -370,14 +359,13 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        14
+        14,
       );
     });
 
     it("Enum element 1", () => {
       // Should be able to reuse most of the enum elements.
-      const source =
-        "enum E { a = 1, b = 1 << 1, c = 3, e = 4, f = 5, g = 7, h = 8, i = 9, j = 10 }";
+      const source = "enum E { a = 1, b = 1 << 1, c = 3, e = 4, f = 5, g = 7, h = 8, i = 9, j = 10 }";
 
       const index = source.indexOf("<<");
       const oldText = ScriptSnapshot.fromString(source);
@@ -387,7 +375,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        24
+        24,
       );
     });
 
@@ -401,7 +389,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        9
+        9,
       );
     });
 
@@ -415,7 +403,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        9
+        9,
       );
     });
 
@@ -430,13 +418,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        9
+        9,
       );
     });
 
     it("Strict mode 4", () => {
-      const source =
-        "'use strict';\r\nfoo1();\r\nfoo1();\r\nfoo1();\r\npackage();";
+      const source = "'use strict';\r\nfoo1();\r\nfoo1();\r\nfoo1();\r\npackage();";
 
       const index = source.indexOf("f");
       const oldText = ScriptSnapshot.fromString(source);
@@ -446,7 +433,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        9
+        9,
       );
     });
 
@@ -462,7 +449,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        27
+        27,
       );
     });
 
@@ -478,7 +465,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        27
+        27,
       );
     });
 
@@ -494,7 +481,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        24
+        24,
       );
     });
 
@@ -509,7 +496,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -524,7 +511,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -539,7 +526,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -554,7 +541,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -569,7 +556,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        -1
+        -1,
       );
     });
 
@@ -584,7 +571,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        -1
+        -1,
       );
     });
 
@@ -599,7 +586,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        -1
+        -1,
       );
     });
 
@@ -614,7 +601,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        -1
+        -1,
       );
     });
 
@@ -629,7 +616,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -644,7 +631,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -659,7 +646,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -674,7 +661,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -689,7 +676,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -704,7 +691,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -717,14 +704,14 @@ namespace ts {
         oldText,
         index,
         "= ".length,
-        ": Foo<Bar<"
+        ": Foo<Bar<",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -737,14 +724,14 @@ namespace ts {
         oldText,
         index,
         ": Foo<Bar<".length,
-        "= "
+        "= ",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -759,7 +746,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -774,7 +761,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -790,7 +777,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -806,7 +793,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -822,7 +809,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        14
+        14,
       );
     });
 
@@ -837,7 +824,7 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        2
+        2,
       );
     });
 
@@ -852,13 +839,12 @@ namespace ts {
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Modifier added to accessor", () => {
-      const source =
-        "class C {\
+      const source = "class C {\
     set Bar(bar:string) {}\
 }\
 var o2 = { set Foo(val:number) { } };";
@@ -871,13 +857,12 @@ var o2 = { set Foo(val:number) { } };";
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        14
+        14,
       );
     });
 
     it("Insert parameter ahead of parameter", () => {
-      const source =
-        "alert(100);\
+      const source = "alert(100);\
 \
 class OverloadedMonster {\
 constructor();\
@@ -892,7 +877,7 @@ constructor(name) { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        7
+        7,
       );
     });
 
@@ -909,7 +894,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -927,7 +912,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -942,7 +927,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -957,7 +942,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -972,7 +957,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -989,27 +974,26 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        7
+        7,
       );
     });
 
     it("Class to interface", () => {
-      const source =
-        "class A { public M1() { } public M2() { } public M3() { } p1 = 0; p2 = 0; p3 = 0 }";
+      const source = "class A { public M1() { } public M2() { } public M3() { } p1 = 0; p2 = 0; p3 = 0 }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         0,
         "class".length,
-        "interface"
+        "interface",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -1021,20 +1005,19 @@ module m3 { }\
         oldText,
         0,
         "interface".length,
-        "class"
+        "class",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Surrounding function declarations with block", () => {
-      const source =
-        "declare function F1() { } export function F2() { } declare export function F3() { }";
+      const source = "declare function F1() { } export function F2() { } declare export function F3() { }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withInsert(oldText, 0, "{");
@@ -1043,13 +1026,12 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        9
+        9,
       );
     });
 
     it("Removing block around function declarations", () => {
-      const source =
-        "{ declare function F1() { } export function F2() { } declare export function F3() { }";
+      const source = "{ declare function F1() { } export function F2() { } declare export function F3() { }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withDelete(oldText, 0, "{".length);
@@ -1058,7 +1040,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        9
+        9,
       );
     });
 
@@ -1070,14 +1052,14 @@ module m3 { }\
         oldText,
         0,
         "class C".length,
-        "var v ="
+        "var v =",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
@@ -1089,114 +1071,110 @@ module m3 { }\
         oldText,
         0,
         "var v =".length,
-        "class C"
+        "class C",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        4
+        4,
       );
     });
 
     it("Moving methods from object literal to class in strict mode", () => {
-      const source =
-        '"use strict"; var v = { public A() { } public B() { } public C() { } }';
+      const source = "\"use strict\"; var v = { public A() { } public B() { } public C() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         14,
         "var v =".length,
-        "class C"
+        "class C",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        4
+        4,
       );
     });
 
     it("Do not move constructors from class to object-literal.", () => {
-      const source =
-        "class C { public constructor() { } public constructor() { } public constructor() { } }";
+      const source = "class C { public constructor() { } public constructor() { } public constructor() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         0,
         "class C".length,
-        "var v ="
+        "var v =",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
-    it('Do not move methods called "constructor" from object literal to class', () => {
-      const source =
-        "var v = { public constructor() { } public constructor() { } public constructor() { } }";
+    it("Do not move methods called \"constructor\" from object literal to class", () => {
+      const source = "var v = { public constructor() { } public constructor() { } public constructor() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         0,
         "var v =".length,
-        "class C"
+        "class C",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Moving index signatures from class to interface", () => {
-      const source =
-        "class C { public [a: number]: string; public [a: number]: string; public [a: number]: string }";
+      const source = "class C { public [a: number]: string; public [a: number]: string; public [a: number]: string }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         0,
         "class".length,
-        "interface"
+        "interface",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        18
+        18,
       );
     });
 
     it("Moving index signatures from class to interface in strict mode", () => {
       const source =
-        '"use strict"; class C { public [a: number]: string; public [a: number]: string; public [a: number]: string }';
+        "\"use strict\"; class C { public [a: number]: string; public [a: number]: string; public [a: number]: string }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         14,
         "class".length,
-        "interface"
+        "interface",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        18
+        18,
       );
     });
 
@@ -1209,94 +1187,91 @@ module m3 { }\
         oldText,
         0,
         "interface".length,
-        "class"
+        "class",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        18
+        18,
       );
     });
 
     it("Moving index signatures from interface to class in strict mode", () => {
       const source =
-        '"use strict"; interface C { public [a: number]: string; public [a: number]: string; public [a: number]: string }';
+        "\"use strict\"; interface C { public [a: number]: string; public [a: number]: string; public [a: number]: string }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         14,
         "interface".length,
-        "class"
+        "class",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        18
+        18,
       );
     });
 
     it("Moving accessors from class to object literal", () => {
-      const source =
-        "class C { public get A() { } public get B() { } public get C() { } }";
+      const source = "class C { public get A() { } public get B() { } public get C() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         0,
         "class C".length,
-        "var v ="
+        "var v =",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        0
+        0,
       );
     });
 
     it("Moving accessors from object literal to class", () => {
-      const source =
-        "var v = { public get A() { } public get B() { } public get C() { } }";
+      const source = "var v = { public get A() { } public get B() { } public get C() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         0,
         "var v =".length,
-        "class C"
+        "class C",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        4
+        4,
       );
     });
 
     it("Moving accessors from object literal to class in strict mode", () => {
-      const source =
-        '"use strict"; var v = { public get A() { } public get B() { } public get C() { } }';
+      const source = "\"use strict\"; var v = { public get A() { } public get B() { } public get C() { } }";
 
       const oldText = ScriptSnapshot.fromString(source);
       const newTextAndChange = withChange(
         oldText,
         14,
         "var v =".length,
-        "class C"
+        "class C",
       );
 
       compareTrees(
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        4
+        4,
       );
     });
 
@@ -1308,7 +1283,7 @@ module m3 { }\
         oldText,
         newTextAndChange.text,
         newTextAndChange.textChangeRange,
-        -1
+        -1,
       );
       bindSourceFile(oldTree, {});
       bindSourceFile(incrementalNewTree, {});
@@ -1318,41 +1293,41 @@ module m3 { }\
     // Simulated typing tests.
 
     it("Type extends clause 1", () => {
-      const source =
-        "interface IFoo<T> { }\r\ninterface Array<T> extends IFoo<T> { }";
+      const source = "interface IFoo<T> { }\r\ninterface Array<T> extends IFoo<T> { }";
 
       const index = source.indexOf("extends");
       deleteCode(source, index, "extends IFoo<T>");
     });
 
     it("Type after incomplete enum 1", () => {
-      const source =
-        "function foo() {\r\n" +
-        "            function getOccurrencesAtPosition() {\r\n" +
-        "            switch (node) {\r\n" +
-        "                enum \r\n" +
-        "            }\r\n" +
-        "                \r\n" +
-        "                return undefined;\r\n" +
-        "                \r\n" +
-        "                function keywordToReferenceEntry() {\r\n" +
-        "                }\r\n" +
-        "            }\r\n" +
-        "                \r\n" +
-        "            return {\r\n" +
-        "                getEmitOutput: (fileName): Bar => null,\r\n" +
-        "            };\r\n" +
-        "        }";
+      const source = "function foo() {\r\n"
+        + "            function getOccurrencesAtPosition() {\r\n"
+        + "            switch (node) {\r\n"
+        + "                enum \r\n"
+        + "            }\r\n"
+        + "                \r\n"
+        + "                return undefined;\r\n"
+        + "                \r\n"
+        + "                function keywordToReferenceEntry() {\r\n"
+        + "                }\r\n"
+        + "            }\r\n"
+        + "                \r\n"
+        + "            return {\r\n"
+        + "                getEmitOutput: (fileName): Bar => null,\r\n"
+        + "            };\r\n"
+        + "        }";
 
       const index = source.indexOf("enum ") + "enum ".length;
       insertCode(source, index, "Fo");
     });
 
-    for (const tsIgnoreComment of [
-      "// @ts-ignore",
-      "/* @ts-ignore */",
-      "/*\n  @ts-ignore */",
-    ]) {
+    for (
+      const tsIgnoreComment of [
+        "// @ts-ignore",
+        "/* @ts-ignore */",
+        "/*\n  @ts-ignore */",
+      ]
+    ) {
       describe(`${tsIgnoreComment} comment directives`, () => {
         const textWithIgnoreComment = `const x = 10;
     function foo() {
@@ -1377,20 +1352,20 @@ module m3 { }\
         verifyScenario("when inserting ts-ignore comment", verifyInsert);
         verifyScenario(
           "when changing ts-ignore comment to blah",
-          verifyChangeToBlah
+          verifyChangeToBlah,
         );
         verifyScenario(
           "when changing blah comment to ts-ignore",
-          verifyChangeBackToDirective
+          verifyChangeBackToDirective,
         );
         verifyScenario("when deleting blah comment", verifyDeletingBlah);
         verifyScenario(
           "when changing text that adds another comment",
-          verifyChangeDirectiveType
+          verifyChangeDirectiveType,
         );
         verifyScenario(
           "when changing text that keeps the comment but adds more nodes",
-          verifyReuseChange
+          verifyReuseChange,
         );
 
         function verifyCommentDirectives(
@@ -1398,23 +1373,23 @@ module m3 { }\
           newTextAndChange: {
             text: IScriptSnapshot;
             textChangeRange: TextChangeRange;
-          }
+          },
         ) {
           const { incrementalNewTree, newTree } = compareTrees(
             oldText,
             newTextAndChange.text,
             newTextAndChange.textChangeRange,
-            -1
+            -1,
           );
           assert.deepEqual(
             incrementalNewTree.commentDirectives,
-            newTree.commentDirectives
+            newTree.commentDirectives,
           );
         }
 
         function verifyScenario(
           scenario: string,
-          verifyChange: (atIndex: number, singleIgnore?: true) => void
+          verifyChange: (atIndex: number, singleIgnore?: true) => void,
         ) {
           it(`${scenario} - 0`, () => {
             verifyChange(0);
@@ -1440,7 +1415,7 @@ module m3 { }\
 
         function textWithIgnoreCommentFrom(
           text: string,
-          singleIgnore: true | undefined
+          singleIgnore: true | undefined,
         ) {
           if (!singleIgnore) return text;
           const splits = text.split(tsIgnoreComment);
@@ -1456,12 +1431,12 @@ module m3 { }\
         function verifyDelete(atIndex: number, singleIgnore?: true) {
           const index = getIndexOfTsIgnoreComment(atIndex);
           const oldText = ScriptSnapshot.fromString(
-            textWithIgnoreCommentFrom(textWithIgnoreComment, singleIgnore)
+            textWithIgnoreCommentFrom(textWithIgnoreComment, singleIgnore),
           );
           const newTextAndChange = withDelete(
             oldText,
             index,
-            tsIgnoreComment.length
+            tsIgnoreComment.length,
           );
           verifyCommentDirectives(oldText, newTextAndChange);
         }
@@ -1469,9 +1444,9 @@ module m3 { }\
         function verifyInsert(atIndex: number, singleIgnore?: true) {
           const index = getIndexOfTsIgnoreComment(atIndex);
           const source = textWithIgnoreCommentFrom(
-            textWithIgnoreComment.slice(0, index) +
-              textWithIgnoreComment.slice(index + tsIgnoreComment.length),
-            singleIgnore
+            textWithIgnoreComment.slice(0, index)
+              + textWithIgnoreComment.slice(index + tsIgnoreComment.length),
+            singleIgnore,
           );
           const oldText = ScriptSnapshot.fromString(source);
           const newTextAndChange = withInsert(oldText, index, tsIgnoreComment);
@@ -1479,10 +1454,9 @@ module m3 { }\
         }
 
         function verifyChangeToBlah(atIndex: number, singleIgnore?: true) {
-          const index =
-            getIndexOfTsIgnoreComment(atIndex) + tsIgnoreComment.indexOf("@");
+          const index = getIndexOfTsIgnoreComment(atIndex) + tsIgnoreComment.indexOf("@");
           const oldText = ScriptSnapshot.fromString(
-            textWithIgnoreCommentFrom(textWithIgnoreComment, singleIgnore)
+            textWithIgnoreCommentFrom(textWithIgnoreComment, singleIgnore),
           );
           const newTextAndChange = withChange(oldText, index, 1, "blah ");
           verifyCommentDirectives(oldText, newTextAndChange);
@@ -1490,22 +1464,21 @@ module m3 { }\
 
         function verifyChangeBackToDirective(
           atIndex: number,
-          singleIgnore?: true
+          singleIgnore?: true,
         ) {
-          const index =
-            getIndexOfTsIgnoreComment(atIndex) + tsIgnoreComment.indexOf("@");
+          const index = getIndexOfTsIgnoreComment(atIndex) + tsIgnoreComment.indexOf("@");
           const source = textWithIgnoreCommentFrom(
-            textWithIgnoreComment.slice(0, index) +
-              "blah " +
-              textWithIgnoreComment.slice(index + 1),
-            singleIgnore
+            textWithIgnoreComment.slice(0, index)
+              + "blah "
+              + textWithIgnoreComment.slice(index + 1),
+            singleIgnore,
           );
           const oldText = ScriptSnapshot.fromString(source);
           const newTextAndChange = withChange(
             oldText,
             index,
             "blah ".length,
-            "@"
+            "@",
           );
           verifyCommentDirectives(oldText, newTextAndChange);
         }
@@ -1514,35 +1487,34 @@ module m3 { }\
           const tsIgnoreIndex = getIndexOfTsIgnoreComment(atIndex);
           const index = tsIgnoreIndex + tsIgnoreComment.indexOf("@");
           const source = textWithIgnoreCommentFrom(
-            textWithIgnoreComment.slice(0, index) +
-              "blah " +
-              textWithIgnoreComment.slice(index + 1),
-            singleIgnore
+            textWithIgnoreComment.slice(0, index)
+              + "blah "
+              + textWithIgnoreComment.slice(index + 1),
+            singleIgnore,
           );
           const oldText = ScriptSnapshot.fromString(source);
           const newTextAndChange = withDelete(
             oldText,
             tsIgnoreIndex,
-            tsIgnoreComment.length + "blah".length
+            tsIgnoreComment.length + "blah".length,
           );
           verifyCommentDirectives(oldText, newTextAndChange);
         }
 
         function verifyChangeDirectiveType(
           atIndex: number,
-          singleIgnore?: true
+          singleIgnore?: true,
         ) {
-          const index =
-            getIndexOfTsIgnoreComment(atIndex) +
-            tsIgnoreComment.indexOf("ignore");
+          const index = getIndexOfTsIgnoreComment(atIndex)
+            + tsIgnoreComment.indexOf("ignore");
           const oldText = ScriptSnapshot.fromString(
-            textWithIgnoreCommentFrom(textWithIgnoreComment, singleIgnore)
+            textWithIgnoreCommentFrom(textWithIgnoreComment, singleIgnore),
           );
           const newTextAndChange = withChange(
             oldText,
             index,
             "ignore".length,
-            "expect-error"
+            "expect-error",
           );
           verifyCommentDirectives(oldText, newTextAndChange);
         }
@@ -1574,7 +1546,7 @@ module m3 { }\
     foo2();
     foo3();`;
           const oldText = ScriptSnapshot.fromString(
-            textWithIgnoreCommentFrom(source, singleIgnore)
+            textWithIgnoreCommentFrom(source, singleIgnore),
           );
           const start = source.indexOf(`const x${atIndex + 1}`);
           const letStr = `let y${atIndex + 1}: string = x;`;
@@ -1585,7 +1557,7 @@ module m3 { }\
             oldText,
             start,
             end - start,
-            newText
+            newText,
           );
           verifyCommentDirectives(oldText, newTextAndChange);
         }

@@ -5,7 +5,7 @@ namespace ts.projectSystem {
     const session = createSession(host);
     openFilesForSession([file], session);
     return function getSmartSelectionRange(
-      locations: protocol.SelectionRangeRequestArgs["locations"]
+      locations: protocol.SelectionRangeRequestArgs["locations"],
     ) {
       return executeSessionRequest<
         protocol.SelectionRangeRequest,
@@ -27,7 +27,7 @@ class Foo {
         }
         return false;
     }
-}`
+}`,
       );
 
       const locations = getSmartSelectionRange([

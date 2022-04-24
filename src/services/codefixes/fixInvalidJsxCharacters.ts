@@ -19,18 +19,16 @@ namespace ts.codefix {
           preferences,
           sourceFile,
           span.start,
-          /* useHtmlEntity */ false
-        )
-      );
+          /* useHtmlEntity */ false,
+        ));
       const changeToHtmlEntity = textChanges.ChangeTracker.with(context, (t) =>
         doChange(
           t,
           preferences,
           sourceFile,
           span.start,
-          /* useHtmlEntity */ true
-        )
-      );
+          /* useHtmlEntity */ true,
+        ));
 
       return [
         createCodeFixAction(
@@ -38,14 +36,14 @@ namespace ts.codefix {
           changeToExpression,
           Diagnostics.Wrap_invalid_character_in_an_expression_container,
           fixIdExpression,
-          Diagnostics.Wrap_all_invalid_characters_in_an_expression_container
+          Diagnostics.Wrap_all_invalid_characters_in_an_expression_container,
         ),
         createCodeFixAction(
           fixIdHtmlEntity,
           changeToHtmlEntity,
           Diagnostics.Convert_invalid_character_to_its_html_entity_code,
           fixIdHtmlEntity,
-          Diagnostics.Convert_all_invalid_characters_to_HTML_entity_code
+          Diagnostics.Convert_all_invalid_characters_to_HTML_entity_code,
         ),
       ];
     },
@@ -56,9 +54,8 @@ namespace ts.codefix {
           context.preferences,
           diagnostic.file,
           diagnostic.start,
-          context.fixId === fixIdHtmlEntity
-        )
-      );
+          context.fixId === fixIdHtmlEntity,
+        ));
     },
   });
 
@@ -68,7 +65,7 @@ namespace ts.codefix {
   };
 
   function isValidCharacter(
-    character: string
+    character: string,
   ): character is keyof typeof htmlEntity {
     return hasProperty(htmlEntity, character);
   }
@@ -78,7 +75,7 @@ namespace ts.codefix {
     preferences: UserPreferences,
     sourceFile: SourceFile,
     start: number,
-    useHtmlEntity: boolean
+    useHtmlEntity: boolean,
   ) {
     const character = sourceFile.getText()[start];
     // sanity check
@@ -92,7 +89,7 @@ namespace ts.codefix {
     changes.replaceRangeWithText(
       sourceFile,
       { pos: start, end: start + 1 },
-      replacement
+      replacement,
     );
   }
 }

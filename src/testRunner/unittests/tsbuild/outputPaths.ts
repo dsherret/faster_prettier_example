@@ -3,8 +3,7 @@ namespace ts {
     const noChangeProject: TscIncremental = {
       buildKind: BuildKind.NoChangeRun,
       modifyFs: noop,
-      subScenario:
-        "Normal build without change, that does not block emit on error to show files that get emitted",
+      subScenario: "Normal build without change, that does not block emit on error to show files that get emitted",
       commandLineArgs: ["-p", "/src/tsconfig.json"],
     };
     const incrementalScenarios: TscIncremental[] = [
@@ -17,7 +16,7 @@ namespace ts {
         VerifyTsBuildInput,
         "subScenario" | "fs" | "incrementalScenarios"
       >,
-      expectedOuptutNames: readonly string[]
+      expectedOuptutNames: readonly string[],
     ) {
       verifyTscSerializedIncrementalEdits({
         scenario: "outputPaths",
@@ -37,12 +36,12 @@ namespace ts {
               /*extendedConfigCache*/ undefined,
               {},
               sys,
-              noop
+              noop,
             )!,
             "/src/src/index.ts",
-            /*ignoreCase*/ false
+            /*ignoreCase*/ false,
           ),
-          expectedOuptutNames
+          expectedOuptutNames,
         );
       });
     }
@@ -61,7 +60,7 @@ namespace ts {
           }),
         incrementalScenarios,
       },
-      ["/src/dist/index.js"]
+      ["/src/dist/index.js"],
     );
 
     verify(
@@ -95,7 +94,7 @@ namespace ts {
           },
         ],
       },
-      ["/src/dist/src/index.js", "/src/dist/src/index.d.ts"]
+      ["/src/dist/src/index.js", "/src/dist/src/index.d.ts"],
     );
 
     verify(
@@ -113,13 +112,12 @@ namespace ts {
           }),
         incrementalScenarios,
       },
-      ["/src/dist/index.js"]
+      ["/src/dist/index.js"],
     );
 
     verify(
       {
-        subScenario:
-          "when rootDir is specified but not all files belong to rootDir",
+        subScenario: "when rootDir is specified but not all files belong to rootDir",
         fs: () =>
           loadProjectFromFiles({
             "/src/src/index.ts": "export const x = 10;",
@@ -133,13 +131,12 @@ namespace ts {
           }),
         incrementalScenarios,
       },
-      ["/src/dist/index.js"]
+      ["/src/dist/index.js"],
     );
 
     verify(
       {
-        subScenario:
-          "when rootDir is specified but not all files belong to rootDir and is composite",
+        subScenario: "when rootDir is specified but not all files belong to rootDir and is composite",
         fs: () =>
           loadProjectFromFiles({
             "/src/src/index.ts": "export const x = 10;",
@@ -154,7 +151,7 @@ namespace ts {
           }),
         incrementalScenarios,
       },
-      ["/src/dist/index.js", "/src/dist/index.d.ts"]
+      ["/src/dist/index.js", "/src/dist/index.d.ts"],
     );
   });
 }

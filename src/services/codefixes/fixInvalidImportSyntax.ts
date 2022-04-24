@@ -4,7 +4,7 @@ namespace ts.codefix {
 
   function getCodeFixesForImportDeclaration(
     context: CodeFixContext,
-    node: ImportDeclaration
+    node: ImportDeclaration,
   ): CodeFixAction[] {
     const sourceFile = getSourceFileOfNode(node);
     const namespace = getNamespaceDeclarationNode(node) as NamespaceImport;
@@ -21,9 +21,9 @@ namespace ts.codefix {
           namespace.name,
           /*namedImports*/ undefined,
           node.moduleSpecifier,
-          getQuotePreference(sourceFile, context.preferences)
-        )
-      )
+          getQuotePreference(sourceFile, context.preferences),
+        ),
+      ),
     );
 
     if (getEmitModuleKind(opts) === ModuleKind.CommonJS) {
@@ -38,9 +38,9 @@ namespace ts.codefix {
             /*modifiers*/ undefined,
             /*isTypeOnly*/ false,
             namespace.name,
-            factory.createExternalModuleReference(node.moduleSpecifier)
-          )
-        )
+            factory.createExternalModuleReference(node.moduleSpecifier),
+          ),
+        ),
       );
     }
 
@@ -51,11 +51,9 @@ namespace ts.codefix {
     context: CodeFixContext,
     sourceFile: SourceFile,
     node: Node,
-    replacement: Node
+    replacement: Node,
   ): CodeFixAction {
-    const changes = textChanges.ChangeTracker.with(context, (t) =>
-      t.replaceNode(sourceFile, node, replacement)
-    );
+    const changes = textChanges.ChangeTracker.with(context, (t) => t.replaceNode(sourceFile, node, replacement));
     return createCodeFixActionWithoutFixAll(fixName, changes, [
       Diagnostics.Replace_import_with_0,
       changes[0].textChanges[0].newText,
@@ -71,16 +69,15 @@ namespace ts.codefix {
   });
 
   function getActionsForUsageOfInvalidImport(
-    context: CodeFixContext
+    context: CodeFixContext,
   ): CodeFixAction[] | undefined {
     const sourceFile = context.sourceFile;
-    const targetKind =
-      Diagnostics.This_expression_is_not_callable.code === context.errorCode
-        ? SyntaxKind.CallExpression
-        : SyntaxKind.NewExpression;
+    const targetKind = Diagnostics.This_expression_is_not_callable.code === context.errorCode
+      ? SyntaxKind.CallExpression
+      : SyntaxKind.NewExpression;
     const node = findAncestor(
       getTokenAtPosition(sourceFile, context.span.start),
-      (a) => a.kind === targetKind
+      (a) => a.kind === targetKind,
     ) as CallExpression | NewExpression;
     if (!node) {
       return [];
@@ -117,14 +114,14 @@ namespace ts.codefix {
   });
 
   function getActionsForInvalidImportLocation(
-    context: CodeFixContext
+    context: CodeFixContext,
   ): CodeFixAction[] | undefined {
     const sourceFile = context.sourceFile;
     const node = findAncestor(
       getTokenAtPosition(sourceFile, context.span.start),
       (a) =>
-        a.getStart() === context.span.start &&
-        a.getEnd() === context.span.start + context.span.length
+        a.getStart() === context.span.start
+        && a.getEnd() === context.span.start + context.span.length,
     );
     if (!node) {
       return [];
@@ -134,7 +131,7 @@ namespace ts.codefix {
 
   function getImportCodeFixesForExpression(
     context: CodeFixContext,
-    expr: Node
+    expr: Node,
   ): CodeFixAction[] | undefined {
     const type = context.program.getTypeChecker().getTypeAtLocation(expr);
     if (!(type.symbol && (type.symbol as TransientSymbol).originatingImport)) {
@@ -146,8 +143,8 @@ namespace ts.codefix {
       addRange(fixes, getCodeFixesForImportDeclaration(context, relatedImport));
     }
     if (
-      isExpression(expr) &&
-      !(isNamedDeclaration(expr.parent) && expr.parent.name === expr)
+      isExpression(expr)
+      && !(isNamedDeclaration(expr.parent) && expr.parent.name === expr)
     ) {
       const sourceFile = context.sourceFile;
       const changes = textChanges.ChangeTracker.with(context, (t) =>
@@ -155,15 +152,14 @@ namespace ts.codefix {
           sourceFile,
           expr,
           factory.createPropertyAccessExpression(expr, "default"),
-          {}
-        )
-      );
+          {},
+        ));
       fixes.push(
         createCodeFixActionWithoutFixAll(
           fixName,
           changes,
-          Diagnostics.Use_synthetic_default_member
-        )
+          Diagnostics.Use_synthetic_default_member,
+        ),
       );
     }
     return fixes;

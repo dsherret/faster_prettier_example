@@ -5,13 +5,13 @@ namespace ts {
         new vfs.FileSystem(/*ignoreCase*/ false, {
           cwd: "/",
           files: { "/": {}, "/a.ts": "", ...additionalFiles },
-        })
+        }),
       );
     }
     function getParsedCommandJson(
       json: object,
       additionalFiles?: vfs.FileSet,
-      existingWatchOptions?: WatchOptions
+      existingWatchOptions?: WatchOptions,
     ) {
       return parseJsonConfigFileContent(
         json,
@@ -22,14 +22,14 @@ namespace ts {
         /*resolutionStack*/ undefined,
         /*extraFileExtensions*/ undefined,
         /*extendedConfigCache*/ undefined,
-        existingWatchOptions
+        existingWatchOptions,
       );
     }
 
     function getParsedCommandJsonNode(
       json: object,
       additionalFiles?: vfs.FileSet,
-      existingWatchOptions?: WatchOptions
+      existingWatchOptions?: WatchOptions,
     ) {
       const parsed = parseJsonText("tsconfig.json", JSON.stringify(json));
       return parseJsonSourceFileConfigFileContent(
@@ -41,7 +41,7 @@ namespace ts {
         /*resolutionStack*/ undefined,
         /*extraFileExtensions*/ undefined,
         /*extendedConfigCache*/ undefined,
-        existingWatchOptions
+        existingWatchOptions,
       );
     }
 
@@ -55,22 +55,24 @@ namespace ts {
 
     function verifyWatchOptions(scenario: () => VerifyWatchOptions[]) {
       it("with json api", () => {
-        for (const {
-          json,
-          expectedOptions,
-          additionalFiles,
-          existingWatchOptions,
-          expectedErrors,
-        } of scenario()) {
+        for (
+          const {
+            json,
+            expectedOptions,
+            additionalFiles,
+            existingWatchOptions,
+            expectedErrors,
+          } of scenario()
+        ) {
           const parsed = getParsedCommandJson(
             json,
             additionalFiles,
-            existingWatchOptions
+            existingWatchOptions,
           );
           assert.deepEqual(
             parsed.watchOptions,
             expectedOptions,
-            `With ${JSON.stringify(json)}`
+            `With ${JSON.stringify(json)}`,
           );
           if (length(parsed.errors)) {
             assert.deepEqual(parsed.errors, expectedErrors?.());
@@ -81,29 +83,31 @@ namespace ts {
       });
 
       it("with json source file api", () => {
-        for (const {
-          json,
-          expectedOptions,
-          additionalFiles,
-          existingWatchOptions,
-          expectedErrors,
-        } of scenario()) {
+        for (
+          const {
+            json,
+            expectedOptions,
+            additionalFiles,
+            existingWatchOptions,
+            expectedErrors,
+          } of scenario()
+        ) {
           const parsed = getParsedCommandJsonNode(
             json,
             additionalFiles,
-            existingWatchOptions
+            existingWatchOptions,
           );
           assert.deepEqual(parsed.watchOptions, expectedOptions);
           if (length(parsed.errors)) {
             assert.deepEqual(
               parsed.errors,
-              expectedErrors?.(parsed.options.configFile)
+              expectedErrors?.(parsed.options.configFile),
             );
           } else {
             assert.equal(
               0,
               length(expectedErrors?.(parsed.options.configFile)),
-              `Expected no errors`
+              `Expected no errors`,
             );
           }
         }
@@ -223,11 +227,11 @@ namespace ts {
           expectedOptions: { excludeDirectories: [] },
           expectedErrors: (sourceFile) => [
             {
-              messageText: `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
-              category:
-                Diagnostics
-                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
-                  .category,
+              messageText:
+                `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
+              category: Diagnostics
+                .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
+                .category,
               code: Diagnostics
                 .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
                 .code,
@@ -244,11 +248,11 @@ namespace ts {
           expectedOptions: { excludeFiles: [] },
           expectedErrors: (sourceFile) => [
             {
-              messageText: `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
-              category:
-                Diagnostics
-                  .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
-                  .category,
+              messageText:
+                `File specification cannot contain a parent directory ('..') that appears after a recursive directory wildcard ('**'): '**/../*'.`,
+              category: Diagnostics
+                .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
+                .category,
               code: Diagnostics
                 .File_specification_cannot_contain_a_parent_directory_that_appears_after_a_recursive_directory_wildcard_Asterisk_Asterisk_Colon_0
                 .code,

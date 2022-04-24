@@ -1,8 +1,7 @@
 /* @internal */
 namespace ts.refactor.addOrRemoveBracesToArrowFunction {
   const refactorName = "Convert overload list to single signature";
-  const refactorDescription =
-    Diagnostics.Convert_overload_list_to_single_signature.message;
+  const refactorDescription = Diagnostics.Convert_overload_list_to_single_signature.message;
 
   const functionOverloadAction = {
     name: refactorName,
@@ -16,13 +15,13 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
   });
 
   function getRefactorActionsToConvertOverloadsToOneSignature(
-    context: RefactorContext
+    context: RefactorContext,
   ): readonly ApplicableRefactorInfo[] {
     const { file, startPosition, program } = context;
     const info = getConvertableOverloadListAtPosition(
       file,
       startPosition,
-      program
+      program,
     );
     if (!info) return emptyArray;
 
@@ -36,13 +35,13 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
   }
 
   function getRefactorEditsToConvertOverloadsToOneSignature(
-    context: RefactorContext
+    context: RefactorContext,
   ): RefactorEditInfo | undefined {
     const { file, startPosition, program } = context;
     const signatureDecls = getConvertableOverloadListAtPosition(
       file,
       startPosition,
-      program
+      program,
     );
     if (!signatureDecls) return undefined;
 
@@ -59,7 +58,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           lastDeclaration.questionToken,
           lastDeclaration.typeParameters,
           getNewParametersForCombinedSignature(signatureDecls),
-          lastDeclaration.type
+          lastDeclaration.type,
         );
         break;
       }
@@ -74,7 +73,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           lastDeclaration.typeParameters,
           getNewParametersForCombinedSignature(signatureDecls),
           lastDeclaration.type,
-          lastDeclaration.body
+          lastDeclaration.body,
         );
         break;
       }
@@ -83,7 +82,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           lastDeclaration,
           lastDeclaration.typeParameters,
           getNewParametersForCombinedSignature(signatureDecls),
-          lastDeclaration.type
+          lastDeclaration.type,
         );
         break;
       }
@@ -93,7 +92,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           lastDeclaration.decorators,
           lastDeclaration.modifiers,
           getNewParametersForCombinedSignature(signatureDecls),
-          lastDeclaration.body
+          lastDeclaration.body,
         );
         break;
       }
@@ -102,7 +101,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           lastDeclaration,
           lastDeclaration.typeParameters,
           getNewParametersForCombinedSignature(signatureDecls),
-          lastDeclaration.type
+          lastDeclaration.type,
         );
         break;
       }
@@ -116,14 +115,14 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           lastDeclaration.typeParameters,
           getNewParametersForCombinedSignature(signatureDecls),
           lastDeclaration.type,
-          lastDeclaration.body
+          lastDeclaration.body,
         );
         break;
       }
       default:
         return Debug.failBadSyntaxKind(
           lastDeclaration,
-          "Unhandled signature kind in overload list conversion refactoring"
+          "Unhandled signature kind in overload list conversion refactoring",
         );
     }
 
@@ -136,7 +135,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
         file,
         signatureDecls[0],
         signatureDecls[signatureDecls.length - 1],
-        updated
+        updated,
       );
     });
 
@@ -150,14 +149,14 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
         | ConstructorDeclaration
         | ConstructSignatureDeclaration
         | FunctionDeclaration
-      )[]
+      )[],
     ): NodeArray<ParameterDeclaration> {
       const lastSig = signatureDeclarations[signatureDeclarations.length - 1];
       if (isFunctionLikeDeclaration(lastSig) && lastSig.body) {
         // Trim away implementation signature arguments (they should already be compatible with overloads, but are likely less precise to guarantee compatability with the overloads)
         signatureDeclarations = signatureDeclarations.slice(
           0,
-          signatureDeclarations.length - 1
+          signatureDeclarations.length - 1,
         );
       }
       return factory.createNodeArray([
@@ -168,8 +167,8 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           "args",
           /*questionToken*/ undefined,
           factory.createUnionTypeNode(
-            map(signatureDeclarations, convertSignatureParametersToTuple)
-          )
+            map(signatureDeclarations, convertSignatureParametersToTuple),
+          ),
         ),
       ]);
     }
@@ -181,19 +180,19 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
         | CallSignatureDeclaration
         | ConstructorDeclaration
         | ConstructSignatureDeclaration
-        | FunctionDeclaration
+        | FunctionDeclaration,
     ): TupleTypeNode {
       const members = map(decl.parameters, convertParameterToNamedTupleMember);
       return setEmitFlags(
         factory.createTupleTypeNode(members),
         some(members, (m) => !!length(getSyntheticLeadingComments(m)))
           ? EmitFlags.None
-          : EmitFlags.SingleLine
+          : EmitFlags.SingleLine,
       );
     }
 
     function convertParameterToNamedTupleMember(
-      p: ParameterDeclaration
+      p: ParameterDeclaration,
     ): NamedTupleMember {
       Debug.assert(isIdentifier(p.name)); // This is checked during refactoring applicability checking
       const result = setTextRange(
@@ -201,22 +200,23 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
           p.dotDotDotToken,
           p.name,
           p.questionToken,
-          p.type || factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+          p.type || factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
         ),
-        p
+        p,
       );
-      const parameterDocComment =
-        p.symbol && p.symbol.getDocumentationComment(checker);
+      const parameterDocComment = p.symbol && p.symbol.getDocumentationComment(checker);
       if (parameterDocComment) {
         const newComment = displayPartsToString(parameterDocComment);
         if (newComment.length) {
           setSyntheticLeadingComments(result, [
             {
               text: `*
-${newComment
-  .split("\n")
-  .map((c) => ` * ${c}`)
-  .join("\n")}
+${
+                newComment
+                  .split("\n")
+                  .map((c) => ` * ${c}`)
+                  .join("\n")
+              }
  `,
               kind: SyntaxKind.MultiLineCommentTrivia,
               pos: -1,
@@ -232,14 +232,15 @@ ${newComment
   }
 
   function isConvertableSignatureDeclaration(
-    d: Node
+    d: Node,
   ): d is
     | MethodSignature
     | MethodDeclaration
     | CallSignatureDeclaration
     | ConstructorDeclaration
     | ConstructSignatureDeclaration
-    | FunctionDeclaration {
+    | FunctionDeclaration
+  {
     switch (d.kind) {
       case SyntaxKind.MethodSignature:
       case SyntaxKind.MethodDeclaration:
@@ -255,12 +256,12 @@ ${newComment
   function getConvertableOverloadListAtPosition(
     file: SourceFile,
     startPosition: number,
-    program: Program
+    program: Program,
   ) {
     const node = getTokenAtPosition(file, startPosition);
     const containingDecl = findAncestor(
       node,
-      isConvertableSignatureDeclaration
+      isConvertableSignatureDeclaration,
     );
     if (!containingDecl) {
       return;
@@ -296,18 +297,16 @@ ${newComment
       some(
         signatureDecls,
         (d) =>
-          !!d.typeParameters ||
-          some(
+          !!d.typeParameters
+          || some(
             d.parameters,
-            (p) => !!p.decorators || !!p.modifiers || !isIdentifier(p.name)
-          )
+            (p) => !!p.decorators || !!p.modifiers || !isIdentifier(p.name),
+          ),
       )
     ) {
       return;
     }
-    const signatures = mapDefined(signatureDecls, (d) =>
-      checker.getSignatureFromDeclaration(d)
-    );
+    const signatures = mapDefined(signatureDecls, (d) => checker.getSignatureFromDeclaration(d));
     if (length(signatures) !== length(decls)) {
       return;
     }
@@ -315,7 +314,7 @@ ${newComment
     if (
       !every(
         signatures,
-        (s) => checker.getReturnTypeOfSignature(s) === returnOne
+        (s) => checker.getReturnTypeOfSignature(s) === returnOne,
       )
     ) {
       return;

@@ -10,16 +10,14 @@ namespace ts.codefix {
       const { sourceFile, span } = context;
       const node = findNodeToFix(sourceFile, span.start);
       if (!node) return undefined;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, node)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, node));
       return [
         createCodeFixAction(
           fixID,
           changes,
           Diagnostics.Wrap_in_JSX_fragment,
           fixID,
-          Diagnostics.Wrap_all_unparented_JSX_in_JSX_fragment
+          Diagnostics.Wrap_all_unparented_JSX_in_JSX_fragment,
         ),
       ];
     },
@@ -34,7 +32,7 @@ namespace ts.codefix {
 
   function findNodeToFix(
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ): BinaryExpression | undefined {
     // The error always at 1st token that is "<" in "<a /><a />"
     const lessThanToken = getTokenAtPosition(sourceFile, pos);
@@ -53,19 +51,20 @@ namespace ts.codefix {
   function doChange(
     changeTracker: textChanges.ChangeTracker,
     sf: SourceFile,
-    node: Node
+    node: Node,
   ) {
     const jsx = flattenInvalidBinaryExpr(node);
-    if (jsx)
+    if (jsx) {
       changeTracker.replaceNode(
         sf,
         node,
         factory.createJsxFragment(
           factory.createJsxOpeningFragment(),
           jsx,
-          factory.createJsxJsxClosingFragment()
-        )
+          factory.createJsxJsxClosingFragment(),
+        ),
       );
+    }
   }
   // The invalid syntax is constructed as
   // InvalidJsxTree :: One of
@@ -76,9 +75,9 @@ namespace ts.codefix {
     let current = node;
     while (true) {
       if (
-        isBinaryExpression(current) &&
-        nodeIsMissing(current.operatorToken) &&
-        current.operatorToken.kind === SyntaxKind.CommaToken
+        isBinaryExpression(current)
+        && nodeIsMissing(current.operatorToken)
+        && current.operatorToken.kind === SyntaxKind.CommaToken
       ) {
         children.push(current.left as JsxChild);
         if (isJsxChild(current.right)) {
@@ -88,11 +87,9 @@ namespace ts.codefix {
         } else if (isBinaryExpression(current.right)) {
           current = current.right;
           continue;
-        }
-        // Unreachable case
+        } // Unreachable case
         else return undefined;
-      }
-      // Unreachable case
+      } // Unreachable case
       else return undefined;
     }
   }

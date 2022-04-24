@@ -10,16 +10,16 @@ namespace ts {
     function changeCaseFile(
       file: TestFSWithWatch.FileOrFolderOrSymLink,
       testPath: (path: string) => boolean,
-      replacePath: (path: string) => string
+      replacePath: (path: string) => string,
     ): TestFSWithWatch.FileOrFolderOrSymLink {
       return !TestFSWithWatch.isSymLink(file) || !testPath(file.symLink)
         ? testPath(file.path)
           ? { ...file, path: replacePath(file.path) }
           : file
         : {
-            path: testPath(file.path) ? replacePath(file.path) : file.path,
-            symLink: replacePath(file.symLink),
-          };
+          path: testPath(file.path) ? replacePath(file.path) : file.path,
+          symLink: replacePath(file.symLink),
+        };
     }
 
     function verifyDeclarationEmit({
@@ -49,11 +49,9 @@ namespace ts {
           sys: () =>
             tscWatch.createWatchedSystem(
               files.map((f) =>
-                changeCaseFile(f, changeCaseFileTestPath, (str) =>
-                  str.replace("myproject", "myProject")
-                )
+                changeCaseFile(f, changeCaseFileTestPath, (str) => str.replace("myproject", "myProject"))
               ),
-              { currentDirectory: tscWatch.projectRoot }
+              { currentDirectory: tscWatch.projectRoot },
             ),
           commandLineArgs: ["-p", rootProject, "--explainFiles"],
           changes: emptyArray,
@@ -129,8 +127,7 @@ namespace ts {
       }
 
       verifyDeclarationEmit({
-        subScenario:
-          "when same version is referenced through source and another symlinked package",
+        subScenario: "when same version is referenced through source and another symlinked package",
         rootProject: "plugin-one",
         files: [
           {
@@ -175,8 +172,7 @@ namespace ts {
       });
 
       verifyDeclarationEmit({
-        subScenario:
-          "when same version is referenced through source and another symlinked package with indirect link",
+        subScenario: "when same version is referenced through source and another symlinked package with indirect link",
         rootProject: "plugin-one",
         files: [
           {
@@ -231,8 +227,7 @@ ${pluginOneAction()}`,
     });
 
     verifyDeclarationEmit({
-      subScenario:
-        "when pkg references sibling package through indirect symlink",
+      subScenario: "when pkg references sibling package through indirect symlink",
       rootProject: "pkg3",
       files: [
         {

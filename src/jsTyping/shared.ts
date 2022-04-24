@@ -11,19 +11,15 @@ namespace ts.server {
   /* @internal */
   export const ActionInvalidate: ActionInvalidate = "action::invalidate";
   /* @internal */
-  export const ActionPackageInstalled: ActionPackageInstalled =
-    "action::packageInstalled";
+  export const ActionPackageInstalled: ActionPackageInstalled = "action::packageInstalled";
   /* @internal */
   export const EventTypesRegistry: EventTypesRegistry = "event::typesRegistry";
   /* @internal */
-  export const EventBeginInstallTypes: EventBeginInstallTypes =
-    "event::beginInstallTypes";
+  export const EventBeginInstallTypes: EventBeginInstallTypes = "event::beginInstallTypes";
   /* @internal */
-  export const EventEndInstallTypes: EventEndInstallTypes =
-    "event::endInstallTypes";
+  export const EventEndInstallTypes: EventEndInstallTypes = "event::endInstallTypes";
   /* @internal */
-  export const EventInitializationFailed: EventInitializationFailed =
-    "event::initializationFailed";
+  export const EventInitializationFailed: EventInitializationFailed = "event::initializationFailed";
 
   /* @internal */
   export namespace Arguments {
@@ -61,14 +57,18 @@ namespace ts.server {
   export function nowString() {
     // E.g. "12:34:56.789"
     const d = new Date();
-    return `${padLeft(d.getHours().toString(), 2, "0")}:${padLeft(
-      d.getMinutes().toString(),
-      2,
-      "0"
-    )}:${padLeft(d.getSeconds().toString(), 2, "0")}.${padLeft(
-      d.getMilliseconds().toString(),
-      3,
-      "0"
-    )}`;
+    return `${padLeft(d.getHours().toString(), 2, "0")}:${
+      padLeft(
+        d.getMinutes().toString(),
+        2,
+        "0",
+      )
+    }:${padLeft(d.getSeconds().toString(), 2, "0")}.${
+      padLeft(
+        d.getMilliseconds().toString(),
+        3,
+        "0",
+      )
+    }`;
   }
 }

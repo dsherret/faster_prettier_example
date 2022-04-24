@@ -11,8 +11,9 @@ namespace ts.codefix {
       const nodes = getNodes(sourceFile, context.span.start);
       if (!nodes) return undefined;
       const { extendsToken, heritageClauses } = nodes;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChanges(t, sourceFile, extendsToken, heritageClauses)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChanges(t, sourceFile, extendsToken, heritageClauses),
       );
       return [
         createCodeFixAction(
@@ -20,7 +21,7 @@ namespace ts.codefix {
           changes,
           Diagnostics.Change_extends_to_implements,
           fixId,
-          Diagnostics.Change_all_extended_interfaces_to_implements
+          Diagnostics.Change_all_extended_interfaces_to_implements,
         ),
       ];
     },
@@ -28,13 +29,14 @@ namespace ts.codefix {
     getAllCodeActions: (context) =>
       codeFixAll(context, errorCodes, (changes, diag) => {
         const nodes = getNodes(diag.file, diag.start);
-        if (nodes)
+        if (nodes) {
           doChanges(
             changes,
             diag.file,
             nodes.extendsToken,
-            nodes.heritageClauses
+            nodes.heritageClauses,
           );
+        }
       }),
   });
 
@@ -51,26 +53,26 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     extendsToken: Node,
-    heritageClauses: readonly HeritageClause[]
+    heritageClauses: readonly HeritageClause[],
   ): void {
     changes.replaceNode(
       sourceFile,
       extendsToken,
-      factory.createToken(SyntaxKind.ImplementsKeyword)
+      factory.createToken(SyntaxKind.ImplementsKeyword),
     );
 
     // If there is already an implements clause, replace the implements keyword with a comma.
     if (
-      heritageClauses.length === 2 &&
-      heritageClauses[0].token === SyntaxKind.ExtendsKeyword &&
-      heritageClauses[1].token === SyntaxKind.ImplementsKeyword
+      heritageClauses.length === 2
+      && heritageClauses[0].token === SyntaxKind.ExtendsKeyword
+      && heritageClauses[1].token === SyntaxKind.ImplementsKeyword
     ) {
       const implementsToken = heritageClauses[1].getFirstToken()!;
       const implementsFullStart = implementsToken.getFullStart();
       changes.replaceRange(
         sourceFile,
         { pos: implementsFullStart, end: implementsFullStart },
-        factory.createToken(SyntaxKind.CommaToken)
+        factory.createToken(SyntaxKind.CommaToken),
       );
 
       // Rough heuristic: delete trailing whitespace after keyword so that it's not excessive.
@@ -78,8 +80,8 @@ namespace ts.codefix {
       const text = sourceFile.text;
       let end = implementsToken.end;
       while (
-        end < text.length &&
-        isWhiteSpaceSingleLine(text.charCodeAt(end))
+        end < text.length
+        && isWhiteSpaceSingleLine(text.charCodeAt(end))
       ) {
         end++;
       }

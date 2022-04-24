@@ -87,7 +87,7 @@ namespace ts {
                     "include": []
                 }`,
           },
-          symbolLibContent
+          symbolLibContent,
         ),
       commandLineArgs: ["-b", "/src", "--verbose"],
     });
@@ -183,7 +183,7 @@ namespace ts {
                         ]
                     }`,
           },
-          ""
+          "",
         ),
       modifyFs: (fs) => {
         fs.writeFileSync("/lib/lib.es2020.full.d.ts", tscWatch.libFile.content);

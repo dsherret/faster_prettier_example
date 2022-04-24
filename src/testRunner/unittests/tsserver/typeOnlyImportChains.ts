@@ -17,7 +17,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c],
         c,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type,
       );
     });
 
@@ -38,7 +38,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c],
         c,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type,
       );
     });
 
@@ -59,7 +59,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c],
         c,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type,
       );
     });
 
@@ -80,7 +80,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c],
         c,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type,
       );
     });
 
@@ -101,7 +101,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c],
         c,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type,
       );
     });
 
@@ -126,7 +126,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c, d],
         d,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_exported_using_export_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_exported_using_export_type,
       );
     });
 
@@ -151,7 +151,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c, d],
         d,
-        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type
+        Diagnostics._0_cannot_be_used_as_a_value_because_it_was_imported_using_import_type,
       );
     });
 
@@ -176,7 +176,7 @@ namespace ts.projectSystem {
       assertUsageError(
         [a, b, c, d],
         d,
-        Diagnostics.Property_0_does_not_exist_on_type_1
+        Diagnostics.Property_0_does_not_exist_on_type_1,
       );
     });
   });
@@ -184,14 +184,14 @@ namespace ts.projectSystem {
   function assertUsageError(
     files: readonly TestFSWithWatch.File[],
     openFile: TestFSWithWatch.File,
-    diagnostic: DiagnosticMessage
+    diagnostic: DiagnosticMessage,
   ) {
     const host = createServerHost(files);
     const session = createSession(host);
     openFilesForSession([openFile], session);
     const req = makeSessionRequest<protocol.SemanticDiagnosticsSyncRequestArgs>(
       protocol.CommandTypes.SemanticDiagnosticsSync,
-      { file: openFile.path }
+      { file: openFile.path },
     );
     const diagnostics = session.executeCommand(req)
       .response as protocol.Diagnostic[];

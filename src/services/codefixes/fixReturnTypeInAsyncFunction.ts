@@ -18,7 +18,7 @@ namespace ts.codefix {
     errorCodes,
     fixIds: [fixId],
     getCodeActions: function getCodeActionsToFixReturnTypeInAsyncFunction(
-      context
+      context,
     ) {
       const { sourceFile, program, span } = context;
       const checker = program.getTypeChecker();
@@ -26,10 +26,10 @@ namespace ts.codefix {
       if (!info) {
         return undefined;
       }
-      const { returnTypeNode, returnType, promisedTypeNode, promisedType } =
-        info;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, returnTypeNode, promisedTypeNode)
+      const { returnTypeNode, returnType, promisedTypeNode, promisedType } = info;
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChange(t, sourceFile, returnTypeNode, promisedTypeNode),
       );
       return [
         createCodeFixAction(
@@ -41,7 +41,7 @@ namespace ts.codefix {
             checker.typeToString(promisedType),
           ],
           fixId,
-          Diagnostics.Fix_all_incorrect_return_type_of_an_async_functions
+          Diagnostics.Fix_all_incorrect_return_type_of_an_async_functions,
         ),
       ];
     },
@@ -50,14 +50,14 @@ namespace ts.codefix {
         const info = getInfo(
           diag.file,
           context.program.getTypeChecker(),
-          diag.start
+          diag.start,
         );
         if (info) {
           doChange(
             changes,
             diag.file,
             info.returnTypeNode,
-            info.promisedTypeNode
+            info.promisedTypeNode,
           );
         }
       }),
@@ -66,7 +66,7 @@ namespace ts.codefix {
   function getInfo(
     sourceFile: SourceFile,
     checker: TypeChecker,
-    pos: number
+    pos: number,
   ): Info | undefined {
     if (isInJSFile(sourceFile)) {
       return undefined;
@@ -80,12 +80,11 @@ namespace ts.codefix {
     }
 
     const returnType = checker.getTypeFromTypeNode(returnTypeNode);
-    const promisedType =
-      checker.getAwaitedType(returnType) || checker.getVoidType();
+    const promisedType = checker.getAwaitedType(returnType) || checker.getVoidType();
     const promisedTypeNode = checker.typeToTypeNode(
       promisedType,
       /*enclosingDeclaration*/ returnTypeNode,
-      /*flags*/ undefined
+      /*flags*/ undefined,
     );
     if (promisedTypeNode) {
       return { returnTypeNode, returnType, promisedTypeNode, promisedType };
@@ -96,12 +95,12 @@ namespace ts.codefix {
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     returnTypeNode: TypeNode,
-    promisedTypeNode: TypeNode
+    promisedTypeNode: TypeNode,
   ): void {
     changes.replaceNode(
       sourceFile,
       returnTypeNode,
-      factory.createTypeReferenceNode("Promise", [promisedTypeNode])
+      factory.createTypeReferenceNode("Promise", [promisedTypeNode]),
     );
   }
 }

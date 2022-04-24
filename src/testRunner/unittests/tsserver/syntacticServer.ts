@@ -42,7 +42,7 @@ import { something } from "something";
 
     function verifySessionException<T extends server.protocol.Request>(
       session: TestSession,
-      request: Partial<T>
+      request: Partial<T>,
     ) {
       let hasException = false;
       try {
@@ -50,7 +50,7 @@ import { something } from "something";
       } catch (e) {
         assert.equal(
           e.message,
-          `Request: ${request.command} not allowed in LanguageServiceMode.Syntactic`
+          `Request: ${request.command} not allowed in LanguageServiceMode.Syntactic`,
         );
         hasException = true;
       }
@@ -110,7 +110,7 @@ import { something } from "something";
           {
             command: protocol.CommandTypes.DefinitionAndBoundSpan,
             arguments: protocolFileLocationFromSubstring(file1, "y"),
-          }
+          },
         );
       }
 
@@ -120,7 +120,7 @@ import { something } from "something";
           {
             command: protocol.CommandTypes.DefinitionAndBoundSpan,
             arguments: protocolFileLocationFromSubstring(file1, "cc"),
-          }
+          },
         );
       }
     });
@@ -143,7 +143,7 @@ import { something } from "something";
       } catch (e) {
         assert.equal(
           e.message,
-          `LanguageService Operation: getSemanticDiagnostics not allowed in LanguageServiceMode.Syntactic`
+          `LanguageService Operation: getSemanticDiagnostics not allowed in LanguageServiceMode.Syntactic`,
         );
         hasException = true;
       }

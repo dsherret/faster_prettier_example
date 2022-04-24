@@ -1,7 +1,7 @@
 /* @internal */
 namespace ts.codefix {
   type ContextualTrackChangesFunction = (
-    cb: (changeTracker: textChanges.ChangeTracker) => void
+    cb: (changeTracker: textChanges.ChangeTracker) => void,
   ) => FileTextChanges[];
   const fixId = "addMissingAsync";
   const errorCodes = [
@@ -15,20 +15,18 @@ namespace ts.codefix {
     fixIds: [fixId],
     errorCodes,
     getCodeActions: function getCodeActionsToAddMissingAsync(context) {
-      const { sourceFile, errorCode, cancellationToken, program, span } =
-        context;
+      const { sourceFile, errorCode, cancellationToken, program, span } = context;
       const diagnostic = find(
         program.getTypeChecker().getDiagnostics(sourceFile, cancellationToken),
-        getIsMatchingAsyncError(span, errorCode)
+        getIsMatchingAsyncError(span, errorCode),
       );
-      const directSpan =
-        diagnostic &&
-        diagnostic.relatedInformation &&
-        (find(
+      const directSpan = diagnostic
+        && diagnostic.relatedInformation
+        && (find(
           diagnostic.relatedInformation,
           (r) =>
-            r.code ===
-            Diagnostics.Did_you_mean_to_mark_this_function_as_async.code
+            r.code
+              === Diagnostics.Did_you_mean_to_mark_this_function_as_async.code,
         ) as TextSpan | undefined);
 
       const decl = getFixableErrorSpanDeclaration(sourceFile, directSpan);
@@ -36,21 +34,19 @@ namespace ts.codefix {
         return;
       }
 
-      const trackChanges: ContextualTrackChangesFunction = (cb) =>
-        textChanges.ChangeTracker.with(context, cb);
+      const trackChanges: ContextualTrackChangesFunction = (cb) => textChanges.ChangeTracker.with(context, cb);
       return [getFix(context, decl, trackChanges)];
     },
     getAllCodeActions: (context) => {
       const { sourceFile } = context;
       const fixedDeclarations = new Set<number>();
       return codeFixAll(context, errorCodes, (t, diagnostic) => {
-        const span =
-          diagnostic.relatedInformation &&
-          (find(
+        const span = diagnostic.relatedInformation
+          && (find(
             diagnostic.relatedInformation,
             (r) =>
-              r.code ===
-              Diagnostics.Did_you_mean_to_mark_this_function_as_async.code
+              r.code
+                === Diagnostics.Did_you_mean_to_mark_this_function_as_async.code,
           ) as TextSpan | undefined);
         const decl = getFixableErrorSpanDeclaration(sourceFile, span);
         if (!decl) {
@@ -73,17 +69,15 @@ namespace ts.codefix {
     context: CodeFixContext | CodeFixAllContext,
     decl: FixableDeclaration,
     trackChanges: ContextualTrackChangesFunction,
-    fixedDeclarations?: Set<number>
+    fixedDeclarations?: Set<number>,
   ) {
-    const changes = trackChanges((t) =>
-      makeChange(t, context.sourceFile, decl, fixedDeclarations)
-    );
+    const changes = trackChanges((t) => makeChange(t, context.sourceFile, decl, fixedDeclarations));
     return createCodeFixAction(
       fixId,
       changes,
       Diagnostics.Add_async_modifier_to_containing_function,
       fixId,
-      Diagnostics.Add_all_missing_async_modifiers
+      Diagnostics.Add_all_missing_async_modifiers,
     );
   }
 
@@ -91,7 +85,7 @@ namespace ts.codefix {
     changeTracker: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     insertionSite: FixableDeclaration,
-    fixedDeclarations?: Set<number>
+    fixedDeclarations?: Set<number>,
   ) {
     if (fixedDeclarations) {
       if (fixedDeclarations.has(getNodeId(insertionSite))) {
@@ -103,16 +97,16 @@ namespace ts.codefix {
       getSynthesizedDeepClone(insertionSite, /*includeTrivia*/ true),
       factory.createNodeArray(
         factory.createModifiersFromModifierFlags(
-          getSyntacticModifierFlags(insertionSite) | ModifierFlags.Async
-        )
-      )
+          getSyntacticModifierFlags(insertionSite) | ModifierFlags.Async,
+        ),
+      ),
     );
     changeTracker.replaceNode(sourceFile, insertionSite, cloneWithModifier);
   }
 
   function getFixableErrorSpanDeclaration(
     sourceFile: SourceFile,
-    span: TextSpan | undefined
+    span: TextSpan | undefined,
   ): FixableDeclaration | undefined {
     if (!span) return undefined;
     const token = getTokenAtPosition(sourceFile, span.start);
@@ -121,17 +115,17 @@ namespace ts.codefix {
     // with the diagnostic range.
     const decl = findAncestor(token, (node) => {
       if (
-        node.getStart(sourceFile) < span.start ||
-        node.getEnd() > textSpanEnd(span)
+        node.getStart(sourceFile) < span.start
+        || node.getEnd() > textSpanEnd(span)
       ) {
         return "quit";
       }
       return (
-        (isArrowFunction(node) ||
-          isMethodDeclaration(node) ||
-          isFunctionExpression(node) ||
-          isFunctionDeclaration(node)) &&
-        textSpansEqual(span, createTextSpanFromNode(node, sourceFile))
+        (isArrowFunction(node)
+          || isMethodDeclaration(node)
+          || isFunctionExpression(node)
+          || isFunctionDeclaration(node))
+        && textSpansEqual(span, createTextSpanFromNode(node, sourceFile))
       );
     }) as FixableDeclaration | undefined;
 
@@ -140,16 +134,16 @@ namespace ts.codefix {
 
   function getIsMatchingAsyncError(span: TextSpan, errorCode: number) {
     return ({ start, length, relatedInformation, code }: Diagnostic) =>
-      isNumber(start) &&
-      isNumber(length) &&
-      textSpansEqual({ start, length }, span) &&
-      code === errorCode &&
-      !!relatedInformation &&
-      some(
+      isNumber(start)
+      && isNumber(length)
+      && textSpansEqual({ start, length }, span)
+      && code === errorCode
+      && !!relatedInformation
+      && some(
         relatedInformation,
         (related) =>
-          related.code ===
-          Diagnostics.Did_you_mean_to_mark_this_function_as_async.code
+          related.code
+            === Diagnostics.Did_you_mean_to_mark_this_function_as_async.code,
       );
   }
 }

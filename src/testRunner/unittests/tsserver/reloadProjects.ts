@@ -25,7 +25,7 @@ namespace ts.projectSystem {
     function verifyFileUpdates(
       host: TestServerHost,
       service: TestProjectService,
-      project: server.Project
+      project: server.Project,
     ) {
       // update file
       const updatedText = `${file2.content}
@@ -35,7 +35,7 @@ namespace ts.projectSystem {
       service.reloadProjects();
       assert.equal(
         project.getCurrentProgram()?.getSourceFile(file2.path)?.text,
-        updatedText
+        updatedText,
       );
 
       // delete file
@@ -43,7 +43,7 @@ namespace ts.projectSystem {
       host.checkTimeoutQueueLength(0);
       service.reloadProjects();
       assert.isUndefined(
-        project.getCurrentProgram()?.getSourceFile(file2.path)?.text
+        project.getCurrentProgram()?.getSourceFile(file2.path)?.text,
       );
       assert.isUndefined(service.getScriptInfo(file2.path));
     }
@@ -72,7 +72,7 @@ namespace ts.projectSystem {
       checkNumberOfProjects(service, { configuredProjects: 1 });
       assert.strictEqual(
         service.configuredProjects.get(configFile.path),
-        project
+        project,
       );
       checkProjectActualFiles(project, [
         libFile.path,
@@ -96,14 +96,14 @@ namespace ts.projectSystem {
       const timeoutId = host.getNextTimeoutId();
       service.setCompilerOptionsForInferredProjects(
         { excludeDirectories: ["node_modules"] },
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       host.clearTimeout(timeoutId);
       service.openClientFile(
         file1.path,
         /*fileContent*/ undefined,
         /*scriptKind*/ undefined,
-        tscWatch.projectRoot
+        tscWatch.projectRoot,
       );
       checkNumberOfProjects(service, { inferredProjects: 1 });
       const project = service.inferredProjects[0];
@@ -192,7 +192,7 @@ namespace ts.projectSystem {
       checkNumberOfProjects(service, { configuredProjects: 1 });
       assert.strictEqual(
         service.configuredProjects.get(configFile.path),
-        project
+        project,
       );
       checkProjectActualFiles(project, [
         libFile.path,

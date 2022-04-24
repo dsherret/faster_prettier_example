@@ -10,14 +10,14 @@ namespace ts.tscWatch {
         arrayToMap(
           ["TSC_WATCHFILE"],
           identity,
-          () => TestFSWithWatch.Tsc_WatchFile.SingleFileWatcherPerName
-        )
+          () => TestFSWithWatch.Tsc_WatchFile.SingleFileWatcherPerName,
+        ),
       );
     });
 
     function verifyWatchFileOnMultipleProjects(
       singleWatchPerFile: boolean,
-      environmentVariables?: ESMap<string, string>
+      environmentVariables?: ESMap<string, string>,
     ) {
       it("watchFile on same file multiple times because file is part of multiple projects", () => {
         const project = `${TestFSWithWatch.tsbuildProjectsLocation}/myproject`;
@@ -34,14 +34,14 @@ namespace ts.tscWatch {
           {
             currentDirectory: project,
             environmentVariables,
-          }
+          },
         );
         writePkgReferences();
         const host = createSolutionBuilderWithWatchHost(system);
         const solutionBuilder = createSolutionBuilderWithWatch(
           host,
           ["tsconfig.json"],
-          { watch: true, verbose: true }
+          { watch: true, verbose: true },
         );
         solutionBuilder.build();
         checkOutputErrorsInitial(
@@ -49,30 +49,32 @@ namespace ts.tscWatch {
           emptyArray,
           /*disableConsoleClears*/ undefined,
           [
-            `Projects in this build: \r\n${concatenate(
-              pkgs((index) => `    * pkg${index}/tsconfig.json`),
-              ["    * tsconfig.json"]
-            ).join("\r\n")}\n\n`,
+            `Projects in this build: \r\n${
+              concatenate(
+                pkgs((index) => `    * pkg${index}/tsconfig.json`),
+                ["    * tsconfig.json"],
+              ).join("\r\n")
+            }\n\n`,
             ...flatArray(
               pkgs((index) => [
                 `Project 'pkg${index}/tsconfig.json' is out of date because output file 'pkg${index}/index.js' does not exist\n\n`,
                 `Building project '${project}/pkg${index}/tsconfig.json'...\n\n`,
-              ])
+              ]),
             ),
-          ]
+          ],
         );
 
         const watchFilesDetailed = arrayToMap(
           flatArray(allPkgFiles),
           (f) => f.path,
-          () => 1
+          () => 1,
         );
         watchFilesDetailed.set(configPath, 1);
         watchFilesDetailed.set(typing.path, singleWatchPerFile ? 1 : maxPkgs);
         checkWatchedFilesDetailed(system, watchFilesDetailed);
         system.writeFile(
           typing.path,
-          `${typing.content}export const typing1 = 10;`
+          `${typing.content}export const typing1 = 10;`,
         );
         verifyInvoke();
 
@@ -99,7 +101,7 @@ namespace ts.tscWatch {
 
         system.writeFile(
           typing.path,
-          `${typing.content}export const typing1 = 10;`
+          `${typing.content}export const typing1 = 10;`,
         );
         system.checkTimeoutQueueLength(0);
 
@@ -138,7 +140,7 @@ namespace ts.tscWatch {
               files: [],
               include: [],
               references: pkgs(createPkgReference),
-            })
+            }),
           );
         }
         function verifyInvoke() {
@@ -154,9 +156,9 @@ namespace ts.tscWatch {
                   `Project 'pkg${index}/tsconfig.json' is out of date because oldest output 'pkg${index}/index.js' is older than newest input 'typings/xterm.d.ts'\n\n`,
                   `Building project '${project}/pkg${index}/tsconfig.json'...\n\n`,
                   `Updating unchanged output timestamps of project '${project}/pkg${index}/tsconfig.json'...\n\n`,
-                ])
+                ]),
               ),
-            ]
+            ],
           );
         }
       });

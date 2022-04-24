@@ -14,7 +14,7 @@ namespace ts {
 
     function convertToFunctionBlock(
       node: ConciseBody,
-      multiLine?: boolean
+      multiLine?: boolean,
     ): Block {
       if (isBlock(node)) return node;
       const returnStatement = factory.createReturnStatement(node);
@@ -25,10 +25,11 @@ namespace ts {
     }
 
     function convertToFunctionExpression(node: FunctionDeclaration) {
-      if (!node.body)
+      if (!node.body) {
         return Debug.fail(
-          `Cannot convert a FunctionDeclaration without a body`
+          `Cannot convert a FunctionDeclaration without a body`,
         );
+      }
       const updated = factory.createFunctionExpression(
         node.modifiers,
         node.asteriskToken,
@@ -36,7 +37,7 @@ namespace ts {
         node.typeParameters,
         node.parameters,
         node.type,
-        node.body
+        node.body,
       );
       setOriginalNode(updated, node);
       setTextRange(updated, node);
@@ -47,39 +48,39 @@ namespace ts {
     }
 
     function convertToArrayAssignmentElement(
-      element: ArrayBindingOrAssignmentElement
+      element: ArrayBindingOrAssignmentElement,
     ) {
       if (isBindingElement(element)) {
         if (element.dotDotDotToken) {
           Debug.assertNode(element.name, isIdentifier);
           return setOriginalNode(
             setTextRange(factory.createSpreadElement(element.name), element),
-            element
+            element,
           );
         }
         const expression = convertToAssignmentElementTarget(element.name);
         return element.initializer
           ? setOriginalNode(
-              setTextRange(
-                factory.createAssignment(expression, element.initializer),
-                element
-              ),
-              element
-            )
+            setTextRange(
+              factory.createAssignment(expression, element.initializer),
+              element,
+            ),
+            element,
+          )
           : expression;
       }
       return cast(element, isExpression);
     }
 
     function convertToObjectAssignmentElement(
-      element: ObjectBindingOrAssignmentElement
+      element: ObjectBindingOrAssignmentElement,
     ) {
       if (isBindingElement(element)) {
         if (element.dotDotDotToken) {
           Debug.assertNode(element.name, isIdentifier);
           return setOriginalNode(
             setTextRange(factory.createSpreadAssignment(element.name), element),
-            element
+            element,
           );
         }
         if (element.propertyName) {
@@ -90,11 +91,11 @@ namespace ts {
                 element.propertyName,
                 element.initializer
                   ? factory.createAssignment(expression, element.initializer)
-                  : expression
+                  : expression,
               ),
-              element
+              element,
             ),
-            element
+            element,
           );
         }
         Debug.assertNode(element.name, isIdentifier);
@@ -102,11 +103,11 @@ namespace ts {
           setTextRange(
             factory.createShorthandPropertyAssignment(
               element.name,
-              element.initializer
+              element.initializer,
             ),
-            element
+            element,
           ),
-          element
+          element,
         );
       }
 
@@ -114,7 +115,7 @@ namespace ts {
     }
 
     function convertToAssignmentPattern(
-      node: BindingOrAssignmentPattern
+      node: BindingOrAssignmentPattern,
     ): AssignmentPattern {
       switch (node.kind) {
         case SyntaxKind.ArrayBindingPattern:
@@ -128,41 +129,41 @@ namespace ts {
     }
 
     function convertToObjectAssignmentPattern(
-      node: ObjectBindingOrAssignmentPattern
+      node: ObjectBindingOrAssignmentPattern,
     ) {
       if (isObjectBindingPattern(node)) {
         return setOriginalNode(
           setTextRange(
             factory.createObjectLiteralExpression(
-              map(node.elements, convertToObjectAssignmentElement)
+              map(node.elements, convertToObjectAssignmentElement),
             ),
-            node
+            node,
           ),
-          node
+          node,
         );
       }
       return cast(node, isObjectLiteralExpression);
     }
 
     function convertToArrayAssignmentPattern(
-      node: ArrayBindingOrAssignmentPattern
+      node: ArrayBindingOrAssignmentPattern,
     ) {
       if (isArrayBindingPattern(node)) {
         return setOriginalNode(
           setTextRange(
             factory.createArrayLiteralExpression(
-              map(node.elements, convertToArrayAssignmentElement)
+              map(node.elements, convertToArrayAssignmentElement),
             ),
-            node
+            node,
           ),
-          node
+          node,
         );
       }
       return cast(node, isArrayLiteralExpression);
     }
 
     function convertToAssignmentElementTarget(
-      node: BindingOrAssignmentElementTarget
+      node: BindingOrAssignmentElementTarget,
     ): Expression {
       if (isBindingPattern(node)) {
         return convertToAssignmentPattern(node);

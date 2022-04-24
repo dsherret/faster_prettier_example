@@ -2,7 +2,7 @@ namespace ts.projectSystem {
   describe("unittests:: tsserver:: rename", () => {
     it("works with fileToRename", () => {
       const aTs: File = { path: "/a.ts", content: "export const a = 0;" };
-      const bTs: File = { path: "/b.ts", content: 'import { a } from "./a";' };
+      const bTs: File = { path: "/b.ts", content: "import { a } from \"./a\";" };
 
       const session = createSession(createServerHost([aTs, bTs]));
       openFilesForSession([bTs], session);
@@ -14,7 +14,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(bTs, 'a";')
+        protocolFileLocationFromSubstring(bTs, "a\";"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response1, {
         info: {
@@ -34,7 +34,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(bTs, 'a";')
+        protocolFileLocationFromSubstring(bTs, "a\";"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response2, {
         info: {
@@ -77,7 +77,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(bTs, 'a";')
+        protocolFileLocationFromSubstring(bTs, "a\";"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response3, {
         info: {
@@ -122,7 +122,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(aTs, "x")
+        protocolFileLocationFromSubstring(aTs, "x"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response1, {
         info: {
@@ -163,7 +163,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(aTs, "x")
+        protocolFileLocationFromSubstring(aTs, "x"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response2, {
         info: {
@@ -210,7 +210,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(aTs, "x")
+        protocolFileLocationFromSubstring(aTs, "x"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response3, {
         info: {
@@ -265,7 +265,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(bTs, "aTest(")
+        protocolFileLocationFromSubstring(bTs, "aTest("),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response1, {
         info: {
@@ -324,7 +324,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(aTs, "x")
+        protocolFileLocationFromSubstring(aTs, "x"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response1, {
         info: {
@@ -364,7 +364,7 @@ namespace ts.projectSystem {
       >(
         session,
         protocol.CommandTypes.Rename,
-        protocolFileLocationFromSubstring(bTs, "x")
+        protocolFileLocationFromSubstring(bTs, "x"),
       );
       assert.deepEqual<protocol.RenameResponseBody | undefined>(response2, {
         info: {

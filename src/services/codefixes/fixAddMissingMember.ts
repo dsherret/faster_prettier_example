@@ -28,56 +28,51 @@ namespace ts.codefix {
         context.span.start,
         context.errorCode,
         typeChecker,
-        context.program
+        context.program,
       );
       if (!info) {
         return undefined;
       }
       if (info.kind === InfoKind.ObjectLiteral) {
-        const changes = textChanges.ChangeTracker.with(context, (t) =>
-          addObjectLiteralProperties(t, context, info)
-        );
+        const changes = textChanges.ChangeTracker.with(context, (t) => addObjectLiteralProperties(t, context, info));
         return [
           createCodeFixAction(
             fixMissingProperties,
             changes,
             Diagnostics.Add_missing_properties,
             fixMissingProperties,
-            Diagnostics.Add_all_missing_properties
+            Diagnostics.Add_all_missing_properties,
           ),
         ];
       }
       if (info.kind === InfoKind.JsxAttributes) {
-        const changes = textChanges.ChangeTracker.with(context, (t) =>
-          addJsxAttributes(t, context, info)
-        );
+        const changes = textChanges.ChangeTracker.with(context, (t) => addJsxAttributes(t, context, info));
         return [
           createCodeFixAction(
             fixMissingAttributes,
             changes,
             Diagnostics.Add_missing_attributes,
             fixMissingAttributes,
-            Diagnostics.Add_all_missing_attributes
+            Diagnostics.Add_all_missing_attributes,
           ),
         ];
       }
       if (info.kind === InfoKind.Function) {
-        const changes = textChanges.ChangeTracker.with(context, (t) =>
-          addFunctionDeclaration(t, context, info)
-        );
+        const changes = textChanges.ChangeTracker.with(context, (t) => addFunctionDeclaration(t, context, info));
         return [
           createCodeFixAction(
             fixMissingFunctionDeclaration,
             changes,
             [Diagnostics.Add_missing_function_declaration_0, info.token.text],
             fixMissingFunctionDeclaration,
-            Diagnostics.Add_all_missing_function_declarations
+            Diagnostics.Add_all_missing_function_declarations,
           ),
         ];
       }
       if (info.kind === InfoKind.Enum) {
-        const changes = textChanges.ChangeTracker.with(context, (t) =>
-          addEnumMemberDeclaration(t, context.program.getTypeChecker(), info)
+        const changes = textChanges.ChangeTracker.with(
+          context,
+          (t) => addEnumMemberDeclaration(t, context.program.getTypeChecker(), info),
         );
         return [
           createCodeFixAction(
@@ -85,13 +80,13 @@ namespace ts.codefix {
             changes,
             [Diagnostics.Add_missing_enum_member_0, info.token.text],
             fixMissingMember,
-            Diagnostics.Add_all_missing_members
+            Diagnostics.Add_all_missing_members,
           ),
         ];
       }
       return concatenate(
         getActionsForMissingMethodDeclaration(context, info),
-        getActionsForMissingMemberDeclaration(context, info)
+        getActionsForMissingMemberDeclaration(context, info),
       );
     },
     fixIds: [
@@ -117,31 +112,31 @@ namespace ts.codefix {
               diag.start,
               diag.code,
               checker,
-              context.program
+              context.program,
             );
             if (
-              !info ||
-              !addToSeen(
+              !info
+              || !addToSeen(
                 seen,
-                getNodeId(info.parentDeclaration) + "#" + info.token.text
+                getNodeId(info.parentDeclaration) + "#" + info.token.text,
               )
             ) {
               return;
             }
 
             if (
-              fixId === fixMissingFunctionDeclaration &&
-              info.kind === InfoKind.Function
+              fixId === fixMissingFunctionDeclaration
+              && info.kind === InfoKind.Function
             ) {
               addFunctionDeclaration(changes, context, info);
             } else if (
-              fixId === fixMissingProperties &&
-              info.kind === InfoKind.ObjectLiteral
+              fixId === fixMissingProperties
+              && info.kind === InfoKind.ObjectLiteral
             ) {
               addObjectLiteralProperties(changes, context, info);
             } else if (
-              fixId === fixMissingAttributes &&
-              info.kind === InfoKind.JsxAttributes
+              fixId === fixMissingAttributes
+              && info.kind === InfoKind.JsxAttributes
             ) {
               addJsxAttributes(changes, context, info);
             } else {
@@ -153,7 +148,7 @@ namespace ts.codefix {
                 const infos = getOrUpdate(
                   typeDeclToMembers,
                   parentDeclaration,
-                  () => []
+                  () => [],
                 );
                 if (!infos.some((i) => i.token.text === token.text)) {
                   infos.push(info);
@@ -169,17 +164,18 @@ namespace ts.codefix {
               if (
                 supers.some((superClassOrInterface) => {
                   const superInfos = typeDeclToMembers.get(
-                    superClassOrInterface
+                    superClassOrInterface,
                   );
                   return (
-                    !!superInfos &&
-                    superInfos.some(
-                      ({ token }) => token.text === info.token.text
+                    !!superInfos
+                    && superInfos.some(
+                      ({ token }) => token.text === info.token.text,
                     )
                   );
                 })
-              )
+              ) {
                 continue;
+              }
 
               const {
                 parentDeclaration,
@@ -198,7 +194,7 @@ namespace ts.codefix {
                   token,
                   modifierFlags & ModifierFlags.Static,
                   parentDeclaration,
-                  declSourceFile
+                  declSourceFile,
                 );
               } else {
                 if (isJSFile && !isInterfaceDeclaration(parentDeclaration)) {
@@ -207,13 +203,13 @@ namespace ts.codefix {
                     declSourceFile,
                     parentDeclaration,
                     token,
-                    !!(modifierFlags & ModifierFlags.Static)
+                    !!(modifierFlags & ModifierFlags.Static),
                   );
                 } else {
                   const typeNode = getTypeNode(
                     program.getTypeChecker(),
                     parentDeclaration,
-                    token
+                    token,
                   );
                   addPropertyDeclaration(
                     changes,
@@ -221,13 +217,13 @@ namespace ts.codefix {
                     parentDeclaration,
                     token.text,
                     typeNode,
-                    modifierFlags & ModifierFlags.Static
+                    modifierFlags & ModifierFlags.Static,
                   );
                 }
               }
             }
           });
-        })
+        }),
       );
     },
   });
@@ -291,7 +287,7 @@ namespace ts.codefix {
     tokenPos: number,
     errorCode: number,
     checker: TypeChecker,
-    program: Program
+    program: Program,
   ): Info | undefined {
     // The identifier of the missing property. eg:
     // this.missing = 1;
@@ -300,47 +296,50 @@ namespace ts.codefix {
     const parent = token.parent;
 
     if (
-      errorCode ===
-      Diagnostics.Argument_of_type_0_is_not_assignable_to_parameter_of_type_1
-        .code
+      errorCode
+        === Diagnostics.Argument_of_type_0_is_not_assignable_to_parameter_of_type_1
+          .code
     ) {
       if (
         !(
-          token.kind === SyntaxKind.OpenBraceToken &&
-          isObjectLiteralExpression(parent) &&
-          isCallExpression(parent.parent)
+          token.kind === SyntaxKind.OpenBraceToken
+          && isObjectLiteralExpression(parent)
+          && isCallExpression(parent.parent)
         )
-      )
+      ) {
         return undefined;
+      }
 
       const argIndex = findIndex(
         parent.parent.arguments,
-        (arg) => arg === parent
+        (arg) => arg === parent,
       );
       if (argIndex < 0) return undefined;
 
       const signature = singleOrUndefined(
         checker.getSignaturesOfType(
           checker.getTypeAtLocation(parent.parent.expression),
-          SignatureKind.Call
-        )
+          SignatureKind.Call,
+        ),
       );
       if (
         !(signature && signature.declaration && signature.parameters[argIndex])
-      )
+      ) {
         return undefined;
+      }
 
       const param = signature.parameters[argIndex].valueDeclaration;
-      if (!(param && isParameter(param) && isIdentifier(param.name)))
+      if (!(param && isParameter(param) && isIdentifier(param.name))) {
         return undefined;
+      }
 
       const properties = arrayFrom(
         checker.getUnmatchedProperties(
           checker.getTypeAtLocation(parent),
           checker.getTypeAtLocation(param),
           /* requireOptionalProperties */ false,
-          /* matchDiscriminantProperties */ false
-        )
+          /* matchDiscriminantProperties */ false,
+        ),
       );
       if (!length(properties)) return undefined;
       return {
@@ -354,18 +353,18 @@ namespace ts.codefix {
     if (!isMemberName(token)) return undefined;
 
     if (
-      isIdentifier(token) &&
-      hasInitializer(parent) &&
-      parent.initializer &&
-      isObjectLiteralExpression(parent.initializer)
+      isIdentifier(token)
+      && hasInitializer(parent)
+      && parent.initializer
+      && isObjectLiteralExpression(parent.initializer)
     ) {
       const properties = arrayFrom(
         checker.getUnmatchedProperties(
           checker.getTypeAtLocation(parent.initializer),
           checker.getTypeAtLocation(token),
           /* requireOptionalProperties */ false,
-          /* matchDiscriminantProperties */ false
-        )
+          /* matchDiscriminantProperties */ false,
+        ),
       );
       if (!length(properties)) return undefined;
 
@@ -403,7 +402,7 @@ namespace ts.codefix {
     if (!isPropertyAccessExpression(parent)) return undefined;
 
     const leftExpressionType = skipConstraint(
-      checker.getTypeAtLocation(parent.expression)
+      checker.getTypeAtLocation(parent.expression),
     );
     const symbol = leftExpressionType.symbol;
     if (!symbol || !symbol.declarations) return undefined;
@@ -412,9 +411,9 @@ namespace ts.codefix {
       const moduleDeclaration = find(symbol.declarations, isModuleDeclaration);
       const moduleDeclarationSourceFile = moduleDeclaration?.getSourceFile();
       if (
-        moduleDeclaration &&
-        moduleDeclarationSourceFile &&
-        !isSourceFileFromLibrary(program, moduleDeclarationSourceFile)
+        moduleDeclaration
+        && moduleDeclarationSourceFile
+        && !isSourceFileFromLibrary(program, moduleDeclarationSourceFile)
       ) {
         return {
           kind: InfoKind.Function,
@@ -430,8 +429,8 @@ namespace ts.codefix {
       if (sourceFile.commonJsModuleIndicator) return undefined;
 
       if (
-        moduleSourceFile &&
-        !isSourceFileFromLibrary(program, moduleSourceFile)
+        moduleSourceFile
+        && !isSourceFileFromLibrary(program, moduleSourceFile)
       ) {
         return {
           kind: InfoKind.Function,
@@ -449,25 +448,23 @@ namespace ts.codefix {
     if (!classDeclaration && isPrivateIdentifier(token)) return undefined;
 
     // Prefer to change the class instead of the interface if they are merged
-    const classOrInterface =
-      classDeclaration || find(symbol.declarations, isInterfaceDeclaration);
+    const classOrInterface = classDeclaration || find(symbol.declarations, isInterfaceDeclaration);
     if (
-      classOrInterface &&
-      !isSourceFileFromLibrary(program, classOrInterface.getSourceFile())
+      classOrInterface
+      && !isSourceFileFromLibrary(program, classOrInterface.getSourceFile())
     ) {
-      const makeStatic =
-        ((leftExpressionType as TypeReference).target || leftExpressionType) !==
-        checker.getDeclaredTypeOfSymbol(symbol);
+      const makeStatic = ((leftExpressionType as TypeReference).target || leftExpressionType)
+        !== checker.getDeclaredTypeOfSymbol(symbol);
       if (
-        makeStatic &&
-        (isPrivateIdentifier(token) || isInterfaceDeclaration(classOrInterface))
-      )
+        makeStatic
+        && (isPrivateIdentifier(token) || isInterfaceDeclaration(classOrInterface))
+      ) {
         return undefined;
+      }
 
       const declSourceFile = classOrInterface.getSourceFile();
-      const modifierFlags =
-        (makeStatic ? ModifierFlags.Static : 0) |
-        (startsWithUnderscore(token.text) ? ModifierFlags.Private : 0);
+      const modifierFlags = (makeStatic ? ModifierFlags.Static : 0)
+        | (startsWithUnderscore(token.text) ? ModifierFlags.Private : 0);
       const isJSFile = isSourceFileJS(declSourceFile);
       const call = tryCast(parent.parent, isCallExpression);
       return {
@@ -483,9 +480,9 @@ namespace ts.codefix {
 
     const enumDeclaration = find(symbol.declarations, isEnumDeclaration);
     if (
-      enumDeclaration &&
-      !isPrivateIdentifier(token) &&
-      !isSourceFileFromLibrary(program, enumDeclaration.getSourceFile())
+      enumDeclaration
+      && !isPrivateIdentifier(token)
+      && !isSourceFileFromLibrary(program, enumDeclaration.getSourceFile())
     ) {
       return { kind: InfoKind.Enum, token, parentDeclaration: enumDeclaration };
     }
@@ -495,19 +492,19 @@ namespace ts.codefix {
 
   function isSourceFileFromLibrary(program: Program, node: SourceFile) {
     return (
-      program.isSourceFileFromExternalLibrary(node) ||
-      program.isSourceFileDefaultLibrary(node)
+      program.isSourceFileFromExternalLibrary(node)
+      || program.isSourceFileDefaultLibrary(node)
     );
   }
 
   function getActionsForMissingMemberDeclaration(
     context: CodeFixContext,
-    info: ClassOrInterfaceInfo
+    info: ClassOrInterfaceInfo,
   ): CodeFixAction[] | undefined {
     return info.isJSFile
       ? singleElementArray(
-          createActionForAddMissingMemberInJavascriptFile(context, info)
-        )
+        createActionForAddMissingMemberInJavascriptFile(context, info),
+      )
       : createActionsForAddMissingMemberInTypeScriptFile(context, info);
   }
 
@@ -518,7 +515,7 @@ namespace ts.codefix {
       declSourceFile,
       modifierFlags,
       token,
-    }: ClassOrInterfaceInfo
+    }: ClassOrInterfaceInfo,
   ): CodeFixAction | undefined {
     if (isInterfaceDeclaration(parentDeclaration)) {
       return undefined;
@@ -530,26 +527,24 @@ namespace ts.codefix {
         declSourceFile,
         parentDeclaration,
         token,
-        !!(modifierFlags & ModifierFlags.Static)
-      )
-    );
+        !!(modifierFlags & ModifierFlags.Static),
+      ));
     if (changes.length === 0) {
       return undefined;
     }
 
-    const diagnostic =
-      modifierFlags & ModifierFlags.Static
-        ? Diagnostics.Initialize_static_property_0
-        : isPrivateIdentifier(token)
-        ? Diagnostics.Declare_a_private_field_named_0
-        : Diagnostics.Initialize_property_0_in_the_constructor;
+    const diagnostic = modifierFlags & ModifierFlags.Static
+      ? Diagnostics.Initialize_static_property_0
+      : isPrivateIdentifier(token)
+      ? Diagnostics.Declare_a_private_field_named_0
+      : Diagnostics.Initialize_property_0_in_the_constructor;
 
     return createCodeFixAction(
       fixMissingMember,
       changes,
       [diagnostic, token.text],
       fixMissingMember,
-      Diagnostics.Add_all_missing_members
+      Diagnostics.Add_all_missing_members,
     );
   }
 
@@ -558,7 +553,7 @@ namespace ts.codefix {
     declSourceFile: SourceFile,
     classDeclaration: ClassLikeDeclaration,
     token: Identifier | PrivateIdentifier,
-    makeStatic: boolean
+    makeStatic: boolean,
   ): void {
     const tokenName = token.text;
     if (makeStatic) {
@@ -568,12 +563,12 @@ namespace ts.codefix {
       const className = classDeclaration.name!.getText();
       const staticInitialization = initializePropertyToUndefined(
         factory.createIdentifier(className),
-        tokenName
+        tokenName,
       );
       changeTracker.insertNodeAfter(
         declSourceFile,
         classDeclaration,
-        staticInitialization
+        staticInitialization,
       );
     } else if (isPrivateIdentifier(token)) {
       const property = factory.createPropertyDeclaration(
@@ -582,7 +577,7 @@ namespace ts.codefix {
         tokenName,
         /*questionToken*/ undefined,
         /*type*/ undefined,
-        /*initializer*/ undefined
+        /*initializer*/ undefined,
       );
 
       const lastProp = getNodeToInsertPropertyAfter(classDeclaration);
@@ -592,7 +587,7 @@ namespace ts.codefix {
         changeTracker.insertNodeAtClassStart(
           declSourceFile,
           classDeclaration,
-          property
+          property,
         );
       }
     } else {
@@ -602,25 +597,25 @@ namespace ts.codefix {
       }
       const propertyInitialization = initializePropertyToUndefined(
         factory.createThis(),
-        tokenName
+        tokenName,
       );
       changeTracker.insertNodeAtConstructorEnd(
         declSourceFile,
         classConstructor,
-        propertyInitialization
+        propertyInitialization,
       );
     }
   }
 
   function initializePropertyToUndefined(
     obj: Expression,
-    propertyName: string
+    propertyName: string,
   ) {
     return factory.createExpressionStatement(
       factory.createAssignment(
         factory.createPropertyAccessExpression(obj, propertyName),
-        createUndefined()
-      )
+        createUndefined(),
+      ),
     );
   }
 
@@ -631,14 +626,14 @@ namespace ts.codefix {
       declSourceFile,
       modifierFlags,
       token,
-    }: ClassOrInterfaceInfo
+    }: ClassOrInterfaceInfo,
   ): CodeFixAction[] | undefined {
     const memberName = token.text;
     const isStatic = modifierFlags & ModifierFlags.Static;
     const typeNode = getTypeNode(
       context.program.getTypeChecker(),
       parentDeclaration,
-      token
+      token,
     );
     const addPropertyDeclarationChanges = (modifierFlags: ModifierFlags) =>
       textChanges.ChangeTracker.with(context, (t) =>
@@ -648,9 +643,8 @@ namespace ts.codefix {
           parentDeclaration,
           memberName,
           typeNode,
-          modifierFlags
-        )
-      );
+          modifierFlags,
+        ));
 
     const actions = [
       createCodeFixAction(
@@ -663,7 +657,7 @@ namespace ts.codefix {
           memberName,
         ],
         fixMissingMember,
-        Diagnostics.Add_all_missing_members
+        Diagnostics.Add_all_missing_members,
       ),
     ];
     if (isStatic || isPrivateIdentifier(token)) {
@@ -675,8 +669,8 @@ namespace ts.codefix {
         createCodeFixActionWithoutFixAll(
           fixMissingMember,
           addPropertyDeclarationChanges(ModifierFlags.Private),
-          [Diagnostics.Declare_private_property_0, memberName]
-        )
+          [Diagnostics.Declare_private_property_0, memberName],
+        ),
       );
     }
 
@@ -686,8 +680,8 @@ namespace ts.codefix {
         declSourceFile,
         parentDeclaration,
         token.text,
-        typeNode
-      )
+        typeNode,
+      ),
     );
     return actions;
   }
@@ -695,35 +689,34 @@ namespace ts.codefix {
   function getTypeNode(
     checker: TypeChecker,
     classDeclaration: ClassOrInterface,
-    token: Node
+    token: Node,
   ) {
     let typeNode: TypeNode | undefined;
     if (token.parent.parent.kind === SyntaxKind.BinaryExpression) {
       const binaryExpression = token.parent.parent as BinaryExpression;
-      const otherExpression =
-        token.parent === binaryExpression.left
-          ? binaryExpression.right
-          : binaryExpression.left;
+      const otherExpression = token.parent === binaryExpression.left
+        ? binaryExpression.right
+        : binaryExpression.left;
       const widenedType = checker.getWidenedType(
         checker.getBaseTypeOfLiteralType(
-          checker.getTypeAtLocation(otherExpression)
-        )
+          checker.getTypeAtLocation(otherExpression),
+        ),
       );
       typeNode = checker.typeToTypeNode(
         widenedType,
         classDeclaration,
-        NodeBuilderFlags.NoTruncation
+        NodeBuilderFlags.NoTruncation,
       );
     } else {
       const contextualType = checker.getContextualType(
-        token.parent as Expression
+        token.parent as Expression,
       );
       typeNode = contextualType
         ? checker.typeToTypeNode(
-            contextualType,
-            /*enclosingDeclaration*/ undefined,
-            NodeBuilderFlags.NoTruncation
-          )
+          contextualType,
+          /*enclosingDeclaration*/ undefined,
+          NodeBuilderFlags.NoTruncation,
+        )
         : undefined;
     }
     return typeNode || factory.createKeywordTypeNode(SyntaxKind.AnyKeyword);
@@ -735,19 +728,19 @@ namespace ts.codefix {
     classDeclaration: ClassOrInterface,
     tokenName: string,
     typeNode: TypeNode,
-    modifierFlags: ModifierFlags
+    modifierFlags: ModifierFlags,
   ): void {
     const property = factory.createPropertyDeclaration(
       /*decorators*/ undefined,
       /*modifiers*/ modifierFlags
         ? factory.createNodeArray(
-            factory.createModifiersFromModifierFlags(modifierFlags)
-          )
+          factory.createModifiersFromModifierFlags(modifierFlags),
+        )
         : undefined,
       tokenName,
       /*questionToken*/ undefined,
       typeNode,
-      /*initializer*/ undefined
+      /*initializer*/ undefined,
     );
 
     const lastProp = getNodeToInsertPropertyAfter(classDeclaration);
@@ -757,14 +750,14 @@ namespace ts.codefix {
       changeTracker.insertNodeAtClassStart(
         declSourceFile,
         classDeclaration,
-        property
+        property,
       );
     }
   }
 
   // Gets the last of the first run of PropertyDeclarations, or undefined if the class does not start with a PropertyDeclaration.
   function getNodeToInsertPropertyAfter(
-    cls: ClassOrInterface
+    cls: ClassOrInterface,
   ): PropertyDeclaration | undefined {
     let res: PropertyDeclaration | undefined;
     for (const member of cls.members) {
@@ -779,11 +772,11 @@ namespace ts.codefix {
     declSourceFile: SourceFile,
     classDeclaration: ClassOrInterface,
     tokenName: string,
-    typeNode: TypeNode
+    typeNode: TypeNode,
   ): CodeFixAction {
     // Index signatures cannot have the static modifier.
     const stringTypeNode = factory.createKeywordTypeNode(
-      SyntaxKind.StringKeyword
+      SyntaxKind.StringKeyword,
     );
     const indexingParameter = factory.createParameterDeclaration(
       /*decorators*/ undefined,
@@ -792,17 +785,18 @@ namespace ts.codefix {
       "x",
       /*questionToken*/ undefined,
       stringTypeNode,
-      /*initializer*/ undefined
+      /*initializer*/ undefined,
     );
     const indexSignature = factory.createIndexSignature(
       /*decorators*/ undefined,
       /*modifiers*/ undefined,
       [indexingParameter],
-      typeNode
+      typeNode,
     );
 
-    const changes = textChanges.ChangeTracker.with(context, (t) =>
-      t.insertNodeAtClassStart(declSourceFile, classDeclaration, indexSignature)
+    const changes = textChanges.ChangeTracker.with(
+      context,
+      (t) => t.insertNodeAtClassStart(declSourceFile, classDeclaration, indexSignature),
     );
     // No fixId here because code-fix-all currently only works on adding individual named properties.
     return createCodeFixActionWithoutFixAll(fixMissingMember, changes, [
@@ -813,10 +807,9 @@ namespace ts.codefix {
 
   function getActionsForMissingMethodDeclaration(
     context: CodeFixContext,
-    info: ClassOrInterfaceInfo
+    info: ClassOrInterfaceInfo,
   ): CodeFixAction[] | undefined {
-    const { parentDeclaration, declSourceFile, modifierFlags, token, call } =
-      info;
+    const { parentDeclaration, declSourceFile, modifierFlags, token, call } = info;
     if (call === undefined) {
       return undefined;
     }
@@ -836,9 +829,8 @@ namespace ts.codefix {
           token,
           modifierFlags,
           parentDeclaration,
-          declSourceFile
-        )
-      );
+          declSourceFile,
+        ));
     const actions = [
       createCodeFixAction(
         fixMissingMember,
@@ -850,7 +842,7 @@ namespace ts.codefix {
           methodName,
         ],
         fixMissingMember,
-        Diagnostics.Add_all_missing_members
+        Diagnostics.Add_all_missing_members,
       ),
     ];
     if (modifierFlags & ModifierFlags.Private) {
@@ -858,8 +850,8 @@ namespace ts.codefix {
         createCodeFixActionWithoutFixAll(
           fixMissingMember,
           addMethodDeclarationChanges(ModifierFlags.Private),
-          [Diagnostics.Declare_private_method_0, methodName]
-        )
+          [Diagnostics.Declare_private_method_0, methodName],
+        ),
       );
     }
     return actions;
@@ -872,13 +864,13 @@ namespace ts.codefix {
     name: Identifier,
     modifierFlags: ModifierFlags,
     parentDeclaration: ClassOrInterface,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): void {
     const importAdder = createImportAdder(
       sourceFile,
       context.program,
       context.preferences,
-      context.host
+      context.host,
     );
     const methodDeclaration = createSignatureDeclarationFromCallExpression(
       SyntaxKind.MethodDeclaration,
@@ -887,26 +879,26 @@ namespace ts.codefix {
       callExpression,
       name,
       modifierFlags,
-      parentDeclaration
+      parentDeclaration,
     ) as MethodDeclaration;
     const containingMethodDeclaration = findAncestor(
       callExpression,
-      (n) => isMethodDeclaration(n) || isConstructorDeclaration(n)
+      (n) => isMethodDeclaration(n) || isConstructorDeclaration(n),
     );
     if (
-      containingMethodDeclaration &&
-      containingMethodDeclaration.parent === parentDeclaration
+      containingMethodDeclaration
+      && containingMethodDeclaration.parent === parentDeclaration
     ) {
       changes.insertNodeAfter(
         sourceFile,
         containingMethodDeclaration,
-        methodDeclaration
+        methodDeclaration,
       );
     } else {
       changes.insertNodeAtClassStart(
         sourceFile,
         parentDeclaration,
-        methodDeclaration
+        methodDeclaration,
       );
     }
     importAdder.writeFixes(changes);
@@ -915,7 +907,7 @@ namespace ts.codefix {
   function addEnumMemberDeclaration(
     changes: textChanges.ChangeTracker,
     checker: TypeChecker,
-    { token, parentDeclaration }: EnumInfo
+    { token, parentDeclaration }: EnumInfo,
   ) {
     /**
      * create initializer only literal enum that has string initializer.
@@ -929,7 +921,7 @@ namespace ts.codefix {
 
     const enumMember = factory.createEnumMember(
       token,
-      hasStringInitializer ? factory.createStringLiteral(token.text) : undefined
+      hasStringInitializer ? factory.createStringLiteral(token.text) : undefined,
     );
     changes.replaceNode(
       parentDeclaration.getSourceFile(),
@@ -939,25 +931,25 @@ namespace ts.codefix {
         parentDeclaration.decorators,
         parentDeclaration.modifiers,
         parentDeclaration.name,
-        concatenate(parentDeclaration.members, singleElementArray(enumMember))
+        concatenate(parentDeclaration.members, singleElementArray(enumMember)),
       ),
       {
         leadingTriviaOption: textChanges.LeadingTriviaOption.IncludeAll,
         trailingTriviaOption: textChanges.TrailingTriviaOption.Exclude,
-      }
+      },
     );
   }
 
   function addFunctionDeclaration(
     changes: textChanges.ChangeTracker,
     context: CodeFixContextBase,
-    info: FunctionInfo
+    info: FunctionInfo,
   ) {
     const importAdder = createImportAdder(
       context.sourceFile,
       context.program,
       context.preferences,
-      context.host
+      context.host,
     );
     const functionDeclaration = createSignatureDeclarationFromCallExpression(
       SyntaxKind.FunctionDeclaration,
@@ -966,35 +958,35 @@ namespace ts.codefix {
       info.call,
       idText(info.token),
       info.modifierFlags,
-      info.parentDeclaration
+      info.parentDeclaration,
     ) as FunctionDeclaration;
     changes.insertNodeAtEndOfScope(
       info.sourceFile,
       info.parentDeclaration,
-      functionDeclaration
+      functionDeclaration,
     );
   }
 
   function addJsxAttributes(
     changes: textChanges.ChangeTracker,
     context: CodeFixContextBase,
-    info: JsxAttributesInfo
+    info: JsxAttributesInfo,
   ) {
     const importAdder = createImportAdder(
       context.sourceFile,
       context.program,
       context.preferences,
-      context.host
+      context.host,
     );
     const quotePreference = getQuotePreference(
       context.sourceFile,
-      context.preferences
+      context.preferences,
     );
     const checker = context.program.getTypeChecker();
     const jsxAttributesNode = info.parentDeclaration.attributes;
     const hasSpreadAttribute = some(
       jsxAttributesNode.properties,
-      isJsxSpreadAttribute
+      isJsxSpreadAttribute,
     );
     const attrs = map(info.attributes, (attr) => {
       const value = tryGetValueFromType(
@@ -1002,12 +994,12 @@ namespace ts.codefix {
         checker,
         importAdder,
         quotePreference,
-        checker.getTypeOfSymbol(attr)
+        checker.getTypeOfSymbol(attr),
       );
       const name = factory.createIdentifier(attr.name);
       const jsxAttribute = factory.createJsxAttribute(
         name,
-        factory.createJsxExpression(/*dotDotDotToken*/ undefined, value)
+        factory.createJsxExpression(/*dotDotDotToken*/ undefined, value),
       );
       // formattingScanner requires the Identifier to have a context for scanning attributes with "-" (data-foo).
       setParent(name, jsxAttribute);
@@ -1016,7 +1008,7 @@ namespace ts.codefix {
     const jsxAttributes = factory.createJsxAttributes(
       hasSpreadAttribute
         ? [...attrs, ...jsxAttributesNode.properties]
-        : [...jsxAttributesNode.properties, ...attrs]
+        : [...jsxAttributesNode.properties, ...attrs],
     );
     const options = {
       prefix: jsxAttributesNode.pos === jsxAttributesNode.end ? " " : undefined,
@@ -1025,24 +1017,24 @@ namespace ts.codefix {
       context.sourceFile,
       jsxAttributesNode,
       jsxAttributes,
-      options
+      options,
     );
   }
 
   function addObjectLiteralProperties(
     changes: textChanges.ChangeTracker,
     context: CodeFixContextBase,
-    info: ObjectLiteralInfo
+    info: ObjectLiteralInfo,
   ) {
     const importAdder = createImportAdder(
       context.sourceFile,
       context.program,
       context.preferences,
-      context.host
+      context.host,
     );
     const quotePreference = getQuotePreference(
       context.sourceFile,
-      context.preferences
+      context.preferences,
     );
     const target = getEmitScriptTarget(context.program.getCompilerOptions());
     const checker = context.program.getTypeChecker();
@@ -1052,15 +1044,15 @@ namespace ts.codefix {
         checker,
         importAdder,
         quotePreference,
-        checker.getTypeOfSymbol(prop)
+        checker.getTypeOfSymbol(prop),
       );
       return factory.createPropertyAssignment(
         createPropertyNameNodeForIdentifierOrLiteral(
           prop.name,
           target,
-          quotePreference === QuotePreference.Single
+          quotePreference === QuotePreference.Single,
         ),
-        initializer
+        initializer,
       );
     });
     const options = {
@@ -1073,9 +1065,9 @@ namespace ts.codefix {
       info.parentDeclaration,
       factory.createObjectLiteralExpression(
         [...info.parentDeclaration.properties, ...props],
-        /*multiLine*/ true
+        /*multiLine*/ true,
       ),
-      options
+      options,
     );
   }
 
@@ -1084,7 +1076,7 @@ namespace ts.codefix {
     checker: TypeChecker,
     importAdder: ImportAdder,
     quotePreference: QuotePreference,
-    type: Type
+    type: Type,
   ): Expression {
     if (type.flags & TypeFlags.AnyOrUnknown) {
       return createUndefined();
@@ -1092,7 +1084,7 @@ namespace ts.codefix {
     if (type.flags & (TypeFlags.String | TypeFlags.TemplateLiteral)) {
       return factory.createStringLiteral(
         "",
-        /* isSingleQuote */ quotePreference === QuotePreference.Single
+        /* isSingleQuote */ quotePreference === QuotePreference.Single,
       );
     }
     if (type.flags & TypeFlags.Number) {
@@ -1112,14 +1104,14 @@ namespace ts.codefix {
         type.symbol.parent ? type.symbol.parent : type.symbol,
         SymbolFlags.Value,
         /*enclosingDeclaration*/ undefined,
-        /*flags*/ undefined
+        /*flags*/ undefined,
       );
       return enumMember === undefined || name === undefined
         ? factory.createNumericLiteral(0)
         : factory.createPropertyAccessExpression(
-            name,
-            checker.symbolToString(enumMember)
-          );
+          name,
+          checker.symbolToString(enumMember),
+        );
     }
     if (type.flags & TypeFlags.NumberLiteral) {
       return factory.createNumericLiteral((type as NumberLiteralType).value);
@@ -1130,12 +1122,12 @@ namespace ts.codefix {
     if (type.flags & TypeFlags.StringLiteral) {
       return factory.createStringLiteral(
         (type as StringLiteralType).value,
-        /* isSingleQuote */ quotePreference === QuotePreference.Single
+        /* isSingleQuote */ quotePreference === QuotePreference.Single,
       );
     }
     if (type.flags & TypeFlags.BooleanLiteral) {
-      return type === checker.getFalseType() ||
-        type === checker.getFalseType(/*fresh*/ true)
+      return type === checker.getFalseType()
+          || type === checker.getFalseType(/*fresh*/ true)
         ? factory.createFalse()
         : factory.createTrue();
     }
@@ -1143,8 +1135,9 @@ namespace ts.codefix {
       return factory.createNull();
     }
     if (type.flags & TypeFlags.Union) {
-      const expression = firstDefined((type as UnionType).types, (t) =>
-        tryGetValueFromType(context, checker, importAdder, quotePreference, t)
+      const expression = firstDefined(
+        (type as UnionType).types,
+        (t) => tryGetValueFromType(context, checker, importAdder, quotePreference, t),
       );
       return expression ?? createUndefined();
     }
@@ -1155,12 +1148,12 @@ namespace ts.codefix {
       const props = map(checker.getPropertiesOfType(type), (prop) => {
         const initializer = prop.valueDeclaration
           ? tryGetValueFromType(
-              context,
-              checker,
-              importAdder,
-              quotePreference,
-              checker.getTypeAtLocation(prop.valueDeclaration)
-            )
+            context,
+            checker,
+            importAdder,
+            quotePreference,
+            checker.getTypeAtLocation(prop.valueDeclaration),
+          )
           : createUndefined();
         return factory.createPropertyAssignment(prop.name, initializer);
       });
@@ -1169,7 +1162,7 @@ namespace ts.codefix {
     if (getObjectFlags(type) & ObjectFlags.Anonymous) {
       const decl = find(
         type.symbol.declarations || emptyArray,
-        or(isFunctionTypeNode, isMethodSignature, isMethodDeclaration)
+        or(isFunctionTypeNode, isMethodSignature, isMethodDeclaration),
       );
       if (decl === undefined) return createUndefined();
 
@@ -1183,33 +1176,34 @@ namespace ts.codefix {
         signature[0],
         createStubbedBody(
           Diagnostics.Function_not_implemented.message,
-          quotePreference
+          quotePreference,
         ),
         /*name*/ undefined,
         /*modifiers*/ undefined,
         /*optional*/ undefined,
         /*enclosingDeclaration*/ undefined,
-        importAdder
+        importAdder,
       ) as FunctionExpression | undefined;
       return func ?? createUndefined();
     }
     if (getObjectFlags(type) & ObjectFlags.Class) {
       const classDeclaration = getClassLikeDeclarationOfSymbol(type.symbol);
       if (
-        classDeclaration === undefined ||
-        hasAbstractModifier(classDeclaration)
-      )
+        classDeclaration === undefined
+        || hasAbstractModifier(classDeclaration)
+      ) {
         return createUndefined();
+      }
 
-      const constructorDeclaration =
-        getFirstConstructorWithBody(classDeclaration);
-      if (constructorDeclaration && length(constructorDeclaration.parameters))
+      const constructorDeclaration = getFirstConstructorWithBody(classDeclaration);
+      if (constructorDeclaration && length(constructorDeclaration.parameters)) {
         return createUndefined();
+      }
 
       return factory.createNewExpression(
         factory.createIdentifier(type.symbol.name),
         /*typeArguments*/ undefined,
-        /*argumentsArray*/ undefined
+        /*argumentsArray*/ undefined,
       );
     }
     return createUndefined();
@@ -1221,12 +1215,12 @@ namespace ts.codefix {
 
   function isObjectLiteralType(type: Type) {
     return (
-      type.flags & TypeFlags.Object &&
-      (getObjectFlags(type) & ObjectFlags.ObjectLiteral ||
-        (type.symbol &&
-          tryCast(
+      type.flags & TypeFlags.Object
+      && (getObjectFlags(type) & ObjectFlags.ObjectLiteral
+        || (type.symbol
+          && tryCast(
             singleOrUndefined(type.symbol.declarations),
-            isTypeLiteralNode
+            isTypeLiteralNode,
           )))
     );
   }
@@ -1234,7 +1228,7 @@ namespace ts.codefix {
   function getUnmatchedAttributes(
     checker: TypeChecker,
     target: ScriptTarget,
-    source: JsxOpeningLikeElement
+    source: JsxOpeningLikeElement,
   ) {
     const attrsType = checker.getContextualType(source.attributes);
     if (attrsType === undefined) return emptyArray;
@@ -1257,12 +1251,12 @@ namespace ts.codefix {
     return filter(
       targetProps,
       (targetProp) =>
-        isIdentifierText(targetProp.name, target, LanguageVariant.JSX) &&
-        !(
-          targetProp.flags & SymbolFlags.Optional ||
-          getCheckFlags(targetProp) & CheckFlags.Partial ||
-          seenNames.has(targetProp.escapedName)
-        )
+        isIdentifierText(targetProp.name, target, LanguageVariant.JSX)
+        && !(
+          targetProp.flags & SymbolFlags.Optional
+          || getCheckFlags(targetProp) & CheckFlags.Partial
+          || seenNames.has(targetProp.escapedName)
+        ),
     );
   }
 }

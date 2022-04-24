@@ -19,7 +19,7 @@ globalThis.assert = _chai.assert;
       assertDeepImpl(
         arrayExtraKeysObject(a),
         arrayExtraKeysObject(b),
-        "Array extra keys differ"
+        "Array extra keys differ",
       );
     }
     assertDeepImpl(a, b, msg);

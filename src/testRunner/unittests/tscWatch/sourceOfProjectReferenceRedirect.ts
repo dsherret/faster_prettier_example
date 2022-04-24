@@ -8,7 +8,7 @@ namespace ts.tscWatch {
     }
     function verifyWatch(
       { files, config, expectedProgramFiles }: VerifyWatchInput,
-      alreadyBuilt: boolean
+      alreadyBuilt: boolean,
     ) {
       const sys = createWatchedSystem(files);
       if (alreadyBuilt) {
@@ -25,7 +25,7 @@ namespace ts.tscWatch {
       const watch = createWatchProgram(host);
       checkProgramActualFiles(
         watch.getCurrentProgram().getProgram(),
-        expectedProgramFiles
+        expectedProgramFiles,
       );
     }
 
@@ -49,7 +49,7 @@ namespace ts.tscWatch {
         const indexTs = getFileFromProject("demo", "animals/index.ts");
         const animalsConfig = getFileFromProject(
           "demo",
-          "animals/tsconfig.json"
+          "animals/tsconfig.json",
         );
         return {
           files: [
@@ -93,7 +93,7 @@ namespace ts.tscWatch {
 
       function verifySymlinkScenarioWorker(
         packages: () => Packages,
-        extraOptions: CompilerOptions
+        extraOptions: CompilerOptions,
       ) {
         verifyScenario(() => {
           const { bPackageJson, aTest, bFoo, bBar, bSymlink } = packages();
@@ -124,7 +124,7 @@ namespace ts.tscWatch {
       function config(
         packageName: string,
         extraOptions: CompilerOptions,
-        references?: string[]
+        references?: string[],
       ): File {
         return {
           path: `${projectRoot}/packages/${packageName}/tsconfig.json`,
@@ -146,7 +146,7 @@ namespace ts.tscWatch {
       function file(
         packageName: string,
         fileName: string,
-        content: string
+        content: string,
       ): File {
         return {
           path: `${projectRoot}/packages/${packageName}/src/${fileName}`,
@@ -171,7 +171,7 @@ namespace ts.tscWatch {
 import { bar } from '${scope}b/lib/bar';
 foo();
 bar();
-`
+`,
             ),
             bFoo: file("B", "index.ts", `export function foo() { }`),
             bBar: file("B", "bar.ts", `export function bar() { }`),
@@ -195,7 +195,7 @@ bar();
 import { bar } from '${scope}b/lib/bar/foo';
 foo();
 bar();
-`
+`,
             ),
             bFoo: file("B", "foo.ts", `export function foo() { }`),
             bBar: file("B", "bar/foo.ts", `export function bar() { }`),

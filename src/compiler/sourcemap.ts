@@ -9,14 +9,14 @@ namespace ts {
     file: string,
     sourceRoot: string,
     sourcesDirectoryPath: string,
-    generatorOptions: SourceMapGeneratorOptions
+    generatorOptions: SourceMapGeneratorOptions,
   ): SourceMapGenerator {
     const { enter, exit } = generatorOptions.extendedDiagnostics
       ? performance.createTimer(
-          "Source Map",
-          "beforeSourcemap",
-          "afterSourcemap"
-        )
+        "Source Map",
+        "beforeSourcemap",
+        "afterSourcemap",
+      )
       : performance.nullTimer;
 
     // Current source map file and its index in the sources list
@@ -67,7 +67,7 @@ namespace ts {
         fileName,
         host.getCurrentDirectory(),
         host.getCanonicalFileName,
-        /*isAbsolutePathAnUrl*/ true
+        /*isAbsolutePathAnUrl*/ true,
       );
 
       let sourceIndex = sourceToSourceIndexMap.get(source);
@@ -110,28 +110,28 @@ namespace ts {
 
     function isNewGeneratedPosition(
       generatedLine: number,
-      generatedCharacter: number
+      generatedCharacter: number,
     ) {
       return (
-        !hasPending ||
-        pendingGeneratedLine !== generatedLine ||
-        pendingGeneratedCharacter !== generatedCharacter
+        !hasPending
+        || pendingGeneratedLine !== generatedLine
+        || pendingGeneratedCharacter !== generatedCharacter
       );
     }
 
     function isBacktrackingSourcePosition(
       sourceIndex: number | undefined,
       sourceLine: number | undefined,
-      sourceCharacter: number | undefined
+      sourceCharacter: number | undefined,
     ) {
       return (
-        sourceIndex !== undefined &&
-        sourceLine !== undefined &&
-        sourceCharacter !== undefined &&
-        pendingSourceIndex === sourceIndex &&
-        (pendingSourceLine > sourceLine ||
-          (pendingSourceLine === sourceLine &&
-            pendingSourceCharacter > sourceCharacter))
+        sourceIndex !== undefined
+        && sourceLine !== undefined
+        && sourceCharacter !== undefined
+        && pendingSourceIndex === sourceIndex
+        && (pendingSourceLine > sourceLine
+          || (pendingSourceLine === sourceLine
+            && pendingSourceCharacter > sourceCharacter))
       );
     }
 
@@ -141,33 +141,33 @@ namespace ts {
       sourceIndex?: number,
       sourceLine?: number,
       sourceCharacter?: number,
-      nameIndex?: number
+      nameIndex?: number,
     ) {
       Debug.assert(
         generatedLine >= pendingGeneratedLine,
-        "generatedLine cannot backtrack"
+        "generatedLine cannot backtrack",
       );
       Debug.assert(
         generatedCharacter >= 0,
-        "generatedCharacter cannot be negative"
+        "generatedCharacter cannot be negative",
       );
       Debug.assert(
         sourceIndex === undefined || sourceIndex >= 0,
-        "sourceIndex cannot be negative"
+        "sourceIndex cannot be negative",
       );
       Debug.assert(
         sourceLine === undefined || sourceLine >= 0,
-        "sourceLine cannot be negative"
+        "sourceLine cannot be negative",
       );
       Debug.assert(
         sourceCharacter === undefined || sourceCharacter >= 0,
-        "sourceCharacter cannot be negative"
+        "sourceCharacter cannot be negative",
       );
       enter();
       // If this location wasn't recorded or the location in source is going backwards, record the mapping
       if (
-        isNewGeneratedPosition(generatedLine, generatedCharacter) ||
-        isBacktrackingSourcePosition(sourceIndex, sourceLine, sourceCharacter)
+        isNewGeneratedPosition(generatedLine, generatedCharacter)
+        || isBacktrackingSourcePosition(sourceIndex, sourceLine, sourceCharacter)
       ) {
         commitPendingMapping();
         pendingGeneratedLine = generatedLine;
@@ -178,9 +178,9 @@ namespace ts {
       }
 
       if (
-        sourceIndex !== undefined &&
-        sourceLine !== undefined &&
-        sourceCharacter !== undefined
+        sourceIndex !== undefined
+        && sourceLine !== undefined
+        && sourceCharacter !== undefined
       ) {
         pendingSourceIndex = sourceIndex;
         pendingSourceLine = sourceLine;
@@ -200,15 +200,15 @@ namespace ts {
       map: RawSourceMap,
       sourceMapPath: string,
       start?: LineAndCharacter,
-      end?: LineAndCharacter
+      end?: LineAndCharacter,
     ) {
       Debug.assert(
         generatedLine >= pendingGeneratedLine,
-        "generatedLine cannot backtrack"
+        "generatedLine cannot backtrack",
       );
       Debug.assert(
         generatedCharacter >= 0,
-        "generatedCharacter cannot be negative"
+        "generatedCharacter cannot be negative",
       );
       enter();
       // First, decode the old component sourcemap
@@ -222,19 +222,19 @@ namespace ts {
       ) {
         const raw = iterResult.value;
         if (
-          end &&
-          (raw.generatedLine > end.line ||
-            (raw.generatedLine === end.line &&
-              raw.generatedCharacter > end.character))
+          end
+          && (raw.generatedLine > end.line
+            || (raw.generatedLine === end.line
+              && raw.generatedCharacter > end.character))
         ) {
           break;
         }
 
         if (
-          start &&
-          (raw.generatedLine < start.line ||
-            (start.line === raw.generatedLine &&
-              raw.generatedCharacter < start.character))
+          start
+          && (raw.generatedLine < start.line
+            || (start.line === raw.generatedLine
+              && raw.generatedCharacter < start.character))
         ) {
           continue;
         }
@@ -253,17 +253,16 @@ namespace ts {
               : rawPath;
             const combinedPath = combinePaths(
               getDirectoryPath(sourceMapPath),
-              relativePath
+              relativePath,
             );
-            sourceIndexToNewSourceIndexMap[raw.sourceIndex] = newSourceIndex =
-              addSource(combinedPath);
+            sourceIndexToNewSourceIndexMap[raw.sourceIndex] = newSourceIndex = addSource(combinedPath);
             if (
-              map.sourcesContent &&
-              typeof map.sourcesContent[raw.sourceIndex] === "string"
+              map.sourcesContent
+              && typeof map.sourcesContent[raw.sourceIndex] === "string"
             ) {
               setSourceContent(
                 newSourceIndex,
-                map.sourcesContent[raw.sourceIndex]
+                map.sourcesContent[raw.sourceIndex],
               );
             }
           }
@@ -274,29 +273,26 @@ namespace ts {
             if (!nameIndexToNewNameIndexMap) nameIndexToNewNameIndexMap = [];
             newNameIndex = nameIndexToNewNameIndexMap[raw.nameIndex];
             if (newNameIndex === undefined) {
-              nameIndexToNewNameIndexMap[raw.nameIndex] = newNameIndex =
-                addName(map.names[raw.nameIndex]);
+              nameIndexToNewNameIndexMap[raw.nameIndex] = newNameIndex = addName(map.names[raw.nameIndex]);
             }
           }
         }
 
         const rawGeneratedLine = raw.generatedLine - (start ? start.line : 0);
         const newGeneratedLine = rawGeneratedLine + generatedLine;
-        const rawGeneratedCharacter =
-          start && start.line === raw.generatedLine
-            ? raw.generatedCharacter - start.character
-            : raw.generatedCharacter;
-        const newGeneratedCharacter =
-          rawGeneratedLine === 0
-            ? rawGeneratedCharacter + generatedCharacter
-            : rawGeneratedCharacter;
+        const rawGeneratedCharacter = start && start.line === raw.generatedLine
+          ? raw.generatedCharacter - start.character
+          : raw.generatedCharacter;
+        const newGeneratedCharacter = rawGeneratedLine === 0
+          ? rawGeneratedCharacter + generatedCharacter
+          : rawGeneratedCharacter;
         addMapping(
           newGeneratedLine,
           newGeneratedCharacter,
           newSourceIndex,
           newSourceLine,
           newSourceCharacter,
-          newNameIndex
+          newNameIndex,
         );
       }
       exit();
@@ -304,13 +300,13 @@ namespace ts {
 
     function shouldCommitMapping() {
       return (
-        !hasLast ||
-        lastGeneratedLine !== pendingGeneratedLine ||
-        lastGeneratedCharacter !== pendingGeneratedCharacter ||
-        lastSourceIndex !== pendingSourceIndex ||
-        lastSourceLine !== pendingSourceLine ||
-        lastSourceCharacter !== pendingSourceCharacter ||
-        lastNameIndex !== pendingNameIndex
+        !hasLast
+        || lastGeneratedLine !== pendingGeneratedLine
+        || lastGeneratedCharacter !== pendingGeneratedCharacter
+        || lastSourceIndex !== pendingSourceIndex
+        || lastSourceLine !== pendingSourceLine
+        || lastSourceCharacter !== pendingSourceCharacter
+        || lastNameIndex !== pendingNameIndex
       );
     }
 
@@ -343,7 +339,7 @@ namespace ts {
         Debug.assertEqual(
           lastGeneratedLine,
           pendingGeneratedLine,
-          "generatedLine cannot backtrack"
+          "generatedLine cannot backtrack",
         );
         // Emit comma to separate the entry
         if (hasLast) {
@@ -437,12 +433,11 @@ namespace ts {
 
   export function getLineInfo(
     text: string,
-    lineStarts: readonly number[]
+    lineStarts: readonly number[],
   ): LineInfo {
     return {
       getLineCount: () => lineStarts.length,
-      getLineText: (line) =>
-        text.substring(lineStarts[line], lineStarts[line + 1]),
+      getLineText: (line) => text.substring(lineStarts[line], lineStarts[line + 1]),
     };
   }
 
@@ -455,8 +450,7 @@ namespace ts {
       const comment = sourceMapCommentRegExp.exec(line);
       if (comment) {
         return trimStringEnd(comment[1]);
-      }
-      // If we see a non-whitespace/map comment-like line, break, to avoid scanning up the entire file
+      } // If we see a non-whitespace/map comment-like line, break, to avoid scanning up the entire file
       else if (!line.match(whitespaceOrMapCommentRegExp)) {
         break;
       }
@@ -470,23 +464,23 @@ namespace ts {
 
   export function isRawSourceMap(x: any): x is RawSourceMap {
     return (
-      x !== null &&
-      typeof x === "object" &&
-      x.version === 3 &&
-      typeof x.file === "string" &&
-      typeof x.mappings === "string" &&
-      isArray(x.sources) &&
-      every(x.sources, isString) &&
-      (x.sourceRoot === undefined ||
-        x.sourceRoot === null ||
-        typeof x.sourceRoot === "string") &&
-      (x.sourcesContent === undefined ||
-        x.sourcesContent === null ||
-        (isArray(x.sourcesContent) &&
-          every(x.sourcesContent, isStringOrNull))) &&
-      (x.names === undefined ||
-        x.names === null ||
-        (isArray(x.names) && every(x.names, isString)))
+      x !== null
+      && typeof x === "object"
+      && x.version === 3
+      && typeof x.file === "string"
+      && typeof x.mappings === "string"
+      && isArray(x.sources)
+      && every(x.sources, isString)
+      && (x.sourceRoot === undefined
+        || x.sourceRoot === null
+        || typeof x.sourceRoot === "string")
+      && (x.sourcesContent === undefined
+        || x.sourcesContent === null
+        || (isArray(x.sourcesContent)
+          && every(x.sourcesContent, isStringOrNull)))
+      && (x.names === undefined
+        || x.names === null
+        || (isArray(x.names) && every(x.names, isString)))
     );
   }
   /* eslint-enable no-null/no-null */
@@ -568,46 +562,54 @@ namespace ts {
 
           generatedCharacter += base64VLQFormatDecode();
           if (hasReportedError()) return stopIterating();
-          if (generatedCharacter < 0)
+          if (generatedCharacter < 0) {
             return setErrorAndStopIterating("Invalid generatedCharacter found");
+          }
 
           if (!isSourceMappingSegmentEnd()) {
             hasSource = true;
 
             sourceIndex += base64VLQFormatDecode();
             if (hasReportedError()) return stopIterating();
-            if (sourceIndex < 0)
+            if (sourceIndex < 0) {
               return setErrorAndStopIterating("Invalid sourceIndex found");
-            if (isSourceMappingSegmentEnd())
+            }
+            if (isSourceMappingSegmentEnd()) {
               return setErrorAndStopIterating(
-                "Unsupported Format: No entries after sourceIndex"
+                "Unsupported Format: No entries after sourceIndex",
               );
+            }
 
             sourceLine += base64VLQFormatDecode();
             if (hasReportedError()) return stopIterating();
-            if (sourceLine < 0)
+            if (sourceLine < 0) {
               return setErrorAndStopIterating("Invalid sourceLine found");
-            if (isSourceMappingSegmentEnd())
+            }
+            if (isSourceMappingSegmentEnd()) {
               return setErrorAndStopIterating(
-                "Unsupported Format: No entries after sourceLine"
+                "Unsupported Format: No entries after sourceLine",
               );
+            }
 
             sourceCharacter += base64VLQFormatDecode();
             if (hasReportedError()) return stopIterating();
-            if (sourceCharacter < 0)
+            if (sourceCharacter < 0) {
               return setErrorAndStopIterating("Invalid sourceCharacter found");
+            }
 
             if (!isSourceMappingSegmentEnd()) {
               hasName = true;
               nameIndex += base64VLQFormatDecode();
               if (hasReportedError()) return stopIterating();
-              if (nameIndex < 0)
+              if (nameIndex < 0) {
                 return setErrorAndStopIterating("Invalid nameIndex found");
+              }
 
-              if (!isSourceMappingSegmentEnd())
+              if (!isSourceMappingSegmentEnd()) {
                 return setErrorAndStopIterating(
-                  "Unsupported Error Format: Entries after nameIndex"
+                  "Unsupported Error Format: Entries after nameIndex",
                 );
+              }
             }
           }
 
@@ -653,9 +655,9 @@ namespace ts {
 
     function isSourceMappingSegmentEnd() {
       return (
-        pos === mappings.length ||
-        mappings.charCodeAt(pos) === CharacterCodes.comma ||
-        mappings.charCodeAt(pos) === CharacterCodes.semicolon
+        pos === mappings.length
+        || mappings.charCodeAt(pos) === CharacterCodes.comma
+        || mappings.charCodeAt(pos) === CharacterCodes.semicolon
       );
     }
 
@@ -665,13 +667,13 @@ namespace ts {
       let value = 0;
 
       for (; moreDigits; pos++) {
-        if (pos >= mappings.length)
+        if (pos >= mappings.length) {
           return (
             setError(
-              "Error in decoding base64VLQFormatDecode, past the mapping string"
-            ),
-            -1
+              "Error in decoding base64VLQFormatDecode, past the mapping string",
+            ), -1
           );
+        }
 
         // 6 digit number
         const currentByte = base64FormatDecode(mappings.charCodeAt(pos));
@@ -701,21 +703,21 @@ namespace ts {
 
   export function sameMapping<T extends Mapping>(left: T, right: T) {
     return (
-      left === right ||
-      (left.generatedLine === right.generatedLine &&
-        left.generatedCharacter === right.generatedCharacter &&
-        left.sourceIndex === right.sourceIndex &&
-        left.sourceLine === right.sourceLine &&
-        left.sourceCharacter === right.sourceCharacter &&
-        left.nameIndex === right.nameIndex)
+      left === right
+      || (left.generatedLine === right.generatedLine
+        && left.generatedCharacter === right.generatedCharacter
+        && left.sourceIndex === right.sourceIndex
+        && left.sourceLine === right.sourceLine
+        && left.sourceCharacter === right.sourceCharacter
+        && left.nameIndex === right.nameIndex)
     );
   }
 
   export function isSourceMapping(mapping: Mapping): mapping is SourceMapping {
     return (
-      mapping.sourceIndex !== undefined &&
-      mapping.sourceLine !== undefined &&
-      mapping.sourceCharacter !== undefined
+      mapping.sourceIndex !== undefined
+      && mapping.sourceLine !== undefined
+      && mapping.sourceCharacter !== undefined
     );
   }
 
@@ -762,7 +764,7 @@ namespace ts {
   }
 
   function isSourceMappedPosition(
-    value: MappedPosition
+    value: MappedPosition,
   ): value is SourceMappedPosition {
     return (
       value.sourceIndex !== undefined && value.sourcePosition !== undefined
@@ -771,15 +773,15 @@ namespace ts {
 
   function sameMappedPosition(left: MappedPosition, right: MappedPosition) {
     return (
-      left.generatedPosition === right.generatedPosition &&
-      left.sourceIndex === right.sourceIndex &&
-      left.sourcePosition === right.sourcePosition
+      left.generatedPosition === right.generatedPosition
+      && left.sourceIndex === right.sourceIndex
+      && left.sourcePosition === right.sourcePosition
     );
   }
 
   function compareSourcePositions(
     left: SourceMappedPosition,
-    right: SourceMappedPosition
+    right: SourceMappedPosition,
   ) {
     // Compares sourcePosition without comparing sourceIndex
     // since the mappings are grouped by sourceIndex
@@ -789,7 +791,7 @@ namespace ts {
 
   function compareGeneratedPositions(
     left: MappedPosition,
-    right: MappedPosition
+    right: MappedPosition,
   ) {
     return compareValues(left.generatedPosition, right.generatedPosition);
   }
@@ -805,7 +807,7 @@ namespace ts {
   export function createDocumentPositionMapper(
     host: DocumentPositionMapperHost,
     map: RawSourceMap,
-    mapPath: string
+    mapPath: string,
   ): DocumentPositionMapper {
     const mapDirectory = getDirectoryPath(mapPath);
     const sourceRoot = map.sourceRoot
@@ -813,17 +815,15 @@ namespace ts {
       : mapDirectory;
     const generatedAbsoluteFilePath = getNormalizedAbsolutePath(
       map.file,
-      mapDirectory
+      mapDirectory,
     );
     const generatedFile = host.getSourceFileLike(generatedAbsoluteFilePath);
-    const sourceFileAbsolutePaths = map.sources.map((source) =>
-      getNormalizedAbsolutePath(source, sourceRoot)
-    );
+    const sourceFileAbsolutePaths = map.sources.map((source) => getNormalizedAbsolutePath(source, sourceRoot));
     const sourceToSourceIndexMap = new Map(
       sourceFileAbsolutePaths.map((source, i) => [
         host.getCanonicalFileName(source),
         i,
-      ])
+      ]),
     );
     let decodedMappings: readonly MappedPosition[] | undefined;
     let generatedMappings: SortedReadonlyArray<MappedPosition> | undefined;
@@ -837,31 +837,29 @@ namespace ts {
     };
 
     function processMapping(mapping: Mapping): MappedPosition {
-      const generatedPosition =
-        generatedFile !== undefined
-          ? getPositionOfLineAndCharacter(
-              generatedFile,
-              mapping.generatedLine,
-              mapping.generatedCharacter,
-              /*allowEdits*/ true
-            )
-          : -1;
+      const generatedPosition = generatedFile !== undefined
+        ? getPositionOfLineAndCharacter(
+          generatedFile,
+          mapping.generatedLine,
+          mapping.generatedCharacter,
+          /*allowEdits*/ true,
+        )
+        : -1;
       let source: string | undefined;
       let sourcePosition: number | undefined;
       if (isSourceMapping(mapping)) {
         const sourceFile = host.getSourceFileLike(
-          sourceFileAbsolutePaths[mapping.sourceIndex]
+          sourceFileAbsolutePaths[mapping.sourceIndex],
         );
         source = map.sources[mapping.sourceIndex];
-        sourcePosition =
-          sourceFile !== undefined
-            ? getPositionOfLineAndCharacter(
-                sourceFile,
-                mapping.sourceLine,
-                mapping.sourceCharacter,
-                /*allowEdits*/ true
-              )
-            : -1;
+        sourcePosition = sourceFile !== undefined
+          ? getPositionOfLineAndCharacter(
+            sourceFile,
+            mapping.sourceLine,
+            mapping.sourceCharacter,
+            /*allowEdits*/ true,
+          )
+          : -1;
       }
       return {
         generatedPosition,
@@ -879,7 +877,7 @@ namespace ts {
         if (decoder.error !== undefined) {
           if (host.log) {
             host.log(
-              `Encountered error while decoding sourcemap: ${decoder.error}`
+              `Encountered error while decoding sourcemap: ${decoder.error}`,
             );
           }
           decodedMappings = emptyArray;
@@ -903,7 +901,7 @@ namespace ts {
           sortAndDeduplicate<SourceMappedPosition>(
             list,
             compareSourcePositions,
-            sameMappedPosition
+            sameMappedPosition,
           )
         );
       }
@@ -919,7 +917,7 @@ namespace ts {
         generatedMappings = sortAndDeduplicate(
           list,
           compareGeneratedPositions,
-          sameMappedPosition
+          sameMappedPosition,
         );
       }
       return generatedMappings;
@@ -927,7 +925,7 @@ namespace ts {
 
     function getGeneratedPosition(loc: DocumentPosition): DocumentPosition {
       const sourceIndex = sourceToSourceIndexMap.get(
-        host.getCanonicalFileName(loc.fileName)
+        host.getCanonicalFileName(loc.fileName),
       );
       if (sourceIndex === undefined) return loc;
 
@@ -938,7 +936,7 @@ namespace ts {
         sourceMappings,
         loc.pos,
         getSourcePositionOfMapping,
-        compareValues
+        compareValues,
       );
       if (targetIndex < 0) {
         // if no exact match, closest is 2's complement of result
@@ -964,7 +962,7 @@ namespace ts {
         generatedMappings,
         loc.pos,
         getGeneratedPositionOfMapping,
-        compareValues
+        compareValues,
       );
       if (targetIndex < 0) {
         // if no exact match, closest is 2's complement of result

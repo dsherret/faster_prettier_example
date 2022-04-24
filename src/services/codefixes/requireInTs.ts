@@ -10,21 +10,19 @@ namespace ts.codefix {
       const info = getInfo(
         context.sourceFile,
         context.program,
-        context.span.start
+        context.span.start,
       );
       if (!info) {
         return undefined;
       }
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, context.sourceFile, info)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, context.sourceFile, info));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Convert_require_to_import,
           fixId,
-          Diagnostics.Convert_all_require_to_import
+          Diagnostics.Convert_all_require_to_import,
         ),
       ];
     },
@@ -41,7 +39,7 @@ namespace ts.codefix {
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    info: Info
+    info: Info,
   ) {
     const {
       allowSyntheticDefaults,
@@ -55,23 +53,23 @@ namespace ts.codefix {
       statement,
       defaultImportName && !allowSyntheticDefaults
         ? factory.createImportEqualsDeclaration(
-            /*decorators*/ undefined,
-            /*modifiers*/ undefined,
+          /*decorators*/ undefined,
+          /*modifiers*/ undefined,
+          /*isTypeOnly*/ false,
+          defaultImportName,
+          factory.createExternalModuleReference(required),
+        )
+        : factory.createImportDeclaration(
+          /*decorators*/ undefined,
+          /*modifiers*/ undefined,
+          factory.createImportClause(
             /*isTypeOnly*/ false,
             defaultImportName,
-            factory.createExternalModuleReference(required)
-          )
-        : factory.createImportDeclaration(
-            /*decorators*/ undefined,
-            /*modifiers*/ undefined,
-            factory.createImportClause(
-              /*isTypeOnly*/ false,
-              defaultImportName,
-              namedImports
-            ),
-            required,
-            /*assertClause*/ undefined
-          )
+            namedImports,
+          ),
+          required,
+          /*assertClause*/ undefined,
+        ),
     );
   }
 
@@ -86,7 +84,7 @@ namespace ts.codefix {
   function getInfo(
     sourceFile: SourceFile,
     program: Program,
-    pos: number
+    pos: number,
   ): Info | undefined {
     const { parent } = getTokenAtPosition(sourceFile, pos);
     if (!isRequireCall(parent, /*checkArgumentIsStringLiteralLike*/ true)) {
@@ -101,7 +99,7 @@ namespace ts.codefix {
     if (defaultImportName || namedImports) {
       return {
         allowSyntheticDefaults: getAllowSyntheticDefaultImports(
-          program.getCompilerOptions()
+          program.getCompilerOptions(),
         ),
         defaultImportName,
         namedImports,
@@ -112,7 +110,7 @@ namespace ts.codefix {
   }
 
   function tryCreateNamedImportsFromObjectBindingPattern(
-    node: ObjectBindingPattern
+    node: ObjectBindingPattern,
   ): NamedImports | undefined {
     const importSpecifiers: ImportSpecifier[] = [];
     for (const element of node.elements) {
@@ -123,8 +121,8 @@ namespace ts.codefix {
         factory.createImportSpecifier(
           /*isTypeOnly*/ false,
           tryCast(element.propertyName, isIdentifier),
-          element.name
-        )
+          element.name,
+        ),
       );
     }
 

@@ -1,8 +1,7 @@
 /* @internal */
 namespace ts.refactor.addOrRemoveBracesToArrowFunction {
   const refactorName = "Add or remove braces in an arrow function";
-  const refactorDescription =
-    Diagnostics.Add_or_remove_braces_in_an_arrow_function.message;
+  const refactorDescription = Diagnostics.Add_or_remove_braces_in_an_arrow_function.message;
 
   const addBracesAction = {
     name: "Add braces to arrow function",
@@ -28,13 +27,13 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
   }
 
   function getRefactorActionsToRemoveFunctionBraces(
-    context: RefactorContext
+    context: RefactorContext,
   ): readonly ApplicableRefactorInfo[] {
     const { file, startPosition, triggerReason } = context;
     const info = getConvertibleArrowFunctionAtPosition(
       file,
       startPosition,
-      triggerReason === "invoked"
+      triggerReason === "invoked",
     );
     if (!info) return emptyArray;
 
@@ -66,13 +65,13 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
 
   function getRefactorEditsToRemoveFunctionBraces(
     context: RefactorContext,
-    actionName: string
+    actionName: string,
   ): RefactorEditInfo | undefined {
     const { file, startPosition } = context;
     const info = getConvertibleArrowFunctionAtPosition(file, startPosition);
     Debug.assert(
       info && !isRefactorErrorInfo(info),
-      "Expected applicable refactor info"
+      "Expected applicable refactor info",
     );
 
     const { expression, returnStatement, func } = info;
@@ -87,7 +86,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
         returnStatement,
         file,
         SyntaxKind.MultiLineCommentTrivia,
-        /* hasTrailingNewLine */ true
+        /* hasTrailingNewLine */ true,
       );
     } else if (actionName === removeBracesAction.name && returnStatement) {
       const actualExpression = expression || factory.createVoidZero();
@@ -99,21 +98,21 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
         body,
         file,
         SyntaxKind.MultiLineCommentTrivia,
-        /* hasTrailingNewLine */ false
+        /* hasTrailingNewLine */ false,
       );
       copyLeadingComments(
         returnStatement,
         body,
         file,
         SyntaxKind.MultiLineCommentTrivia,
-        /* hasTrailingNewLine */ false
+        /* hasTrailingNewLine */ false,
       );
       copyTrailingComments(
         returnStatement,
         body,
         file,
         SyntaxKind.MultiLineCommentTrivia,
-        /* hasTrailingNewLine */ false
+        /* hasTrailingNewLine */ false,
       );
     } else {
       Debug.fail("invalid action");
@@ -130,7 +129,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
     file: SourceFile,
     startPosition: number,
     considerFunctionBodies = true,
-    kind?: string
+    kind?: string,
   ): FunctionBracesInfo | RefactorErrorInfo | undefined {
     const node = getTokenAtPosition(file, startPosition);
     const func = getContainingFunction(node);
@@ -138,7 +137,7 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
     if (!func) {
       return {
         error: getLocaleSpecificMessage(
-          Diagnostics.Could_not_find_a_containing_arrow_function
+          Diagnostics.Could_not_find_a_containing_arrow_function,
         ),
       };
     }
@@ -146,27 +145,27 @@ namespace ts.refactor.addOrRemoveBracesToArrowFunction {
     if (!isArrowFunction(func)) {
       return {
         error: getLocaleSpecificMessage(
-          Diagnostics.Containing_function_is_not_an_arrow_function
+          Diagnostics.Containing_function_is_not_an_arrow_function,
         ),
       };
     }
 
     if (
-      !rangeContainsRange(func, node) ||
-      (rangeContainsRange(func.body, node) && !considerFunctionBodies)
+      !rangeContainsRange(func, node)
+      || (rangeContainsRange(func.body, node) && !considerFunctionBodies)
     ) {
       return undefined;
     }
 
     if (
-      refactorKindBeginsWith(addBracesAction.kind, kind) &&
-      isExpression(func.body)
+      refactorKindBeginsWith(addBracesAction.kind, kind)
+      && isExpression(func.body)
     ) {
       return { func, addBraces: true, expression: func.body };
     } else if (
-      refactorKindBeginsWith(removeBracesAction.kind, kind) &&
-      isBlock(func.body) &&
-      func.body.statements.length === 1
+      refactorKindBeginsWith(removeBracesAction.kind, kind)
+      && isBlock(func.body)
+      && func.body.statements.length === 1
     ) {
       const firstStatement = first(func.body.statements);
       if (isReturnStatement(firstStatement)) {

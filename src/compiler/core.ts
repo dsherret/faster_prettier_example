@@ -5,38 +5,34 @@ namespace ts {
       | readonly any[]
       | ReadonlySet<any>
       | ReadonlyESMap<any, any>
-      | undefined
+      | undefined,
   >(
-    iterable: I
+    iterable: I,
   ): Iterator<
-    I extends ReadonlyESMap<infer K, infer V>
-      ? [K, V]
-      : I extends ReadonlySet<infer T>
-      ? T
-      : I extends readonly (infer T)[]
-      ? T
-      : I extends undefined
-      ? undefined
+    I extends ReadonlyESMap<infer K, infer V> ? [K, V]
+      : I extends ReadonlySet<infer T> ? T
+      : I extends readonly (infer T)[] ? T
+      : I extends undefined ? undefined
       : never
   >;
   export function getIterator<K, V>(
-    iterable: ReadonlyESMap<K, V>
+    iterable: ReadonlyESMap<K, V>,
   ): Iterator<[K, V]>;
   export function getIterator<K, V>(
-    iterable: ReadonlyESMap<K, V> | undefined
+    iterable: ReadonlyESMap<K, V> | undefined,
   ): Iterator<[K, V]> | undefined;
   export function getIterator<T>(
-    iterable: readonly T[] | ReadonlySet<T>
+    iterable: readonly T[] | ReadonlySet<T>,
   ): Iterator<T>;
   export function getIterator<T>(
-    iterable: readonly T[] | ReadonlySet<T> | undefined
+    iterable: readonly T[] | ReadonlySet<T> | undefined,
   ): Iterator<T> | undefined;
   export function getIterator(
     iterable:
       | readonly any[]
       | ReadonlySet<any>
       | ReadonlyESMap<any, any>
-      | undefined
+      | undefined,
   ): Iterator<any> | undefined {
     if (iterable) {
       if (isArray(iterable)) return arrayIterator(iterable);
@@ -61,7 +57,7 @@ namespace ts {
    */
   export function forEach<T, U>(
     array: readonly T[] | undefined,
-    callback: (element: T, index: number) => U | undefined
+    callback: (element: T, index: number) => U | undefined,
   ): U | undefined {
     if (array) {
       for (let i = 0; i < array.length; i++) {
@@ -79,7 +75,7 @@ namespace ts {
    */
   export function forEachRight<T, U>(
     array: readonly T[] | undefined,
-    callback: (element: T, index: number) => U | undefined
+    callback: (element: T, index: number) => U | undefined,
   ): U | undefined {
     if (array) {
       for (let i = array.length - 1; i >= 0; i--) {
@@ -95,7 +91,7 @@ namespace ts {
   /** Like `forEach`, but suitable for use with numbers and strings (which may be falsy). */
   export function firstDefined<T, U>(
     array: readonly T[] | undefined,
-    callback: (element: T, index: number) => U | undefined
+    callback: (element: T, index: number) => U | undefined,
   ): U | undefined {
     if (array === undefined) {
       return undefined;
@@ -112,7 +108,7 @@ namespace ts {
 
   export function firstDefinedIterator<T, U>(
     iter: Iterator<T>,
-    callback: (element: T) => U | undefined
+    callback: (element: T) => U | undefined,
   ): U | undefined {
     while (true) {
       const iterResult = iter.next();
@@ -129,7 +125,7 @@ namespace ts {
   export function reduceLeftIterator<T, U>(
     iterator: Iterator<T> | undefined,
     f: (memo: U, value: T, i: number) => U,
-    initial: U
+    initial: U,
   ): U {
     let result = initial;
     if (iterator) {
@@ -147,7 +143,7 @@ namespace ts {
   export function zipWith<T, U, V>(
     arrayA: readonly T[],
     arrayB: readonly U[],
-    callback: (a: T, b: U, index: number) => V
+    callback: (a: T, b: U, index: number) => V,
   ): V[] {
     const result: V[] = [];
     Debug.assertEqual(arrayA.length, arrayB.length);
@@ -159,7 +155,7 @@ namespace ts {
 
   export function zipToIterator<T, U>(
     arrayA: readonly T[],
-    arrayB: readonly U[]
+    arrayB: readonly U[],
   ): Iterator<[T, U]> {
     Debug.assertEqual(arrayA.length, arrayB.length);
     let i = 0;
@@ -176,7 +172,7 @@ namespace ts {
 
   export function zipToMap<K, V>(
     keys: readonly K[],
-    values: readonly V[]
+    values: readonly V[],
   ): ESMap<K, V> {
     Debug.assert(keys.length === values.length);
     const map = new Map<K, V>();
@@ -209,7 +205,7 @@ namespace ts {
    */
   export function every<T>(
     array: readonly T[] | undefined,
-    callback: (element: T, index: number) => boolean
+    callback: (element: T, index: number) => boolean,
   ): boolean {
     if (array) {
       for (let i = 0; i < array.length; i++) {
@@ -225,15 +221,15 @@ namespace ts {
   /** Works like Array.prototype.find, returning `undefined` if no element satisfying the predicate is found. */
   export function find<T, U extends T>(
     array: readonly T[],
-    predicate: (element: T, index: number) => element is U
+    predicate: (element: T, index: number) => element is U,
   ): U | undefined;
   export function find<T>(
     array: readonly T[],
-    predicate: (element: T, index: number) => boolean
+    predicate: (element: T, index: number) => boolean,
   ): T | undefined;
   export function find<T>(
     array: readonly T[],
-    predicate: (element: T, index: number) => boolean
+    predicate: (element: T, index: number) => boolean,
   ): T | undefined {
     for (let i = 0; i < array.length; i++) {
       const value = array[i];
@@ -246,15 +242,15 @@ namespace ts {
 
   export function findLast<T, U extends T>(
     array: readonly T[],
-    predicate: (element: T, index: number) => element is U
+    predicate: (element: T, index: number) => element is U,
   ): U | undefined;
   export function findLast<T>(
     array: readonly T[],
-    predicate: (element: T, index: number) => boolean
+    predicate: (element: T, index: number) => boolean,
   ): T | undefined;
   export function findLast<T>(
     array: readonly T[],
-    predicate: (element: T, index: number) => boolean
+    predicate: (element: T, index: number) => boolean,
   ): T | undefined {
     for (let i = array.length - 1; i >= 0; i--) {
       const value = array[i];
@@ -269,7 +265,7 @@ namespace ts {
   export function findIndex<T>(
     array: readonly T[],
     predicate: (element: T, index: number) => boolean,
-    startIndex?: number
+    startIndex?: number,
   ): number {
     for (let i = startIndex || 0; i < array.length; i++) {
       if (predicate(array[i], i)) {
@@ -282,7 +278,7 @@ namespace ts {
   export function findLastIndex<T>(
     array: readonly T[],
     predicate: (element: T, index: number) => boolean,
-    startIndex?: number
+    startIndex?: number,
   ): number {
     for (
       let i = startIndex === undefined ? array.length - 1 : startIndex;
@@ -302,7 +298,7 @@ namespace ts {
    */
   export function findMap<T, U>(
     array: readonly T[],
-    callback: (element: T, index: number) => U | undefined
+    callback: (element: T, index: number) => U | undefined,
   ): U {
     for (let i = 0; i < array.length; i++) {
       const result = callback(array[i], i);
@@ -316,7 +312,7 @@ namespace ts {
   export function contains<T>(
     array: readonly T[] | undefined,
     value: T,
-    equalityComparer: EqualityComparer<T> = equateValues
+    equalityComparer: EqualityComparer<T> = equateValues,
   ): boolean {
     if (array) {
       for (const v of array) {
@@ -331,7 +327,7 @@ namespace ts {
   export function arraysEqual<T>(
     a: readonly T[],
     b: readonly T[],
-    equalityComparer: EqualityComparer<T> = equateValues
+    equalityComparer: EqualityComparer<T> = equateValues,
   ): boolean {
     return (
       a.length === b.length && a.every((x, i) => equalityComparer(x, b[i]))
@@ -341,7 +337,7 @@ namespace ts {
   export function indexOfAnyCharCode(
     text: string,
     charCodes: readonly number[],
-    start?: number
+    start?: number,
   ): number {
     for (let i = start || 0; i < text.length; i++) {
       if (contains(charCodes, text.charCodeAt(i))) {
@@ -353,7 +349,7 @@ namespace ts {
 
   export function countWhere<T>(
     array: readonly T[] | undefined,
-    predicate: (x: T, i: number) => boolean
+    predicate: (x: T, i: number) => boolean,
   ): number {
     let count = 0;
     if (array) {
@@ -375,31 +371,31 @@ namespace ts {
   export function filter<T>(array: T[], f: (x: T) => boolean): T[];
   export function filter<T, U extends T>(
     array: readonly T[],
-    f: (x: T) => x is U
+    f: (x: T) => x is U,
   ): readonly U[];
   export function filter<T, U extends T>(
     array: readonly T[],
-    f: (x: T) => boolean
+    f: (x: T) => boolean,
   ): readonly T[];
   export function filter<T, U extends T>(
     array: T[] | undefined,
-    f: (x: T) => x is U
+    f: (x: T) => x is U,
   ): U[] | undefined;
   export function filter<T>(
     array: T[] | undefined,
-    f: (x: T) => boolean
+    f: (x: T) => boolean,
   ): T[] | undefined;
   export function filter<T, U extends T>(
     array: readonly T[] | undefined,
-    f: (x: T) => x is U
+    f: (x: T) => x is U,
   ): readonly U[] | undefined;
   export function filter<T, U extends T>(
     array: readonly T[] | undefined,
-    f: (x: T) => boolean
+    f: (x: T) => boolean,
   ): readonly T[] | undefined;
   export function filter<T>(
     array: readonly T[] | undefined,
-    f: (x: T) => boolean
+    f: (x: T) => boolean,
   ): readonly T[] | undefined {
     if (array) {
       const len = array.length;
@@ -423,7 +419,7 @@ namespace ts {
 
   export function filterMutate<T>(
     array: T[],
-    f: (x: T, i: number, array: T[]) => boolean
+    f: (x: T, i: number, array: T[]) => boolean,
   ): void {
     let outIndex = 0;
     for (let i = 0; i < array.length; i++) {
@@ -441,15 +437,15 @@ namespace ts {
 
   export function map<T, U>(
     array: readonly T[],
-    f: (x: T, i: number) => U
+    f: (x: T, i: number) => U,
   ): U[];
   export function map<T, U>(
     array: readonly T[] | undefined,
-    f: (x: T, i: number) => U
+    f: (x: T, i: number) => U,
   ): U[] | undefined;
   export function map<T, U>(
     array: readonly T[] | undefined,
-    f: (x: T, i: number) => U
+    f: (x: T, i: number) => U,
   ): U[] | undefined {
     let result: U[] | undefined;
     if (array) {
@@ -463,7 +459,7 @@ namespace ts {
 
   export function mapIterator<T, U>(
     iter: Iterator<T>,
-    mapFn: (x: T) => U
+    mapFn: (x: T) => U,
   ): Iterator<U> {
     return {
       next() {
@@ -479,19 +475,19 @@ namespace ts {
   export function sameMap<T>(array: T[], f: (x: T, i: number) => T): T[];
   export function sameMap<T>(
     array: readonly T[],
-    f: (x: T, i: number) => T
+    f: (x: T, i: number) => T,
   ): readonly T[];
   export function sameMap<T>(
     array: T[] | undefined,
-    f: (x: T, i: number) => T
+    f: (x: T, i: number) => T,
   ): T[] | undefined;
   export function sameMap<T>(
     array: readonly T[] | undefined,
-    f: (x: T, i: number) => T
+    f: (x: T, i: number) => T,
   ): readonly T[] | undefined;
   export function sameMap<T>(
     array: readonly T[] | undefined,
-    f: (x: T, i: number) => T
+    f: (x: T, i: number) => T,
   ): readonly T[] | undefined {
     if (array) {
       for (let i = 0; i < array.length; i++) {
@@ -516,7 +512,7 @@ namespace ts {
    * @param array The array to flatten.
    */
   export function flatten<T>(
-    array: T[][] | readonly (T | readonly T[] | undefined)[]
+    array: T[][] | readonly (T | readonly T[] | undefined)[],
   ): T[] {
     const result = [];
     for (const v of array) {
@@ -539,7 +535,7 @@ namespace ts {
    */
   export function flatMap<T, U>(
     array: readonly T[] | undefined,
-    mapfn: (x: T, i: number) => U | readonly U[] | undefined
+    mapfn: (x: T, i: number) => U | readonly U[] | undefined,
   ): readonly U[] {
     let result: U[] | undefined;
     if (array) {
@@ -559,7 +555,7 @@ namespace ts {
 
   export function flatMapToMutable<T, U>(
     array: readonly T[] | undefined,
-    mapfn: (x: T, i: number) => U | readonly U[] | undefined
+    mapfn: (x: T, i: number) => U | readonly U[] | undefined,
   ): U[] {
     const result: U[] = [];
     if (array) {
@@ -579,7 +575,7 @@ namespace ts {
 
   export function flatMapIterator<T, U>(
     iter: Iterator<T>,
-    mapfn: (x: T) => readonly U[] | Iterator<U> | undefined
+    mapfn: (x: T) => readonly U[] | Iterator<U> | undefined,
   ): Iterator<U> {
     const first = iter.next();
     if (first.done) {
@@ -621,15 +617,15 @@ namespace ts {
    */
   export function sameFlatMap<T>(
     array: T[],
-    mapfn: (x: T, i: number) => T | readonly T[]
+    mapfn: (x: T, i: number) => T | readonly T[],
   ): T[];
   export function sameFlatMap<T>(
     array: readonly T[],
-    mapfn: (x: T, i: number) => T | readonly T[]
+    mapfn: (x: T, i: number) => T | readonly T[],
   ): readonly T[];
   export function sameFlatMap<T>(
     array: T[],
-    mapfn: (x: T, i: number) => T | T[]
+    mapfn: (x: T, i: number) => T | T[],
   ): T[] {
     let result: T[] | undefined;
     if (array) {
@@ -653,7 +649,7 @@ namespace ts {
 
   export function mapAllOrFail<T, U>(
     array: readonly T[],
-    mapFn: (x: T, i: number) => U | undefined
+    mapFn: (x: T, i: number) => U | undefined,
   ): U[] | undefined {
     const result: U[] = [];
     for (let i = 0; i < array.length; i++) {
@@ -668,7 +664,7 @@ namespace ts {
 
   export function mapDefined<T, U>(
     array: readonly T[] | undefined,
-    mapFn: (x: T, i: number) => U | undefined
+    mapFn: (x: T, i: number) => U | undefined,
   ): U[] {
     const result: U[] = [];
     if (array) {
@@ -684,7 +680,7 @@ namespace ts {
 
   export function mapDefinedIterator<T, U>(
     iter: Iterator<T>,
-    mapFn: (x: T) => U | undefined
+    mapFn: (x: T) => U | undefined,
   ): Iterator<U> {
     return {
       next() {
@@ -704,21 +700,21 @@ namespace ts {
 
   export function mapDefinedEntries<K1, V1, K2, V2>(
     map: ReadonlyESMap<K1, V1>,
-    f: (key: K1, value: V1) => readonly [K2, V2] | undefined
+    f: (key: K1, value: V1) => readonly [K2, V2] | undefined,
   ): ESMap<K2, V2>;
   export function mapDefinedEntries<K1, V1, K2, V2>(
     map: ReadonlyESMap<K1, V1> | undefined,
     f: (
       key: K1,
-      value: V1
-    ) => readonly [K2 | undefined, V2 | undefined] | undefined
+      value: V1,
+    ) => readonly [K2 | undefined, V2 | undefined] | undefined,
   ): ESMap<K2, V2> | undefined;
   export function mapDefinedEntries<K1, V1, K2, V2>(
     map: ReadonlyESMap<K1, V1> | undefined,
     f: (
       key: K1,
-      value: V1
-    ) => readonly [K2 | undefined, V2 | undefined] | undefined
+      value: V1,
+    ) => readonly [K2 | undefined, V2 | undefined] | undefined,
   ): ESMap<K2, V2> | undefined {
     if (!map) {
       return undefined;
@@ -740,15 +736,15 @@ namespace ts {
 
   export function mapDefinedValues<V1, V2>(
     set: ReadonlySet<V1>,
-    f: (value: V1) => V2 | undefined
+    f: (value: V1) => V2 | undefined,
   ): Set<V2>;
   export function mapDefinedValues<V1, V2>(
     set: ReadonlySet<V1> | undefined,
-    f: (value: V1) => V2 | undefined
+    f: (value: V1) => V2 | undefined,
   ): Set<V2> | undefined;
   export function mapDefinedValues<V1, V2>(
     set: ReadonlySet<V1> | undefined,
-    f: (value: V1) => V2 | undefined
+    f: (value: V1) => V2 | undefined,
   ): Set<V2> | undefined {
     if (set) {
       const result = new Set<V2>();
@@ -765,7 +761,7 @@ namespace ts {
   export function getOrUpdate<K, V>(
     map: ESMap<K, V>,
     key: K,
-    callback: () => V
+    callback: () => V,
   ) {
     if (map.has(key)) {
       return map.get(key)!;
@@ -810,17 +806,17 @@ namespace ts {
   export function spanMap<T, K, U>(
     array: readonly T[],
     keyfn: (x: T, i: number) => K,
-    mapfn: (chunk: T[], key: K, start: number, end: number) => U
+    mapfn: (chunk: T[], key: K, start: number, end: number) => U,
   ): U[];
   export function spanMap<T, K, U>(
     array: readonly T[] | undefined,
     keyfn: (x: T, i: number) => K,
-    mapfn: (chunk: T[], key: K, start: number, end: number) => U
+    mapfn: (chunk: T[], key: K, start: number, end: number) => U,
   ): U[] | undefined;
   export function spanMap<T, K, U>(
     array: readonly T[] | undefined,
     keyfn: (x: T, i: number) => K,
-    mapfn: (chunk: T[], key: K, start: number, end: number) => U
+    mapfn: (chunk: T[], key: K, start: number, end: number) => U,
   ): U[] | undefined {
     let result: U[] | undefined;
     if (array) {
@@ -862,15 +858,15 @@ namespace ts {
 
   export function mapEntries<K1, V1, K2, V2>(
     map: ReadonlyESMap<K1, V1>,
-    f: (key: K1, value: V1) => readonly [K2, V2]
+    f: (key: K1, value: V1) => readonly [K2, V2],
   ): ESMap<K2, V2>;
   export function mapEntries<K1, V1, K2, V2>(
     map: ReadonlyESMap<K1, V1> | undefined,
-    f: (key: K1, value: V1) => readonly [K2, V2]
+    f: (key: K1, value: V1) => readonly [K2, V2],
   ): ESMap<K2, V2> | undefined;
   export function mapEntries<K1, V1, K2, V2>(
     map: ReadonlyESMap<K1, V1> | undefined,
-    f: (key: K1, value: V1) => readonly [K2, V2]
+    f: (key: K1, value: V1) => readonly [K2, V2],
   ): ESMap<K2, V2> | undefined {
     if (!map) {
       return undefined;
@@ -885,15 +881,15 @@ namespace ts {
   }
 
   export function some<T>(
-    array: readonly T[] | undefined
+    array: readonly T[] | undefined,
   ): array is readonly T[];
   export function some<T>(
     array: readonly T[] | undefined,
-    predicate: (value: T) => boolean
+    predicate: (value: T) => boolean,
   ): boolean;
   export function some<T>(
     array: readonly T[] | undefined,
-    predicate?: (value: T) => boolean
+    predicate?: (value: T) => boolean,
   ): boolean {
     if (array) {
       if (predicate) {
@@ -913,7 +909,7 @@ namespace ts {
   export function getRangesWhere<T>(
     arr: readonly T[],
     pred: (t: T) => boolean,
-    cb: (start: number, afterEnd: number) => void
+    cb: (start: number, afterEnd: number) => void,
   ): void {
     let start: number | undefined;
     for (let i = 0; i < arr.length; i++) {
@@ -932,15 +928,15 @@ namespace ts {
   export function concatenate<T>(array1: T[], array2: T[]): T[];
   export function concatenate<T>(
     array1: readonly T[],
-    array2: readonly T[]
+    array2: readonly T[],
   ): readonly T[];
   export function concatenate<T>(
     array1: T[] | undefined,
-    array2: T[] | undefined
+    array2: T[] | undefined,
   ): T[];
   export function concatenate<T>(
     array1: readonly T[] | undefined,
-    array2: readonly T[] | undefined
+    array2: readonly T[] | undefined,
   ): readonly T[];
   export function concatenate<T>(array1: T[], array2: T[]): T[] {
     if (!some(array2)) return array1;
@@ -959,7 +955,7 @@ namespace ts {
   function deduplicateRelational<T>(
     array: readonly T[],
     equalityComparer: EqualityComparer<T>,
-    comparer: Comparer<T>
+    comparer: Comparer<T>,
   ) {
     // Perform a stable sort of the array. This ensures the first entry in a list of
     // duplicates remains the first entry in the result.
@@ -984,7 +980,7 @@ namespace ts {
 
   function deduplicateEquality<T>(
     array: readonly T[],
-    equalityComparer: EqualityComparer<T>
+    equalityComparer: EqualityComparer<T>,
   ) {
     const result: T[] = [];
     for (const item of array) {
@@ -1002,7 +998,7 @@ namespace ts {
   export function deduplicate<T>(
     array: readonly T[],
     equalityComparer: EqualityComparer<T>,
-    comparer?: Comparer<T>
+    comparer?: Comparer<T>,
   ): T[] {
     return array.length === 0
       ? []
@@ -1018,7 +1014,7 @@ namespace ts {
    */
   function deduplicateSorted<T>(
     array: SortedReadonlyArray<T>,
-    comparer: EqualityComparer<T> | Comparer<T>
+    comparer: EqualityComparer<T> | Comparer<T>,
   ): SortedReadonlyArray<T> {
     if (array.length === 0) return emptyArray as any as SortedReadonlyArray<T>;
 
@@ -1040,7 +1036,7 @@ namespace ts {
           return Debug.fail("Array is unsorted.");
       }
 
-      deduplicated.push((last = next));
+      deduplicated.push(last = next);
     }
 
     return deduplicated as any as SortedReadonlyArray<T>;
@@ -1054,7 +1050,7 @@ namespace ts {
     array: SortedArray<T>,
     insert: T,
     compare: Comparer<T>,
-    allowDuplicates?: boolean
+    allowDuplicates?: boolean,
   ): void {
     if (array.length === 0) {
       array.push(insert);
@@ -1070,23 +1066,23 @@ namespace ts {
   }
 
   export function sortAndDeduplicate<T>(
-    array: readonly string[]
+    array: readonly string[],
   ): SortedReadonlyArray<string>;
   export function sortAndDeduplicate<T>(
     array: readonly T[],
     comparer: Comparer<T>,
-    equalityComparer?: EqualityComparer<T>
+    equalityComparer?: EqualityComparer<T>,
   ): SortedReadonlyArray<T>;
   export function sortAndDeduplicate<T>(
     array: readonly T[],
     comparer?: Comparer<T>,
-    equalityComparer?: EqualityComparer<T>
+    equalityComparer?: EqualityComparer<T>,
   ): SortedReadonlyArray<T> {
     return deduplicateSorted(
       sort(array, comparer),
-      equalityComparer ||
-        comparer ||
-        (compareStringsCaseSensitive as any as Comparer<T>)
+      equalityComparer
+        || comparer
+        || (compareStringsCaseSensitive as any as Comparer<T>),
     );
   }
 
@@ -1105,7 +1101,7 @@ namespace ts {
   export function arrayIsEqualTo<T>(
     array1: readonly T[] | undefined,
     array2: readonly T[] | undefined,
-    equalityComparer: (a: T, b: T, index: number) => boolean = equateValues
+    equalityComparer: (a: T, b: T, index: number) => boolean = equateValues,
   ): boolean {
     if (!array1 || !array2) {
       return array1 === array2;
@@ -1128,10 +1124,10 @@ namespace ts {
    * Compacts an array, removing any falsey elements.
    */
   export function compact<T>(
-    array: (T | undefined | null | false | 0 | "")[]
+    array: (T | undefined | null | false | 0 | "")[],
   ): T[];
   export function compact<T>(
-    array: readonly (T | undefined | null | false | 0 | "")[]
+    array: readonly (T | undefined | null | false | 0 | "")[],
   ): readonly T[];
   // ESLint thinks these can be combined with the above - they cannot; they'd produce higher-priority inferences and prevent the falsey types from being stripped
   export function compact<T>(array: T[]): T[]; // eslint-disable-line @typescript-eslint/unified-signatures
@@ -1162,12 +1158,14 @@ namespace ts {
   export function relativeComplement<T>(
     arrayA: T[] | undefined,
     arrayB: T[] | undefined,
-    comparer: Comparer<T>
+    comparer: Comparer<T>,
   ): T[] | undefined {
-    if (!arrayB || !arrayA || arrayB.length === 0 || arrayA.length === 0)
+    if (!arrayB || !arrayA || arrayB.length === 0 || arrayA.length === 0) {
       return arrayB;
+    }
     const result: T[] = [];
-    loopB: for (
+    loopB:
+    for (
       let offsetA = 0, offsetB = 0;
       offsetB < arrayB.length;
       offsetB++
@@ -1176,17 +1174,18 @@ namespace ts {
         // Ensure `arrayB` is properly sorted.
         Debug.assertGreaterThanOrEqual(
           comparer(arrayB[offsetB], arrayB[offsetB - 1]),
-          Comparison.EqualTo
+          Comparison.EqualTo,
         );
       }
 
-      loopA: for (const startA = offsetA; offsetA < arrayA.length; offsetA++) {
+      loopA:
+      for (const startA = offsetA; offsetA < arrayA.length; offsetA++) {
         if (offsetA > startA) {
           // Ensure `arrayA` is properly sorted. We only need to perform this check if
           // `offsetA` has changed since we entered the loop.
           Debug.assertGreaterThanOrEqual(
             comparer(arrayA[offsetA], arrayA[offsetA - 1]),
-            Comparison.EqualTo
+            Comparison.EqualTo,
           );
         }
 
@@ -1214,7 +1213,7 @@ namespace ts {
 
   export function sum<T extends Record<K, number>, K extends string>(
     array: readonly T[],
-    prop: K
+    prop: K,
   ): number {
     let result = 0;
     for (const v of array) {
@@ -1233,18 +1232,17 @@ namespace ts {
    */
   export function append<
     TArray extends any[] | undefined,
-    TValue extends NonNullable<TArray>[number] | undefined
+    TValue extends NonNullable<TArray>[number] | undefined,
   >(
     to: TArray,
-    value: TValue
-  ): [undefined, undefined] extends [TArray, TValue]
-    ? TArray
+    value: TValue,
+  ): [undefined, undefined] extends [TArray, TValue] ? TArray
     : NonNullable<TArray>[number][];
   export function append<T>(to: T[], value: T | undefined): T[];
   export function append<T>(to: T[] | undefined, value: T): T[];
   export function append<T>(
     to: T[] | undefined,
-    value: T | undefined
+    value: T | undefined,
   ): T[] | undefined;
   export function append<T>(to: Push<T>, value: T | undefined): void;
   export function append<T>(to: T[], value: T | undefined): T[] | undefined {
@@ -1268,11 +1266,11 @@ namespace ts {
    */
   export function combine<T>(
     xs: T | readonly T[] | undefined,
-    ys: T | readonly T[] | undefined
+    ys: T | readonly T[] | undefined,
   ): T | readonly T[] | undefined;
   export function combine<T>(
     xs: T | T[] | undefined,
-    ys: T | T[] | undefined
+    ys: T | T[] | undefined,
   ): T | T[] | undefined;
   export function combine<T>(xs: T | T[] | undefined, ys: T | T[] | undefined) {
     if (xs === undefined) return ys;
@@ -1304,19 +1302,19 @@ namespace ts {
     to: T[],
     from: readonly T[] | undefined,
     start?: number,
-    end?: number
+    end?: number,
   ): T[];
   export function addRange<T>(
     to: T[] | undefined,
     from: readonly T[] | undefined,
     start?: number,
-    end?: number
+    end?: number,
   ): T[] | undefined;
   export function addRange<T>(
     to: T[] | undefined,
     from: readonly T[] | undefined,
     start?: number,
-    end?: number
+    end?: number,
   ): T[] | undefined {
     if (from === undefined || from.length === 0) return to;
     if (to === undefined) return from.slice(start, end);
@@ -1336,7 +1334,7 @@ namespace ts {
   export function pushIfUnique<T>(
     array: T[],
     toAdd: T,
-    equalityComparer?: EqualityComparer<T>
+    equalityComparer?: EqualityComparer<T>,
   ): boolean {
     if (contains(array, toAdd, equalityComparer)) {
       return false;
@@ -1352,7 +1350,7 @@ namespace ts {
   export function appendIfUnique<T>(
     array: T[] | undefined,
     toAdd: T,
-    equalityComparer?: EqualityComparer<T>
+    equalityComparer?: EqualityComparer<T>,
   ): T[] {
     if (array) {
       pushIfUnique(array, toAdd, equalityComparer);
@@ -1365,7 +1363,7 @@ namespace ts {
   function stableSortIndices<T>(
     array: readonly T[],
     indices: number[],
-    comparer: Comparer<T>
+    comparer: Comparer<T>,
   ) {
     // sort indices by value then position
     indices.sort((x, y) => comparer(array[x], array[y]) || compareValues(x, y));
@@ -1376,7 +1374,7 @@ namespace ts {
    */
   export function sort<T>(
     array: readonly T[],
-    comparer?: Comparer<T>
+    comparer?: Comparer<T>,
   ): SortedReadonlyArray<T> {
     return (
       array.length === 0 ? array : array.slice().sort(comparer)
@@ -1416,12 +1414,12 @@ namespace ts {
    */
   export function stableSort<T>(
     array: readonly T[],
-    comparer: Comparer<T>
+    comparer: Comparer<T>,
   ): SortedReadonlyArray<T> {
     const indices = indicesOf(array);
     stableSortIndices(array, indices, comparer);
     return indices.map(
-      (i) => array[i]
+      (i) => array[i],
     ) as SortedArray<T> as SortedReadonlyArray<T>;
   }
 
@@ -1429,7 +1427,7 @@ namespace ts {
     array1: readonly T[],
     array2: readonly T[],
     pos: number,
-    end: number
+    end: number,
   ) {
     while (pos < end) {
       if (array1[pos] !== array2[pos]) {
@@ -1446,7 +1444,7 @@ namespace ts {
    */
   export function elementAt<T>(
     array: readonly T[] | undefined,
-    offset: number
+    offset: number,
   ): T | undefined {
     if (array) {
       offset = toOffset(array, offset);
@@ -1485,7 +1483,7 @@ namespace ts {
    * Returns the only element of an array if it contains only one element, `undefined` otherwise.
    */
   export function singleOrUndefined<T>(
-    array: readonly T[] | undefined
+    array: readonly T[] | undefined,
   ): T | undefined {
     return array && array.length === 1 ? array[0] : undefined;
   }
@@ -1498,10 +1496,10 @@ namespace ts {
   export function singleOrMany<T>(array: readonly T[]): T | readonly T[];
   export function singleOrMany<T>(array: T[] | undefined): T | T[] | undefined;
   export function singleOrMany<T>(
-    array: readonly T[] | undefined
+    array: readonly T[] | undefined,
   ): T | readonly T[] | undefined;
   export function singleOrMany<T>(
-    array: readonly T[] | undefined
+    array: readonly T[] | undefined,
   ): T | readonly T[] | undefined {
     return array && array.length === 1 ? array[0] : array;
   }
@@ -1509,7 +1507,7 @@ namespace ts {
   export function replaceElement<T>(
     array: readonly T[],
     index: number,
-    value: T
+    value: T,
   ): T[] {
     const result = array.slice(0);
     result[index] = value;
@@ -1532,14 +1530,14 @@ namespace ts {
     value: T,
     keySelector: (v: T) => U,
     keyComparer: Comparer<U>,
-    offset?: number
+    offset?: number,
   ): number {
     return binarySearchKey(
       array,
       keySelector(value),
       keySelector,
       keyComparer,
-      offset
+      offset,
     );
   }
 
@@ -1558,7 +1556,7 @@ namespace ts {
     key: U,
     keySelector: (v: T, i: number) => U,
     keyComparer: Comparer<U>,
-    offset?: number
+    offset?: number,
   ): number {
     if (!some(array)) {
       return -1;
@@ -1589,27 +1587,26 @@ namespace ts {
     f: (memo: U, value: T, i: number) => U,
     initial: U,
     start?: number,
-    count?: number
+    count?: number,
   ): U;
   export function reduceLeft<T>(
     array: readonly T[],
-    f: (memo: T, value: T, i: number) => T
+    f: (memo: T, value: T, i: number) => T,
   ): T | undefined;
   export function reduceLeft<T>(
     array: T[],
     f: (memo: T, value: T, i: number) => T,
     initial?: T,
     start?: number,
-    count?: number
+    count?: number,
   ): T | undefined {
     if (array && array.length > 0) {
       const size = array.length;
       if (size > 0) {
         let pos = start === undefined || start < 0 ? 0 : start;
-        const end =
-          count === undefined || pos + count > size - 1
-            ? size - 1
-            : pos + count;
+        const end = count === undefined || pos + count > size - 1
+          ? size - 1
+          : pos + count;
         let result: T;
         if (arguments.length <= 2) {
           result = array[pos];
@@ -1685,9 +1682,8 @@ namespace ts {
     return values;
   }
 
-  const _entries =
-    Object.entries ||
-    (<T>(obj: MapLike<T>) => {
+  const _entries = Object.entries
+    || (<T>(obj: MapLike<T>) => {
       const keys = getOwnKeys(obj);
       const result: [string, T][] = Array(keys.length);
       for (let i = 0; i < keys.length; i++) {
@@ -1711,14 +1707,14 @@ namespace ts {
   /** Shims `Array.from`. */
   export function arrayFrom<T, U>(
     iterator: Iterator<T> | IterableIterator<T>,
-    map: (t: T) => U
+    map: (t: T) => U,
   ): U[];
   export function arrayFrom<T>(
-    iterator: Iterator<T> | IterableIterator<T>
+    iterator: Iterator<T> | IterableIterator<T>,
   ): T[];
   export function arrayFrom<T, U>(
     iterator: Iterator<T> | IterableIterator<T>,
-    map?: (t: T) => U
+    map?: (t: T) => U,
   ): (T | U)[] {
     const result: (T | U)[] = [];
     for (
@@ -1752,7 +1748,7 @@ namespace ts {
   export function equalOwnProperties<T>(
     left: MapLike<T> | undefined,
     right: MapLike<T> | undefined,
-    equalityComparer: EqualityComparer<T> = equateValues
+    equalityComparer: EqualityComparer<T> = equateValues,
   ) {
     if (left === right) return true;
     if (!left || !right) return false;
@@ -1784,26 +1780,26 @@ namespace ts {
    */
   export function arrayToMap<K, V>(
     array: readonly V[],
-    makeKey: (value: V) => K | undefined
+    makeKey: (value: V) => K | undefined,
   ): ESMap<K, V>;
   export function arrayToMap<K, V1, V2>(
     array: readonly V1[],
     makeKey: (value: V1) => K | undefined,
-    makeValue: (value: V1) => V2
+    makeValue: (value: V1) => V2,
   ): ESMap<K, V2>;
   export function arrayToMap<T>(
     array: readonly T[],
-    makeKey: (value: T) => string | undefined
+    makeKey: (value: T) => string | undefined,
   ): ESMap<string, T>;
   export function arrayToMap<T, U>(
     array: readonly T[],
     makeKey: (value: T) => string | undefined,
-    makeValue: (value: T) => U
+    makeValue: (value: T) => U,
   ): ESMap<string, U>;
   export function arrayToMap<K, V1, V2>(
     array: readonly V1[],
     makeKey: (value: V1) => K | undefined,
-    makeValue: (value: V1) => V1 | V2 = identity
+    makeValue: (value: V1) => V1 | V2 = identity,
   ): ESMap<K, V1 | V2> {
     const result = new Map<K, V1 | V2>();
     for (const value of array) {
@@ -1815,17 +1811,17 @@ namespace ts {
 
   export function arrayToNumericMap<T>(
     array: readonly T[],
-    makeKey: (value: T) => number
+    makeKey: (value: T) => number,
   ): T[];
   export function arrayToNumericMap<T, U>(
     array: readonly T[],
     makeKey: (value: T) => number,
-    makeValue: (value: T) => U
+    makeValue: (value: T) => U,
   ): U[];
   export function arrayToNumericMap<T, U>(
     array: readonly T[],
     makeKey: (value: T) => number,
-    makeValue: (value: T) => T | U = identity
+    makeValue: (value: T) => T | U = identity,
   ): (T | U)[] {
     const result: (T | U)[] = [];
     for (const value of array) {
@@ -1836,17 +1832,17 @@ namespace ts {
 
   export function arrayToMultiMap<K, V>(
     values: readonly V[],
-    makeKey: (value: V) => K
+    makeKey: (value: V) => K,
   ): MultiMap<K, V>;
   export function arrayToMultiMap<K, V, U>(
     values: readonly V[],
     makeKey: (value: V) => K,
-    makeValue: (value: V) => U
+    makeValue: (value: V) => U,
   ): MultiMap<K, U>;
   export function arrayToMultiMap<K, V, U>(
     values: readonly V[],
     makeKey: (value: V) => K,
-    makeValue: (value: V) => V | U = identity
+    makeValue: (value: V) => V | U = identity,
   ): MultiMap<K, V | U> {
     const result = createMultiMap<K, V | U>();
     for (const value of values) {
@@ -1857,30 +1853,30 @@ namespace ts {
 
   export function group<T, K>(
     values: readonly T[],
-    getGroupId: (value: T) => K
+    getGroupId: (value: T) => K,
   ): readonly (readonly T[])[];
   export function group<T, K, R>(
     values: readonly T[],
     getGroupId: (value: T) => K,
-    resultSelector: (values: readonly T[]) => R
+    resultSelector: (values: readonly T[]) => R,
   ): R[];
   export function group<T>(
     values: readonly T[],
-    getGroupId: (value: T) => string
+    getGroupId: (value: T) => string,
   ): readonly (readonly T[])[];
   export function group<T, R>(
     values: readonly T[],
     getGroupId: (value: T) => string,
-    resultSelector: (values: readonly T[]) => R
+    resultSelector: (values: readonly T[]) => R,
   ): R[];
   export function group<T, K>(
     values: readonly T[],
     getGroupId: (value: T) => K,
-    resultSelector: (values: readonly T[]) => readonly T[] = identity
+    resultSelector: (values: readonly T[]) => readonly T[] = identity,
   ): readonly (readonly T[])[] {
     return arrayFrom(
       arrayToMultiMap(values, getGroupId).values(),
-      resultSelector
+      resultSelector,
     );
   }
 
@@ -1926,7 +1922,7 @@ namespace ts {
 
   export function maybeBind<T, A extends any[], R>(
     obj: T,
-    fn: ((this: T, ...args: A) => R) | undefined
+    fn: ((this: T, ...args: A) => R) | undefined,
   ): ((...args: A) => R) | undefined {
     return fn ? fn.bind(obj) : undefined;
   }
@@ -1958,7 +1954,7 @@ namespace ts {
     if (values) {
       values.push(value);
     } else {
-      this.set(key, (values = [value]));
+      this.set(key, values = [value]);
     }
     return values;
   }
@@ -1972,8 +1968,7 @@ namespace ts {
     }
   }
 
-  export interface UnderscoreEscapedMultiMap<T>
-    extends UnderscoreEscapedMap<T[]> {
+  export interface UnderscoreEscapedMultiMap<T> extends UnderscoreEscapedMap<T[]> {
     /**
      * Adds the value to an array of values associated with the key, and returns the array.
      * Creates the array if it does not already exist.
@@ -1988,7 +1983,7 @@ namespace ts {
   }
 
   export function createUnderscoreEscapedMultiMap<
-    T
+    T,
   >(): UnderscoreEscapedMultiMap<T> {
     return createMultiMap() as UnderscoreEscapedMultiMap<T>;
   }
@@ -2005,7 +2000,7 @@ namespace ts {
    */
   export function createSet<TElement, THash = number>(
     getHashCode: (element: TElement) => THash,
-    equals: EqualityComparer<TElement>
+    equals: EqualityComparer<TElement>,
   ): Set<TElement> {
     const multiMap = new Map<THash, TElement | TElement[]>();
     let size = 0;
@@ -2167,29 +2162,31 @@ namespace ts {
 
   export function tryCast<TOut extends TIn, TIn = any>(
     value: TIn | undefined,
-    test: (value: TIn) => value is TOut
+    test: (value: TIn) => value is TOut,
   ): TOut | undefined;
   export function tryCast<T>(
     value: T,
-    test: (value: T) => boolean
+    test: (value: T) => boolean,
   ): T | undefined;
   export function tryCast<T>(
     value: T,
-    test: (value: T) => boolean
+    test: (value: T) => boolean,
   ): T | undefined {
     return value !== undefined && test(value) ? value : undefined;
   }
 
   export function cast<TOut extends TIn, TIn = any>(
     value: TIn | undefined,
-    test: (value: TIn) => value is TOut
+    test: (value: TIn) => value is TOut,
   ): TOut {
     if (value !== undefined && test(value)) return value;
 
     return Debug.fail(
-      `Invalid cast. The supplied value ${value} did not pass the test '${Debug.getFunctionName(
-        test
-      )}'.`
+      `Invalid cast. The supplied value ${value} did not pass the test '${
+        Debug.getFunctionName(
+          test,
+        )
+      }'.`,
     );
   }
 
@@ -2280,7 +2277,7 @@ namespace ts {
   /** A version of `memoize` that supports a single primitive argument */
   export function memoizeOne<
     A extends string | number | boolean | undefined,
-    T
+    T,
   >(callback: (arg: A) => T): (arg: A) => T {
     const map = new Map<string, T>();
     return (arg: A) => {
@@ -2306,7 +2303,7 @@ namespace ts {
     b: (t: T) => T,
     c: (t: T) => T,
     d: (t: T) => T,
-    e: (t: T) => T
+    e: (t: T) => T,
   ): (t: T) => T {
     if (!!e) {
       const args: ((t: T) => T)[] = [];
@@ -2340,7 +2337,7 @@ namespace ts {
    * Every function should be assignable to this, but this should not be assignable to every function.
    */
   export type AnyFunction = (...args: never[]) => void;
-  export type AnyConstructor = new (...args: unknown[]) => unknown;
+  export type AnyConstructor = new(...args: unknown[]) => unknown;
 
   export function equateValues<T>(a: T, b: T) {
     return a === b;
@@ -2356,10 +2353,10 @@ namespace ts {
    */
   export function equateStringsCaseInsensitive(a: string, b: string) {
     return (
-      a === b ||
-      (a !== undefined &&
-        b !== undefined &&
-        a.toUpperCase() === b.toUpperCase())
+      a === b
+      || (a !== undefined
+        && b !== undefined
+        && a.toUpperCase() === b.toUpperCase())
     );
   }
 
@@ -2375,15 +2372,15 @@ namespace ts {
 
   function compareComparableValues(
     a: string | undefined,
-    b: string | undefined
+    b: string | undefined,
   ): Comparison;
   function compareComparableValues(
     a: number | undefined,
-    b: number | undefined
+    b: number | undefined,
   ): Comparison;
   function compareComparableValues(
     a: string | number | undefined,
-    b: string | number | undefined
+    b: string | number | undefined,
   ) {
     return a === b
       ? Comparison.EqualTo
@@ -2402,7 +2399,7 @@ namespace ts {
    */
   export function compareValues(
     a: number | undefined,
-    b: number | undefined
+    b: number | undefined,
   ): Comparison {
     return compareComparableValues(a, b);
   }
@@ -2412,7 +2409,7 @@ namespace ts {
    */
   export function compareTextSpans(
     a: Partial<TextSpan> | undefined,
-    b: Partial<TextSpan> | undefined
+    b: Partial<TextSpan> | undefined,
   ): Comparison {
     return (
       compareValues(a?.start, b?.start) || compareValues(a?.length, b?.length)
@@ -2460,7 +2457,7 @@ namespace ts {
    */
   export function compareStringsCaseSensitive(
     a: string | undefined,
-    b: string | undefined
+    b: string | undefined,
   ): Comparison {
     return compareComparableValues(a, b);
   }
@@ -2484,7 +2481,7 @@ namespace ts {
     function compareWithCallback(
       a: string | undefined,
       b: string | undefined,
-      comparer: (a: string, b: string) => number
+      comparer: (a: string, b: string) => number,
     ) {
       if (a === b) return Comparison.EqualTo;
       if (a === undefined) return Comparison.LessThan;
@@ -2498,7 +2495,7 @@ namespace ts {
     }
 
     function createIntlCollatorStringComparer(
-      locale: string | undefined
+      locale: string | undefined,
     ): Comparer<string> {
       // Intl.Collator.prototype.compare is bound to the collator. See NOTE in
       // http://www.ecma-international.org/ecma-402/2.0/#sec-Intl.Collator.prototype.compare
@@ -2510,7 +2507,7 @@ namespace ts {
     }
 
     function createLocaleCompareStringComparer(
-      locale: string | undefined
+      locale: string | undefined,
     ): Comparer<string> {
       // if the locale is not the default locale (`undefined`), use the fallback comparer.
       if (locale !== undefined) return createFallbackStringComparer();
@@ -2534,8 +2531,8 @@ namespace ts {
 
       function compareDictionaryOrder(a: string, b: string) {
         return (
-          compareStrings(a.toUpperCase(), b.toUpperCase()) ||
-          compareStrings(a, b)
+          compareStrings(a.toUpperCase(), b.toUpperCase())
+          || compareStrings(a, b)
         );
       }
 
@@ -2557,9 +2554,9 @@ namespace ts {
       // If the host does not support Intl, we fall back to localeCompare.
       // localeCompare in Node v0.10 is just an ordinal comparison, so don't use it.
       if (
-        typeof String.prototype.localeCompare === "function" &&
-        typeof String.prototype.toLocaleUpperCase === "function" &&
-        "a".localeCompare("B") < 0
+        typeof String.prototype.localeCompare === "function"
+        && typeof String.prototype.toLocaleUpperCase === "function"
+        && "a".localeCompare("B") < 0
       ) {
         return createLocaleCompareStringComparer;
       }
@@ -2608,9 +2605,8 @@ namespace ts {
    * accents/diacritic marks, or case as unequal.
    */
   export function compareStringsCaseSensitiveUI(a: string, b: string) {
-    const comparer =
-      uiComparerCaseSensitive ||
-      (uiComparerCaseSensitive = createUIStringComparer(uiLocale));
+    const comparer = uiComparerCaseSensitive
+      || (uiComparerCaseSensitive = createUIStringComparer(uiLocale));
     return comparer(a, b);
   }
 
@@ -2618,7 +2614,7 @@ namespace ts {
     a: T | undefined,
     b: T | undefined,
     key: K,
-    comparer: Comparer<T[K]>
+    comparer: Comparer<T[K]>,
   ): Comparison {
     return a === b
       ? Comparison.EqualTo
@@ -2649,7 +2645,7 @@ namespace ts {
   export function getSpellingSuggestion<T>(
     name: string,
     candidates: T[],
-    getName: (candidate: T) => string | undefined
+    getName: (candidate: T) => string | undefined,
   ): T | undefined {
     const maximumLengthDifference = Math.min(2, Math.floor(name.length * 0.34));
     let bestDistance = Math.floor(name.length * 0.4) + 1; // If the best result is worse than this, don't bother.
@@ -2657,8 +2653,8 @@ namespace ts {
     for (const candidate of candidates) {
       const candidateName = getName(candidate);
       if (
-        candidateName !== undefined &&
-        Math.abs(candidateName.length - name.length) <= maximumLengthDifference
+        candidateName !== undefined
+        && Math.abs(candidateName.length - name.length) <= maximumLengthDifference
       ) {
         if (candidateName === name) {
           continue;
@@ -2666,8 +2662,8 @@ namespace ts {
         // Only consider candidates less than 3 characters long when they differ by case.
         // Otherwise, don't bother, since a user would usually notice differences of a 2-character name.
         if (
-          candidateName.length < 3 &&
-          candidateName.toLowerCase() !== name.toLowerCase()
+          candidateName.length < 3
+          && candidateName.toLowerCase() !== name.toLowerCase()
         ) {
           continue;
         }
@@ -2675,7 +2671,7 @@ namespace ts {
         const distance = levenshteinWithMax(
           name,
           candidateName,
-          bestDistance - 0.1
+          bestDistance - 0.1,
         );
         if (distance === undefined) {
           continue;
@@ -2692,7 +2688,7 @@ namespace ts {
   function levenshteinWithMax(
     s1: string,
     s2: string,
-    max: number
+    max: number,
   ): number | undefined {
     let previous = new Array(s2.length + 1);
     let current = new Array(s2.length + 1);
@@ -2715,18 +2711,16 @@ namespace ts {
       }
       for (let j = minJ; j <= maxJ; j++) {
         // case difference should be significantly cheaper than other differences
-        const substitutionDistance =
-          s1[i - 1].toLowerCase() === s2[j - 1].toLowerCase()
-            ? previous[j - 1] + 0.1
-            : previous[j - 1] + 2;
-        const dist =
-          c1 === s2.charCodeAt(j - 1)
-            ? previous[j - 1]
-            : Math.min(
-                /*delete*/ previous[j] + 1,
-                /*insert*/ current[j - 1] + 1,
-                /*substitute*/ substitutionDistance
-              );
+        const substitutionDistance = s1[i - 1].toLowerCase() === s2[j - 1].toLowerCase()
+          ? previous[j - 1] + 0.1
+          : previous[j - 1] + 2;
+        const dist = c1 === s2.charCodeAt(j - 1)
+          ? previous[j - 1]
+          : Math.min(
+            /*delete*/ previous[j] + 1,
+            /*insert*/ current[j - 1] + 1,
+            /*substitute*/ substitutionDistance,
+          );
         current[j] = dist;
         colMin = Math.min(colMin, dist);
       }
@@ -2760,7 +2754,7 @@ namespace ts {
 
   export function tryRemoveSuffix(
     str: string,
-    suffix: string
+    suffix: string,
   ): string | undefined {
     return endsWith(str, suffix)
       ? str.slice(0, str.length - suffix.length)
@@ -2790,8 +2784,8 @@ namespace ts {
           ch = fileName.charCodeAt(pos);
         } while (pos > 0 && ch >= CharacterCodes._0 && ch <= CharacterCodes._9);
       } else if (
-        pos > 4 &&
-        (ch === CharacterCodes.n || ch === CharacterCodes.N)
+        pos > 4
+        && (ch === CharacterCodes.n || ch === CharacterCodes.N)
       ) {
         // Looking for "min" or "min"
         // Already matched the 'n'
@@ -2857,7 +2851,7 @@ namespace ts {
   /** Remove the *first* element satisfying `predicate`. */
   function unorderedRemoveFirstItemWhere<T>(
     array: T[],
-    predicate: (element: T) => boolean
+    predicate: (element: T) => boolean,
   ) {
     for (let i = 0; i < array.length; i++) {
       if (predicate(array[i])) {
@@ -2870,7 +2864,7 @@ namespace ts {
 
   export type GetCanonicalFileName = (fileName: string) => string;
   export function createGetCanonicalFileName(
-    useCaseSensitiveFileNames: boolean
+    useCaseSensitiveFileNames: boolean,
   ): GetCanonicalFileName {
     return useCaseSensitiveFileNames ? identity : toFileNameLowerCase;
   }
@@ -2893,7 +2887,7 @@ namespace ts {
     Debug.assert(isPatternMatch(pattern, candidate));
     return candidate.substring(
       pattern.prefix.length,
-      candidate.length - pattern.suffix.length
+      candidate.length - pattern.suffix.length,
     );
   }
 
@@ -2901,7 +2895,7 @@ namespace ts {
   export function findBestPatternMatch<T>(
     values: readonly T[],
     getPattern: (value: T) => Pattern,
-    candidate: string
+    candidate: string,
   ): T | undefined {
     let matchedValue: T | undefined;
     // use length of prefix as betterness criteria
@@ -2910,8 +2904,8 @@ namespace ts {
     for (const v of values) {
       const pattern = getPattern(v);
       if (
-        isPatternMatch(pattern, candidate) &&
-        pattern.prefix.length > longestMatchPrefixLength
+        isPatternMatch(pattern, candidate)
+        && pattern.prefix.length > longestMatchPrefixLength
       ) {
         longestMatchPrefixLength = pattern.prefix.length;
         matchedValue = v;
@@ -2932,7 +2926,7 @@ namespace ts {
   export function tryRemovePrefix(
     str: string,
     prefix: string,
-    getCanonicalFileName: GetCanonicalFileName = identity
+    getCanonicalFileName: GetCanonicalFileName = identity,
   ): string | undefined {
     return startsWith(getCanonicalFileName(str), getCanonicalFileName(prefix))
       ? str.substring(prefix.length)
@@ -2941,9 +2935,9 @@ namespace ts {
 
   function isPatternMatch({ prefix, suffix }: Pattern, candidate: string) {
     return (
-      candidate.length >= prefix.length + suffix.length &&
-      startsWith(candidate, prefix) &&
-      endsWith(candidate, suffix)
+      candidate.length >= prefix.length + suffix.length
+      && startsWith(candidate, prefix)
+      && endsWith(candidate, suffix)
     );
   }
 
@@ -2967,7 +2961,7 @@ namespace ts {
   }
 
   export function not<T extends unknown[]>(
-    fn: (...args: T) => boolean
+    fn: (...args: T) => boolean,
   ): (...args: T) => boolean {
     return (...args) => !fn(...args);
   }
@@ -2984,7 +2978,7 @@ namespace ts {
     comparer: (a: T, b: U) => Comparison,
     inserted: (newItem: T) => void,
     deleted: (oldItem: U) => void,
-    unchanged?: (oldItem: U, newItem: T) => void
+    unchanged?: (oldItem: U, newItem: T) => void,
   ) {
     unchanged = unchanged || noop;
     let newIndex = 0;
@@ -3039,7 +3033,7 @@ namespace ts {
     arrays: readonly (readonly T[])[],
     result: (readonly T[])[],
     outer: readonly T[] | undefined,
-    index: number
+    index: number,
   ) {
     for (const element of arrays[index]) {
       let inner: T[];
@@ -3067,7 +3061,7 @@ namespace ts {
   export function padLeft(
     s: string,
     length: number,
-    padString: " " | "0" = " "
+    padString: " " | "0" = " ",
   ) {
     return length <= s.length ? s : padString.repeat(length - s.length) + s;
   }
@@ -3085,11 +3079,11 @@ namespace ts {
 
   export function takeWhile<T, U extends T>(
     array: readonly T[],
-    predicate: (element: T) => element is U
+    predicate: (element: T) => element is U,
   ): U[];
   export function takeWhile<T>(
     array: readonly T[],
-    predicate: (element: T) => boolean
+    predicate: (element: T) => boolean,
   ): T[] {
     const len = array.length;
     let index = 0;

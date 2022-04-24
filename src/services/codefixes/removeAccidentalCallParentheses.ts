@@ -11,7 +11,7 @@ namespace ts.codefix {
     getCodeActions(context) {
       const callExpression = findAncestor(
         getTokenAtPosition(context.sourceFile, context.span.start),
-        isCallExpression
+        isCallExpression,
       );
       if (!callExpression) {
         return undefined;
@@ -26,7 +26,7 @@ namespace ts.codefix {
         createCodeFixActionWithoutFixAll(
           fixId,
           changes,
-          Diagnostics.Remove_parentheses
+          Diagnostics.Remove_parentheses,
         ),
       ];
     },

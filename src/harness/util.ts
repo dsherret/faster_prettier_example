@@ -5,36 +5,34 @@ namespace Utils {
   const testPathPrefixRegExp = /(?:(file:\/{3})|\/)\.(ts|lib|src)\//g;
   export function removeTestPathPrefixes(
     text: string,
-    retainTrailingDirectorySeparator?: boolean
+    retainTrailingDirectorySeparator?: boolean,
   ): string {
     return text !== undefined
       ? text.replace(
-          testPathPrefixRegExp,
-          (_, scheme) => scheme || (retainTrailingDirectorySeparator ? "/" : "")
-        )
+        testPathPrefixRegExp,
+        (_, scheme) => scheme || (retainTrailingDirectorySeparator ? "/" : ""),
+      )
       : undefined!; // TODO: GH#18217
   }
 
   function createDiagnosticMessageReplacer<
-    R extends (messageArgs: string[], ...args: string[]) => string[]
+    R extends (messageArgs: string[], ...args: string[]) => string[],
   >(diagnosticMessage: ts.DiagnosticMessage, replacer: R) {
     const messageParts = diagnosticMessage.message.split(/{\d+}/g);
     const regExp = new RegExp(
-      `^(?:${messageParts.map(ts.regExpEscape).join("(.*?)")})$`
+      `^(?:${messageParts.map(ts.regExpEscape).join("(.*?)")})$`,
     );
     type Args<R> = R extends (
       messageArgs: string[],
       ...args: infer A
-    ) => string[]
-      ? A
+    ) => string[] ? A
       : [];
     return (text: string, ...args: Args<R>) =>
       text.replace(regExp, (_, ...fixedArgs) =>
         ts.formatStringFromArgs(
           diagnosticMessage.message,
-          replacer(fixedArgs, ...args)
-        )
-      );
+          replacer(fixedArgs, ...args),
+        ));
   }
 
   const replaceTypesVersionsMessage = createDiagnosticMessageReplacer(
@@ -44,13 +42,13 @@ namespace Utils {
       entry,
       compilerVersion,
       moduleName,
-    ]
+    ],
   );
 
   export function sanitizeTraceResolutionLogEntry(text: string) {
     return (
-      text &&
-      removeTestPathPrefixes(replaceTypesVersionsMessage(text, "3.1.0-dev"))
+      text
+      && removeTestPathPrefixes(replaceTypesVersionsMessage(text, "3.1.0-dev"))
     );
   }
 
@@ -118,16 +116,19 @@ namespace Utils {
     if (text.length >= 1) {
       const ch0 = text.charCodeAt(0);
       if (ch0 === 0xfeff) return 1;
-      if (ch0 === 0xfe)
+      if (ch0 === 0xfe) {
         return text.length >= 2 && text.charCodeAt(1) === 0xff ? 2 : 0;
-      if (ch0 === 0xff)
+      }
+      if (ch0 === 0xff) {
         return text.length >= 2 && text.charCodeAt(1) === 0xfe ? 2 : 0;
-      if (ch0 === 0xef)
-        return text.length >= 3 &&
-          text.charCodeAt(1) === 0xbb &&
-          text.charCodeAt(2) === 0xbf
+      }
+      if (ch0 === 0xef) {
+        return text.length >= 3
+            && text.charCodeAt(1) === 0xbb
+            && text.charCodeAt(2) === 0xbf
           ? 3
           : 0;
+      }
     }
     return 0;
   }
@@ -146,11 +147,10 @@ namespace Utils {
   export function theory<T extends any[]>(
     name: string,
     cb: (...args: T) => void,
-    data: T[]
+    data: T[],
   ) {
     for (const entry of data) {
-      it(`${name}(${entry.map(formatTheoryDatum).join(", ")})`, () =>
-        cb(...entry));
+      it(`${name}(${entry.map(formatTheoryDatum).join(", ")})`, () => cb(...entry));
     }
   }
 

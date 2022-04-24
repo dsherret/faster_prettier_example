@@ -2,7 +2,7 @@ namespace ts.projectSystem {
   describe("unittests:: tsserver:: ExternalProjects", () => {
     describe("can handle tsconfig file name with difference casing", () => {
       function verifyConfigFileCasing(
-        lazyConfiguredProjectsFromExternalProject: boolean
+        lazyConfiguredProjectsFromExternalProject: boolean,
       ) {
         const f1 = {
           path: "/a/b/app.ts",
@@ -24,7 +24,7 @@ namespace ts.projectSystem {
         });
         const upperCaseConfigFilePath = combinePaths(
           getDirectoryPath(config.path).toUpperCase(),
-          getBaseFileName(config.path)
+          getBaseFileName(config.path),
         );
         service.openExternalProject({
           projectFileName: "/a/b/project.csproj",
@@ -36,13 +36,13 @@ namespace ts.projectSystem {
         if (lazyConfiguredProjectsFromExternalProject) {
           assert.equal(
             project.pendingReload,
-            ConfigFileProgramReloadLevel.Full
+            ConfigFileProgramReloadLevel.Full,
           ); // External project referenced configured project pending to be reloaded
           checkProjectActualFiles(project, emptyArray);
         } else {
           assert.equal(
             project.pendingReload,
-            ConfigFileProgramReloadLevel.None
+            ConfigFileProgramReloadLevel.None,
           ); // External project referenced configured project loaded
           checkProjectActualFiles(project, [upperCaseConfigFilePath]);
         }
@@ -60,13 +60,13 @@ namespace ts.projectSystem {
 
       it("when lazyConfiguredProjectsFromExternalProject not set", () => {
         verifyConfigFileCasing(
-          /*lazyConfiguredProjectsFromExternalProject*/ false
+          /*lazyConfiguredProjectsFromExternalProject*/ false,
         );
       });
 
       it("when lazyConfiguredProjectsFromExternalProject is set", () => {
         verifyConfigFileCasing(
-          /*lazyConfiguredProjectsFromExternalProject*/ true
+          /*lazyConfiguredProjectsFromExternalProject*/ true,
         );
       });
     });
@@ -90,16 +90,15 @@ namespace ts.projectSystem {
             create(info: server.PluginCreateInfo) {
               const proxy = Harness.LanguageService.makeDefaultProxy(info);
               proxy.getSemanticDiagnostics = (filename) => {
-                const prev =
-                  info.languageService.getSemanticDiagnostics(filename);
+                const prev = info.languageService.getSemanticDiagnostics(filename);
                 const sourceFile: SourceFile = info.project.getSourceFile(
                   toPath(
                     filename,
                     /*basePath*/ undefined,
                     createGetCanonicalFileName(
-                      info.serverHost.useCaseSensitiveFileNames
-                    )
-                  )
+                      info.serverHost.useCaseSensitiveFileNames,
+                    ),
+                  ),
                 )!;
                 prev.push({
                   category: DiagnosticCategory.Warning,
@@ -130,7 +129,7 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { externalProjects: 1 });
       assert.equal(
         projectService.externalProjects[0].getProjectName(),
-        p1.projectFileName
+        p1.projectFileName,
       );
 
       const handlerResponse = session.executeCommand({
@@ -185,11 +184,11 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { externalProjects: 2 });
       assert.equal(
         projectService.externalProjects[0].getProjectName(),
-        p1.projectFileName
+        p1.projectFileName,
       );
       assert.equal(
         projectService.externalProjects[1].getProjectName(),
-        p2.projectFileName
+        p2.projectFileName,
       );
 
       session.executeCommand({
@@ -201,11 +200,11 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { externalProjects: 2 });
       assert.equal(
         projectService.externalProjects[0].getProjectName(),
-        p1.projectFileName
+        p1.projectFileName,
       );
       assert.equal(
         projectService.externalProjects[1].getProjectName(),
-        p3.projectFileName
+        p3.projectFileName,
       );
 
       session.executeCommand({
@@ -224,7 +223,7 @@ namespace ts.projectSystem {
       } as protocol.OpenExternalProjectsRequest);
       assert.equal(
         projectService.externalProjects[0].getProjectName(),
-        p2.projectFileName
+        p2.projectFileName,
       );
     });
 
@@ -350,11 +349,11 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { configuredProjects: 2 });
       assert.strictEqual(
         projectService.configuredProjects.get(config1.path),
-        proj1
+        proj1,
       );
       assert.strictEqual(
         projectService.configuredProjects.get(config2.path),
-        proj2
+        proj2,
       );
 
       projectService.openClientFile(file3.path, file3.content);
@@ -364,11 +363,11 @@ namespace ts.projectSystem {
       });
       assert.strictEqual(
         projectService.configuredProjects.get(config1.path),
-        proj1
+        proj1,
       );
       assert.strictEqual(
         projectService.configuredProjects.get(config2.path),
-        proj2
+        proj2,
       );
 
       projectService.closeExternalProject(externalProjectName);
@@ -379,7 +378,7 @@ namespace ts.projectSystem {
       });
       assert.strictEqual(
         projectService.configuredProjects.get(config1.path),
-        proj1
+        proj1,
       );
       assert.isUndefined(projectService.configuredProjects.get(config2.path));
 
@@ -390,7 +389,7 @@ namespace ts.projectSystem {
       });
       assert.strictEqual(
         projectService.configuredProjects.get(config1.path),
-        proj1
+        proj1,
       );
       assert.isUndefined(projectService.configuredProjects.get(config2.path));
       assert.isTrue(projectService.inferredProjects[0].isOrphan());
@@ -402,7 +401,7 @@ namespace ts.projectSystem {
       });
       assert.strictEqual(
         projectService.configuredProjects.get(config1.path),
-        proj1
+        proj1,
       );
       assert.isUndefined(projectService.configuredProjects.get(config2.path));
       assert.isTrue(projectService.inferredProjects[0].isOrphan());
@@ -475,7 +474,7 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
       assert.strictEqual(
         projectService.configuredProjects.get(configFile.path),
-        project
+        project,
       );
 
       projectService.closeExternalProject(externalProjectName);
@@ -483,20 +482,20 @@ namespace ts.projectSystem {
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
       assert.strictEqual(
         projectService.configuredProjects.get(configFile.path),
-        project
+        project,
       );
 
       projectService.closeClientFile(file1.path);
       checkNumberOfProjects(projectService, { configuredProjects: 1 });
       assert.strictEqual(
         projectService.configuredProjects.get(configFile.path),
-        project
+        project,
       );
 
       projectService.openClientFile(file2.path);
       checkNumberOfProjects(projectService, { inferredProjects: 1 });
       assert.isUndefined(
-        projectService.configuredProjects.get(configFile.path)
+        projectService.configuredProjects.get(configFile.path),
       );
     });
 
@@ -608,7 +607,7 @@ namespace ts.projectSystem {
       service.checkNumberOfProjects({ externalProjects: 1 });
       assert.isFalse(
         service.externalProjects[0].languageServiceEnabled,
-        "language service should be disabled - 1"
+        "language service should be disabled - 1",
       );
 
       service.openExternalProject({
@@ -619,7 +618,7 @@ namespace ts.projectSystem {
       service.checkNumberOfProjects({ externalProjects: 1 });
       assert.isTrue(
         service.externalProjects[0].languageServiceEnabled,
-        "language service should be enabled"
+        "language service should be enabled",
       );
 
       service.openExternalProject({
@@ -630,13 +629,13 @@ namespace ts.projectSystem {
       service.checkNumberOfProjects({ externalProjects: 1 });
       assert.isFalse(
         service.externalProjects[0].languageServiceEnabled,
-        "language service should be disabled - 2"
+        "language service should be disabled - 2",
       );
     });
 
     describe("deleting config file opened from the external project works", () => {
       function verifyDeletingConfigFile(
-        lazyConfiguredProjectsFromExternalProject: boolean
+        lazyConfiguredProjectsFromExternalProject: boolean,
       ) {
         const site = {
           path: "/user/someuser/project/js/site.js",
@@ -677,13 +676,13 @@ namespace ts.projectSystem {
           configProject,
           lazyConfiguredProjectsFromExternalProject
             ? emptyArray // Since no files opened from this project, its not loaded
-            : [configFile.path]
+            : [configFile.path],
         );
 
         host.deleteFile(configFile.path);
 
         knownProjects = projectService.synchronizeProjectList(
-          map(knownProjects, (proj) => proj.info!)
+          map(knownProjects, (proj) => proj.info!),
         ); // TODO: GH#18217 GH#20039
         checkNumberOfProjects(projectService, {
           configuredProjects: 0,
@@ -706,19 +705,19 @@ namespace ts.projectSystem {
       }
       it("when lazyConfiguredProjectsFromExternalProject not set", () => {
         verifyDeletingConfigFile(
-          /*lazyConfiguredProjectsFromExternalProject*/ false
+          /*lazyConfiguredProjectsFromExternalProject*/ false,
         );
       });
       it("when lazyConfiguredProjectsFromExternalProject is set", () => {
         verifyDeletingConfigFile(
-          /*lazyConfiguredProjectsFromExternalProject*/ true
+          /*lazyConfiguredProjectsFromExternalProject*/ true,
         );
       });
     });
 
     describe("correctly handling add/remove tsconfig - 1", () => {
       function verifyAddRemoveConfig(
-        lazyConfiguredProjectsFromExternalProject: boolean
+        lazyConfiguredProjectsFromExternalProject: boolean,
       ) {
         const f1 = {
           path: "/a/b/app.ts",
@@ -763,7 +762,7 @@ namespace ts.projectSystem {
         if (lazyConfiguredProjectsFromExternalProject) {
           checkProjectActualFiles(
             configuredProjectAt(projectService, 0),
-            emptyArray
+            emptyArray,
           ); // Configured project created but not loaded till actually needed
           projectService.ensureInferredProjectsUpToDate_TestOnly();
         }
@@ -788,19 +787,19 @@ namespace ts.projectSystem {
       }
       it("when lazyConfiguredProjectsFromExternalProject not set", () => {
         verifyAddRemoveConfig(
-          /*lazyConfiguredProjectsFromExternalProject*/ false
+          /*lazyConfiguredProjectsFromExternalProject*/ false,
         );
       });
       it("when lazyConfiguredProjectsFromExternalProject is set", () => {
         verifyAddRemoveConfig(
-          /*lazyConfiguredProjectsFromExternalProject*/ true
+          /*lazyConfiguredProjectsFromExternalProject*/ true,
         );
       });
     });
 
     describe("correctly handling add/remove tsconfig - 2", () => {
       function verifyAddRemoveConfig(
-        lazyConfiguredProjectsFromExternalProject: boolean
+        lazyConfiguredProjectsFromExternalProject: boolean,
       ) {
         const f1 = {
           path: "/a/b/app.ts",
@@ -849,11 +848,11 @@ namespace ts.projectSystem {
         if (lazyConfiguredProjectsFromExternalProject) {
           checkProjectActualFiles(
             configuredProjectAt(projectService, 0),
-            emptyArray
+            emptyArray,
           ); // Configured project created but not loaded till actually needed
           checkProjectActualFiles(
             configuredProjectAt(projectService, 1),
-            emptyArray
+            emptyArray,
           ); // Configured project created but not loaded till actually needed
           projectService.ensureInferredProjectsUpToDate_TestOnly();
         }
@@ -900,11 +899,11 @@ namespace ts.projectSystem {
         if (lazyConfiguredProjectsFromExternalProject) {
           checkProjectActualFiles(
             configuredProjectAt(projectService, 0),
-            emptyArray
+            emptyArray,
           ); // Configured project created but not loaded till actually needed
           checkProjectActualFiles(
             configuredProjectAt(projectService, 1),
-            emptyArray
+            emptyArray,
           ); // Configured project created but not loaded till actually needed
           projectService.ensureInferredProjectsUpToDate_TestOnly();
         }
@@ -924,12 +923,12 @@ namespace ts.projectSystem {
 
       it("when lazyConfiguredProjectsFromExternalProject not set", () => {
         verifyAddRemoveConfig(
-          /*lazyConfiguredProjectsFromExternalProject*/ false
+          /*lazyConfiguredProjectsFromExternalProject*/ false,
         );
       });
       it("when lazyConfiguredProjectsFromExternalProject is set", () => {
         verifyAddRemoveConfig(
-          /*lazyConfiguredProjectsFromExternalProject*/ true
+          /*lazyConfiguredProjectsFromExternalProject*/ true,
         );
       });
     });
@@ -1019,7 +1018,7 @@ namespace ts.projectSystem {
       projectService.checkNumberOfProjects({ configuredProjects: 1 });
       assert.strictEqual(
         projectService.configuredProjects.get(config.path),
-        project
+        project,
       );
       assert.isFalse(project.hasOpenRef()); // No files
       assert.isFalse(project.isClosed());
@@ -1028,7 +1027,7 @@ namespace ts.projectSystem {
       projectService.checkNumberOfProjects({ configuredProjects: 1 });
       assert.strictEqual(
         projectService.configuredProjects.get(config.path),
-        project
+        project,
       );
       assert.isTrue(project.hasOpenRef()); // f
       assert.isFalse(project.isClosed());
@@ -1099,7 +1098,7 @@ namespace ts.projectSystem {
       ]);
       checkNumberOfProjects(service, { configuredProjects: 1 });
       const configProject = service.configuredProjects.get(
-        tsconfig.path.toLowerCase()
+        tsconfig.path.toLowerCase(),
       )!;
       checkProjectActualFiles(configProject, [tsconfig.path]);
 
@@ -1118,7 +1117,7 @@ namespace ts.projectSystem {
           fileName: jsFilePath,
           scriptKind: ScriptKind.JS,
           content: "",
-        })
+        }),
       );
       checkNumberOfProjects(service, {
         configuredProjects: 1,
@@ -1136,7 +1135,7 @@ namespace ts.projectSystem {
       // Dont invoke file creation watchers as the repro suggests
       host.ensureFileOrFolder(
         jsConfig,
-        /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true
+        /*ignoreWatchInvokedWithTriggerAsFileCreate*/ true,
       );
 
       // Open external project
@@ -1158,7 +1157,7 @@ namespace ts.projectSystem {
       checkProjectActualFiles(configProject, [tsconfig.path]);
       assert.isTrue(inferredProject.isOrphan());
       const jsConfigProject = service.configuredProjects.get(
-        jsConfig.path.toLowerCase()
+        jsConfig.path.toLowerCase(),
       )!;
       checkProjectActualFiles(jsConfigProject, [
         jsConfig.path,

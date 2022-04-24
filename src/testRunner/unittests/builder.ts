@@ -4,14 +4,14 @@ namespace ts {
       const files: NamedSourceText[] = [
         {
           name: "/a.ts",
-          text: SourceText.New("", 'import { b } from "./b";', ""),
+          text: SourceText.New("", "import { b } from \"./b\";", ""),
         },
         {
           name: "/b.ts",
           text: SourceText.New(
             "",
-            ' import { c } from "./c";',
-            "export const b = c;"
+            " import { c } from \"./c\";",
+            "export const b = c;",
           ),
         },
         { name: "/c.ts", text: SourceText.New("", "", "export const c = 0;") },
@@ -52,14 +52,14 @@ namespace ts {
       program = updateProgramFile(
         program,
         "/a.ts",
-        "namespace A { export const x = 1; }"
+        "namespace A { export const x = 1; }",
       );
       assertChanges(["/a.js", "/b.js"]);
 
       program = updateProgramFile(
         program,
         "/b.ts",
-        "namespace B { export const x = 1; }"
+        "namespace B { export const x = 1; }",
       );
       assertChanges(["/b.js", "/a.js"]);
     });
@@ -68,14 +68,14 @@ namespace ts {
       const files: NamedSourceText[] = [
         {
           name: "/a.ts",
-          text: SourceText.New("", 'import { b } from "./b";', ""),
+          text: SourceText.New("", "import { b } from \"./b\";", ""),
         },
         {
           name: "/b.ts",
           text: SourceText.New(
             "",
-            ' import { c } from "./c";',
-            "export const b = c;"
+            " import { c } from \"./c\";",
+            "export const b = c;",
           ),
         },
         { name: "/c.ts", text: SourceText.New("", "", "export const c = 0;") },
@@ -85,7 +85,7 @@ namespace ts {
 
       let program = newProgram(files, ["/d.ts", "/e.ts", "/a.ts"], {});
       const assertChanges = makeAssertChangesWithCancellationToken(
-        () => program
+        () => program,
       );
       // No cancellation
       assertChanges(["/d.js", "/e.js", "/c.js", "/b.js", "/a.js"]);
@@ -94,14 +94,14 @@ namespace ts {
       program = updateProgramFile(
         program,
         "/a.ts",
-        "export function foo() { }"
+        "export function foo() { }",
       );
       assertChanges(["/a.js"], 0);
       // Change d.ts and verify previously pending a.ts is emitted as well
       program = updateProgramFile(
         program,
         "/d.ts",
-        "export function bar() { }"
+        "export function bar() { }",
       );
       assertChanges(["/a.js", "/d.js"]);
 
@@ -109,26 +109,26 @@ namespace ts {
       program = updateProgramFile(
         program,
         "/b.ts",
-        "export class b { foo() { c + 1; } }"
+        "export class b { foo() { c + 1; } }",
       );
       program = updateProgramFile(
         program,
         "/d.ts",
-        "export function bar2() { }"
+        "export function bar2() { }",
       );
       assertChanges(["/d.js", "/b.js", "/a.js"], 1);
       // Change e.ts and verify previously b.js as well as a.js get emitted again since previous change was consumed completely but not d.ts
       program = updateProgramFile(
         program,
         "/e.ts",
-        "export function bar3() { }"
+        "export function bar3() { }",
       );
       assertChanges(["/b.js", "/a.js", "/e.js"]);
     });
   });
 
   function makeAssertChanges(
-    getProgram: () => Program
+    getProgram: () => Program,
   ): (fileNames: readonly string[]) => void {
     const host: BuilderProgramHost = { useCaseSensitiveFileNames: returnTrue };
     let builderProgram: EmitAndSemanticDiagnosticsBuilderProgram | undefined;
@@ -137,21 +137,20 @@ namespace ts {
       builderProgram = createEmitAndSemanticDiagnosticsBuilderProgram(
         program,
         host,
-        builderProgram
+        builderProgram,
       );
       const outputFileNames: string[] = [];
       // eslint-disable-next-line no-empty
       while (
-        builderProgram.emitNextAffectedFile((fileName) =>
-          outputFileNames.push(fileName)
-        )
-      ) {}
+        builderProgram.emitNextAffectedFile((fileName) => outputFileNames.push(fileName))
+      ) {
+      }
       assert.deepEqual(outputFileNames, fileNames);
     };
   }
 
   function makeAssertChangesWithCancellationToken(
-    getProgram: () => Program
+    getProgram: () => Program,
   ): (fileNames: readonly string[], cancelAfterEmitLength?: number) => void {
     const host: BuilderProgramHost = { useCaseSensitiveFileNames: returnTrue };
     let builderProgram: EmitAndSemanticDiagnosticsBuilderProgram | undefined;
@@ -171,7 +170,7 @@ namespace ts {
       builderProgram = createEmitAndSemanticDiagnosticsBuilderProgram(
         program,
         host,
-        builderProgram
+        builderProgram,
       );
       const outputFileNames: string[] = [];
       try {
@@ -183,7 +182,7 @@ namespace ts {
         } while (
           builderProgram.emitNextAffectedFile(
             (fileName) => outputFileNames.push(fileName),
-            cancellationToken
+            cancellationToken,
           )
         );
       } catch (e) {
@@ -194,11 +193,11 @@ namespace ts {
       assert.equal(cancel, operationWasCancelled);
       assert.equal(
         operationWasCancelled,
-        fileNames.length > cancelAfterEmitLength!
+        fileNames.length > cancelAfterEmitLength!,
       );
       assert.deepEqual(
         outputFileNames,
-        fileNames.slice(0, cancelAfterEmitLength)
+        fileNames.slice(0, cancelAfterEmitLength),
       );
     };
   }
@@ -206,7 +205,7 @@ namespace ts {
   function updateProgramFile(
     program: ProgramWithSourceTexts,
     fileName: string,
-    fileContent: string
+    fileContent: string,
   ): ProgramWithSourceTexts {
     return updateProgram(
       program,
@@ -214,7 +213,7 @@ namespace ts {
       program.getCompilerOptions(),
       (files) => {
         updateProgramText(files, fileName, fileContent);
-      }
+      },
     );
   }
 }

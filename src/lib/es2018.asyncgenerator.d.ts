@@ -1,11 +1,10 @@
 /// <reference lib="es2018.asynciterable" />
 
-interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown>
-  extends AsyncIterator<T, TReturn, TNext> {
+interface AsyncGenerator<T = unknown, TReturn = any, TNext = unknown> extends AsyncIterator<T, TReturn, TNext> {
   // NOTE: 'next' is defined using a tuple to ensure we report the correct assignability errors in all places.
   next(...args: [] | [TNext]): Promise<IteratorResult<T, TReturn>>;
   return(
-    value: TReturn | PromiseLike<TReturn>
+    value: TReturn | PromiseLike<TReturn>,
   ): Promise<IteratorResult<T, TReturn>>;
   throw(e: any): Promise<IteratorResult<T, TReturn>>;
   [Symbol.asyncIterator](): AsyncGenerator<T, TReturn, TNext>;
@@ -16,7 +15,7 @@ interface AsyncGeneratorFunction {
    * Creates a new AsyncGenerator object.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: any[]): AsyncGenerator;
+  new(...args: any[]): AsyncGenerator;
   /**
    * Creates a new AsyncGenerator object.
    * @param args A list of arguments the function accepts.
@@ -41,7 +40,7 @@ interface AsyncGeneratorFunctionConstructor {
    * Creates a new AsyncGenerator function.
    * @param args A list of arguments the function accepts.
    */
-  new (...args: string[]): AsyncGeneratorFunction;
+  new(...args: string[]): AsyncGeneratorFunction;
   /**
    * Creates a new AsyncGenerator function.
    * @param args A list of arguments the function accepts.

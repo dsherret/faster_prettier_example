@@ -52,21 +52,21 @@ namespace ts.projectSystem {
       const { session, projectService } = setup();
       openFilesForSession([appSrcIndexTs], session);
       const project = projectService.configuredProjects.get(
-        appTsconfigJson.path
+        appTsconfigJson.path,
       )!;
       assert.deepEqual(
         project
           .getSymlinkCache()
           ?.getSymlinkedDirectories()
           ?.get((link.path + "/") as Path),
-        { real: "/packages/dep/", realPath: "/packages/dep/" as Path }
+        { real: "/packages/dep/", realPath: "/packages/dep/" as Path },
       );
     });
 
     it("works for paths close to the root", () => {
       const cache = createSymlinkCache(
         "/",
-        createGetCanonicalFileName(/*useCaseSensitiveFileNames*/ false)
+        createGetCanonicalFileName(/*useCaseSensitiveFileNames*/ false),
       );
       // Used to crash, #44953
       const map = createModeAwareCache<

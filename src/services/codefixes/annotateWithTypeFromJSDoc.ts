@@ -9,16 +9,14 @@ namespace ts.codefix {
     getCodeActions(context) {
       const decl = getDeclaration(context.sourceFile, context.span.start);
       if (!decl) return;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, context.sourceFile, decl)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, context.sourceFile, decl));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Annotate_with_type_from_JSDoc,
           fixId,
-          Diagnostics.Annotate_everything_with_types_from_JSDoc
+          Diagnostics.Annotate_everything_with_types_from_JSDoc,
         ),
       ];
     },
@@ -32,13 +30,13 @@ namespace ts.codefix {
 
   function getDeclaration(
     file: SourceFile,
-    pos: number
+    pos: number,
   ): DeclarationWithType | undefined {
     const name = getTokenAtPosition(file, pos);
     // For an arrow function with no name, 'name' lands on the first parameter.
     return tryCast(
       isParameter(name.parent) ? name.parent.parent : name.parent,
-      parameterShouldGetTypeFromJSDoc
+      parameterShouldGetTypeFromJSDoc,
     );
   }
 
@@ -49,90 +47,94 @@ namespace ts.codefix {
     | PropertyDeclaration;
 
   export function parameterShouldGetTypeFromJSDoc(
-    node: Node
+    node: Node,
   ): node is DeclarationWithType {
     return isDeclarationWithType(node) && hasUsableJSDoc(node);
   }
 
   function hasUsableJSDoc(
-    decl: DeclarationWithType | ParameterDeclaration
+    decl: DeclarationWithType | ParameterDeclaration,
   ): boolean {
     return isFunctionLikeDeclaration(decl)
-      ? decl.parameters.some(hasUsableJSDoc) ||
-          (!decl.type && !!getJSDocReturnType(decl))
+      ? decl.parameters.some(hasUsableJSDoc)
+        || (!decl.type && !!getJSDocReturnType(decl))
       : !decl.type && !!getJSDocType(decl);
   }
 
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    decl: DeclarationWithType
+    decl: DeclarationWithType,
   ): void {
     if (
-      isFunctionLikeDeclaration(decl) &&
-      (getJSDocReturnType(decl) ||
-        decl.parameters.some((p) => !!getJSDocType(p)))
+      isFunctionLikeDeclaration(decl)
+      && (getJSDocReturnType(decl)
+        || decl.parameters.some((p) => !!getJSDocType(p)))
     ) {
       if (!decl.typeParameters) {
         const typeParameters = getJSDocTypeParameterDeclarations(decl);
-        if (typeParameters.length)
+        if (typeParameters.length) {
           changes.insertTypeParameters(sourceFile, decl, typeParameters);
+        }
       }
-      const needParens =
-        isArrowFunction(decl) &&
-        !findChildOfKind(decl, SyntaxKind.OpenParenToken, sourceFile);
-      if (needParens)
+      const needParens = isArrowFunction(decl)
+        && !findChildOfKind(decl, SyntaxKind.OpenParenToken, sourceFile);
+      if (needParens) {
         changes.insertNodeBefore(
           sourceFile,
           first(decl.parameters),
-          factory.createToken(SyntaxKind.OpenParenToken)
+          factory.createToken(SyntaxKind.OpenParenToken),
         );
+      }
       for (const param of decl.parameters) {
         if (!param.type) {
           const paramType = getJSDocType(param);
-          if (paramType)
+          if (paramType) {
             changes.tryInsertTypeAnnotation(
               sourceFile,
               param,
-              transformJSDocType(paramType)
+              transformJSDocType(paramType),
             );
+          }
         }
       }
-      if (needParens)
+      if (needParens) {
         changes.insertNodeAfter(
           sourceFile,
           last(decl.parameters),
-          factory.createToken(SyntaxKind.CloseParenToken)
+          factory.createToken(SyntaxKind.CloseParenToken),
         );
+      }
       if (!decl.type) {
         const returnType = getJSDocReturnType(decl);
-        if (returnType)
+        if (returnType) {
           changes.tryInsertTypeAnnotation(
             sourceFile,
             decl,
-            transformJSDocType(returnType)
+            transformJSDocType(returnType),
           );
+        }
       }
     } else {
       const jsdocType = Debug.checkDefined(
         getJSDocType(decl),
-        "A JSDocType for this declaration should exist"
+        "A JSDocType for this declaration should exist",
       ); // If not defined, shouldn't have been an error to fix
       Debug.assert(!decl.type, "The JSDocType decl should have a type"); // If defined, shouldn't have been an error to fix.
       changes.tryInsertTypeAnnotation(
         sourceFile,
         decl,
-        transformJSDocType(jsdocType)
+        transformJSDocType(jsdocType),
       );
     }
   }
 
   function isDeclarationWithType(node: Node): node is DeclarationWithType {
     return (
-      isFunctionLikeDeclaration(node) ||
-      node.kind === SyntaxKind.VariableDeclaration ||
-      node.kind === SyntaxKind.PropertySignature ||
-      node.kind === SyntaxKind.PropertyDeclaration
+      isFunctionLikeDeclaration(node)
+      || node.kind === SyntaxKind.VariableDeclaration
+      || node.kind === SyntaxKind.PropertySignature
+      || node.kind === SyntaxKind.PropertyDeclaration
     );
   }
 
@@ -157,7 +159,7 @@ namespace ts.codefix {
         const visited = visitEachChild(
           node,
           transformJSDocType,
-          nullTransformationContext
+          nullTransformationContext,
         );
         setEmitFlags(visited, EmitFlags.SingleLine);
         return visited;
@@ -180,7 +182,7 @@ namespace ts.codefix {
 
   function transformJSDocVariadicType(node: JSDocVariadicType) {
     return factory.createArrayTypeNode(
-      visitNode(node.type, transformJSDocType)
+      visitNode(node.type, transformJSDocType),
     );
   }
 
@@ -190,15 +192,14 @@ namespace ts.codefix {
     return factory.createFunctionTypeNode(
       emptyArray,
       node.parameters.map(transformJSDocParameter),
-      node.type ?? factory.createKeywordTypeNode(SyntaxKind.AnyKeyword)
+      node.type ?? factory.createKeywordTypeNode(SyntaxKind.AnyKeyword),
     );
   }
 
   function transformJSDocParameter(node: ParameterDeclaration) {
     const index = node.parent.parameters.indexOf(node);
-    const isRest =
-      node.type!.kind === SyntaxKind.JSDocVariadicType &&
-      index === node.parent.parameters.length - 1; // TODO: GH#18217
+    const isRest = node.type!.kind === SyntaxKind.JSDocVariadicType
+      && index === node.parent.parameters.length - 1; // TODO: GH#18217
     const name = node.name || (isRest ? "rest" : "arg" + index);
     const dotdotdot = isRest
       ? factory.createToken(SyntaxKind.DotDotDotToken)
@@ -210,7 +211,7 @@ namespace ts.codefix {
       name,
       node.questionToken,
       visitNode(node.type, transformJSDocType),
-      node.initializer
+      node.initializer,
     );
   }
 
@@ -258,16 +259,16 @@ namespace ts.codefix {
         node.typeArguments![0].kind === SyntaxKind.NumberKeyword
           ? "number"
           : "string",
-        []
+        [],
       ),
-      /*initializer*/ undefined
+      /*initializer*/ undefined,
     );
     const indexSignature = factory.createTypeLiteralNode([
       factory.createIndexSignature(
         /*decorators*/ undefined,
         /*modifiers*/ undefined,
         [index],
-        node.typeArguments![1]
+        node.typeArguments![1],
       ),
     ]);
     setEmitFlags(indexSignature, EmitFlags.SingleLine);

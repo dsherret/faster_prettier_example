@@ -62,33 +62,33 @@ namespace ts.projectSystem {
       verifyConfigFileName(
         file2,
         "/a",
-        useCaseSensitiveFileNames ? configFile2 : configFile
+        useCaseSensitiveFileNames ? configFile2 : configFile,
       );
       verifyConfigFileName(
         file2,
         "/a/b",
-        useCaseSensitiveFileNames ? configFile2 : configFile
+        useCaseSensitiveFileNames ? configFile2 : configFile,
       );
       verifyConfigFileName(
         file2,
         "/a/B",
-        useCaseSensitiveFileNames ? undefined : configFile
+        useCaseSensitiveFileNames ? undefined : configFile,
       );
 
       function verifyConfigFileName(
         file: File,
         projectRoot: string,
-        expectedConfigFile: File | undefined
+        expectedConfigFile: File | undefined,
       ) {
         const { configFileName } = service.openClientFile(
           file.path,
           /*fileContent*/ undefined,
           /*scriptKind*/ undefined,
-          projectRoot
+          projectRoot,
         );
         assert.equal(
           configFileName,
-          expectedConfigFile && expectedConfigFile.path
+          expectedConfigFile && expectedConfigFile.path,
         );
         service.closeClientFile(file.path);
       }
@@ -118,7 +118,7 @@ namespace ts.projectSystem {
         aFile.path,
         /*fileContent*/ undefined,
         ScriptKind.TS,
-        projectFolder
+        projectFolder,
       );
       verifyProject();
 
@@ -132,7 +132,7 @@ namespace ts.projectSystem {
         bFile.path,
         /*fileContent*/ undefined,
         ScriptKind.TS,
-        projectFolder
+        projectFolder,
       );
       verifyProject();
 
@@ -141,7 +141,7 @@ namespace ts.projectSystem {
         const project = service.configuredProjects.get(configFile.path)!;
         checkProjectActualFiles(
           project,
-          files.map((f) => f.path)
+          files.map((f) => f.path),
         );
       }
     });
@@ -167,16 +167,16 @@ namespace ts.projectSystem {
           aFile.path,
           aFileContent,
           ScriptKind.TS,
-          projectFolder
+          projectFolder,
         );
         const project = service.configuredProjects.get(configFile.path)!;
         checkProjectActualFiles(
           project,
-          files.map((f) => f.path)
+          files.map((f) => f.path),
         );
         assert.equal(
           project.getCurrentProgram()?.getSourceFile(aFile.path)!.text,
-          aFileContent
+          aFileContent,
         );
       }
     });
@@ -210,7 +210,7 @@ bar();`,
       const tsIgnoreComment = `// @ts-ignore`;
       const locationOfTsIgnore = protocolTextSpanFromSubstring(
         file.content,
-        tsIgnoreComment
+        tsIgnoreComment,
       );
       session.executeCommandSeq<protocol.UpdateOpenRequest>({
         command: protocol.CommandTypes.UpdateOpen,
@@ -250,7 +250,7 @@ bar();`,
       baselineTsserverLogs(
         "openfile",
         "when file makes edits to add/remove comment directives, they are handled correcrly",
-        session
+        session,
       );
     });
   });

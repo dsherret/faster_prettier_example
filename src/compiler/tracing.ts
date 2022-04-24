@@ -40,7 +40,7 @@ namespace ts {
     export function startTracing(
       tracingMode: Mode,
       traceDir: string,
-      configFilePath?: string
+      configFilePath?: string,
     ) {
       Debug.assert(!tracing, "Tracing already started");
 
@@ -49,7 +49,7 @@ namespace ts {
           fs = require("fs");
         } catch (e) {
           throw new Error(
-            `tracing requires having fs\n(original error: ${e.message || e})`
+            `tracing requires having fs\n(original error: ${e.message || e})`,
           );
         }
       }
@@ -66,12 +66,11 @@ namespace ts {
         fs.mkdirSync(traceDir, { recursive: true });
       }
 
-      const countPart =
-        mode === "build"
-          ? `.${process.pid}-${++traceCount}`
-          : mode === "server"
-          ? `.${process.pid}`
-          : ``;
+      const countPart = mode === "build"
+        ? `.${process.pid}-${++traceCount}`
+        : mode === "server"
+        ? `.${process.pid}`
+        : ``;
       const tracePath = combinePaths(traceDir, `trace${countPart}.json`);
       const typesPath = combinePaths(traceDir, `types${countPart}.json`);
 
@@ -94,8 +93,8 @@ namespace ts {
       };
       fs.writeSync(
         traceFd,
-        "[\n" +
-          [
+        "[\n"
+          + [
             { name: "process_name", args: { name: "tsc" }, ...meta },
             { name: "thread_name", args: { name: "Main" }, ...meta },
             {
@@ -105,7 +104,7 @@ namespace ts {
             },
           ]
             .map((v) => JSON.stringify(v))
-            .join(",\n")
+            .join(",\n"),
       );
     }
 
@@ -165,7 +164,7 @@ namespace ts {
       phase: Phase,
       name: string,
       args?: Args,
-      separateBeginAndEnd = false
+      separateBeginAndEnd = false,
     ) {
       if (separateBeginAndEnd) {
         writeEvent("B", phase, name, args);
@@ -193,12 +192,10 @@ namespace ts {
     // sample every 10ms
     const sampleInterval = 1000 * 10;
     function writeStackEvent(index: number, endTime: number) {
-      const { phase, name, args, time, separateBeginAndEnd } =
-        eventStack[index];
+      const { phase, name, args, time, separateBeginAndEnd } = eventStack[index];
       if (separateBeginAndEnd) {
         writeEvent("E", phase, name, args, /*extras*/ undefined, endTime);
-      }
-      // test if [time,endTime) straddles a sampling point
+      } // test if [time,endTime) straddles a sampling point
       else if (sampleInterval - (time % sampleInterval) <= endTime - time) {
         writeEvent("X", phase, name, args, `"dur":${endTime - time}`, time);
       }
@@ -210,7 +207,7 @@ namespace ts {
       name: string,
       args: Args | undefined,
       extras?: string,
-      time: number = 1000 * timestamp()
+      time: number = 1000 * timestamp(),
     ) {
       // In server mode, there's no easy way to dump type information, so we drop events that would require it.
       if (mode === "server" && phase === Phase.CheckTypes) return;
@@ -218,7 +215,7 @@ namespace ts {
       performance.mark("beginTracing");
       fs.writeSync(
         traceFd,
-        `,\n{"pid":1,"tid":1,"ph":"${eventType}","cat":"${phase}","ts":${time},"name":"${name}"`
+        `,\n{"pid":1,"tid":1,"ph":"${eventType}","cat":"${phase}","ts":${time},"name":"${name}"`,
       );
       if (extras) fs.writeSync(traceFd, `,${extras}`);
       if (args) fs.writeSync(traceFd, `,"args":${JSON.stringify(args)}`);
@@ -232,10 +229,10 @@ namespace ts {
       return !file
         ? undefined
         : {
-            path: file.path,
-            start: indexFromOne(getLineAndCharacterOfPosition(file, node!.pos)),
-            end: indexFromOne(getLineAndCharacterOfPosition(file, node!.end)),
-          };
+          path: file.path,
+          start: indexFromOne(getLineAndCharacterOfPosition(file, node!.pos)),
+          end: indexFromOne(getLineAndCharacterOfPosition(file, node!.end)),
+        };
 
       function indexFromOne(lc: LineAndCharacter): LineAndCharacter {
         return {
@@ -265,8 +262,8 @@ namespace ts {
         // It's slow to compute the display text, so skip it unless it's really valuable (or cheap)
         let display: string | undefined;
         if (
-          (objectFlags & ObjectFlags.Anonymous) |
-          (type.flags & TypeFlags.Literal)
+          (objectFlags & ObjectFlags.Anonymous)
+          | (type.flags & TypeFlags.Literal)
         ) {
           try {
             display = type.checker?.typeToString(type);
@@ -290,7 +287,7 @@ namespace ts {
           referenceProperties = {
             instantiatedType: referenceType.target?.id,
             typeArguments: referenceType.resolvedTypeArguments?.map(
-              (t) => t.id
+              (t) => t.id,
             ),
             referenceLocation: getLocation(referenceType.node),
           };
@@ -350,24 +347,20 @@ namespace ts {
         const descriptor = {
           id: type.id,
           intrinsicName: (type as any).intrinsicName,
-          symbolName:
-            symbol?.escapedName &&
-            unescapeLeadingUnderscores(symbol.escapedName),
+          symbolName: symbol?.escapedName
+            && unescapeLeadingUnderscores(symbol.escapedName),
           recursionId: recursionToken,
           isTuple: objectFlags & ObjectFlags.Tuple ? true : undefined,
-          unionTypes:
-            type.flags & TypeFlags.Union
-              ? (type as UnionType).types?.map((t) => t.id)
-              : undefined,
-          intersectionTypes:
-            type.flags & TypeFlags.Intersection
-              ? (type as IntersectionType).types.map((t) => t.id)
-              : undefined,
+          unionTypes: type.flags & TypeFlags.Union
+            ? (type as UnionType).types?.map((t) => t.id)
+            : undefined,
+          intersectionTypes: type.flags & TypeFlags.Intersection
+            ? (type as IntersectionType).types.map((t) => t.id)
+            : undefined,
           aliasTypeArguments: type.aliasTypeArguments?.map((t) => t.id),
-          keyofType:
-            type.flags & TypeFlags.Index
-              ? (type as IndexType).type?.id
-              : undefined,
+          keyofType: type.flags & TypeFlags.Index
+            ? (type as IndexType).type?.id
+            : undefined,
           ...indexedAccessProperties,
           ...referenceProperties,
           ...conditionalProperties,

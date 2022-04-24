@@ -312,8 +312,8 @@ namespace ts {
 
     function transformSourceFile(node: SourceFile) {
       if (
-        node.isDeclarationFile ||
-        (node.transformFlags & TransformFlags.ContainsGenerator) === 0
+        node.isDeclarationFile
+        || (node.transformFlags & TransformFlags.ContainsGenerator) === 0
       ) {
         return node;
       }
@@ -349,7 +349,7 @@ namespace ts {
      * @param node The node to visit.
      */
     function visitJavaScriptInStatementContainingYield(
-      node: Node
+      node: Node,
     ): VisitResult<Node> {
       switch (node.kind) {
         case SyntaxKind.DoStatement:
@@ -371,7 +371,7 @@ namespace ts {
      * @param node The node to visit.
      */
     function visitJavaScriptInGeneratorFunctionBody(
-      node: Node
+      node: Node,
     ): VisitResult<Node> {
       switch (node.kind) {
         case SyntaxKind.FunctionDeclaration:
@@ -397,9 +397,9 @@ namespace ts {
           if (node.transformFlags & TransformFlags.ContainsYield) {
             return visitJavaScriptContainingYield(node);
           } else if (
-            node.transformFlags &
-            (TransformFlags.ContainsGenerator |
-              TransformFlags.ContainsHoistedDeclarationOrCompletion)
+            node.transformFlags
+            & (TransformFlags.ContainsGenerator
+              | TransformFlags.ContainsHoistedDeclarationOrCompletion)
           ) {
             return visitEachChild(node, visitor, context);
           } else {
@@ -466,7 +466,7 @@ namespace ts {
      * @param node The node to visit.
      */
     function visitFunctionDeclaration(
-      node: FunctionDeclaration
+      node: FunctionDeclaration,
     ): Statement | undefined {
       // Currently, we only support generators that were originally async functions.
       if (node.asteriskToken) {
@@ -480,11 +480,11 @@ namespace ts {
               /*typeParameters*/ undefined,
               visitParameterList(node.parameters, visitor, context),
               /*type*/ undefined,
-              transformGeneratorFunctionBody(node.body!)
+              transformGeneratorFunctionBody(node.body!),
             ),
-            /*location*/ node
+            /*location*/ node,
           ),
-          node
+          node,
         );
       } else {
         const savedInGeneratorFunctionBody = inGeneratorFunctionBody;
@@ -527,11 +527,11 @@ namespace ts {
               /*typeParameters*/ undefined,
               visitParameterList(node.parameters, visitor, context),
               /*type*/ undefined,
-              transformGeneratorFunctionBody(node.body)
+              transformGeneratorFunctionBody(node.body),
             ),
-            /*location*/ node
+            /*location*/ node,
           ),
-          node
+          node,
         );
       } else {
         const savedInGeneratorFunctionBody = inGeneratorFunctionBody;
@@ -609,7 +609,7 @@ namespace ts {
         body.statements,
         statements,
         /*ensureUseStrict*/ false,
-        visitor
+        visitor,
       );
 
       transformAndEmitStatements(body.statements, statementOffset);
@@ -617,7 +617,7 @@ namespace ts {
       const buildResult = build();
       insertStatementsAfterStandardPrologue(
         statements,
-        endLexicalEnvironment()
+        endLexicalEnvironment(),
       );
       statements.push(factory.createReturnStatement(buildResult));
 
@@ -638,7 +638,7 @@ namespace ts {
 
       return setTextRange(
         factory.createBlock(statements, body.multiLine),
-        body
+        body,
       );
     }
 
@@ -651,7 +651,7 @@ namespace ts {
      * @param node The node to visit.
      */
     function visitVariableStatement(
-      node: VariableStatement
+      node: VariableStatement,
     ): Statement | undefined {
       if (node.transformFlags & TransformFlags.ContainsYield) {
         transformAndEmitVariableDeclarationList(node.declarationList);
@@ -674,10 +674,10 @@ namespace ts {
         return setSourceMapRange(
           factory.createExpressionStatement(
             factory.inlineExpressions(
-              map(variables, transformInitializedVariable)
-            )
+              map(variables, transformInitializedVariable),
+            ),
           ),
-          node
+          node,
         );
       }
     }
@@ -729,10 +729,10 @@ namespace ts {
                 visitNode(
                   (left as PropertyAccessExpression).expression,
                   visitor,
-                  isLeftHandSideExpression
-                )
+                  isLeftHandSideExpression,
+                ),
               ),
-              (left as PropertyAccessExpression).name
+              (left as PropertyAccessExpression).name,
             );
             break;
 
@@ -754,16 +754,16 @@ namespace ts {
                 visitNode(
                   (left as ElementAccessExpression).expression,
                   visitor,
-                  isLeftHandSideExpression
-                )
+                  isLeftHandSideExpression,
+                ),
               ),
               cacheExpression(
                 visitNode(
                   (left as ElementAccessExpression).argumentExpression,
                   visitor,
-                  isExpression
-                )
-              )
+                  isExpression,
+                ),
+              ),
             );
             break;
 
@@ -781,19 +781,19 @@ namespace ts {
                 factory.createBinaryExpression(
                   cacheExpression(target),
                   getNonAssignmentOperatorForCompoundAssignment(operator),
-                  visitNode(right, visitor, isExpression)
+                  visitNode(right, visitor, isExpression),
                 ),
-                node
-              )
+                node,
+              ),
             ),
-            node
+            node,
           );
         } else {
           return factory.updateBinaryExpression(
             node,
             target,
             node.operatorToken,
-            visitNode(right, visitor, isExpression)
+            visitNode(right, visitor, isExpression),
           );
         }
       }
@@ -822,7 +822,7 @@ namespace ts {
           node,
           cacheExpression(visitNode(node.left, visitor, isExpression)),
           node.operatorToken,
-          visitNode(node.right, visitor, isExpression)
+          visitNode(node.right, visitor, isExpression),
         );
       }
 
@@ -851,8 +851,8 @@ namespace ts {
 
       function visit(node: Expression) {
         if (
-          isBinaryExpression(node) &&
-          node.operatorToken.kind === SyntaxKind.CommaToken
+          isBinaryExpression(node)
+          && node.operatorToken.kind === SyntaxKind.CommaToken
         ) {
           visit(node.left);
           visit(node.right);
@@ -860,7 +860,7 @@ namespace ts {
           if (containsYield(node) && pendingExpressions.length > 0) {
             emitWorker(OpCode.Statement, [
               factory.createExpressionStatement(
-                factory.inlineExpressions(pendingExpressions)
+                factory.inlineExpressions(pendingExpressions),
               ),
             ]);
             pendingExpressions = [];
@@ -881,15 +881,15 @@ namespace ts {
       let pendingExpressions: Expression[] = [];
       for (const elem of node.elements) {
         if (
-          isBinaryExpression(elem) &&
-          elem.operatorToken.kind === SyntaxKind.CommaToken
+          isBinaryExpression(elem)
+          && elem.operatorToken.kind === SyntaxKind.CommaToken
         ) {
           pendingExpressions.push(visitCommaExpression(elem));
         } else {
           if (containsYield(elem) && pendingExpressions.length > 0) {
             emitWorker(OpCode.Statement, [
               factory.createExpressionStatement(
-                factory.inlineExpressions(pendingExpressions)
+                factory.inlineExpressions(pendingExpressions),
               ),
             ]);
             pendingExpressions = [];
@@ -941,7 +941,7 @@ namespace ts {
       emitAssignment(
         resultLocal,
         visitNode(node.left, visitor, isExpression),
-        /*location*/ node.left
+        /*location*/ node.left,
       );
       if (node.operatorToken.kind === SyntaxKind.AmpersandAmpersandToken) {
         // Logical `&&` shortcuts when the left-hand operand is falsey.
@@ -954,7 +954,7 @@ namespace ts {
       emitAssignment(
         resultLocal,
         visitNode(node.right, visitor, isExpression),
-        /*location*/ node.right
+        /*location*/ node.right,
       );
       markLabel(resultLabel);
       return resultLocal;
@@ -966,7 +966,7 @@ namespace ts {
      * @param node The node to visit.
      */
     function visitConditionalExpression(
-      node: ConditionalExpression
+      node: ConditionalExpression,
     ): Expression {
       // [source]
       //      x = a() ? yield : b();
@@ -993,19 +993,19 @@ namespace ts {
         emitBreakWhenFalse(
           whenFalseLabel,
           visitNode(node.condition, visitor, isExpression),
-          /*location*/ node.condition
+          /*location*/ node.condition,
         );
         emitAssignment(
           resultLocal,
           visitNode(node.whenTrue, visitor, isExpression),
-          /*location*/ node.whenTrue
+          /*location*/ node.whenTrue,
         );
         emitBreak(resultLabel);
         markLabel(whenFalseLabel);
         emitAssignment(
           resultLocal,
           visitNode(node.whenFalse, visitor, isExpression),
-          /*location*/ node.whenFalse
+          /*location*/ node.whenFalse,
         );
         markLabel(resultLabel);
         return resultLocal;
@@ -1020,7 +1020,7 @@ namespace ts {
      * @param node The node to visit.
      */
     function visitYieldExpression(
-      node: YieldExpression
+      node: YieldExpression,
     ): LeftHandSideExpression {
       // [source]
       //      x = yield a();
@@ -1034,10 +1034,9 @@ namespace ts {
       const expression = visitNode(node.expression, visitor, isExpression);
       if (node.asteriskToken) {
         // NOTE: `expression` must be defined for `yield*`.
-        const iterator =
-          (getEmitFlags(node.expression!) & EmitFlags.Iterator) === 0
-            ? setTextRange(emitHelpers().createValuesHelper(expression!), node)
-            : expression;
+        const iterator = (getEmitFlags(node.expression!) & EmitFlags.Iterator) === 0
+          ? setTextRange(emitHelpers().createValuesHelper(expression!), node)
+          : expression;
         emitYieldStar(iterator, /*location*/ node);
       } else {
         emitYield(expression, /*location*/ node);
@@ -1057,7 +1056,7 @@ namespace ts {
         node.elements,
         /*leadingElement*/ undefined,
         /*location*/ undefined,
-        node.multiLine
+        node.multiLine,
       );
     }
 
@@ -1072,7 +1071,7 @@ namespace ts {
       elements: NodeArray<Expression>,
       leadingElement?: Expression,
       location?: TextRange,
-      multiLine?: boolean
+      multiLine?: boolean,
     ) {
       // [source]
       //      ar = [1, yield, 2];
@@ -1094,15 +1093,15 @@ namespace ts {
           visitor,
           isExpression,
           0,
-          numInitialElements
+          numInitialElements,
         );
         emitAssignment(
           temp,
           factory.createArrayLiteralExpression(
             leadingElement
               ? [leadingElement, ...initialElements]
-              : initialElements
-          )
+              : initialElements,
+          ),
         );
         leadingElement = undefined;
       }
@@ -1111,19 +1110,19 @@ namespace ts {
         elements,
         reduceElement,
         [] as Expression[],
-        numInitialElements
+        numInitialElements,
       );
       return temp
         ? factory.createArrayConcatCall(temp, [
-            factory.createArrayLiteralExpression(expressions, multiLine),
-          ])
+          factory.createArrayLiteralExpression(expressions, multiLine),
+        ])
         : setTextRange(
-            factory.createArrayLiteralExpression(
-              leadingElement ? [leadingElement, ...expressions] : expressions,
-              multiLine
-            ),
-            location
-          );
+          factory.createArrayLiteralExpression(
+            leadingElement ? [leadingElement, ...expressions] : expressions,
+            multiLine,
+          ),
+          location,
+        );
 
       function reduceElement(expressions: Expression[], element: Expression) {
         if (containsYield(element) && expressions.length > 0) {
@@ -1136,14 +1135,14 @@ namespace ts {
             temp,
             hasAssignedTemp
               ? factory.createArrayConcatCall(temp, [
-                  factory.createArrayLiteralExpression(expressions, multiLine),
-                ])
+                factory.createArrayLiteralExpression(expressions, multiLine),
+              ])
               : factory.createArrayLiteralExpression(
-                  leadingElement
-                    ? [leadingElement, ...expressions]
-                    : expressions,
-                  multiLine
-                )
+                leadingElement
+                  ? [leadingElement, ...expressions]
+                  : expressions,
+                multiLine,
+              ),
           );
           leadingElement = undefined;
           expressions = [];
@@ -1186,40 +1185,40 @@ namespace ts {
             visitor,
             isObjectLiteralElementLike,
             0,
-            numInitialProperties
+            numInitialProperties,
           ),
-          multiLine
-        )
+          multiLine,
+        ),
       );
 
       const expressions = reduceLeft(
         properties,
         reduceProperty,
         [] as Expression[],
-        numInitialProperties
+        numInitialProperties,
       );
       // TODO(rbuckton): Does this need to be parented?
       expressions.push(
         multiLine
           ? startOnNewLine(
-              setParent(
-                setTextRange(factory.cloneNode(temp), temp),
-                temp.parent
-              )
-            )
-          : temp
+            setParent(
+              setTextRange(factory.cloneNode(temp), temp),
+              temp.parent,
+            ),
+          )
+          : temp,
       );
       return factory.inlineExpressions(expressions);
 
       function reduceProperty(
         expressions: Expression[],
-        property: ObjectLiteralElementLike
+        property: ObjectLiteralElementLike,
       ) {
         if (containsYield(property) && expressions.length > 0) {
           emitStatement(
             factory.createExpressionStatement(
-              factory.inlineExpressions(expressions)
-            )
+              factory.inlineExpressions(expressions),
+            ),
           );
           expressions = [];
         }
@@ -1228,7 +1227,7 @@ namespace ts {
           factory,
           node,
           property,
-          temp
+          temp,
         );
         const visited = visitNode(expression, visitor, isExpression);
         if (visited) {
@@ -1261,9 +1260,9 @@ namespace ts {
         return factory.updateElementAccessExpression(
           node,
           cacheExpression(
-            visitNode(node.expression, visitor, isLeftHandSideExpression)
+            visitNode(node.expression, visitor, isLeftHandSideExpression),
           ),
-          visitNode(node.argumentExpression, visitor, isExpression)
+          visitNode(node.argumentExpression, visitor, isExpression),
         );
       }
 
@@ -1286,20 +1285,20 @@ namespace ts {
           node.expression,
           hoistVariableDeclaration,
           languageVersion,
-          /*cacheIdentifiers*/ true
+          /*cacheIdentifiers*/ true,
         );
         return setOriginalNode(
           setTextRange(
             factory.createFunctionApplyCall(
               cacheExpression(
-                visitNode(target, visitor, isLeftHandSideExpression)
+                visitNode(target, visitor, isLeftHandSideExpression),
               ),
               thisArg,
-              visitElements(node.arguments)
+              visitElements(node.arguments),
             ),
-            node
+            node,
           ),
-          node
+          node,
         );
       }
 
@@ -1321,7 +1320,7 @@ namespace ts {
 
         const { target, thisArg } = factory.createCallBinding(
           factory.createPropertyAccessExpression(node.expression, "bind"),
-          hoistVariableDeclaration
+          hoistVariableDeclaration,
         );
         return setOriginalNode(
           setTextRange(
@@ -1331,15 +1330,15 @@ namespace ts {
                 thisArg,
                 visitElements(
                   node.arguments!,
-                  /*leadingElement*/ factory.createVoidZero()
-                )
+                  /*leadingElement*/ factory.createVoidZero(),
+                ),
               ),
               /*typeArguments*/ undefined,
-              []
+              [],
             ),
-            node
+            node,
           ),
-          node
+          node,
         );
       }
       return visitEachChild(node, visitor, context);
@@ -1347,7 +1346,7 @@ namespace ts {
 
     function transformAndEmitStatements(
       statements: readonly Statement[],
-      start = 0
+      start = 0,
     ) {
       const numStatements = statements.length;
       for (let i = start; i < numStatements; i++) {
@@ -1379,7 +1378,7 @@ namespace ts {
           return transformAndEmitBlock(node as Block);
         case SyntaxKind.ExpressionStatement:
           return transformAndEmitExpressionStatement(
-            node as ExpressionStatement
+            node as ExpressionStatement,
           );
         case SyntaxKind.IfStatement:
           return transformAndEmitIfStatement(node as IfStatement);
@@ -1425,7 +1424,7 @@ namespace ts {
     }
 
     function transformAndEmitVariableDeclarationList(
-      node: VariableDeclarationList
+      node: VariableDeclarationList,
     ): VariableDeclarationList | undefined {
       for (const variable of node.declarations) {
         const name = factory.cloneNode(variable.name as Identifier);
@@ -1441,8 +1440,8 @@ namespace ts {
         for (let i = variablesWritten; i < numVariables; i++) {
           const variable = variables[i];
           if (
-            containsYield(variable.initializer) &&
-            pendingExpressions.length > 0
+            containsYield(variable.initializer)
+            && pendingExpressions.length > 0
           ) {
             break;
           }
@@ -1453,8 +1452,8 @@ namespace ts {
         if (pendingExpressions.length) {
           emitStatement(
             factory.createExpressionStatement(
-              factory.inlineExpressions(pendingExpressions)
-            )
+              factory.inlineExpressions(pendingExpressions),
+            ),
           );
           variablesWritten += pendingExpressions.length;
           pendingExpressions = [];
@@ -1465,17 +1464,17 @@ namespace ts {
     }
 
     function transformInitializedVariable(
-      node: InitializedVariableDeclaration
+      node: InitializedVariableDeclaration,
     ) {
       return setSourceMapRange(
         factory.createAssignment(
           setSourceMapRange(
             factory.cloneNode(node.name) as Identifier,
-            node.name
+            node.name,
           ),
-          visitNode(node.initializer, visitor, isExpression)
+          visitNode(node.initializer, visitor, isExpression),
         ),
-        node
+        node,
       );
     }
 
@@ -1496,15 +1495,15 @@ namespace ts {
         //  .mark endLabel
 
         if (
-          containsYield(node.thenStatement) ||
-          containsYield(node.elseStatement)
+          containsYield(node.thenStatement)
+          || containsYield(node.elseStatement)
         ) {
           const endLabel = defineLabel();
           const elseLabel = node.elseStatement ? defineLabel() : undefined;
           emitBreakWhenFalse(
             node.elseStatement ? elseLabel! : endLabel,
             visitNode(node.expression, visitor, isExpression),
-            /*location*/ node.expression
+            /*location*/ node.expression,
           );
           transformAndEmitEmbeddedStatement(node.thenStatement);
           if (node.elseStatement) {
@@ -1546,7 +1545,7 @@ namespace ts {
         markLabel(conditionLabel);
         emitBreakWhenTrue(
           loopLabel,
-          visitNode(node.expression, visitor, isExpression)
+          visitNode(node.expression, visitor, isExpression),
         );
         endLoopBlock();
       } else {
@@ -1586,7 +1585,7 @@ namespace ts {
         markLabel(loopLabel);
         emitBreakWhenFalse(
           endLabel,
-          visitNode(node.expression, visitor, isExpression)
+          visitNode(node.expression, visitor, isExpression),
         );
         transformAndEmitEmbeddedStatement(node.statement);
         emitBreak(loopLabel);
@@ -1638,10 +1637,10 @@ namespace ts {
             emitStatement(
               setTextRange(
                 factory.createExpressionStatement(
-                  visitNode(initializer, visitor, isExpression)
+                  visitNode(initializer, visitor, isExpression),
                 ),
-                initializer
-              )
+                initializer,
+              ),
             );
           }
         }
@@ -1650,7 +1649,7 @@ namespace ts {
         if (node.condition) {
           emitBreakWhenFalse(
             endLabel,
-            visitNode(node.condition, visitor, isExpression)
+            visitNode(node.condition, visitor, isExpression),
           );
         }
 
@@ -1661,10 +1660,10 @@ namespace ts {
           emitStatement(
             setTextRange(
               factory.createExpressionStatement(
-                visitNode(node.incrementor, visitor, isExpression)
+                visitNode(node.incrementor, visitor, isExpression),
               ),
-              node.incrementor
-            )
+              node.incrementor,
+            ),
           );
         }
         emitBreak(conditionLabel);
@@ -1690,12 +1689,12 @@ namespace ts {
           node,
           variables.length > 0
             ? factory.inlineExpressions(
-                map(variables, transformInitializedVariable)
-              )
+              map(variables, transformInitializedVariable),
+            )
             : undefined,
           visitNode(node.condition, visitor, isExpression),
           visitNode(node.incrementor, visitor, isExpression),
-          visitIterationBody(node.statement, visitor, context)
+          visitIterationBody(node.statement, visitor, context),
         );
       } else {
         node = visitEachChild(node, visitor, context);
@@ -1747,10 +1746,10 @@ namespace ts {
               factory.createCallExpression(
                 factory.createPropertyAccessExpression(keysArray, "push"),
                 /*typeArguments*/ undefined,
-                [key]
-              )
-            )
-          )
+                [key],
+              ),
+            ),
+          ),
         );
 
         emitAssignment(keysIndex, factory.createNumericLiteral(0));
@@ -1764,8 +1763,8 @@ namespace ts {
           endLabel,
           factory.createLessThan(
             keysIndex,
-            factory.createPropertyAccessExpression(keysArray, "length")
-          )
+            factory.createPropertyAccessExpression(keysArray, "length"),
+          ),
         );
 
         let variable: Expression;
@@ -1775,7 +1774,7 @@ namespace ts {
           }
 
           variable = factory.cloneNode(
-            initializer.declarations[0].name
+            initializer.declarations[0].name,
           ) as Identifier;
         } else {
           variable = visitNode(initializer, visitor, isExpression);
@@ -1784,15 +1783,15 @@ namespace ts {
 
         emitAssignment(
           variable,
-          factory.createElementAccessExpression(keysArray, keysIndex)
+          factory.createElementAccessExpression(keysArray, keysIndex),
         );
         transformAndEmitEmbeddedStatement(node.statement);
 
         markLabel(incrementLabel);
         emitStatement(
           factory.createExpressionStatement(
-            factory.createPostfixIncrement(keysIndex)
-          )
+            factory.createPostfixIncrement(keysIndex),
+          ),
         );
 
         emitBreak(conditionLabel);
@@ -1830,7 +1829,7 @@ namespace ts {
           node,
           initializer.declarations[0].name as Identifier,
           visitNode(node.expression, visitor, isExpression),
-          visitNode(node.statement, visitor, isStatement, factory.liftToBlock)
+          visitNode(node.statement, visitor, isStatement, factory.liftToBlock),
         );
       } else {
         node = visitEachChild(node, visitor, context);
@@ -1845,7 +1844,7 @@ namespace ts {
 
     function transformAndEmitContinueStatement(node: ContinueStatement): void {
       const label = findContinueTarget(
-        node.label ? idText(node.label) : undefined
+        node.label ? idText(node.label) : undefined,
       );
       if (label > 0) {
         emitBreak(label, /*location*/ node);
@@ -1868,7 +1867,7 @@ namespace ts {
 
     function transformAndEmitBreakStatement(node: BreakStatement): void {
       const label = findBreakTarget(
-        node.label ? idText(node.label) : undefined
+        node.label ? idText(node.label) : undefined,
       );
       if (label > 0) {
         emitBreak(label, /*location*/ node);
@@ -1892,14 +1891,14 @@ namespace ts {
     function transformAndEmitReturnStatement(node: ReturnStatement): void {
       emitReturn(
         visitNode(node.expression, visitor, isExpression),
-        /*location*/ node
+        /*location*/ node,
       );
     }
 
     function visitReturnStatement(node: ReturnStatement) {
       return createInlineReturn(
         visitNode(node.expression, visitor, isExpression),
-        /*location*/ node
+        /*location*/ node,
       );
     }
 
@@ -1915,7 +1914,7 @@ namespace ts {
         //      /*body*/
         //  .endwith
         beginWithBlock(
-          cacheExpression(visitNode(node.expression, visitor, isExpression))
+          cacheExpression(visitNode(node.expression, visitor, isExpression)),
         );
         transformAndEmitEmbeddedStatement(node.statement);
         endWithBlock();
@@ -1963,7 +1962,7 @@ namespace ts {
         const endLabel = beginSwitchBlock();
 
         const expression = cacheExpression(
-          visitNode(node.expression, visitor, isExpression)
+          visitNode(node.expression, visitor, isExpression),
         );
 
         // Create labels for each clause and find the index of the first default clause.
@@ -1973,8 +1972,8 @@ namespace ts {
           const clause = caseBlock.clauses[i];
           clauseLabels.push(defineLabel());
           if (
-            clause.kind === SyntaxKind.DefaultClause &&
-            defaultClauseIndex === -1
+            clause.kind === SyntaxKind.DefaultClause
+            && defaultClauseIndex === -1
           ) {
             defaultClauseIndex = i;
           }
@@ -1991,8 +1990,8 @@ namespace ts {
             const clause = caseBlock.clauses[i];
             if (clause.kind === SyntaxKind.CaseClause) {
               if (
-                containsYield(clause.expression) &&
-                pendingClauses.length > 0
+                containsYield(clause.expression)
+                && pendingClauses.length > 0
               ) {
                 break;
               }
@@ -2003,10 +2002,10 @@ namespace ts {
                   [
                     createInlineBreak(
                       clauseLabels[i],
-                      /*location*/ clause.expression
+                      /*location*/ clause.expression,
                     ),
-                  ]
-                )
+                  ],
+                ),
               );
             } else {
               defaultClausesSkipped++;
@@ -2017,8 +2016,8 @@ namespace ts {
             emitStatement(
               factory.createSwitchStatement(
                 expression,
-                factory.createCaseBlock(pendingClauses)
-              )
+                factory.createCaseBlock(pendingClauses),
+              ),
             );
             clausesWritten += pendingClauses.length;
             pendingClauses = [];
@@ -2100,9 +2099,9 @@ namespace ts {
         visitNode(
           node.expression ?? factory.createVoidZero(),
           visitor,
-          isExpression
+          isExpression,
         ),
-        /*location*/ node
+        /*location*/ node,
       );
     }
 
@@ -2190,21 +2189,20 @@ namespace ts {
 
     function substituteExpressionIdentifier(node: Identifier) {
       if (
-        !isGeneratedIdentifier(node) &&
-        renamedCatchVariables &&
-        renamedCatchVariables.has(idText(node))
+        !isGeneratedIdentifier(node)
+        && renamedCatchVariables
+        && renamedCatchVariables.has(idText(node))
       ) {
         const original = getOriginalNode(node);
         if (isIdentifier(original) && original.parent) {
           const declaration = resolver.getReferencedValueDeclaration(original);
           if (declaration) {
-            const name =
-              renamedCatchVariableDeclarations[getOriginalNodeId(declaration)];
+            const name = renamedCatchVariableDeclarations[getOriginalNodeId(declaration)];
             if (name) {
               // TODO(rbuckton): Does this need to be parented?
               const clone = setParent(
                 setTextRange(factory.cloneNode(name), name),
-                name.parent
+                name.parent,
               );
               setSourceMapRange(clone, node);
               setCommentRange(clone, node);
@@ -2219,8 +2217,8 @@ namespace ts {
 
     function cacheExpression(node: Expression): Identifier {
       if (
-        isGeneratedIdentifier(node) ||
-        getEmitFlags(node) & EmitFlags.HelperName
+        isGeneratedIdentifier(node)
+        || getEmitFlags(node) & EmitFlags.HelperName
       ) {
         return node as Identifier;
       }
@@ -2286,8 +2284,9 @@ namespace ts {
      */
     function endBlock(): CodeBlock {
       const block = peekBlock();
-      if (block === undefined)
+      if (block === undefined) {
         return Debug.fail("beginBlock was never called.");
+      }
 
       const index = blockActions!.length;
       blockActions![index] = BlockAction.Close;
@@ -2398,8 +2397,8 @@ namespace ts {
         factory.createCallExpression(
           factory.createPropertyAccessExpression(state, "sent"),
           /*typeArguments*/ undefined,
-          []
-        )
+          [],
+        ),
       );
       emitNop();
     }
@@ -2490,7 +2489,6 @@ namespace ts {
     /**
      * Begins a code block that supports `break` statements that are defined in the source
      * tree and not from generated code.
-     *
      */
     function beginScriptSwitchBlock(): void {
       beginBlock({
@@ -2560,7 +2558,7 @@ namespace ts {
      * @param block A code block.
      */
     function supportsUnlabeledBreak(
-      block: CodeBlock
+      block: CodeBlock,
     ): block is SwitchBlock | LoopBlock {
       return (
         block.kind === CodeBlockKind.Switch || block.kind === CodeBlockKind.Loop
@@ -2573,7 +2571,7 @@ namespace ts {
      * @param block A code block.
      */
     function supportsLabeledBreakOrContinue(
-      block: CodeBlock
+      block: CodeBlock,
     ): block is LabeledBlock {
       return block.kind === CodeBlockKind.Labeled;
     }
@@ -2589,7 +2587,7 @@ namespace ts {
 
     function hasImmediateContainingLabeledBlock(
       labelText: string,
-      start: number
+      start: number,
     ) {
       for (let j = start; j >= 0; j--) {
         const containingBlock = blockStack![j];
@@ -2616,13 +2614,13 @@ namespace ts {
           for (let i = blockStack.length - 1; i >= 0; i--) {
             const block = blockStack[i];
             if (
-              supportsLabeledBreakOrContinue(block) &&
-              block.labelText === labelText
+              supportsLabeledBreakOrContinue(block)
+              && block.labelText === labelText
             ) {
               return block.breakLabel;
             } else if (
-              supportsUnlabeledBreak(block) &&
-              hasImmediateContainingLabeledBlock(labelText, i - 1)
+              supportsUnlabeledBreak(block)
+              && hasImmediateContainingLabeledBlock(labelText, i - 1)
             ) {
               return block.breakLabel;
             }
@@ -2650,8 +2648,8 @@ namespace ts {
           for (let i = blockStack.length - 1; i >= 0; i--) {
             const block = blockStack[i];
             if (
-              supportsUnlabeledContinue(block) &&
-              hasImmediateContainingLabeledBlock(labelText, i - 1)
+              supportsUnlabeledContinue(block)
+              && hasImmediateContainingLabeledBlock(labelText, i - 1)
             ) {
               return block.continueLabel;
             }
@@ -2700,7 +2698,7 @@ namespace ts {
       addSyntheticTrailingComment(
         literal,
         SyntaxKind.MultiLineCommentTrivia,
-        getInstructionName(instruction)
+        getInstructionName(instruction),
       );
       return literal;
     }
@@ -2713,7 +2711,7 @@ namespace ts {
      */
     function createInlineBreak(
       label: Label,
-      location?: TextRange
+      location?: TextRange,
     ): ReturnStatement {
       Debug.assertLessThan(0, label, "Invalid label");
       return setTextRange(
@@ -2721,9 +2719,9 @@ namespace ts {
           factory.createArrayLiteralExpression([
             createInstruction(Instruction.Break),
             createLabel(label),
-          ])
+          ]),
         ),
-        location
+        location,
       );
     }
 
@@ -2735,17 +2733,17 @@ namespace ts {
      */
     function createInlineReturn(
       expression?: Expression,
-      location?: TextRange
+      location?: TextRange,
     ): ReturnStatement {
       return setTextRange(
         factory.createReturnStatement(
           factory.createArrayLiteralExpression(
             expression
               ? [createInstruction(Instruction.Return), expression]
-              : [createInstruction(Instruction.Return)]
-          )
+              : [createInstruction(Instruction.Return)],
+          ),
         ),
-        location
+        location,
       );
     }
 
@@ -2753,15 +2751,15 @@ namespace ts {
      * Creates an expression that can be used to resume from a Yield operation.
      */
     function createGeneratorResume(
-      location?: TextRange
+      location?: TextRange,
     ): LeftHandSideExpression {
       return setTextRange(
         factory.createCallExpression(
           factory.createPropertyAccessExpression(state, "sent"),
           /*typeArguments*/ undefined,
-          []
+          [],
         ),
-        location
+        location,
       );
     }
 
@@ -2795,7 +2793,7 @@ namespace ts {
     function emitAssignment(
       left: Expression,
       right: Expression,
-      location?: TextRange
+      location?: TextRange,
     ): void {
       emitWorker(OpCode.Assign, [left, right], location);
     }
@@ -2821,7 +2819,7 @@ namespace ts {
     function emitBreakWhenTrue(
       label: Label,
       condition: Expression,
-      location?: TextRange
+      location?: TextRange,
     ): void {
       emitWorker(OpCode.BreakWhenTrue, [label, condition], location);
     }
@@ -2837,7 +2835,7 @@ namespace ts {
     function emitBreakWhenFalse(
       label: Label,
       condition: Expression,
-      location?: TextRange
+      location?: TextRange,
     ): void {
       emitWorker(OpCode.BreakWhenFalse, [label, condition], location);
     }
@@ -2850,7 +2848,7 @@ namespace ts {
      */
     function emitYieldStar(
       expression?: Expression,
-      location?: TextRange
+      location?: TextRange,
     ): void {
       emitWorker(OpCode.YieldStar, [expression], location);
     }
@@ -2901,7 +2899,7 @@ namespace ts {
     function emitWorker(
       code: OpCode,
       args?: OperationArguments,
-      location?: TextRange
+      location?: TextRange,
     ): void {
       if (operations === undefined) {
         operations = [];
@@ -2948,17 +2946,17 @@ namespace ts {
                 /*decorators*/ undefined,
                 /*modifiers*/ undefined,
                 /*dotDotDotToken*/ undefined,
-                state
+                state,
               ),
             ],
             /*type*/ undefined,
             factory.createBlock(
               buildResult,
-              /*multiLine*/ buildResult.length > 0
-            )
+              /*multiLine*/ buildResult.length > 0,
+            ),
           ),
-          EmitFlags.ReuseTempVariableScope
-        )
+          EmitFlags.ReuseTempVariableScope,
+        ),
       );
     }
 
@@ -2983,11 +2981,11 @@ namespace ts {
       if (clauses) {
         const labelExpression = factory.createPropertyAccessExpression(
           state,
-          "label"
+          "label",
         );
         const switchStatement = factory.createSwitchStatement(
           labelExpression,
-          factory.createCaseBlock(clauses)
+          factory.createCaseBlock(clauses),
         );
         return [startOnNewLine(switchStatement)];
       }
@@ -3080,7 +3078,7 @@ namespace ts {
             statements = [
               factory.createWithStatement(
                 withBlock.expression,
-                factory.createBlock(statements)
+                factory.createBlock(statements),
               ),
             ];
           }
@@ -3090,14 +3088,13 @@ namespace ts {
           // The previous label was nested inside of an exception block, so we must
           // indicate entry into a protected region by pushing the label numbers
           // for each block in the protected region.
-          const { startLabel, catchLabel, finallyLabel, endLabel } =
-            currentExceptionBlock;
+          const { startLabel, catchLabel, finallyLabel, endLabel } = currentExceptionBlock;
           statements.unshift(
             factory.createExpressionStatement(
               factory.createCallExpression(
                 factory.createPropertyAccessExpression(
                   factory.createPropertyAccessExpression(state, "trys"),
-                  "push"
+                  "push",
                 ),
                 /*typeArguments*/ undefined,
                 [
@@ -3107,9 +3104,9 @@ namespace ts {
                     createLabel(finallyLabel),
                     createLabel(endLabel),
                   ]),
-                ]
-              )
-            )
+                ],
+              ),
+            ),
           );
 
           currentExceptionBlock = undefined;
@@ -3122,9 +3119,9 @@ namespace ts {
             factory.createExpressionStatement(
               factory.createAssignment(
                 factory.createPropertyAccessExpression(state, "label"),
-                factory.createNumericLiteral(labelNumber + 1)
-              )
-            )
+                factory.createNumericLiteral(labelNumber + 1),
+              ),
+            ),
           );
         }
       }
@@ -3132,8 +3129,8 @@ namespace ts {
       clauses.push(
         factory.createCaseClause(
           factory.createNumericLiteral(labelNumber),
-          statements || []
-        )
+          statements || [],
+        ),
       );
 
       statements = undefined;
@@ -3194,8 +3191,8 @@ namespace ts {
       if (blocks) {
         for (
           ;
-          blockIndex < blockActions!.length &&
-          blockOffsets![blockIndex] <= operationIndex;
+          blockIndex < blockActions!.length
+          && blockOffsets![blockIndex] <= operationIndex;
           blockIndex++
         ) {
           const block: CodeBlock = blocks[blockIndex];
@@ -3228,7 +3225,7 @@ namespace ts {
                 withBlockStack!.pop();
               }
               break;
-            // default: do nothing
+              // default: do nothing
           }
         }
       }
@@ -3269,7 +3266,7 @@ namespace ts {
           return writeAssign(
             args[0] as Expression,
             args[1] as Expression,
-            location
+            location,
           );
         case OpCode.Break:
           return writeBreak(args[0] as Label, location);
@@ -3277,13 +3274,13 @@ namespace ts {
           return writeBreakWhenTrue(
             args[0] as Label,
             args[1] as Expression,
-            location
+            location,
           );
         case OpCode.BreakWhenFalse:
           return writeBreakWhenFalse(
             args[0] as Label,
             args[1] as Expression,
-            location
+            location,
           );
         case OpCode.Yield:
           return writeYield(args[0] as Expression, location);
@@ -3321,15 +3318,15 @@ namespace ts {
     function writeAssign(
       left: Expression,
       right: Expression,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       writeStatement(
         setTextRange(
           factory.createExpressionStatement(
-            factory.createAssignment(left, right)
+            factory.createAssignment(left, right),
           ),
-          operationLocation
-        )
+          operationLocation,
+        ),
       );
     }
 
@@ -3341,15 +3338,15 @@ namespace ts {
      */
     function writeThrow(
       expression: Expression,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       lastOperationWasAbrupt = true;
       lastOperationWasCompletion = true;
       writeStatement(
         setTextRange(
           factory.createThrowStatement(expression),
-          operationLocation
-        )
+          operationLocation,
+        ),
       );
     }
 
@@ -3361,7 +3358,7 @@ namespace ts {
      */
     function writeReturn(
       expression: Expression | undefined,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       lastOperationWasAbrupt = true;
       lastOperationWasCompletion = true;
@@ -3372,13 +3369,13 @@ namespace ts {
               factory.createArrayLiteralExpression(
                 expression
                   ? [createInstruction(Instruction.Return), expression]
-                  : [createInstruction(Instruction.Return)]
-              )
+                  : [createInstruction(Instruction.Return)],
+              ),
             ),
-            operationLocation
+            operationLocation,
           ),
-          EmitFlags.NoTokenSourceMaps
-        )
+          EmitFlags.NoTokenSourceMaps,
+        ),
       );
     }
 
@@ -3390,7 +3387,7 @@ namespace ts {
      */
     function writeBreak(
       label: Label,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       lastOperationWasAbrupt = true;
       writeStatement(
@@ -3400,12 +3397,12 @@ namespace ts {
               factory.createArrayLiteralExpression([
                 createInstruction(Instruction.Break),
                 createLabel(label),
-              ])
+              ]),
             ),
-            operationLocation
+            operationLocation,
           ),
-          EmitFlags.NoTokenSourceMaps
-        )
+          EmitFlags.NoTokenSourceMaps,
+        ),
       );
     }
 
@@ -3419,7 +3416,7 @@ namespace ts {
     function writeBreakWhenTrue(
       label: Label,
       condition: Expression,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       writeStatement(
         setEmitFlags(
@@ -3431,15 +3428,15 @@ namespace ts {
                   factory.createArrayLiteralExpression([
                     createInstruction(Instruction.Break),
                     createLabel(label),
-                  ])
+                  ]),
                 ),
-                operationLocation
+                operationLocation,
               ),
-              EmitFlags.NoTokenSourceMaps
-            )
+              EmitFlags.NoTokenSourceMaps,
+            ),
           ),
-          EmitFlags.SingleLine
-        )
+          EmitFlags.SingleLine,
+        ),
       );
     }
 
@@ -3453,7 +3450,7 @@ namespace ts {
     function writeBreakWhenFalse(
       label: Label,
       condition: Expression,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       writeStatement(
         setEmitFlags(
@@ -3465,15 +3462,15 @@ namespace ts {
                   factory.createArrayLiteralExpression([
                     createInstruction(Instruction.Break),
                     createLabel(label),
-                  ])
+                  ]),
                 ),
-                operationLocation
+                operationLocation,
               ),
-              EmitFlags.NoTokenSourceMaps
-            )
+              EmitFlags.NoTokenSourceMaps,
+            ),
           ),
-          EmitFlags.SingleLine
-        )
+          EmitFlags.SingleLine,
+        ),
       );
     }
 
@@ -3485,7 +3482,7 @@ namespace ts {
      */
     function writeYield(
       expression: Expression,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       lastOperationWasAbrupt = true;
       writeStatement(
@@ -3495,13 +3492,13 @@ namespace ts {
               factory.createArrayLiteralExpression(
                 expression
                   ? [createInstruction(Instruction.Yield), expression]
-                  : [createInstruction(Instruction.Yield)]
-              )
+                  : [createInstruction(Instruction.Yield)],
+              ),
             ),
-            operationLocation
+            operationLocation,
           ),
-          EmitFlags.NoTokenSourceMaps
-        )
+          EmitFlags.NoTokenSourceMaps,
+        ),
       );
     }
 
@@ -3513,7 +3510,7 @@ namespace ts {
      */
     function writeYieldStar(
       expression: Expression,
-      operationLocation: TextRange | undefined
+      operationLocation: TextRange | undefined,
     ): void {
       lastOperationWasAbrupt = true;
       writeStatement(
@@ -3523,12 +3520,12 @@ namespace ts {
               factory.createArrayLiteralExpression([
                 createInstruction(Instruction.YieldStar),
                 expression,
-              ])
+              ]),
             ),
-            operationLocation
+            operationLocation,
           ),
-          EmitFlags.NoTokenSourceMaps
-        )
+          EmitFlags.NoTokenSourceMaps,
+        ),
       );
     }
 
@@ -3541,8 +3538,8 @@ namespace ts {
         factory.createReturnStatement(
           factory.createArrayLiteralExpression([
             createInstruction(Instruction.Endfinally),
-          ])
-        )
+          ]),
+        ),
       );
     }
   }

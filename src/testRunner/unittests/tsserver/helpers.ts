@@ -22,7 +22,7 @@ namespace ts.projectSystem {
   export function mapOutputToJson(s: string) {
     return convertToObject(
       parseJsonText("json.json", s.replace(outputEventRegex, "")),
-      []
+      [],
     );
   }
 
@@ -104,13 +104,13 @@ namespace ts.projectSystem {
             .replace(/Elapsed::?\s*\d+(?:\.\d+)?ms/g, "Elapsed:: *ms")
             .replace(
               /\"updateGraphDurationMs\"\:\d+(?:\.\d+)?/g,
-              `"updateGraphDurationMs":*`
+              `"updateGraphDurationMs":*`,
             )
             .replace(
               /\"createAutoImportProviderProgramDurationMs\"\:\d+(?:\.\d+)?/g,
-              `"createAutoImportProviderProgramDurationMs":*`
+              `"createAutoImportProviderProgramDurationMs":*`,
             )
-            .replace(`"version":"${version}"`, `"version":"FakeVersion"`)
+            .replace(`"version":"${version}"`, `"version":"FakeVersion"`),
         ),
     };
   }
@@ -118,30 +118,28 @@ namespace ts.projectSystem {
   export function baselineTsserverLogs(
     scenario: string,
     subScenario: string,
-    sessionOrService: TestSession | TestProjectService
+    sessionOrService: TestSession | TestProjectService,
   ) {
     Debug.assert(sessionOrService.logger.logs.length); // Ensure caller used in memory logger
     Harness.Baseline.runBaseline(
       `tsserver/${scenario}/${subScenario.split(" ").join("-")}.js`,
-      sessionOrService.logger.logs.join("\r\n")
+      sessionOrService.logger.logs.join("\r\n"),
     );
   }
 
   export function appendAllScriptInfos(
     service: server.ProjectService,
-    logs: string[]
+    logs: string[],
   ) {
     logs.push("");
     logs.push(`ScriptInfos:`);
-    service.filenameToScriptInfo.forEach((info) =>
-      logs.push(`path: ${info.path} fileName: ${info.fileName}`)
-    );
+    service.filenameToScriptInfo.forEach((info) => logs.push(`path: ${info.path} fileName: ${info.fileName}`));
     logs.push("");
   }
 
   export function appendProjectFileText(
     project: server.Project,
-    logs: string[]
+    logs: string[],
   ) {
     logs.push("");
     logs.push(`Project: ${project.getProjectName()}`);
@@ -156,17 +154,14 @@ namespace ts.projectSystem {
     logs.push("");
   }
 
-  export class TestTypingsInstaller
-    extends TI.TypingsInstaller
-    implements server.ITypingsInstaller
-  {
+  export class TestTypingsInstaller extends TI.TypingsInstaller implements server.ITypingsInstaller {
     protected projectService!: server.ProjectService;
     constructor(
       readonly globalTypingsCacheLocation: string,
       throttleLimit: number,
       installTypingHost: server.ServerHost,
       readonly typesRegistry = new Map<string, MapLike<string>>(),
-      log?: TI.Log
+      log?: TI.Log,
     ) {
       super(
         installTypingHost,
@@ -174,7 +169,7 @@ namespace ts.projectSystem {
         TestFSWithWatch.safeList.path,
         customTypesMap.path,
         throttleLimit,
-        log
+        log,
       );
     }
 
@@ -196,7 +191,7 @@ namespace ts.projectSystem {
       assert.equal(
         this.postExecActions.length,
         expectedCount,
-        `Expected ${expectedCount} post install actions`
+        `Expected ${expectedCount} post install actions`,
       );
     }
 
@@ -214,7 +209,7 @@ namespace ts.projectSystem {
       _requestId: number,
       _args: string[],
       _cwd: string,
-      cb: TI.RequestCompletedAction
+      cb: TI.RequestCompletedAction,
     ): void {
       this.addPostExecAction("success", cb);
     }
@@ -226,20 +221,20 @@ namespace ts.projectSystem {
     enqueueInstallTypingsRequest(
       project: server.Project,
       typeAcquisition: TypeAcquisition,
-      unresolvedImports: SortedReadonlyArray<string>
+      unresolvedImports: SortedReadonlyArray<string>,
     ) {
       const request = server.createInstallTypingsRequest(
         project,
         typeAcquisition,
         unresolvedImports,
-        this.globalTypingsCacheLocation
+        this.globalTypingsCacheLocation,
       );
       this.install(request);
     }
 
     addPostExecAction(
       stdout: string | string[],
-      cb: TI.RequestCompletedAction
+      cb: TI.RequestCompletedAction,
     ) {
       const out = isString(stdout)
         ? stdout
@@ -290,7 +285,7 @@ namespace ts.projectSystem {
   }
 
   export function fileStats(
-    nonZeroStats: Partial<server.FileStats>
+    nonZeroStats: Partial<server.FileStats>,
   ): server.FileStats {
     return {
       ts: 0,
@@ -331,7 +326,7 @@ namespace ts.projectSystem {
     }
 
     getEvent<T extends server.ProjectServiceEvent>(
-      eventName: T["eventName"]
+      eventName: T["eventName"],
     ): T["data"] {
       let eventData: T["data"] | undefined;
       filterMutate(this.events, (e) => {
@@ -348,20 +343,18 @@ namespace ts.projectSystem {
     }
 
     hasZeroEvent<T extends server.ProjectServiceEvent>(
-      eventName: T["eventName"]
+      eventName: T["eventName"],
     ) {
-      this.events.forEach((event) =>
-        assert.notEqual(event.eventName, eventName)
-      );
+      this.events.forEach((event) => assert.notEqual(event.eventName, eventName));
     }
 
     assertProjectInfoTelemetryEvent(
       partial: Partial<server.ProjectInfoTelemetryEventData>,
-      configFile = "/tsconfig.json"
+      configFile = "/tsconfig.json",
     ): void {
       assert.deepEqual<server.ProjectInfoTelemetryEventData>(
         this.getEvent<server.ProjectInfoTelemetryEvent>(
-          server.ProjectInfoTelemetryEvent
+          server.ProjectInfoTelemetryEvent,
         ),
         {
           projectId: sys.createSHA256Hash!(configFile),
@@ -382,21 +375,21 @@ namespace ts.projectSystem {
           languageServiceEnabled: true,
           version: ts.version, // eslint-disable-line @typescript-eslint/no-unnecessary-qualifier
           ...partial,
-        }
+        },
       );
     }
 
     assertOpenFileTelemetryEvent(info: server.OpenFileInfo): void {
       assert.deepEqual<server.OpenFileInfoTelemetryEventData>(
         this.getEvent<server.OpenFileInfoTelemetryEvent>(
-          server.OpenFileInfoTelemetryEvent
+          server.OpenFileInfoTelemetryEvent,
         ),
-        { info }
+        { info },
       );
     }
     assertNoOpenFilesTelemetryEvent(): void {
       this.hasZeroEvent<server.OpenFileInfoTelemetryEvent>(
-        server.OpenFileInfoTelemetryEvent
+        server.OpenFileInfoTelemetryEvent,
       );
     }
   }
@@ -430,16 +423,18 @@ namespace ts.projectSystem {
 
     public executeCommand(request: protocol.Request) {
       const verboseLogging = this.logger.hasLevel(server.LogLevel.verbose);
-      if (verboseLogging)
+      if (verboseLogging) {
         this.logger.info(`request:${JSON.stringify(request)}`);
+      }
       const result = super.executeCommand(request);
-      if (verboseLogging)
+      if (verboseLogging) {
         this.logger.info(`response:${JSON.stringify(result)}`);
+      }
       return result;
     }
 
     public executeCommandSeq<T extends server.protocol.Request>(
-      request: Partial<T>
+      request: Partial<T>,
     ) {
       this.seq++;
       request.seq = this.seq;
@@ -460,13 +455,13 @@ namespace ts.projectSystem {
 
   export function createSession(
     host: server.ServerHost,
-    opts: Partial<TestSessionOptions> = {}
+    opts: Partial<TestSessionOptions> = {},
   ) {
     if (opts.typingsInstaller === undefined) {
       opts.typingsInstaller = new TestTypingsInstaller(
         "/a/data/",
         /*throttleLimit*/ 5,
-        host
+        host,
       );
     }
 
@@ -490,7 +485,7 @@ namespace ts.projectSystem {
   }
 
   export function createSessionWithEventTracking<
-    T extends server.ProjectServiceEvent
+    T extends server.ProjectServiceEvent,
   >(
     host: server.ServerHost,
     eventName: T["eventName"],
@@ -500,8 +495,8 @@ namespace ts.projectSystem {
     const session = createSession(host, {
       eventHandler: (e) => {
         if (
-          e.eventName === eventName ||
-          eventNames.some((eventName) => e.eventName === eventName)
+          e.eventName === eventName
+          || eventNames.some((eventName) => e.eventName === eventName)
         ) {
           events.push(e as T);
         }
@@ -512,11 +507,11 @@ namespace ts.projectSystem {
   }
 
   export function createSessionWithDefaultEventHandler<
-    T extends protocol.AnyEvent
+    T extends protocol.AnyEvent,
   >(
     host: TestServerHost,
     eventNames: T["event"] | T["event"][],
-    opts: Partial<TestSessionOptions> = {}
+    opts: Partial<TestSessionOptions> = {},
   ) {
     const session = createSession(host, { canUseEvents: true, ...opts });
 
@@ -530,10 +525,10 @@ namespace ts.projectSystem {
       return mapDefined(host.getOutput(), (s) => {
         const e = mapOutputToJson(s);
         return (
-          isArray(eventNames)
-            ? eventNames.some((eventName) => e.event === eventName)
-            : e.event === eventNames
-        )
+            isArray(eventNames)
+              ? eventNames.some((eventName) => e.event === eventName)
+              : e.event === eventNames
+          )
           ? (e as T)
           : undefined;
       });
@@ -544,8 +539,7 @@ namespace ts.projectSystem {
     }
   }
 
-  export interface TestProjectServiceOptions
-    extends server.ProjectServiceOptions {
+  export interface TestProjectServiceOptions extends server.ProjectServiceOptions {
     logger: Logger;
   }
 
@@ -556,7 +550,7 @@ namespace ts.projectSystem {
       cancellationToken: HostCancellationToken,
       useSingleInferredProject: boolean,
       typingsInstaller: server.ITypingsInstaller,
-      opts: Partial<TestProjectServiceOptions> = {}
+      opts: Partial<TestProjectServiceOptions> = {},
     ) {
       super({
         host,
@@ -582,55 +576,53 @@ namespace ts.projectSystem {
 
   export function createProjectService(
     host: server.ServerHost,
-    options?: Partial<TestProjectServiceOptions>
+    options?: Partial<TestProjectServiceOptions>,
   ) {
-    const cancellationToken =
-      options?.cancellationToken || server.nullCancellationToken;
+    const cancellationToken = options?.cancellationToken || server.nullCancellationToken;
     const logger = options?.logger || createHasErrorMessageLogger();
-    const useSingleInferredProject =
-      options?.useSingleInferredProject !== undefined
-        ? options.useSingleInferredProject
-        : false;
+    const useSingleInferredProject = options?.useSingleInferredProject !== undefined
+      ? options.useSingleInferredProject
+      : false;
     return new TestProjectService(
       host,
       logger,
       cancellationToken,
       useSingleInferredProject,
       options?.typingsInstaller || server.nullTypingsInstaller,
-      options
+      options,
     );
   }
 
   export function checkNumberOfConfiguredProjects(
     projectService: server.ProjectService,
-    expected: number
+    expected: number,
   ) {
     assert.equal(
       projectService.configuredProjects.size,
       expected,
-      `expected ${expected} configured project(s)`
+      `expected ${expected} configured project(s)`,
     );
   }
 
   export function checkNumberOfExternalProjects(
     projectService: server.ProjectService,
-    expected: number
+    expected: number,
   ) {
     assert.equal(
       projectService.externalProjects.length,
       expected,
-      `expected ${expected} external project(s)`
+      `expected ${expected} external project(s)`,
     );
   }
 
   export function checkNumberOfInferredProjects(
     projectService: server.ProjectService,
-    expected: number
+    expected: number,
   ) {
     assert.equal(
       projectService.inferredProjects.length,
       expected,
-      `expected ${expected} inferred project(s)`
+      `expected ${expected} inferred project(s)`,
     );
   }
 
@@ -640,11 +632,11 @@ namespace ts.projectSystem {
       inferredProjects?: number;
       configuredProjects?: number;
       externalProjects?: number;
-    }
+    },
   ) {
     checkNumberOfConfiguredProjects(
       projectService,
-      count.configuredProjects || 0
+      count.configuredProjects || 0,
     );
     checkNumberOfExternalProjects(projectService, count.externalProjects || 0);
     checkNumberOfInferredProjects(projectService, count.inferredProjects || 0);
@@ -652,7 +644,7 @@ namespace ts.projectSystem {
 
   export function configuredProjectAt(
     projectService: server.ProjectService,
-    index: number
+    index: number,
   ) {
     const values = projectService.configuredProjects.values();
     while (index > 0) {
@@ -667,49 +659,46 @@ namespace ts.projectSystem {
 
   export function checkOrphanScriptInfos(
     service: server.ProjectService,
-    expectedFiles: readonly string[]
+    expectedFiles: readonly string[],
   ) {
     checkArray(
       "Orphan ScriptInfos:",
       arrayFrom(
-        mapDefinedIterator(service.filenameToScriptInfo.values(), (v) =>
-          v.containingProjects.length === 0 ? v.fileName : undefined
-        )
+        mapDefinedIterator(
+          service.filenameToScriptInfo.values(),
+          (v) => v.containingProjects.length === 0 ? v.fileName : undefined,
+        ),
       ),
-      expectedFiles
+      expectedFiles,
     );
   }
 
   export function checkProjectActualFiles(
     project: server.Project,
-    expectedFiles: readonly string[]
+    expectedFiles: readonly string[],
   ) {
     checkArray(
-      `${
-        server.ProjectKind[project.projectKind]
-      } project: ${project.getProjectName()}:: actual files`,
+      `${server.ProjectKind[project.projectKind]} project: ${project.getProjectName()}:: actual files`,
       project.getFileNames(),
-      expectedFiles
+      expectedFiles,
     );
   }
 
   export function checkProjectRootFiles(
     project: server.Project,
-    expectedFiles: readonly string[]
+    expectedFiles: readonly string[],
   ) {
     checkArray(
-      `${
-        server.ProjectKind[project.projectKind]
-      } project: ${project.getProjectName()}::, rootFileNames`,
+      `${server.ProjectKind[project.projectKind]} project: ${project.getProjectName()}::, rootFileNames`,
       project.getRootFiles(),
-      expectedFiles
+      expectedFiles,
     );
   }
 
   export function mapCombinedPathsInAncestor(
     dir: string,
     path2: string,
-    mapAncestor: (ancestor: string) => boolean
+    mapAncestor: (ancestor: string) => boolean,
   ) {
     dir = normalizePath(dir);
     const result: string[] = [];
@@ -723,12 +712,12 @@ namespace ts.projectSystem {
 
   export function getRootsToWatchWithAncestorDirectory(
     dir: string,
-    path2: string
+    path2: string,
   ) {
     return mapCombinedPathsInAncestor(
       dir,
       path2,
-      (ancestor) => ancestor.split(directorySeparator).length > 4
+      (ancestor) => ancestor.split(directorySeparator).length > 4,
     );
   }
 
@@ -741,7 +730,7 @@ namespace ts.projectSystem {
   export function getTypeRootsFromLocation(currentDirectory: string) {
     return getRootsToWatchWithAncestorDirectory(
       currentDirectory,
-      nodeModulesAtTypes
+      nodeModulesAtTypes,
     );
   }
 
@@ -754,37 +743,37 @@ namespace ts.projectSystem {
 
   export function checkOpenFiles(
     projectService: server.ProjectService,
-    expectedFiles: File[]
+    expectedFiles: File[],
   ) {
     checkArray(
       "Open files",
       arrayFrom(
         projectService.openFiles.keys(),
-        (path) => projectService.getScriptInfoForPath(path as Path)!.fileName
+        (path) => projectService.getScriptInfoForPath(path as Path)!.fileName,
       ),
-      expectedFiles.map((file) => file.path)
+      expectedFiles.map((file) => file.path),
     );
   }
 
   export function checkScriptInfos(
     projectService: server.ProjectService,
     expectedFiles: readonly string[],
-    additionInfo?: string
+    additionInfo?: string,
   ) {
     checkArray(
       `ScriptInfos files: ${additionInfo || ""}`,
       arrayFrom(
         projectService.filenameToScriptInfo.values(),
-        (info) => info.fileName
+        (info) => info.fileName,
       ),
-      expectedFiles
+      expectedFiles,
     );
   }
 
   export function protocolLocationFromSubstring(
     str: string,
     substring: string,
-    options?: SpanFromSubstringOptions
+    options?: SpanFromSubstringOptions,
   ): protocol.Location {
     const start = nthIndexOf(str, substring, options ? options.index : 0);
     Debug.assert(start !== -1);
@@ -792,7 +781,7 @@ namespace ts.projectSystem {
   }
 
   export function protocolToLocation(
-    text: string
+    text: string,
   ): (pos: number) => protocol.Location {
     const lineStarts = computeLineStarts(text);
     return (pos) => {
@@ -804,7 +793,7 @@ namespace ts.projectSystem {
   export function protocolTextSpanFromSubstring(
     str: string,
     substring: string,
-    options?: SpanFromSubstringOptions
+    options?: SpanFromSubstringOptions,
   ): protocol.TextSpan {
     const span = textSpanFromSubstring(str, substring, options);
     const toLocation = protocolToLocation(str);
@@ -845,20 +834,19 @@ namespace ts.projectSystem {
     ...rest
   }: FileSpanWithContextFromSubString): protocol.FileSpanWithContext {
     const result = protocolFileSpanFromSubstring(rest);
-    const contextSpan =
-      contextText !== undefined
-        ? protocolFileSpanFromSubstring({
-            file: rest.file,
-            text: contextText,
-            options: contextOptions,
-          })
-        : undefined;
+    const contextSpan = contextText !== undefined
+      ? protocolFileSpanFromSubstring({
+        file: rest.file,
+        text: contextText,
+        options: contextOptions,
+      })
+      : undefined;
     return contextSpan
       ? {
-          ...result,
-          contextStart: contextSpan.start,
-          contextEnd: contextSpan.end,
-        }
+        ...result,
+        contextStart: contextSpan.start,
+        contextEnd: contextSpan.end,
+      }
       : result;
   }
 
@@ -878,10 +866,9 @@ namespace ts.projectSystem {
   }: ProtocolTextSpanWithContextFromString): protocol.TextSpanWithContext {
     const span = textSpanFromSubstring(fileText, text, options);
     const toLocation = protocolToLocation(fileText);
-    const contextSpan =
-      contextText !== undefined
-        ? textSpanFromSubstring(fileText, contextText, contextOptions)
-        : undefined;
+    const contextSpan = contextText !== undefined
+      ? textSpanFromSubstring(fileText, contextText, contextOptions)
+      : undefined;
     return {
       start: toLocation(span.start),
       end: toLocation(textSpanEnd(span)),
@@ -892,8 +879,7 @@ namespace ts.projectSystem {
     };
   }
 
-  export interface ProtocolRenameSpanFromSubstring
-    extends ProtocolTextSpanWithContextFromString {
+  export interface ProtocolRenameSpanFromSubstring extends ProtocolTextSpanWithContextFromString {
     prefixSuffixText?: {
       readonly prefixText?: string;
       readonly suffixText?: string;
@@ -912,7 +898,7 @@ namespace ts.projectSystem {
   export function textSpanFromSubstring(
     str: string,
     substring: string,
-    options?: SpanFromSubstringOptions
+    options?: SpanFromSubstringOptions,
   ): TextSpan {
     const start = nthIndexOf(str, substring, options ? options.index : 0);
     Debug.assert(start !== -1);
@@ -922,7 +908,7 @@ namespace ts.projectSystem {
   export function protocolFileLocationFromSubstring(
     file: File,
     substring: string,
-    options?: SpanFromSubstringOptions
+    options?: SpanFromSubstringOptions,
   ): protocol.FileLocationRequestArgs {
     return {
       file: file.path,
@@ -949,9 +935,7 @@ namespace ts.projectSystem {
    * should be made before canceling the token. The id of the request to cancel should be set with
    * setRequestToCancel();
    */
-  export class TestServerCancellationToken
-    implements server.ServerCancellationToken
-  {
+  export class TestServerCancellationToken implements server.ServerCancellationToken {
     private currentId: number | undefined = -1;
     private requestToCancel = -1;
     private isCancellationRequestedCount = 0;
@@ -971,7 +955,7 @@ namespace ts.projectSystem {
       assert.equal(
         requestId,
         this.currentId,
-        "unexpected request id in cancellation"
+        "unexpected request id in cancellation",
       );
       this.currentId = undefined;
     }
@@ -982,8 +966,8 @@ namespace ts.projectSystem {
       // has been met then cancel the request. Ex: cancel the request if it is a
       // nav bar request & isCancellationRequested() has already been called three times.
       return (
-        this.requestToCancel === this.currentId &&
-        this.isCancellationRequestedCount >= this.cancelAfterRequest
+        this.requestToCancel === this.currentId
+        && this.isCancellationRequestedCount >= this.cancelAfterRequest
       );
     }
 
@@ -996,7 +980,7 @@ namespace ts.projectSystem {
 
   export function makeSessionRequest<T>(
     command: string,
-    args: T
+    args: T,
   ): protocol.Request {
     return {
       seq: 0,
@@ -1008,22 +992,22 @@ namespace ts.projectSystem {
 
   export function executeSessionRequest<
     TRequest extends protocol.Request,
-    TResponse extends protocol.Response
+    TResponse extends protocol.Response,
   >(
     session: server.Session,
     command: TRequest["command"],
-    args: TRequest["arguments"]
+    args: TRequest["arguments"],
   ): TResponse["body"] {
     return session.executeCommand(makeSessionRequest(command, args))
       .response as TResponse["body"];
   }
 
   export function executeSessionRequestNoResponse<
-    TRequest extends protocol.Request
+    TRequest extends protocol.Request,
   >(
     session: server.Session,
     command: TRequest["command"],
-    args: TRequest["arguments"]
+    args: TRequest["arguments"],
   ): void {
     session.executeCommand(makeSessionRequest(command, args));
   }
@@ -1032,12 +1016,12 @@ namespace ts.projectSystem {
     files: readonly (
       | File
       | {
-          readonly file: File | string;
-          readonly projectRootPath: string;
-          content?: string;
-        }
+        readonly file: File | string;
+        readonly projectRootPath: string;
+        content?: string;
+      }
     )[],
-    session: server.Session
+    session: server.Session,
   ): void {
     for (const file of files) {
       session.executeCommand(
@@ -1045,25 +1029,24 @@ namespace ts.projectSystem {
           CommandNames.Open,
           "projectRootPath" in file
             ? {
-                file:
-                  typeof file.file === "string" ? file.file : file.file.path,
-                projectRootPath: file.projectRootPath,
-              }
-            : { file: file.path }
-        )
+              file: typeof file.file === "string" ? file.file : file.file.path,
+              projectRootPath: file.projectRootPath,
+            }
+            : { file: file.path },
+        ),
       ); // eslint-disable-line no-in-operator
     }
   }
 
   export function closeFilesForSession(
     files: readonly File[],
-    session: server.Session
+    session: server.Session,
   ): void {
     for (const file of files) {
       session.executeCommand(
         makeSessionRequest<protocol.FileRequestArgs>(CommandNames.Close, {
           file: file.path,
-        })
+        }),
       );
     }
   }
@@ -1183,7 +1166,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         scenario,
         `${subScenario} geterrForProject`,
-        session
+        session,
       );
     });
   }
@@ -1222,7 +1205,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         scenario,
         `${subScenario} gerErr with sync commands`,
-        session
+        session,
       );
     });
   }

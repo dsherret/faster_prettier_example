@@ -44,8 +44,7 @@ namespace ts {
 
     verifyTsc({
       scenario: "composite",
-      subScenario:
-        "when setting composite false on command line but has tsbuild info in config",
+      subScenario: "when setting composite false on command line but has tsbuild info in config",
       fs: () =>
         loadProjectFromFiles({
           "/src/project/src/main.ts": "export const x = 10;",

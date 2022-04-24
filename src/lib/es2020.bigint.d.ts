@@ -201,7 +201,7 @@ interface BigInt {
   /** Returns a string representation appropriate to the host environment's current locale. */
   toLocaleString(
     locales?: Intl.LocalesArgument,
-    options?: BigIntToLocaleStringOptions
+    options?: BigIntToLocaleStringOptions,
   ): string;
 
   /** Returns the primitive value of the specified object. */
@@ -273,7 +273,7 @@ interface BigInt64Array {
    */
   every(
     predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -295,7 +295,7 @@ interface BigInt64Array {
    */
   filter(
     predicate: (value: bigint, index: number, array: BigInt64Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): BigInt64Array;
 
   /**
@@ -309,7 +309,7 @@ interface BigInt64Array {
    */
   find(
     predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): bigint | undefined;
 
   /**
@@ -323,7 +323,7 @@ interface BigInt64Array {
    */
   findIndex(
     predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -335,7 +335,7 @@ interface BigInt64Array {
    */
   forEach(
     callbackfn: (value: bigint, index: number, array: BigInt64Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -384,7 +384,7 @@ interface BigInt64Array {
    */
   map(
     callbackfn: (value: bigint, index: number, array: BigInt64Array) => bigint,
-    thisArg?: any
+    thisArg?: any,
   ): BigInt64Array;
 
   /**
@@ -402,8 +402,8 @@ interface BigInt64Array {
       previousValue: bigint,
       currentValue: bigint,
       currentIndex: number,
-      array: BigInt64Array
-    ) => bigint
+      array: BigInt64Array,
+    ) => bigint,
   ): bigint;
 
   /**
@@ -421,9 +421,9 @@ interface BigInt64Array {
       previousValue: U,
       currentValue: bigint,
       currentIndex: number,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -441,8 +441,8 @@ interface BigInt64Array {
       previousValue: bigint,
       currentValue: bigint,
       currentIndex: number,
-      array: BigInt64Array
-    ) => bigint
+      array: BigInt64Array,
+    ) => bigint,
   ): bigint;
 
   /**
@@ -460,9 +460,9 @@ interface BigInt64Array {
       previousValue: U,
       currentValue: bigint,
       currentIndex: number,
-      array: BigInt64Array
+      array: BigInt64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /** Reverses the elements in the array. */
@@ -492,7 +492,7 @@ interface BigInt64Array {
    */
   some(
     predicate: (value: bigint, index: number, array: BigInt64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -530,12 +530,12 @@ interface BigInt64Array {
 
 interface BigInt64ArrayConstructor {
   readonly prototype: BigInt64Array;
-  new (length?: number): BigInt64Array;
-  new (array: Iterable<bigint>): BigInt64Array;
-  new (
+  new(length?: number): BigInt64Array;
+  new(array: Iterable<bigint>): BigInt64Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): BigInt64Array;
 
   /** The size in bytes of each element in the array. */
@@ -557,7 +557,7 @@ interface BigInt64ArrayConstructor {
   from<U>(
     arrayLike: ArrayLike<U>,
     mapfn: (v: U, k: number) => bigint,
-    thisArg?: any
+    thisArg?: any,
   ): BigInt64Array;
 }
 
@@ -604,7 +604,7 @@ interface BigUint64Array {
    */
   every(
     predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -626,7 +626,7 @@ interface BigUint64Array {
    */
   filter(
     predicate: (value: bigint, index: number, array: BigUint64Array) => any,
-    thisArg?: any
+    thisArg?: any,
   ): BigUint64Array;
 
   /**
@@ -640,7 +640,7 @@ interface BigUint64Array {
    */
   find(
     predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): bigint | undefined;
 
   /**
@@ -654,7 +654,7 @@ interface BigUint64Array {
    */
   findIndex(
     predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): number;
 
   /**
@@ -666,7 +666,7 @@ interface BigUint64Array {
    */
   forEach(
     callbackfn: (value: bigint, index: number, array: BigUint64Array) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
 
   /**
@@ -715,7 +715,7 @@ interface BigUint64Array {
    */
   map(
     callbackfn: (value: bigint, index: number, array: BigUint64Array) => bigint,
-    thisArg?: any
+    thisArg?: any,
   ): BigUint64Array;
 
   /**
@@ -733,8 +733,8 @@ interface BigUint64Array {
       previousValue: bigint,
       currentValue: bigint,
       currentIndex: number,
-      array: BigUint64Array
-    ) => bigint
+      array: BigUint64Array,
+    ) => bigint,
   ): bigint;
 
   /**
@@ -752,9 +752,9 @@ interface BigUint64Array {
       previousValue: U,
       currentValue: bigint,
       currentIndex: number,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /**
@@ -772,8 +772,8 @@ interface BigUint64Array {
       previousValue: bigint,
       currentValue: bigint,
       currentIndex: number,
-      array: BigUint64Array
-    ) => bigint
+      array: BigUint64Array,
+    ) => bigint,
   ): bigint;
 
   /**
@@ -791,9 +791,9 @@ interface BigUint64Array {
       previousValue: U,
       currentValue: bigint,
       currentIndex: number,
-      array: BigUint64Array
+      array: BigUint64Array,
     ) => U,
-    initialValue: U
+    initialValue: U,
   ): U;
 
   /** Reverses the elements in the array. */
@@ -823,7 +823,7 @@ interface BigUint64Array {
    */
   some(
     predicate: (value: bigint, index: number, array: BigUint64Array) => boolean,
-    thisArg?: any
+    thisArg?: any,
   ): boolean;
 
   /**
@@ -861,12 +861,12 @@ interface BigUint64Array {
 
 interface BigUint64ArrayConstructor {
   readonly prototype: BigUint64Array;
-  new (length?: number): BigUint64Array;
-  new (array: Iterable<bigint>): BigUint64Array;
-  new (
+  new(length?: number): BigUint64Array;
+  new(array: Iterable<bigint>): BigUint64Array;
+  new(
     buffer: ArrayBufferLike,
     byteOffset?: number,
-    length?: number
+    length?: number,
   ): BigUint64Array;
 
   /** The size in bytes of each element in the array. */
@@ -888,7 +888,7 @@ interface BigUint64ArrayConstructor {
   from<U>(
     arrayLike: ArrayLike<U>,
     mapfn: (v: U, k: number) => bigint,
-    thisArg?: any
+    thisArg?: any,
   ): BigUint64Array;
 }
 

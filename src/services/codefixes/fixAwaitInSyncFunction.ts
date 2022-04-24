@@ -17,22 +17,20 @@ namespace ts.codefix {
       const { sourceFile, span } = context;
       const nodes = getNodes(sourceFile, span.start);
       if (!nodes) return undefined;
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, nodes)
-      );
+      const changes = textChanges.ChangeTracker.with(context, (t) => doChange(t, sourceFile, nodes));
       return [
         createCodeFixAction(
           fixId,
           changes,
           Diagnostics.Add_async_modifier_to_containing_function,
           fixId,
-          Diagnostics.Add_all_missing_async_modifiers
+          Diagnostics.Add_all_missing_async_modifiers,
         ),
       ];
     },
     fixIds: [fixId],
     getAllCodeActions: function getAllCodeActionsToFixAwaitInSyncFunction(
-      context
+      context,
     ) {
       const seen = new Map<number, true>();
       return codeFixAll(context, errorCodes, (changes, diag) => {
@@ -48,15 +46,15 @@ namespace ts.codefix {
       | FunctionDeclaration
       | MethodDeclaration
       | FunctionExpression
-      | ArrowFunction
+      | ArrowFunction,
   ) {
     if (expr.type) {
       return expr.type;
     }
     if (
-      isVariableDeclaration(expr.parent) &&
-      expr.parent.type &&
-      isFunctionTypeNode(expr.parent.type)
+      isVariableDeclaration(expr.parent)
+      && expr.parent.type
+      && isFunctionTypeNode(expr.parent.type)
     ) {
       return expr.parent.type.type;
     }
@@ -64,7 +62,7 @@ namespace ts.codefix {
 
   function getNodes(
     sourceFile: SourceFile,
-    start: number
+    start: number,
   ): { insertBefore: Node; returnType: TypeNode | undefined } | undefined {
     const token = getTokenAtPosition(sourceFile, start);
     const containingFunction = getContainingFunction(token);
@@ -82,16 +80,15 @@ namespace ts.codefix {
         insertBefore = findChildOfKind(
           containingFunction,
           SyntaxKind.FunctionKeyword,
-          sourceFile
+          sourceFile,
         );
         break;
       case SyntaxKind.ArrowFunction:
         const kind = containingFunction.typeParameters
           ? SyntaxKind.LessThanToken
           : SyntaxKind.OpenParenToken;
-        insertBefore =
-          findChildOfKind(containingFunction, kind, sourceFile) ||
-          first(containingFunction.parameters);
+        insertBefore = findChildOfKind(containingFunction, kind, sourceFile)
+          || first(containingFunction.parameters);
         break;
       default:
         return;
@@ -111,29 +108,29 @@ namespace ts.codefix {
     {
       insertBefore,
       returnType,
-    }: { insertBefore: Node; returnType: TypeNode | undefined }
+    }: { insertBefore: Node; returnType: TypeNode | undefined },
   ): void {
     if (returnType) {
       const entityName = getEntityNameFromTypeNode(returnType);
       if (
-        !entityName ||
-        entityName.kind !== SyntaxKind.Identifier ||
-        entityName.text !== "Promise"
+        !entityName
+        || entityName.kind !== SyntaxKind.Identifier
+        || entityName.text !== "Promise"
       ) {
         changes.replaceNode(
           sourceFile,
           returnType,
           factory.createTypeReferenceNode(
             "Promise",
-            factory.createNodeArray([returnType])
-          )
+            factory.createNodeArray([returnType]),
+          ),
         );
       }
     }
     changes.insertModifierBefore(
       sourceFile,
       SyntaxKind.AsyncKeyword,
-      insertBefore
+      insertBefore,
     );
   }
 }

@@ -49,7 +49,7 @@ namespace ts {
     function testMapIterationAddedValues<K>(
       keys: K[],
       map: ESMap<K, string>,
-      useForEach: boolean
+      useForEach: boolean,
     ): string {
       let resultString = "";
 
@@ -131,18 +131,14 @@ namespace ts {
           | readonly any[]
           | ReadonlySet<any>
           | ReadonlyESMap<any, any>
-          | undefined
+          | undefined,
       >(
-        iterable: I
+        iterable: I,
       ): Iterator<
-        I extends ReadonlyESMap<infer K, infer V>
-          ? [K, V]
-          : I extends ReadonlySet<infer T>
-          ? T
-          : I extends readonly (infer T)[]
-          ? T
-          : I extends undefined
-          ? undefined
+        I extends ReadonlyESMap<infer K, infer V> ? [K, V]
+          : I extends ReadonlySet<infer T> ? T
+          : I extends readonly (infer T)[] ? T
+          : I extends undefined ? undefined
           : never
       >;
       function getIterator(
@@ -150,7 +146,7 @@ namespace ts {
           | readonly any[]
           | ReadonlySet<any>
           | ReadonlyESMap<any, any>
-          | undefined
+          | undefined,
       ): Iterator<any> | undefined {
         // override `ts.getIterator` with a version that allows us to iterate over a `MapShim` in an environment with a native `Map`.
         if (iterable instanceof MapShim) return iterable.entries();
@@ -164,15 +160,14 @@ namespace ts {
     });
 
     it("iterates values in insertion order and handles changes with string keys", () => {
-      const expectedResult =
-        "1:1;3:3;2:Y2;4:X4;0:X0;3:Y3;999:999;A:A;Z:Z;X:X;Y:Y;";
+      const expectedResult = "1:1;3:3;2:Y2;4:X4;0:X0;3:Y3;999:999;A:A;Z:Z;X:X;Y:Y;";
 
       // First, ensure the test actually has the same behavior as a native Map.
       let nativeMap = new Map<string, string>();
       const nativeMapForEachResult = testMapIterationAddedValues(
         stringKeys,
         nativeMap,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(nativeMapForEachResult, expectedResult, "nativeMap-forEach");
 
@@ -180,12 +175,12 @@ namespace ts {
       const nativeMapIteratorResult = testMapIterationAddedValues(
         stringKeys,
         nativeMap,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(
         nativeMapIteratorResult,
         expectedResult,
-        "nativeMap-iterator"
+        "nativeMap-iterator",
       );
 
       // Then, test the map shim.
@@ -193,7 +188,7 @@ namespace ts {
       const shimMapForEachResult = testMapIterationAddedValues(
         stringKeys,
         localShimMap,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(shimMapForEachResult, expectedResult, "shimMap-forEach");
 
@@ -201,21 +196,20 @@ namespace ts {
       const shimMapIteratorResult = testMapIterationAddedValues(
         stringKeys,
         localShimMap,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(shimMapIteratorResult, expectedResult, "shimMap-iterator");
     });
 
     it("iterates values in insertion order and handles changes with mixed-type keys", () => {
-      const expectedResult =
-        "true:1;3:3;2:Y2;4:X4;false:X0;3:Y3;null:999;undefined:A;Z:Z;X:X;Y:Y;";
+      const expectedResult = "true:1;3:3;2:Y2;4:X4;false:X0;3:Y3;null:999;undefined:A;Z:Z;X:X;Y:Y;";
 
       // First, ensure the test actually has the same behavior as a native Map.
       let nativeMap = new Map<any, string>();
       const nativeMapForEachResult = testMapIterationAddedValues(
         mixedKeys,
         nativeMap,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(nativeMapForEachResult, expectedResult, "nativeMap-forEach");
 
@@ -223,12 +217,12 @@ namespace ts {
       const nativeMapIteratorResult = testMapIterationAddedValues(
         mixedKeys,
         nativeMap,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(
         nativeMapIteratorResult,
         expectedResult,
-        "nativeMap-iterator"
+        "nativeMap-iterator",
       );
 
       // Then, test the map shim.
@@ -236,7 +230,7 @@ namespace ts {
       const shimMapForEachResult = testMapIterationAddedValues(
         mixedKeys,
         localShimMap,
-        /* useForEach */ true
+        /* useForEach */ true,
       );
       assert.equal(shimMapForEachResult, expectedResult, "shimMap-forEach");
 
@@ -244,7 +238,7 @@ namespace ts {
       const shimMapIteratorResult = testMapIterationAddedValues(
         mixedKeys,
         localShimMap,
-        /* useForEach */ false
+        /* useForEach */ false,
       );
       assert.equal(shimMapIteratorResult, expectedResult, "shimMap-iterator");
     });

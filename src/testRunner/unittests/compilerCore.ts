@@ -9,62 +9,62 @@ namespace ts {
       it("correctly identifies unmatched objects", () => {
         assert.isFalse(
           equalOwnProperties({}, { a: 1 }),
-          "missing left property"
+          "missing left property",
         );
         assert.isFalse(
           equalOwnProperties({ a: 1 }, {}),
-          "missing right property"
+          "missing right property",
         );
         assert.isFalse(
           equalOwnProperties({ a: 1 }, { a: 2 }),
-          "differing property"
+          "differing property",
         );
       });
       it("correctly identifies undefined vs hasOwnProperty", () => {
         assert.isFalse(
           equalOwnProperties({}, { a: undefined }),
-          "missing left property"
+          "missing left property",
         );
         assert.isFalse(
           equalOwnProperties({ a: undefined }, {}),
-          "missing right property"
+          "missing right property",
         );
       });
       it("truthiness", () => {
         const trythyTest = (l: any, r: any) => !!l === !!r;
         assert.isFalse(
           equalOwnProperties({}, { a: 1 }, trythyTest),
-          "missing left truthy property"
+          "missing left truthy property",
         );
         assert.isFalse(
           equalOwnProperties({}, { a: 0 }, trythyTest),
-          "missing left falsey property"
+          "missing left falsey property",
         );
         assert.isFalse(
           equalOwnProperties({ a: 1 }, {}, trythyTest),
-          "missing right truthy property"
+          "missing right truthy property",
         );
         assert.isFalse(
           equalOwnProperties({ a: 0 }, {}, trythyTest),
-          "missing right falsey property"
+          "missing right falsey property",
         );
         assert.isTrue(
           equalOwnProperties({ a: 1 }, { a: "foo" }, trythyTest),
-          "valid equality"
+          "valid equality",
         );
       });
       it("all equal", () => {
         assert.isFalse(
           equalOwnProperties({}, { a: 1 }, () => true),
-          "missing left property"
+          "missing left property",
         );
         assert.isFalse(
           equalOwnProperties({ a: 1 }, {}, () => true),
-          "missing right property"
+          "missing right property",
         );
         assert.isTrue(
           equalOwnProperties({ a: 1 }, { a: 2 }, () => true),
-          "valid equality"
+          "valid equality",
         );
       });
     });
@@ -72,7 +72,7 @@ namespace ts {
       it("mutation", () => {
         const set = createSet<number, number>(
           (x) => x % 2,
-          (x, y) => x % 4 === y % 4
+          (x, y) => x % 4 === y % 4,
         );
         assert.equal(set.size, 0);
 
@@ -115,7 +115,7 @@ namespace ts {
       it("resizing", () => {
         const set = createSet<number, number>(
           (x) => x % 2,
-          (x, y) => x === y
+          (x, y) => x === y,
         );
         const elementCount = 100;
 
@@ -136,7 +136,7 @@ namespace ts {
       it("clear", () => {
         const set = createSet<number, number>(
           (x) => x % 2,
-          (x, y) => x % 4 === y % 4
+          (x, y) => x % 4 === y % 4,
         );
         for (let j = 0; j < 2; j++) {
           for (let i = 0; i < 100; i++) {
@@ -152,7 +152,7 @@ namespace ts {
       it("forEach", () => {
         const set = createSet<number, number>(
           (x) => x % 2,
-          (x, y) => x % 4 === y % 4
+          (x, y) => x % 4 === y % 4,
         );
         for (let i = 0; i < 100; i++) {
           set.add(i);
@@ -178,7 +178,7 @@ namespace ts {
       it("iteration", () => {
         const set = createSet<number, number>(
           (x) => x % 2,
-          (x, y) => x % 4 === y % 4
+          (x, y) => x % 4 === y % 4,
         );
         for (let i = 0; i < 4; i++) {
           set.add(i);
@@ -209,7 +209,7 @@ namespace ts {
 
         const set = createSet<Thing, string>(
           (t) => t.y,
-          (t, u) => t.x === u.x && t.y === u.y
+          (t, u) => t.x === u.x && t.y === u.y,
         );
 
         const thing1: Thing = {
@@ -241,14 +241,14 @@ namespace ts {
           set.has({
             x: 4,
             y: "a", // Collides with thing1
-          })
+          }),
         );
 
         assert.isFalse(
           set.has({
             x: 5,
             y: "c", // No collision
-          })
+          }),
         );
       });
     });

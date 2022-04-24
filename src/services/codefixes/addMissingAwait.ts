@@ -1,11 +1,10 @@
 /* @internal */
 namespace ts.codefix {
   type ContextualTrackChangesFunction = (
-    cb: (changeTracker: textChanges.ChangeTracker) => void
+    cb: (changeTracker: textChanges.ChangeTracker) => void,
   ) => FileTextChanges[];
   const fixId = "addMissingAwait";
-  const propertyAccessCode =
-    Diagnostics.Property_0_does_not_exist_on_type_1.code;
+  const propertyAccessCode = Diagnostics.Property_0_does_not_exist_on_type_1.code;
   const callableConstructableErrorCodes = [
     Diagnostics.This_expression_is_not_callable.code,
     Diagnostics.This_expression_is_not_constructable.code,
@@ -54,29 +53,27 @@ namespace ts.codefix {
     fixIds: [fixId],
     errorCodes,
     getCodeActions: function getCodeActionsToAddMissingAwait(context) {
-      const { sourceFile, errorCode, span, cancellationToken, program } =
-        context;
+      const { sourceFile, errorCode, span, cancellationToken, program } = context;
       const expression = getAwaitErrorSpanExpression(
         sourceFile,
         errorCode,
         span,
         cancellationToken,
-        program
+        program,
       );
       if (!expression) {
         return;
       }
 
       const checker = context.program.getTypeChecker();
-      const trackChanges: ContextualTrackChangesFunction = (cb) =>
-        textChanges.ChangeTracker.with(context, cb);
+      const trackChanges: ContextualTrackChangesFunction = (cb) => textChanges.ChangeTracker.with(context, cb);
       return compact([
         getDeclarationSiteFix(
           context,
           expression,
           errorCode,
           checker,
-          trackChanges
+          trackChanges,
         ),
         getUseSiteFix(context, expression, errorCode, checker, trackChanges),
       ]);
@@ -91,7 +88,7 @@ namespace ts.codefix {
           diagnostic.code,
           diagnostic,
           cancellationToken,
-          program
+          program,
         );
         if (!expression) {
           return;
@@ -106,15 +103,15 @@ namespace ts.codefix {
             diagnostic.code,
             checker,
             trackChanges,
-            fixedDeclarations
-          ) ||
-          getUseSiteFix(
+            fixedDeclarations,
+          )
+          || getUseSiteFix(
             context,
             expression,
             diagnostic.code,
             checker,
             trackChanges,
-            fixedDeclarations
+            fixedDeclarations,
           )
         );
       });
@@ -126,18 +123,18 @@ namespace ts.codefix {
     errorCode: number,
     span: TextSpan,
     cancellationToken: CancellationToken,
-    program: Program
+    program: Program,
   ) {
     const expression = getFixableErrorSpanExpression(sourceFile, span);
-    return expression &&
-      isMissingAwaitError(
-        sourceFile,
-        errorCode,
-        span,
-        cancellationToken,
-        program
-      ) &&
-      isInsideAwaitableBody(expression)
+    return expression
+        && isMissingAwaitError(
+          sourceFile,
+          errorCode,
+          span,
+          cancellationToken,
+          program,
+        )
+        && isInsideAwaitableBody(expression)
       ? expression
       : undefined;
   }
@@ -148,7 +145,7 @@ namespace ts.codefix {
     errorCode: number,
     checker: TypeChecker,
     trackChanges: ContextualTrackChangesFunction,
-    fixedDeclarations?: Set<number>
+    fixedDeclarations?: Set<number>,
   ) {
     const { sourceFile, program, cancellationToken } = context;
     const awaitableInitializers = findAwaitableInitializers(
@@ -156,7 +153,7 @@ namespace ts.codefix {
       sourceFile,
       cancellationToken,
       program,
-      checker
+      checker,
     );
     if (awaitableInitializers) {
       const initializerChanges = trackChanges((t) => {
@@ -167,12 +164,11 @@ namespace ts.codefix {
             sourceFile,
             checker,
             expression,
-            fixedDeclarations
-          )
-        );
+            fixedDeclarations,
+          ));
         if (
-          fixedDeclarations &&
-          awaitableInitializers.needsSecondPassForFixAll
+          fixedDeclarations
+          && awaitableInitializers.needsSecondPassForFixAll
         ) {
           makeChange(
             t,
@@ -180,7 +176,7 @@ namespace ts.codefix {
             sourceFile,
             checker,
             expression,
-            fixedDeclarations
+            fixedDeclarations,
           );
         }
       });
@@ -191,10 +187,10 @@ namespace ts.codefix {
         initializerChanges,
         awaitableInitializers.initializers.length === 1
           ? [
-              Diagnostics.Add_await_to_initializer_for_0,
-              awaitableInitializers.initializers[0].declarationSymbol.name,
-            ]
-          : Diagnostics.Add_await_to_initializers
+            Diagnostics.Add_await_to_initializer_for_0,
+            awaitableInitializers.initializers[0].declarationSymbol.name,
+          ]
+          : Diagnostics.Add_await_to_initializers,
       );
     }
   }
@@ -205,7 +201,7 @@ namespace ts.codefix {
     errorCode: number,
     checker: TypeChecker,
     trackChanges: ContextualTrackChangesFunction,
-    fixedDeclarations?: Set<number>
+    fixedDeclarations?: Set<number>,
   ) {
     const changes = trackChanges((t) =>
       makeChange(
@@ -214,7 +210,7 @@ namespace ts.codefix {
         context.sourceFile,
         checker,
         expression,
-        fixedDeclarations
+        fixedDeclarations,
       )
     );
     return createCodeFixAction(
@@ -222,7 +218,7 @@ namespace ts.codefix {
       changes,
       Diagnostics.Add_await,
       fixId,
-      Diagnostics.Fix_all_expressions_possibly_missing_await
+      Diagnostics.Fix_all_expressions_possibly_missing_await,
     );
   }
 
@@ -231,23 +227,22 @@ namespace ts.codefix {
     errorCode: number,
     span: TextSpan,
     cancellationToken: CancellationToken,
-    program: Program
+    program: Program,
   ) {
     const checker = program.getTypeChecker();
     const diagnostics = checker.getDiagnostics(sourceFile, cancellationToken);
     return some(
       diagnostics,
       ({ start, length, relatedInformation, code }) =>
-        isNumber(start) &&
-        isNumber(length) &&
-        textSpansEqual({ start, length }, span) &&
-        code === errorCode &&
-        !!relatedInformation &&
-        some(
+        isNumber(start)
+        && isNumber(length)
+        && textSpansEqual({ start, length }, span)
+        && code === errorCode
+        && !!relatedInformation
+        && some(
           relatedInformation,
-          (related) =>
-            related.code === Diagnostics.Did_you_forget_to_use_await.code
-        )
+          (related) => related.code === Diagnostics.Did_you_forget_to_use_await.code,
+        ),
     );
   }
 
@@ -266,11 +261,11 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     cancellationToken: CancellationToken,
     program: Program,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): AwaitableInitializers | undefined {
     const identifiers = getIdentifiersFromErrorSpanExpression(
       expression,
-      checker
+      checker,
     );
     if (!identifiers) {
       return;
@@ -286,23 +281,22 @@ namespace ts.codefix {
 
       const declaration = tryCast(
         symbol.valueDeclaration,
-        isVariableDeclaration
+        isVariableDeclaration,
       );
-      const variableName =
-        declaration && tryCast(declaration.name, isIdentifier);
+      const variableName = declaration && tryCast(declaration.name, isIdentifier);
       const variableStatement = getAncestor(
         declaration,
-        SyntaxKind.VariableStatement
+        SyntaxKind.VariableStatement,
       );
       if (
-        !declaration ||
-        !variableStatement ||
-        declaration.type ||
-        !declaration.initializer ||
-        variableStatement.getSourceFile() !== sourceFile ||
-        hasSyntacticModifier(variableStatement, ModifierFlags.Export) ||
-        !variableName ||
-        !isInsideAwaitableBody(declaration.initializer)
+        !declaration
+        || !variableStatement
+        || declaration.type
+        || !declaration.initializer
+        || variableStatement.getSourceFile() !== sourceFile
+        || hasSyntacticModifier(variableStatement, ModifierFlags.Export)
+        || !variableName
+        || !isInsideAwaitableBody(declaration.initializer)
       ) {
         isCompleteFix = false;
         continue;
@@ -310,7 +304,7 @@ namespace ts.codefix {
 
       const diagnostics = program.getSemanticDiagnostics(
         sourceFile,
-        cancellationToken
+        cancellationToken,
       );
       const isUsedElsewhere = FindAllReferences.Core.eachSymbolReferenceInFile(
         variableName,
@@ -318,15 +312,15 @@ namespace ts.codefix {
         sourceFile,
         (reference) => {
           return (
-            identifier !== reference &&
-            !symbolReferenceIsAlsoMissingAwait(
+            identifier !== reference
+            && !symbolReferenceIsAlsoMissingAwait(
               reference,
               diagnostics,
               sourceFile,
-              checker
+              checker,
             )
           );
-        }
+        },
       );
 
       if (isUsedElsewhere) {
@@ -354,11 +348,11 @@ namespace ts.codefix {
 
   function getIdentifiersFromErrorSpanExpression(
     expression: Node,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): Identifiers | undefined {
     if (
-      isPropertyAccessExpression(expression.parent) &&
-      isIdentifier(expression.parent.expression)
+      isPropertyAccessExpression(expression.parent)
+      && isIdentifier(expression.parent.expression)
     ) {
       return {
         identifiers: [expression.parent.expression],
@@ -389,7 +383,7 @@ namespace ts.codefix {
     reference: Identifier,
     diagnostics: readonly Diagnostic[],
     sourceFile: SourceFile,
-    checker: TypeChecker
+    checker: TypeChecker,
   ) {
     const errorNode = isPropertyAccessExpression(reference.parent)
       ? reference.parent.name
@@ -399,12 +393,12 @@ namespace ts.codefix {
     const diagnostic = find(
       diagnostics,
       (diagnostic) =>
-        diagnostic.start === errorNode.getStart(sourceFile) &&
-        diagnostic.start + diagnostic.length! === errorNode.getEnd()
+        diagnostic.start === errorNode.getStart(sourceFile)
+        && diagnostic.start + diagnostic.length! === errorNode.getEnd(),
     );
 
     return (
-      (diagnostic && contains(errorCodes, diagnostic.code)) ||
+      (diagnostic && contains(errorCodes, diagnostic.code))
       // A Promise is usually not correct in a binary expression (it’s not valid
       // in an arithmetic expression and an equality comparison seems unusual),
       // but if the other side of the binary expression has an error, the side
@@ -412,24 +406,24 @@ namespace ts.codefix {
       // Promise as an invalid operand. So if the whole binary expression is
       // typed `any` as a result, there is a strong likelihood that this Promise
       // is accidentally missing `await`.
-      checker.getTypeAtLocation(errorNode).flags & TypeFlags.Any
+      || checker.getTypeAtLocation(errorNode).flags & TypeFlags.Any
     );
   }
 
   function isInsideAwaitableBody(node: Node) {
     return (
-      node.kind & NodeFlags.AwaitContext ||
-      !!findAncestor(
+      node.kind & NodeFlags.AwaitContext
+      || !!findAncestor(
         node,
         (ancestor) =>
-          (ancestor.parent &&
-            isArrowFunction(ancestor.parent) &&
-            ancestor.parent.body === ancestor) ||
-          (isBlock(ancestor) &&
-            (ancestor.parent.kind === SyntaxKind.FunctionDeclaration ||
-              ancestor.parent.kind === SyntaxKind.FunctionExpression ||
-              ancestor.parent.kind === SyntaxKind.ArrowFunction ||
-              ancestor.parent.kind === SyntaxKind.MethodDeclaration))
+          (ancestor.parent
+            && isArrowFunction(ancestor.parent)
+            && ancestor.parent.body === ancestor)
+          || (isBlock(ancestor)
+            && (ancestor.parent.kind === SyntaxKind.FunctionDeclaration
+              || ancestor.parent.kind === SyntaxKind.FunctionExpression
+              || ancestor.parent.kind === SyntaxKind.ArrowFunction
+              || ancestor.parent.kind === SyntaxKind.MethodDeclaration)),
       )
     );
   }
@@ -440,7 +434,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     checker: TypeChecker,
     insertionSite: Expression,
-    fixedDeclarations?: Set<number>
+    fixedDeclarations?: Set<number>,
   ) {
     if (isBinaryExpression(insertionSite)) {
       for (const side of [insertionSite.left, insertionSite.right]) {
@@ -457,12 +451,12 @@ namespace ts.codefix {
         changeTracker.replaceNode(sourceFile, side, newNode);
       }
     } else if (
-      errorCode === propertyAccessCode &&
-      isPropertyAccessExpression(insertionSite.parent)
+      errorCode === propertyAccessCode
+      && isPropertyAccessExpression(insertionSite.parent)
     ) {
       if (fixedDeclarations && isIdentifier(insertionSite.parent.expression)) {
         const symbol = checker.getSymbolAtLocation(
-          insertionSite.parent.expression
+          insertionSite.parent.expression,
         );
         if (symbol && fixedDeclarations.has(getSymbolId(symbol))) {
           return;
@@ -472,17 +466,17 @@ namespace ts.codefix {
         sourceFile,
         insertionSite.parent.expression,
         factory.createParenthesizedExpression(
-          factory.createAwaitExpression(insertionSite.parent.expression)
-        )
+          factory.createAwaitExpression(insertionSite.parent.expression),
+        ),
       );
       insertLeadingSemicolonIfNeeded(
         changeTracker,
         insertionSite.parent.expression,
-        sourceFile
+        sourceFile,
       );
     } else if (
-      contains(callableConstructableErrorCodes, errorCode) &&
-      isCallOrNewExpression(insertionSite.parent)
+      contains(callableConstructableErrorCodes, errorCode)
+      && isCallOrNewExpression(insertionSite.parent)
     ) {
       if (fixedDeclarations && isIdentifier(insertionSite)) {
         const symbol = checker.getSymbolAtLocation(insertionSite);
@@ -494,15 +488,15 @@ namespace ts.codefix {
         sourceFile,
         insertionSite,
         factory.createParenthesizedExpression(
-          factory.createAwaitExpression(insertionSite)
-        )
+          factory.createAwaitExpression(insertionSite),
+        ),
       );
       insertLeadingSemicolonIfNeeded(changeTracker, insertionSite, sourceFile);
     } else {
       if (
-        fixedDeclarations &&
-        isVariableDeclaration(insertionSite.parent) &&
-        isIdentifier(insertionSite.parent.name)
+        fixedDeclarations
+        && isVariableDeclaration(insertionSite.parent)
+        && isIdentifier(insertionSite.parent.name)
       ) {
         const symbol = checker.getSymbolAtLocation(insertionSite.parent.name);
         if (symbol && !tryAddToSet(fixedDeclarations, getSymbolId(symbol))) {
@@ -512,7 +506,7 @@ namespace ts.codefix {
       changeTracker.replaceNode(
         sourceFile,
         insertionSite,
-        factory.createAwaitExpression(insertionSite)
+        factory.createAwaitExpression(insertionSite),
       );
     }
   }
@@ -520,21 +514,21 @@ namespace ts.codefix {
   function insertLeadingSemicolonIfNeeded(
     changeTracker: textChanges.ChangeTracker,
     beforeNode: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ) {
     const precedingToken = findPrecedingToken(beforeNode.pos, sourceFile);
     if (
-      precedingToken &&
-      positionIsASICandidate(
+      precedingToken
+      && positionIsASICandidate(
         precedingToken.end,
         precedingToken.parent,
-        sourceFile
+        sourceFile,
       )
     ) {
       changeTracker.insertText(
         sourceFile,
         beforeNode.getStart(sourceFile),
-        ";"
+        ";",
       );
     }
   }

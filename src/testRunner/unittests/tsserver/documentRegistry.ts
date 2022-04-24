@@ -20,7 +20,7 @@ namespace ts.projectSystem {
 
     function checkProject(
       service: TestProjectService,
-      moduleIsOrphan: boolean
+      moduleIsOrphan: boolean,
     ) {
       // Update the project
       const project = getProject(service);
@@ -35,14 +35,14 @@ namespace ts.projectSystem {
       assert.isDefined(moduleInfo);
       assert.equal(moduleInfo.isOrphan(), moduleIsOrphan);
       const key = service.documentRegistry.getKeyForCompilationSettings(
-        project.getCompilationSettings()
+        project.getCompilationSettings(),
       );
       assert.deepEqual(
         service.documentRegistry.getLanguageServiceRefCounts(
           moduleInfo.path,
-          moduleInfo.scriptKind
+          moduleInfo.scriptKind,
         ),
-        [[key, moduleIsOrphan ? undefined : 1]]
+        [[key, moduleIsOrphan ? undefined : 1]],
       );
     }
 
@@ -61,7 +61,7 @@ namespace ts.projectSystem {
         singleIterator({
           span: { start: 0, length: importModuleContent.length },
           newText: "",
-        })
+        }),
       );
       checkProject(service, /*moduleIsOrphan*/ true);
     }
@@ -73,7 +73,7 @@ namespace ts.projectSystem {
         singleIterator({
           span: { start: 0, length: 0 },
           newText: importModuleContent,
-        })
+        }),
       );
       checkProject(service, /*moduleIsOrphan*/ false);
     }
@@ -108,8 +108,7 @@ namespace ts.projectSystem {
       changeFileToNotImportModule(service);
       assert.equal(moduleInfo.cacheSourceFile!.sourceFile, sourceFile);
 
-      const updatedModuleContent =
-        moduleFile.content + "\nexport const b: number;";
+      const updatedModuleContent = moduleFile.content + "\nexport const b: number;";
       host.writeFile(moduleFile.path, updatedModuleContent);
 
       // write content back
@@ -117,11 +116,11 @@ namespace ts.projectSystem {
       assert.notEqual(moduleInfo.cacheSourceFile!.sourceFile, sourceFile);
       assert.equal(
         project.getSourceFile(moduleInfo.path),
-        moduleInfo.cacheSourceFile!.sourceFile
+        moduleInfo.cacheSourceFile!.sourceFile,
       );
       assert.equal(
         moduleInfo.cacheSourceFile!.sourceFile.text,
-        updatedModuleContent
+        updatedModuleContent,
       );
     });
   });

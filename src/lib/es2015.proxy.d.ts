@@ -4,13 +4,13 @@ interface ProxyHandler<T extends object> {
   defineProperty?(
     target: T,
     p: string | symbol,
-    attributes: PropertyDescriptor
+    attributes: PropertyDescriptor,
   ): boolean;
   deleteProperty?(target: T, p: string | symbol): boolean;
   get?(target: T, p: string | symbol, receiver: any): any;
   getOwnPropertyDescriptor?(
     target: T,
-    p: string | symbol
+    p: string | symbol,
   ): PropertyDescriptor | undefined;
   getPrototypeOf?(target: T): object | null;
   has?(target: T, p: string | symbol): boolean;
@@ -24,8 +24,8 @@ interface ProxyHandler<T extends object> {
 interface ProxyConstructor {
   revocable<T extends object>(
     target: T,
-    handler: ProxyHandler<T>
+    handler: ProxyHandler<T>,
   ): { proxy: T; revoke: () => void };
-  new <T extends object>(target: T, handler: ProxyHandler<T>): T;
+  new<T extends object>(target: T, handler: ProxyHandler<T>): T;
 }
 declare var Proxy: ProxyConstructor;

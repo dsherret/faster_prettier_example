@@ -13,8 +13,9 @@ namespace ts.codefix {
     getCodeActions(context) {
       const { sourceFile, span, preferences } = context;
       const property = getPropertyAccessExpression(sourceFile, span.start);
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, context.sourceFile, property, preferences)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChange(t, context.sourceFile, property, preferences),
       );
       return [
         createCodeFixAction(
@@ -22,7 +23,7 @@ namespace ts.codefix {
           changes,
           [Diagnostics.Use_element_access_for_0, property.name.text],
           fixId,
-          Diagnostics.Use_element_access_for_all_undeclared_properties
+          Diagnostics.Use_element_access_for_all_undeclared_properties,
         ),
       ];
     },
@@ -32,45 +33,44 @@ namespace ts.codefix {
           changes,
           diag.file,
           getPropertyAccessExpression(diag.file, diag.start),
-          context.preferences
-        )
-      ),
+          context.preferences,
+        )),
   });
 
   function doChange(
     changes: textChanges.ChangeTracker,
     sourceFile: SourceFile,
     node: PropertyAccessExpression,
-    preferences: UserPreferences
+    preferences: UserPreferences,
   ): void {
     const quotePreference = getQuotePreference(sourceFile, preferences);
     const argumentsExpression = factory.createStringLiteral(
       node.name.text,
-      quotePreference === QuotePreference.Single
+      quotePreference === QuotePreference.Single,
     );
     changes.replaceNode(
       sourceFile,
       node,
       isPropertyAccessChain(node)
         ? factory.createElementAccessChain(
-            node.expression,
-            node.questionDotToken,
-            argumentsExpression
-          )
+          node.expression,
+          node.questionDotToken,
+          argumentsExpression,
+        )
         : factory.createElementAccessExpression(
-            node.expression,
-            argumentsExpression
-          )
+          node.expression,
+          argumentsExpression,
+        ),
     );
   }
 
   function getPropertyAccessExpression(
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ): PropertyAccessExpression {
     return cast(
       getTokenAtPosition(sourceFile, pos).parent,
-      isPropertyAccessExpression
+      isPropertyAccessExpression,
     );
   }
 }

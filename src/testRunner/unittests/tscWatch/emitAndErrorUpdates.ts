@@ -4,8 +4,7 @@ namespace ts.tscWatch {
       path: `${projectRoot}/tsconfig.json`,
       content: `{}`,
     };
-    interface VerifyEmitAndErrorUpdatesWorker
-      extends VerifyEmitAndErrorUpdates {
+    interface VerifyEmitAndErrorUpdatesWorker extends VerifyEmitAndErrorUpdates {
       configFile: () => File;
     }
     function verifyEmitAndErrorUpdatesWorker({
@@ -43,7 +42,7 @@ namespace ts.tscWatch {
 
     function changeCompilerOptions(
       input: VerifyEmitAndErrorUpdates,
-      additionalOptions: CompilerOptions
+      additionalOptions: CompilerOptions,
     ): File {
       const configFile = input.configFile?.() || config;
       const content = JSON.parse(configFile.content);
@@ -79,8 +78,7 @@ namespace ts.tscWatch {
       verifyEmitAndErrorUpdatesWorker({
         ...input,
         subScenario: `isolatedModules/${input.subScenario}`,
-        configFile: () =>
-          changeCompilerOptions(input, { isolatedModules: true }),
+        configFile: () => changeCompilerOptions(input, { isolatedModules: true }),
       });
 
       verifyEmitAndErrorUpdatesWorker({
@@ -125,30 +123,25 @@ console.log(b.c.d);`,
       function verifyDeepImportChange(
         subScenario: string,
         bFile: File,
-        cFile: File
+        cFile: File,
       ) {
         verifyEmitAndErrorUpdates({
           subScenario: `deepImportChanges/${subScenario}`,
           files: () => [aFile, bFile, cFile],
           changes: [
             {
-              caption:
-                "Rename property d to d2 of class C to initialize signatures",
-              change: (sys) =>
-                sys.writeFile(cFile.path, cFile.content.replace("d", "d2")),
+              caption: "Rename property d to d2 of class C to initialize signatures",
+              change: (sys) => sys.writeFile(cFile.path, cFile.content.replace("d", "d2")),
               timeouts: runQueuedTimeoutCallbacks,
             },
             {
-              caption:
-                "Rename property d2 to d of class C to revert back to original text",
-              change: (sys) =>
-                sys.writeFile(cFile.path, cFile.content.replace("d2", "d")),
+              caption: "Rename property d2 to d of class C to revert back to original text",
+              change: (sys) => sys.writeFile(cFile.path, cFile.content.replace("d2", "d")),
               timeouts: runQueuedTimeoutCallbacks,
             },
             {
               caption: "Rename property d to d2 of class C",
-              change: (sys) =>
-                sys.writeFile(cFile.path, cFile.content.replace("d", "d2")),
+              change: (sys) => sys.writeFile(cFile.path, cFile.content.replace("d", "d2")),
               timeouts: runQueuedTimeoutCallbacks,
             },
           ],
@@ -237,26 +230,22 @@ getPoint().c.x;`,
         files: () => [aFile, bFile, cFile, dFile, eFile],
         changes: [
           {
-            caption:
-              "Rename property x2 to x of interface Coords to initialize signatures",
-            change: (sys) =>
-              sys.writeFile(aFile.path, aFile.content.replace("x2", "x")),
+            caption: "Rename property x2 to x of interface Coords to initialize signatures",
+            change: (sys) => sys.writeFile(aFile.path, aFile.content.replace("x2", "x")),
             timeouts: runQueuedTimeoutCallbacks,
           },
           {
-            caption:
-              "Rename property x to x2 of interface Coords to revert back to original text",
+            caption: "Rename property x to x2 of interface Coords to revert back to original text",
             change: (sys) =>
               sys.writeFile(
                 aFile.path,
-                aFile.content.replace("x: number", "x2: number")
+                aFile.content.replace("x: number", "x2: number"),
               ),
             timeouts: runQueuedTimeoutCallbacks,
           },
           {
             caption: "Rename property x2 to x of interface Coords",
-            change: (sys) =>
-              sys.writeFile(aFile.path, aFile.content.replace("x2", "x")),
+            change: (sys) => sys.writeFile(aFile.path, aFile.content.replace("x2", "x")),
             timeouts: runQueuedTimeoutCallbacks,
           },
         ],
@@ -312,7 +301,7 @@ export class Data {
 
       function verifyTransitiveExports(
         subScenario: string,
-        files: readonly File[]
+        files: readonly File[],
       ) {
         verifyEmitAndErrorUpdates({
           subScenario: `transitive exports/${subScenario}`,
@@ -327,22 +316,20 @@ export class Data {
           configFile: () => config,
           changes: [
             {
-              caption:
-                "Rename property title to title2 of interface ITest to initialize signatures",
+              caption: "Rename property title to title2 of interface ITest to initialize signatures",
               change: (sys) =>
                 sys.writeFile(
                   lib1ToolsInterface.path,
-                  lib1ToolsInterface.content.replace("title", "title2")
+                  lib1ToolsInterface.content.replace("title", "title2"),
                 ),
               timeouts: runQueuedTimeoutCallbacks,
             },
             {
-              caption:
-                "Rename property title2 to title of interface ITest to revert back to original text",
+              caption: "Rename property title2 to title of interface ITest to revert back to original text",
               change: (sys) =>
                 sys.writeFile(
                   lib1ToolsInterface.path,
-                  lib1ToolsInterface.content.replace("title2", "title")
+                  lib1ToolsInterface.content.replace("title2", "title"),
                 ),
               timeouts: runQueuedTimeoutCallbacks,
             },
@@ -351,7 +338,7 @@ export class Data {
               change: (sys) =>
                 sys.writeFile(
                   lib1ToolsInterface.path,
-                  lib1ToolsInterface.content.replace("title", "title2")
+                  lib1ToolsInterface.content.replace("title", "title2"),
                 ),
               timeouts: runQueuedTimeoutCallbacks,
             },
@@ -395,7 +382,7 @@ export class Data2 {
           change: (sys) =>
             sys.writeFile(
               `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`,
-              content
+              content,
             ),
           // build project
           timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -407,8 +394,8 @@ export class Data2 {
           sys.writeFile(
             `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`,
             sys.readFile(
-              `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`
-            )!
+              `${TestFSWithWatch.tsbuildProjectsLocation}/noEmitOnError/src/main.ts`,
+            )!,
           ),
         // build project
         timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -424,7 +411,7 @@ export class Data2 {
         configFile: () =>
           TestFSWithWatch.getTsBuildProjectFile(
             "noEmitOnError",
-            "tsconfig.json"
+            "tsconfig.json",
           ),
         changes: [
           noChange,
@@ -433,18 +420,18 @@ export class Data2 {
             `import { A } from "../shared/types/db";
 const a = {
     lastName: 'sdsd'
-};`
+};`,
           ),
           change(
             "Semantic Error",
             `import { A } from "../shared/types/db";
-const a: string = 10;`
+const a: string = 10;`,
           ),
           noChange,
           change(
             "Fix Semantic Error",
             `import { A } from "../shared/types/db";
-const a: string = "hello";`
+const a: string = "hello";`,
           ),
           noChange,
         ],

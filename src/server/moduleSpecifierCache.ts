@@ -5,15 +5,16 @@ namespace ts.server {
   }
 
   export function createModuleSpecifierCache(
-    host: ModuleSpecifierResolutionCacheHost
+    host: ModuleSpecifierResolutionCacheHost,
   ): ModuleSpecifierCache {
     let containedNodeModulesWatchers: ESMap<string, FileWatcher> | undefined;
     let cache: ESMap<Path, ResolvedModuleSpecifierInfo> | undefined;
     let currentKey: string | undefined;
     const result: ModuleSpecifierCache = {
       get(fromFileName, toFileName, preferences, options) {
-        if (!cache || currentKey !== key(fromFileName, preferences, options))
+        if (!cache || currentKey !== key(fromFileName, preferences, options)) {
           return undefined;
+        }
         return cache.get(toFileName);
       },
       set(
@@ -22,11 +23,11 @@ namespace ts.server {
         preferences,
         options,
         modulePaths,
-        moduleSpecifiers
+        moduleSpecifiers,
       ) {
         ensureCache(fromFileName, preferences, options).set(
           toFileName,
-          createInfo(modulePaths, moduleSpecifiers, /*isAutoImportable*/ true)
+          createInfo(modulePaths, moduleSpecifiers, /*isAutoImportable*/ true),
         );
 
         // If any module specifiers were generated based off paths in node_modules,
@@ -40,14 +41,14 @@ namespace ts.server {
               // No trailing slash
               const nodeModulesPath = p.path.substring(
                 0,
-                p.path.indexOf(nodeModulesPathPart) +
-                  nodeModulesPathPart.length -
-                  1
+                p.path.indexOf(nodeModulesPathPart)
+                  + nodeModulesPathPart.length
+                  - 1,
               );
               if (!containedNodeModulesWatchers?.has(nodeModulesPath)) {
                 (containedNodeModulesWatchers ||= new Map()).set(
                   nodeModulesPath,
-                  host.watchNodeModulesForPackageJsonChanges(nodeModulesPath)
+                  host.watchNodeModulesForPackageJsonChanges(nodeModulesPath),
                 );
               }
             }
@@ -59,7 +60,7 @@ namespace ts.server {
         toFileName,
         preferences,
         options,
-        modulePaths
+        modulePaths,
       ) {
         const cache = ensureCache(fromFileName, preferences, options);
         const info = cache.get(toFileName);
@@ -71,8 +72,8 @@ namespace ts.server {
             createInfo(
               modulePaths,
               /*moduleSpecifiers*/ undefined,
-              /*isAutoImportable*/ undefined
-            )
+              /*isAutoImportable*/ undefined,
+            ),
           );
         }
       },
@@ -81,7 +82,7 @@ namespace ts.server {
         toFileName,
         preferences,
         options,
-        isAutoImportable
+        isAutoImportable,
       ) {
         const cache = ensureCache(fromFileName, preferences, options);
         const info = cache.get(toFileName);
@@ -93,8 +94,8 @@ namespace ts.server {
             createInfo(
               /*modulePaths*/ undefined,
               /*moduleSpecifiers*/ undefined,
-              isAutoImportable
-            )
+              isAutoImportable,
+            ),
           );
         }
       },
@@ -116,7 +117,7 @@ namespace ts.server {
     function ensureCache(
       fromFileName: Path,
       preferences: UserPreferences,
-      options: ModuleSpecifierOptions
+      options: ModuleSpecifierOptions,
     ) {
       const newKey = key(fromFileName, preferences, options);
       if (cache && currentKey !== newKey) {
@@ -129,7 +130,7 @@ namespace ts.server {
     function key(
       fromFileName: Path,
       preferences: UserPreferences,
-      options: ModuleSpecifierOptions
+      options: ModuleSpecifierOptions,
     ) {
       return `${fromFileName},${preferences.importModuleSpecifierEnding},${preferences.importModuleSpecifierPreference},${options.overrideImportMode}`;
     }
@@ -137,7 +138,7 @@ namespace ts.server {
     function createInfo(
       modulePaths: readonly ModulePath[] | undefined,
       moduleSpecifiers: readonly string[] | undefined,
-      isAutoImportable: boolean | undefined
+      isAutoImportable: boolean | undefined,
     ): ResolvedModuleSpecifierInfo {
       return { modulePaths, moduleSpecifiers, isAutoImportable };
     }

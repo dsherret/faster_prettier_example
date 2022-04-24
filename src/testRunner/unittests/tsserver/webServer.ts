@@ -5,7 +5,7 @@ namespace ts.projectSystem {
         host: server.ServerHost,
         webHost: server.HostWithWriteMessage,
         options: Partial<server.StartSessionOptions>,
-        logger: server.Logger
+        logger: server.Logger,
       ) {
         super(
           host,
@@ -24,7 +24,7 @@ namespace ts.projectSystem {
           },
           logger,
           server.nullCancellationToken,
-          () => emptyArray
+          () => emptyArray,
         );
       }
 
@@ -40,18 +40,15 @@ namespace ts.projectSystem {
         fileExists: (s) => host.fileExists(s),
         writeMessage: (s) => messages.push(s),
       };
-      const webSys = server.createWebSystem(webHost, emptyArray, () =>
-        host.getExecutingFilePath()
-      );
-      const logger =
-        logLevel !== undefined
-          ? new server.MainProcessLogger(logLevel, webHost)
-          : nullLogger();
+      const webSys = server.createWebSystem(webHost, emptyArray, () => host.getExecutingFilePath());
+      const logger = logLevel !== undefined
+        ? new server.MainProcessLogger(logLevel, webHost)
+        : nullLogger();
       const session = new TestWorkerSession(
         webSys,
         webHost,
         { serverMode: LanguageServiceMode.PartialSemantic },
-        logger
+        logger,
       );
       return {
         getMessages: () => messages,
@@ -66,8 +63,7 @@ namespace ts.projectSystem {
         const service = session.getProjectService();
         const file: File = {
           path: "^memfs:/sample-folder/large.ts",
-          content:
-            "export const numberConst = 10; export const arrayConst: Array<string> = [];",
+          content: "export const numberConst = 10; export const arrayConst: Array<string> = [];",
         };
         session.executeCommand({
           seq: 1,
@@ -139,8 +135,7 @@ namespace ts.projectSystem {
                   ...protocolTextSpanWithContextFromSubstring({
                     fileText: libFile.content,
                     text: "Array",
-                    contextText:
-                      "interface Array<T> { length: number; [n: number]: T; }",
+                    contextText: "interface Array<T> { length: number; [n: number]: T; }",
                   }),
                 },
               ],
@@ -161,7 +156,7 @@ namespace ts.projectSystem {
           assert.equal(
             messages.length,
             logLevel === server.LogLevel.verbose ? 4 : 1,
-            `Expected ${JSON.stringify(messages)}`
+            `Expected ${JSON.stringify(messages)}`,
           );
           if (logLevel === server.LogLevel.verbose) {
             verifyLogMessages(messages[0], "info");
@@ -173,7 +168,7 @@ namespace ts.projectSystem {
 
         function verifyLogMessages(
           actual: any,
-          expectedLevel: server.MessageLogLevel
+          expectedLevel: server.MessageLogLevel,
         ) {
           assert.equal(actual.type, "log");
           assert.equal(actual.level, expectedLevel);

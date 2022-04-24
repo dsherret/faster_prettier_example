@@ -29,8 +29,9 @@ namespace ts.codefix {
       if (!info) return undefined;
       const { node, suggestedSymbol } = info;
       const target = getEmitScriptTarget(context.host.getCompilationSettings());
-      const changes = textChanges.ChangeTracker.with(context, (t) =>
-        doChange(t, sourceFile, node, suggestedSymbol, target)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (t) => doChange(t, sourceFile, node, suggestedSymbol, target),
       );
       return [
         createCodeFixAction(
@@ -38,7 +39,7 @@ namespace ts.codefix {
           changes,
           [Diagnostics.Change_spelling_to_0, symbolName(suggestedSymbol)],
           fixId,
-          Diagnostics.Fix_all_detected_spelling_errors
+          Diagnostics.Fix_all_detected_spelling_errors,
         ),
       ];
     },
@@ -47,16 +48,17 @@ namespace ts.codefix {
       codeFixAll(context, errorCodes, (changes, diag) => {
         const info = getInfo(diag.file, diag.start, context, diag.code);
         const target = getEmitScriptTarget(
-          context.host.getCompilationSettings()
+          context.host.getCompilationSettings(),
         );
-        if (info)
+        if (info) {
           doChange(
             changes,
             context.sourceFile,
             info.node,
             info.suggestedSymbol,
-            target
+            target,
           );
+        }
       }),
   });
 
@@ -64,7 +66,7 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     pos: number,
     context: CodeFixContextBase,
-    errorCode: number
+    errorCode: number,
   ): { node: Node; suggestedSymbol: Symbol } | undefined {
     // This is the identifier of the misspelled word. eg:
     // this.speling = 1;
@@ -73,18 +75,19 @@ namespace ts.codefix {
     const parent = node.parent;
     // Only fix spelling for No_overload_matches_this_call emitted on the React class component
     if (
-      (errorCode === Diagnostics.No_overload_matches_this_call.code ||
-        errorCode === Diagnostics.Type_0_is_not_assignable_to_type_1.code) &&
-      !isJsxAttribute(parent)
-    )
+      (errorCode === Diagnostics.No_overload_matches_this_call.code
+        || errorCode === Diagnostics.Type_0_is_not_assignable_to_type_1.code)
+      && !isJsxAttribute(parent)
+    ) {
       return undefined;
+    }
     const checker = context.program.getTypeChecker();
 
     let suggestedSymbol: Symbol | undefined;
     if (isPropertyAccessExpression(parent) && parent.name === node) {
       Debug.assert(
         isMemberName(node),
-        "Expected an identifier for spelling (property access)"
+        "Expected an identifier for spelling (property access)",
       );
       let containingType = checker.getTypeAtLocation(parent.expression);
       if (parent.flags & NodeFlags.OptionalChain) {
@@ -92,61 +95,61 @@ namespace ts.codefix {
       }
       suggestedSymbol = checker.getSuggestedSymbolForNonexistentProperty(
         node,
-        containingType
+        containingType,
       );
     } else if (
-      isBinaryExpression(parent) &&
-      parent.operatorToken.kind === SyntaxKind.InKeyword &&
-      parent.left === node &&
-      isPrivateIdentifier(node)
+      isBinaryExpression(parent)
+      && parent.operatorToken.kind === SyntaxKind.InKeyword
+      && parent.left === node
+      && isPrivateIdentifier(node)
     ) {
       const receiverType = checker.getTypeAtLocation(parent.right);
       suggestedSymbol = checker.getSuggestedSymbolForNonexistentProperty(
         node,
-        receiverType
+        receiverType,
       );
     } else if (isQualifiedName(parent) && parent.right === node) {
       const symbol = checker.getSymbolAtLocation(parent.left);
       if (symbol && symbol.flags & SymbolFlags.Module) {
         suggestedSymbol = checker.getSuggestedSymbolForNonexistentModule(
           parent.right,
-          symbol
+          symbol,
         );
       }
     } else if (isImportSpecifier(parent) && parent.name === node) {
       Debug.assertNode(
         node,
         isIdentifier,
-        "Expected an identifier for spelling (import)"
+        "Expected an identifier for spelling (import)",
       );
       const importDeclaration = findAncestor(node, isImportDeclaration)!;
       const resolvedSourceFile = getResolvedSourceFileFromImportDeclaration(
         sourceFile,
         context,
-        importDeclaration
+        importDeclaration,
       );
       if (resolvedSourceFile && resolvedSourceFile.symbol) {
         suggestedSymbol = checker.getSuggestedSymbolForNonexistentModule(
           node,
-          resolvedSourceFile.symbol
+          resolvedSourceFile.symbol,
         );
       }
     } else if (isJsxAttribute(parent) && parent.name === node) {
       Debug.assertNode(
         node,
         isIdentifier,
-        "Expected an identifier for JSX attribute"
+        "Expected an identifier for JSX attribute",
       );
       const tag = findAncestor(node, isJsxOpeningLikeElement)!;
       const props = checker.getContextualTypeForArgumentAtIndex(tag, 0);
       suggestedSymbol = checker.getSuggestedSymbolForNonexistentJSXAttribute(
         node,
-        props!
+        props!,
       );
     } else if (
-      hasSyntacticModifier(parent, ModifierFlags.Override) &&
-      isClassElement(parent) &&
-      parent.name === node
+      hasSyntacticModifier(parent, ModifierFlags.Override)
+      && isClassElement(parent)
+      && parent.name === node
     ) {
       const baseDeclaration = findAncestor(node, isClassLike);
       const baseTypeNode = baseDeclaration
@@ -158,7 +161,7 @@ namespace ts.codefix {
       if (baseType) {
         suggestedSymbol = checker.getSuggestedSymbolForNonexistentClassMember(
           getTextOfNode(node),
-          baseType
+          baseType,
         );
       }
     } else {
@@ -168,7 +171,7 @@ namespace ts.codefix {
       suggestedSymbol = checker.getSuggestedSymbolForNonexistentSymbol(
         node,
         name,
-        convertSemanticMeaningToSymbolFlags(meaning)
+        convertSemanticMeaningToSymbolFlags(meaning),
       );
     }
 
@@ -182,23 +185,23 @@ namespace ts.codefix {
     sourceFile: SourceFile,
     node: Node,
     suggestedSymbol: Symbol,
-    target: ScriptTarget
+    target: ScriptTarget,
   ) {
     const suggestion = symbolName(suggestedSymbol);
     if (
-      !isIdentifierText(suggestion, target) &&
-      isPropertyAccessExpression(node.parent)
+      !isIdentifierText(suggestion, target)
+      && isPropertyAccessExpression(node.parent)
     ) {
       const valDecl = suggestedSymbol.valueDeclaration;
       if (
-        valDecl &&
-        isNamedDeclaration(valDecl) &&
-        isPrivateIdentifier(valDecl.name)
+        valDecl
+        && isNamedDeclaration(valDecl)
+        && isPrivateIdentifier(valDecl.name)
       ) {
         changes.replaceNode(
           sourceFile,
           node,
-          factory.createIdentifier(suggestion)
+          factory.createIdentifier(suggestion),
         );
       } else {
         changes.replaceNode(
@@ -206,21 +209,21 @@ namespace ts.codefix {
           node.parent,
           factory.createElementAccessExpression(
             node.parent.expression,
-            factory.createStringLiteral(suggestion)
-          )
+            factory.createStringLiteral(suggestion),
+          ),
         );
       }
     } else {
       changes.replaceNode(
         sourceFile,
         node,
-        factory.createIdentifier(suggestion)
+        factory.createIdentifier(suggestion),
       );
     }
   }
 
   function convertSemanticMeaningToSymbolFlags(
-    meaning: SemanticMeaning
+    meaning: SemanticMeaning,
   ): SymbolFlags {
     let flags = 0;
     if (meaning & SemanticMeaning.Namespace) {
@@ -238,18 +241,19 @@ namespace ts.codefix {
   function getResolvedSourceFileFromImportDeclaration(
     sourceFile: SourceFile,
     context: CodeFixContextBase,
-    importDeclaration: ImportDeclaration
+    importDeclaration: ImportDeclaration,
   ): SourceFile | undefined {
     if (
-      !importDeclaration ||
-      !isStringLiteralLike(importDeclaration.moduleSpecifier)
-    )
+      !importDeclaration
+      || !isStringLiteralLike(importDeclaration.moduleSpecifier)
+    ) {
       return undefined;
+    }
 
     const resolvedModule = getResolvedModule(
       sourceFile,
       importDeclaration.moduleSpecifier.text,
-      getModeForUsageLocation(sourceFile, importDeclaration.moduleSpecifier)
+      getModeForUsageLocation(sourceFile, importDeclaration.moduleSpecifier),
     );
     if (!resolvedModule) return undefined;
 

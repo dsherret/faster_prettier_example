@@ -73,7 +73,7 @@ interface ArrayConstructor {
   from<T, U>(
     iterable: Iterable<T> | ArrayLike<T>,
     mapfn: (v: T, k: number) => U,
-    thisArg?: any
+    thisArg?: any,
   ): U[];
 }
 
@@ -143,14 +143,14 @@ interface ReadonlyMap<K, V> {
 }
 
 interface MapConstructor {
-  new (): Map<any, any>;
-  new <K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
+  new(): Map<any, any>;
+  new<K, V>(iterable?: Iterable<readonly [K, V]> | null): Map<K, V>;
 }
 
 interface WeakMap<K extends object, V> {}
 
 interface WeakMapConstructor {
-  new <K extends object, V>(iterable: Iterable<readonly [K, V]>): WeakMap<K, V>;
+  new<K extends object, V>(iterable: Iterable<readonly [K, V]>): WeakMap<K, V>;
 }
 
 interface Set<T> {
@@ -192,13 +192,13 @@ interface ReadonlySet<T> {
 }
 
 interface SetConstructor {
-  new <T>(iterable?: Iterable<T> | null): Set<T>;
+  new<T>(iterable?: Iterable<T> | null): Set<T>;
 }
 
 interface WeakSet<T extends object> {}
 
 interface WeakSetConstructor {
-  new <T extends object = object>(iterable: Iterable<T>): WeakSet<T>;
+  new<T extends object = object>(iterable: Iterable<T>): WeakSet<T>;
 }
 
 interface Promise<T> {}
@@ -243,7 +243,7 @@ interface Int8Array {
 }
 
 interface Int8ArrayConstructor {
-  new (elements: Iterable<number>): Int8Array;
+  new(elements: Iterable<number>): Int8Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -254,7 +254,7 @@ interface Int8ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int8Array;
 }
 
@@ -275,7 +275,7 @@ interface Uint8Array {
 }
 
 interface Uint8ArrayConstructor {
-  new (elements: Iterable<number>): Uint8Array;
+  new(elements: Iterable<number>): Uint8Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -286,7 +286,7 @@ interface Uint8ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8Array;
 }
 
@@ -309,7 +309,7 @@ interface Uint8ClampedArray {
 }
 
 interface Uint8ClampedArrayConstructor {
-  new (elements: Iterable<number>): Uint8ClampedArray;
+  new(elements: Iterable<number>): Uint8ClampedArray;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -320,7 +320,7 @@ interface Uint8ClampedArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint8ClampedArray;
 }
 
@@ -343,7 +343,7 @@ interface Int16Array {
 }
 
 interface Int16ArrayConstructor {
-  new (elements: Iterable<number>): Int16Array;
+  new(elements: Iterable<number>): Int16Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -354,7 +354,7 @@ interface Int16ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int16Array;
 }
 
@@ -375,7 +375,7 @@ interface Uint16Array {
 }
 
 interface Uint16ArrayConstructor {
-  new (elements: Iterable<number>): Uint16Array;
+  new(elements: Iterable<number>): Uint16Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -386,7 +386,7 @@ interface Uint16ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint16Array;
 }
 
@@ -407,7 +407,7 @@ interface Int32Array {
 }
 
 interface Int32ArrayConstructor {
-  new (elements: Iterable<number>): Int32Array;
+  new(elements: Iterable<number>): Int32Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -418,7 +418,7 @@ interface Int32ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Int32Array;
 }
 
@@ -439,7 +439,7 @@ interface Uint32Array {
 }
 
 interface Uint32ArrayConstructor {
-  new (elements: Iterable<number>): Uint32Array;
+  new(elements: Iterable<number>): Uint32Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -450,7 +450,7 @@ interface Uint32ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Uint32Array;
 }
 
@@ -471,7 +471,7 @@ interface Float32Array {
 }
 
 interface Float32ArrayConstructor {
-  new (elements: Iterable<number>): Float32Array;
+  new(elements: Iterable<number>): Float32Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -482,7 +482,7 @@ interface Float32ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Float32Array;
 }
 
@@ -503,7 +503,7 @@ interface Float64Array {
 }
 
 interface Float64ArrayConstructor {
-  new (elements: Iterable<number>): Float64Array;
+  new(elements: Iterable<number>): Float64Array;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -514,6 +514,6 @@ interface Float64ArrayConstructor {
   from(
     arrayLike: Iterable<number>,
     mapfn?: (v: number, k: number) => number,
-    thisArg?: any
+    thisArg?: any,
   ): Float64Array;
 }

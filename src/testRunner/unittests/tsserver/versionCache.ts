@@ -3,19 +3,19 @@ namespace ts {
     position: number,
     deletedLength: number,
     newText: string,
-    source: string
+    source: string,
   ) {
     return (
-      source.substring(0, position) +
-      newText +
-      source.substring(position + deletedLength, source.length)
+      source.substring(0, position)
+      + newText
+      + source.substring(position + deletedLength, source.length)
     );
   }
 
   function lineColToPosition(
     lineIndex: server.LineIndex,
     line: number,
-    col: number
+    col: number,
   ) {
     return lineIndex.absolutePositionOfStartOfLine(line) + (col - 1);
   }
@@ -25,13 +25,13 @@ namespace ts {
     sourceText: string,
     position: number,
     deleteLength: number,
-    insertString: string
+    insertString: string,
   ): void {
     const checkText = editFlat(
       position,
       deleteLength,
       insertString,
-      sourceText
+      sourceText,
     );
     const snapshot = lineIndex.edit(position, deleteLength, insertString);
     const editedText = snapshot.getText(0, snapshot.getLength());
@@ -44,7 +44,7 @@ namespace ts {
       line: number,
       char: number,
       deleteLength: number,
-      insertString: string
+      insertString: string,
     ) => void;
 
     before(() => {
@@ -62,7 +62,7 @@ var q:Point=<Point>p;`;
       const { lines } = server.LineIndex.linesFromText(testContent);
       assert.isTrue(
         lines.length > 0,
-        "Failed to initialize test text. Expected text to have at least one line"
+        "Failed to initialize test text. Expected text to have at least one line",
       );
 
       const lineIndex = new server.LineIndex();
@@ -72,7 +72,7 @@ var q:Point=<Point>p;`;
         line: number,
         char: number,
         deleteLength: number,
-        insertString: string
+        insertString: string,
       ) => {
         const position = lineColToPosition(lineIndex, line, char);
         validateEdit(
@@ -80,7 +80,7 @@ var q:Point=<Point>p;`;
           testContent,
           position,
           deleteLength,
-          insertString
+          insertString,
         );
       };
     });
@@ -102,7 +102,7 @@ var q:Point=<Point>p;`;
       // See below for the main thing that this tests; it would be better to have a test
       // that uses `ScriptInfo.positionToLineOffset` but I couldn't find away to do that
       const { lines } = server.LineIndex.linesFromText(
-        "function foo() {\n\ndsa\n\n}\n\nfo(dsa\n\n\n    "
+        "function foo() {\n\ndsa\n\n}\n\nfo(dsa\n\n\n    ",
       );
       const lineIndex = new server.LineIndex();
       lineIndex.load(lines);
@@ -144,7 +144,7 @@ var q:Point=<Point>p;`;
     let validateEditAtPosition: (
       position: number,
       deleteLength: number,
-      insertString: string
+      insertString: string,
     ) => void;
     let testContent: string;
     let lines: string[];
@@ -160,7 +160,7 @@ and grew 1cm per day`;
       ({ lines, lineMap } = server.LineIndex.linesFromText(testContent));
       assert.isTrue(
         lines.length > 0,
-        "Failed to initialize test text. Expected text to have at least one line"
+        "Failed to initialize test text. Expected text to have at least one line",
       );
 
       const lineIndex = new server.LineIndex();
@@ -169,14 +169,14 @@ and grew 1cm per day`;
       validateEditAtPosition = (
         position: number,
         deleteLength: number,
-        insertString: string
+        insertString: string,
       ) => {
         validateEdit(
           lineIndex,
           testContent,
           position,
           deleteLength,
-          insertString
+          insertString,
         );
       };
     });
@@ -200,7 +200,7 @@ and grew 1cm per day`;
       validateEditAtPosition(
         lineMap[lineMap.length - 2],
         lines[lines.length - 1].length,
-        ""
+        "",
       );
     });
 
@@ -224,7 +224,7 @@ and grew 1cm per day`;
       validateEditAtPosition(
         lines[0].length,
         lines[1].length + lines[2].length,
-        ""
+        "",
       );
     });
 
@@ -232,7 +232,7 @@ and grew 1cm per day`;
       validateEditAtPosition(
         21,
         1,
-        "cr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr"
+        "cr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr...\r\ncr",
       );
     });
 
@@ -297,7 +297,7 @@ and grew 1cm per day`;
       ({ lines, lineMap } = server.LineIndex.linesFromText(testContent));
       assert.isTrue(
         lines.length > 0,
-        "Failed to initialize test text. Expected text to have at least one line"
+        "Failed to initialize test text. Expected text to have at least one line",
       );
 
       lineIndex = new server.LineIndex();
@@ -359,7 +359,7 @@ and grew 1cm per day`;
       for (let i = 0; i < iterationCount; i++) {
         const insertString = testContent.substring(
           rsa[100000 - i],
-          rsa[100000 - i] + las[100000 - i]
+          rsa[100000 - i] + las[100000 - i],
         );
         const snapshot = lineIndex.edit(rsa[i], las[i], insertString);
         const checkText = editFlat(rsa[i], las[i], insertString, testContent);
@@ -386,7 +386,7 @@ and grew 1cm per day`;
       for (let i = 0; i < iterationCount; i++) {
         const insertString = testContent.substring(
           rsa[100000 - i],
-          rsa[100000 - i] + la[100000 - i]
+          rsa[100000 - i] + la[100000 - i],
         );
         const snapshot = lineIndex.edit(rsa[i], la[i], insertString);
         const checkText = editFlat(rsa[i], la[i], insertString, testContent);
@@ -402,17 +402,17 @@ and grew 1cm per day`;
         assert.equal(
           lac.line + 1,
           lp.line,
-          "Line number mismatch " + (lac.line + 1) + " " + lp.line + " " + i
+          "Line number mismatch " + (lac.line + 1) + " " + lp.line + " " + i,
         );
         assert.equal(
           lac.character,
           lp.offset - 1,
-          "Character offset mismatch " +
-            lac.character +
-            " " +
-            (lp.offset - 1) +
-            " " +
-            i
+          "Character offset mismatch "
+            + lac.character
+            + " "
+            + (lp.offset - 1)
+            + " "
+            + i,
         );
       }
     });
@@ -422,7 +422,7 @@ and grew 1cm per day`;
         for (let j = 0; j < lines.length; j++) {
           assert.equal(
             lineIndex.absolutePositionOfStartOfLine(j + 1),
-            lineMap[j]
+            lineMap[j],
           );
         }
       }

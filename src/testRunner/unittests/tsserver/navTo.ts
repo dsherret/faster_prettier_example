@@ -3,18 +3,18 @@ namespace ts.projectSystem {
     function findNavToItem(
       items: protocol.NavtoItem[],
       itemName: string,
-      itemKind: string
+      itemKind: string,
     ) {
       return find(
         items,
-        (item) => item.name === itemName && item.kind === itemKind
+        (item) => item.name === itemName && item.kind === itemKind,
       );
     }
 
     function containsNavToItem(
       items: protocol.NavtoItem[],
       itemName: string,
-      itemKind: string
+      itemKind: string,
     ) {
       return findNavToItem(items, itemName, itemKind) !== undefined;
     }
@@ -39,26 +39,25 @@ namespace ts.projectSystem {
           searchValue: "Document",
           file: file1.path,
           projectFileName: configFile.path,
-        }
+        },
       );
       const items = session.executeCommand(libTypeNavToRequest)
         .response as protocol.NavtoItem[];
       assert.isFalse(
         containsNavToItem(items, "Document", "interface"),
-        `Found lib.d.ts symbol in JavaScript project nav to request result.`
+        `Found lib.d.ts symbol in JavaScript project nav to request result.`,
       );
 
-      const localFunctionNavToRequst =
-        makeSessionRequest<protocol.NavtoRequestArgs>(CommandNames.Navto, {
-          searchValue: "foo",
-          file: file1.path,
-          projectFileName: configFile.path,
-        });
+      const localFunctionNavToRequst = makeSessionRequest<protocol.NavtoRequestArgs>(CommandNames.Navto, {
+        searchValue: "foo",
+        file: file1.path,
+        projectFileName: configFile.path,
+      });
       const items2 = session.executeCommand(localFunctionNavToRequst)
         .response as protocol.NavtoItem[];
       assert.isTrue(
         containsNavToItem(items2, "foo", "function"),
-        `Cannot find function symbol "foo".`
+        `Cannot find function symbol "foo".`,
       );
     });
 
@@ -102,7 +101,7 @@ export const ghijkl = a.abcdef;`,
         {
           searchValue: "abcdef",
           file: file1.path,
-        }
+        },
       );
       session.executeCommand(request).response as protocol.NavtoItem[];
 
@@ -159,13 +158,13 @@ export const ghijkl = a.abcdef;`,
 
       const request = makeSessionRequest<protocol.NavtoRequestArgs>(
         CommandNames.Navto,
-        { searchValue: "abcdef" }
+        { searchValue: "abcdef" },
       );
       session.executeCommand(request).response as protocol.NavtoItem[];
       baselineTsserverLogs(
         "navTo",
         "should de-duplicate symbols when searching all projects",
-        session
+        session,
       );
     });
 
@@ -189,7 +188,7 @@ export const ghijkl = a.abcdef;`,
           searchValue: "foo",
           file: file1.path,
           projectFileName: configFile.path,
-        }
+        },
       );
       const items = session.executeCommand(libTypeNavToRequest)
         .response as protocol.NavtoItem[];

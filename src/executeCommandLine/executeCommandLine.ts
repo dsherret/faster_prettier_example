@@ -56,7 +56,7 @@ namespace ts {
   function updateReportDiagnostic(
     sys: System,
     existing: DiagnosticReporter,
-    options: CompilerOptions | BuildOptions
+    options: CompilerOptions | BuildOptions,
   ): DiagnosticReporter {
     return shouldBePretty(sys, options)
       ? createDiagnosticReporter(sys, /*pretty*/ true)
@@ -65,15 +65,15 @@ namespace ts {
 
   function defaultIsPretty(sys: System) {
     return (
-      !!sys.writeOutputIsTTY &&
-      sys.writeOutputIsTTY() &&
-      !sys.getEnvironmentVariable("NO_COLOR")
+      !!sys.writeOutputIsTTY
+      && sys.writeOutputIsTTY()
+      && !sys.getEnvironmentVariable("NO_COLOR")
     );
   }
 
   function shouldBePretty(
     sys: System,
-    options: CompilerOptions | BuildOptions
+    options: CompilerOptions | BuildOptions,
   ) {
     if (!options || typeof options.pretty === "undefined") {
       return defaultIsPretty(sys);
@@ -84,9 +84,7 @@ namespace ts {
   function getOptionsForHelp(commandLine: ParsedCommandLine) {
     // Sort our options by their names, (e.g. "--noImplicitAny" comes before "--watch")
     return !!commandLine.options.all
-      ? sort(optionDeclarations, (a, b) =>
-          compareStringsCaseInsensitive(a.name, b.name)
-        )
+      ? sort(optionDeclarations, (a, b) => compareStringsCaseInsensitive(a.name, b.name))
       : filter(optionDeclarations.slice(), (v) => !!v.showInSimplifiedHelpView);
   }
 
@@ -109,13 +107,11 @@ namespace ts {
       return `\x1b[1m${str}\x1b[22m`;
     }
 
-    const isWindows =
-      sys.getEnvironmentVariable("OS") &&
-      stringContains(sys.getEnvironmentVariable("OS").toLowerCase(), "windows");
+    const isWindows = sys.getEnvironmentVariable("OS")
+      && stringContains(sys.getEnvironmentVariable("OS").toLowerCase(), "windows");
     const isWindowsTerminal = sys.getEnvironmentVariable("WT_SESSION");
-    const isVSCode =
-      sys.getEnvironmentVariable("TERM_PROGRAM") &&
-      sys.getEnvironmentVariable("TERM_PROGRAM") === "vscode";
+    const isVSCode = sys.getEnvironmentVariable("TERM_PROGRAM")
+      && sys.getEnvironmentVariable("TERM_PROGRAM") === "vscode";
 
     function blue(str: string) {
       // Effectively Powershell and Command prompt users use cyan instead
@@ -130,9 +126,8 @@ namespace ts {
     // There are ~3 types of terminal color support: 16 colors, 256 and 16m colors
     // If there is richer color support, e.g. 256+ we can use extended ANSI codes which are not just generic 'blue'
     // but a 'lighter blue' which is closer to the blue in the TS logo.
-    const supportsRicherColors =
-      sys.getEnvironmentVariable("COLORTERM") === "truecolor" ||
-      sys.getEnvironmentVariable("TERM") === "xterm-256color";
+    const supportsRicherColors = sys.getEnvironmentVariable("COLORTERM") === "truecolor"
+      || sys.getEnvironmentVariable("TERM") === "xterm-256color";
     function blueBackground(str: string) {
       if (supportsRicherColors) {
         return `\x1B[48;5;68m${str}\x1B[39;49m`;
@@ -152,16 +147,14 @@ namespace ts {
   }
 
   function getDisplayNameTextOfOption(option: CommandLineOption) {
-    return `--${option.name}${
-      option.shortName ? `, -${option.shortName}` : ""
-    }`;
+    return `--${option.name}${option.shortName ? `, -${option.shortName}` : ""}`;
   }
 
   function generateOptionOutput(
     sys: System,
     option: CommandLineOption,
     rightAlignOfLeft: number,
-    leftAlignOfRight: number
+    leftAlignOfRight: number,
   ) {
     interface ValueCandidate {
       // "one or more" or "any of"
@@ -177,13 +170,12 @@ namespace ts {
 
     // value type and possible value
     const valueCandidates = getValueCandidate(option);
-    const defaultValueDescription =
-      typeof option.defaultValueDescription === "object"
-        ? getDiagnosticText(option.defaultValueDescription)
-        : formatDefaultValue(
-            option.defaultValueDescription,
-            option.type === "list" ? option.element.type : option.type
-          );
+    const defaultValueDescription = typeof option.defaultValueDescription === "object"
+      ? getDiagnosticText(option.defaultValueDescription)
+      : formatDefaultValue(
+        option.defaultValueDescription,
+        option.type === "list" ? option.element.type : option.type,
+      );
     const terminalWidth = sys.getWidthOfTerminal?.() ?? 0;
 
     // Note: child_process might return `terminalWidth` as undefined.
@@ -199,9 +191,9 @@ namespace ts {
           rightAlignOfLeft,
           leftAlignOfRight,
           terminalWidth,
-          /*colorLeft*/ true
+          /*colorLeft*/ true,
         ),
-        sys.newLine
+        sys.newLine,
       );
       if (showAdditionalInfoOutput(valueCandidates, option)) {
         if (valueCandidates) {
@@ -212,9 +204,9 @@ namespace ts {
               rightAlignOfLeft,
               leftAlignOfRight,
               terminalWidth,
-              /*colorLeft*/ false
+              /*colorLeft*/ false,
             ),
-            sys.newLine
+            sys.newLine,
           );
         }
         if (defaultValueDescription) {
@@ -225,9 +217,9 @@ namespace ts {
               rightAlignOfLeft,
               leftAlignOfRight,
               terminalWidth,
-              /*colorLeft*/ false
+              /*colorLeft*/ false,
             ),
-            sys.newLine
+            sys.newLine,
           );
         }
       }
@@ -242,7 +234,7 @@ namespace ts {
       if (showAdditionalInfoOutput(valueCandidates, option)) {
         if (valueCandidates) {
           text.push(
-            `${valueCandidates.valueType} ${valueCandidates.possibleValues}`
+            `${valueCandidates.valueType} ${valueCandidates.possibleValues}`,
           );
         }
         if (defaultValueDescription) {
@@ -259,7 +251,7 @@ namespace ts {
 
     function formatDefaultValue(
       defaultValue: CommandLineOption["defaultValueDescription"],
-      type: CommandLineOption["type"]
+      type: CommandLineOption["type"],
     ) {
       return defaultValue !== undefined && typeof type === "object"
         ? // e.g. ScriptTarget.ES2015 -> "es6/es2015"
@@ -272,7 +264,7 @@ namespace ts {
 
     function showAdditionalInfoOutput(
       valueCandidates: ValueCandidate | undefined,
-      option: CommandLineOption
+      option: CommandLineOption,
     ): boolean {
       const ignoreValues = ["string"];
       const ignoredDescriptions = [undefined, "false", "n/a"];
@@ -280,8 +272,8 @@ namespace ts {
       if (option.category === Diagnostics.Command_line_Options) return false;
 
       if (
-        contains(ignoreValues, valueCandidates?.possibleValues) &&
-        contains(ignoredDescriptions, defaultValueDescription)
+        contains(ignoreValues, valueCandidates?.possibleValues)
+        && contains(ignoredDescriptions, defaultValueDescription)
       ) {
         return false;
       }
@@ -294,7 +286,7 @@ namespace ts {
       rightAlignOfLeft: number,
       leftAlignOfRight: number,
       terminalWidth: number,
-      colorLeft: boolean
+      colorLeft: boolean,
     ) {
       const res = [];
       let isFirstLine = true;
@@ -319,7 +311,7 @@ namespace ts {
     }
 
     function getValueCandidate(
-      option: CommandLineOption
+      option: CommandLineOption,
     ): ValueCandidate | undefined {
       // option.type might be "string" | "number" | "boolean" | "object" | "list" | ESMap<string, number | string>
       // string -- any of: string
@@ -383,7 +375,7 @@ namespace ts {
 
   function generateGroupOptionOutput(
     sys: System,
-    optionsList: readonly CommandLineOption[]
+    optionsList: readonly CommandLineOption[],
   ) {
     let maxLength = 0;
     for (const option of optionsList) {
@@ -403,7 +395,7 @@ namespace ts {
         sys,
         option,
         rightAlignOfLeftPart,
-        leftAlignOfRightPart
+        leftAlignOfRightPart,
       );
       lines = [...lines, ...tmp];
     }
@@ -420,7 +412,7 @@ namespace ts {
     options: readonly CommandLineOption[],
     subCategory: boolean,
     beforeOptionsDescription?: string,
-    afterOptionsDescription?: string
+    afterOptionsDescription?: string,
   ) {
     let res: string[] = [];
     res.push(createColors(sys).bold(sectionName) + sys.newLine + sys.newLine);
@@ -456,59 +448,61 @@ namespace ts {
 
   function printEasyHelp(
     sys: System,
-    simpleOptions: readonly CommandLineOption[]
+    simpleOptions: readonly CommandLineOption[],
   ) {
     const colors = createColors(sys);
     let output: string[] = [
       ...getHeader(
         sys,
-        `${getDiagnosticText(
-          Diagnostics.tsc_Colon_The_TypeScript_Compiler
-        )} - ${getDiagnosticText(Diagnostics.Version_0, version)}`
+        `${
+          getDiagnosticText(
+            Diagnostics.tsc_Colon_The_TypeScript_Compiler,
+          )
+        } - ${getDiagnosticText(Diagnostics.Version_0, version)}`,
       ),
     ];
     output.push(
-      colors.bold(getDiagnosticText(Diagnostics.COMMON_COMMANDS)) +
-        sys.newLine +
-        sys.newLine
+      colors.bold(getDiagnosticText(Diagnostics.COMMON_COMMANDS))
+        + sys.newLine
+        + sys.newLine,
     );
 
     example(
       "tsc",
-      Diagnostics.Compiles_the_current_project_tsconfig_json_in_the_working_directory
+      Diagnostics.Compiles_the_current_project_tsconfig_json_in_the_working_directory,
     );
     example(
       "tsc app.ts util.ts",
-      Diagnostics.Ignoring_tsconfig_json_compiles_the_specified_files_with_default_compiler_options
+      Diagnostics.Ignoring_tsconfig_json_compiles_the_specified_files_with_default_compiler_options,
     );
     example(
       "tsc -b",
-      Diagnostics.Build_a_composite_project_in_the_working_directory
+      Diagnostics.Build_a_composite_project_in_the_working_directory,
     );
     example(
       "tsc --init",
-      Diagnostics.Creates_a_tsconfig_json_with_the_recommended_settings_in_the_working_directory
+      Diagnostics.Creates_a_tsconfig_json_with_the_recommended_settings_in_the_working_directory,
     );
     example(
       "tsc -p ./path/to/tsconfig.json",
-      Diagnostics.Compiles_the_TypeScript_project_located_at_the_specified_path
+      Diagnostics.Compiles_the_TypeScript_project_located_at_the_specified_path,
     );
     example(
       "tsc --help --all",
-      Diagnostics.An_expanded_version_of_this_information_showing_all_possible_compiler_options
+      Diagnostics.An_expanded_version_of_this_information_showing_all_possible_compiler_options,
     );
     example(
       ["tsc --noEmit", "tsc --target esnext"],
-      Diagnostics.Compiles_the_current_project_with_additional_settings
+      Diagnostics.Compiles_the_current_project_with_additional_settings,
     );
 
     const cliCommands = simpleOptions.filter(
       (opt) =>
-        opt.isCommandLineOnly ||
-        opt.category === Diagnostics.Command_line_Options
+        opt.isCommandLineOnly
+        || opt.category === Diagnostics.Command_line_Options,
     );
     const configOpts = simpleOptions.filter(
-      (opt) => !contains(cliCommands, opt)
+      (opt) => !contains(cliCommands, opt),
     );
 
     output = [
@@ -519,7 +513,7 @@ namespace ts {
         cliCommands,
         /*subCategory*/ false,
         /* beforeOptionsDescription */ undefined,
-        /* afterOptionsDescription*/ undefined
+        /* afterOptionsDescription*/ undefined,
       ),
       ...generateSectionOptionsOutput(
         sys,
@@ -530,8 +524,8 @@ namespace ts {
         formatMessage(
           /*_dummy*/ undefined,
           Diagnostics.You_can_learn_about_all_of_the_compiler_options_at_0,
-          "https://aka.ms/tsc"
-        )
+          "https://aka.ms/tsc",
+        ),
       ),
     ];
 
@@ -552,14 +546,16 @@ namespace ts {
     sys: System,
     compilerOptions: readonly CommandLineOption[],
     buildOptions: readonly CommandLineOption[],
-    watchOptions: readonly CommandLineOption[]
+    watchOptions: readonly CommandLineOption[],
   ) {
     let output: string[] = [
       ...getHeader(
         sys,
-        `${getDiagnosticText(
-          Diagnostics.tsc_Colon_The_TypeScript_Compiler
-        )} - ${getDiagnosticText(Diagnostics.Version_0, version)}`
+        `${
+          getDiagnosticText(
+            Diagnostics.tsc_Colon_The_TypeScript_Compiler,
+          )
+        } - ${getDiagnosticText(Diagnostics.Version_0, version)}`,
       ),
     ];
     output = [
@@ -573,8 +569,8 @@ namespace ts {
         formatMessage(
           /*_dummy*/ undefined,
           Diagnostics.You_can_learn_about_all_of_the_compiler_options_at_0,
-          "https://aka.ms/tsc"
-        )
+          "https://aka.ms/tsc",
+        ),
       ),
     ];
     output = [
@@ -585,8 +581,9 @@ namespace ts {
         watchOptions,
         /*subCategory*/ false,
         getDiagnosticText(
-          Diagnostics.Including_watch_w_will_start_watching_the_current_project_for_the_file_changes_Once_set_you_can_config_watch_mode_with_Colon
-        )
+          Diagnostics
+            .Including_watch_w_will_start_watching_the_current_project_for_the_file_changes_Once_set_you_can_config_watch_mode_with_Colon,
+        ),
       ),
     ];
     output = [
@@ -598,9 +595,10 @@ namespace ts {
         /*subCategory*/ false,
         formatMessage(
           /*_dummy*/ undefined,
-          Diagnostics.Using_build_b_will_make_tsc_behave_more_like_a_build_orchestrator_than_a_compiler_This_is_used_to_trigger_building_composite_projects_which_you_can_learn_more_about_at_0,
-          "https://aka.ms/tsc-composite-builds"
-        )
+          Diagnostics
+            .Using_build_b_will_make_tsc_behave_more_like_a_build_orchestrator_than_a_compiler_This_is_used_to_trigger_building_composite_projects_which_you_can_learn_more_about_at_0,
+          "https://aka.ms/tsc-composite-builds",
+        ),
       ),
     ];
     for (const line of output) {
@@ -610,14 +608,16 @@ namespace ts {
 
   function printBuildHelp(
     sys: System,
-    buildOptions: readonly CommandLineOption[]
+    buildOptions: readonly CommandLineOption[],
   ) {
     let output: string[] = [
       ...getHeader(
         sys,
-        `${getDiagnosticText(
-          Diagnostics.tsc_Colon_The_TypeScript_Compiler
-        )} - ${getDiagnosticText(Diagnostics.Version_0, version)}`
+        `${
+          getDiagnosticText(
+            Diagnostics.tsc_Colon_The_TypeScript_Compiler,
+          )
+        } - ${getDiagnosticText(Diagnostics.Version_0, version)}`,
       ),
     ];
     output = [
@@ -629,9 +629,10 @@ namespace ts {
         /*subCategory*/ false,
         formatMessage(
           /*_dummy*/ undefined,
-          Diagnostics.Using_build_b_will_make_tsc_behave_more_like_a_build_orchestrator_than_a_compiler_This_is_used_to_trigger_building_composite_projects_which_you_can_learn_more_about_at_0,
-          "https://aka.ms/tsc-composite-builds"
-        )
+          Diagnostics
+            .Using_build_b_will_make_tsc_behave_more_like_a_build_orchestrator_than_a_compiler_This_is_used_to_trigger_building_composite_projects_which_you_can_learn_more_about_at_0,
+          "https://aka.ms/tsc-composite-builds",
+        ),
       ),
     ];
     for (const line of output) {
@@ -647,7 +648,7 @@ namespace ts {
 
     const tsIconFirstLine = colors.blueBackground(padLeft("", tsIconLength));
     const tsIconSecondLine = colors.blueBackground(
-      colors.brightWhite(padLeft("TS ", tsIconLength))
+      colors.brightWhite(padLeft("TS ", tsIconLength)),
     );
     // If we have enough space, print TS icon.
     if (terminalWidth >= message.length + tsIconLength) {
@@ -671,7 +672,7 @@ namespace ts {
         sys,
         getOptionsForHelp(commandLine),
         optionsForBuild,
-        optionsForWatch
+        optionsForWatch,
       );
     }
   }
@@ -679,14 +680,14 @@ namespace ts {
   function executeCommandLineWorker(
     sys: System,
     cb: ExecuteCommandLineCallbacks,
-    commandLine: ParsedCommandLine
+    commandLine: ParsedCommandLine,
   ) {
     let reportDiagnostic = createDiagnosticReporter(sys);
     if (commandLine.options.build) {
       reportDiagnostic(
         createCompilerDiagnostic(
-          Diagnostics.Option_build_must_be_the_first_command_line_argument
-        )
+          Diagnostics.Option_build_must_be_the_first_command_line_argument,
+        ),
       );
       return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
     }
@@ -697,7 +698,7 @@ namespace ts {
       validateLocaleAndSetLanguage(
         commandLine.options.locale,
         sys,
-        commandLine.errors
+        commandLine.errors,
       );
     }
 
@@ -713,7 +714,7 @@ namespace ts {
         sys,
         reportDiagnostic,
         commandLine.options,
-        commandLine.fileNames
+        commandLine.fileNames,
       );
       return sys.exit(ExitStatus.Success);
     }
@@ -733,8 +734,8 @@ namespace ts {
         createCompilerDiagnostic(
           Diagnostics.Options_0_and_1_cannot_be_combined,
           "watch",
-          "listFilesOnly"
-        )
+          "listFilesOnly",
+        ),
       );
       return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
     }
@@ -743,24 +744,24 @@ namespace ts {
       if (commandLine.fileNames.length !== 0) {
         reportDiagnostic(
           createCompilerDiagnostic(
-            Diagnostics.Option_project_cannot_be_mixed_with_source_files_on_a_command_line
-          )
+            Diagnostics.Option_project_cannot_be_mixed_with_source_files_on_a_command_line,
+          ),
         );
         return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
       }
 
       const fileOrDirectory = normalizePath(commandLine.options.project);
       if (
-        !fileOrDirectory /* current directory "." */ ||
-        sys.directoryExists(fileOrDirectory)
+        !fileOrDirectory /* current directory "." */
+        || sys.directoryExists(fileOrDirectory)
       ) {
         configFileName = combinePaths(fileOrDirectory, "tsconfig.json");
         if (!sys.fileExists(configFileName)) {
           reportDiagnostic(
             createCompilerDiagnostic(
               Diagnostics.Cannot_find_a_tsconfig_json_file_at_the_specified_directory_Colon_0,
-              commandLine.options.project
-            )
+              commandLine.options.project,
+            ),
           );
           return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
         }
@@ -770,17 +771,15 @@ namespace ts {
           reportDiagnostic(
             createCompilerDiagnostic(
               Diagnostics.The_specified_path_does_not_exist_Colon_0,
-              commandLine.options.project
-            )
+              commandLine.options.project,
+            ),
           );
           return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
         }
       }
     } else if (commandLine.fileNames.length === 0) {
       const searchPath = normalizePath(sys.getCurrentDirectory());
-      configFileName = findConfigFile(searchPath, (fileName) =>
-        sys.fileExists(fileName)
-      );
+      configFileName = findConfigFile(searchPath, (fileName) => sys.fileExists(fileName));
     }
 
     if (commandLine.fileNames.length === 0 && !configFileName) {
@@ -788,8 +787,8 @@ namespace ts {
         reportDiagnostic(
           createCompilerDiagnostic(
             Diagnostics.Cannot_find_a_tsconfig_json_file_at_the_current_directory_Colon_0,
-            normalizePath(sys.getCurrentDirectory())
-          )
+            normalizePath(sys.getCurrentDirectory()),
+          ),
         );
       } else {
         printVersion(sys);
@@ -801,7 +800,7 @@ namespace ts {
     const currentDirectory = sys.getCurrentDirectory();
     const commandLineOptions = convertToOptionsWithAbsolutePaths(
       commandLine.options,
-      (fileName) => getNormalizedAbsolutePath(fileName, currentDirectory)
+      (fileName) => getNormalizedAbsolutePath(fileName, currentDirectory),
     );
     if (configFileName) {
       const extendedConfigCache = new Map<string, ExtendedConfigCacheEntry>();
@@ -811,14 +810,14 @@ namespace ts {
         extendedConfigCache,
         commandLine.watchOptions,
         sys,
-        reportDiagnostic
+        reportDiagnostic,
       )!; // TODO: GH#18217
       if (commandLineOptions.showConfig) {
         if (configParseResult.errors.length !== 0) {
           reportDiagnostic = updateReportDiagnostic(
             sys,
             reportDiagnostic,
-            configParseResult.options
+            configParseResult.options,
           );
           configParseResult.errors.forEach(reportDiagnostic);
           return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
@@ -828,15 +827,15 @@ namespace ts {
           JSON.stringify(
             convertToTSConfig(configParseResult, configFileName, sys),
             null,
-            4
-          ) + sys.newLine
+            4,
+          ) + sys.newLine,
         );
         return sys.exit(ExitStatus.Success);
       }
       reportDiagnostic = updateReportDiagnostic(
         sys,
         reportDiagnostic,
-        configParseResult.options
+        configParseResult.options,
       );
       if (isWatchSet(configParseResult.options)) {
         if (reportWatchModeWithoutSysSupport(sys, reportDiagnostic)) return;
@@ -847,14 +846,14 @@ namespace ts {
           configParseResult,
           commandLineOptions,
           commandLine.watchOptions,
-          extendedConfigCache
+          extendedConfigCache,
         );
       } else if (isIncrementalCompilation(configParseResult.options)) {
         performIncrementalCompilation(
           sys,
           cb,
           reportDiagnostic,
-          configParseResult
+          configParseResult,
         );
       } else {
         performCompilation(sys, cb, reportDiagnostic, configParseResult);
@@ -867,18 +866,18 @@ namespace ts {
             convertToTSConfig(
               commandLine,
               combinePaths(currentDirectory, "tsconfig.json"),
-              sys
+              sys,
             ),
             null,
-            4
-          ) + sys.newLine
+            4,
+          ) + sys.newLine,
         );
         return sys.exit(ExitStatus.Success);
       }
       reportDiagnostic = updateReportDiagnostic(
         sys,
         reportDiagnostic,
-        commandLineOptions
+        commandLineOptions,
       );
       if (isWatchSet(commandLineOptions)) {
         if (reportWatchModeWithoutSysSupport(sys, reportDiagnostic)) return;
@@ -888,7 +887,7 @@ namespace ts {
           reportDiagnostic,
           commandLine.fileNames,
           commandLineOptions,
-          commandLine.watchOptions
+          commandLine.watchOptions,
         );
       } else if (isIncrementalCompilation(commandLineOptions)) {
         performIncrementalCompilation(sys, cb, reportDiagnostic, {
@@ -906,12 +905,12 @@ namespace ts {
 
   export function isBuild(commandLineArgs: readonly string[]) {
     if (
-      commandLineArgs.length > 0 &&
-      commandLineArgs[0].charCodeAt(0) === CharacterCodes.minus
+      commandLineArgs.length > 0
+      && commandLineArgs[0].charCodeAt(0) === CharacterCodes.minus
     ) {
       const firstOption = commandLineArgs[0]
         .slice(
-          commandLineArgs[0].charCodeAt(1) === CharacterCodes.minus ? 2 : 1
+          commandLineArgs[0].charCodeAt(1) === CharacterCodes.minus ? 2 : 1,
         )
         .toLowerCase();
       return firstOption === "build" || firstOption === "b";
@@ -923,19 +922,19 @@ namespace ts {
     program:
       | Program
       | EmitAndSemanticDiagnosticsBuilderProgram
-      | ParsedCommandLine
+      | ParsedCommandLine,
   ) => void;
   export function executeCommandLine(
     system: System,
     cb: ExecuteCommandLineCallbacks,
-    commandLineArgs: readonly string[]
+    commandLineArgs: readonly string[],
   ) {
     if (isBuild(commandLineArgs)) {
-      const { buildOptions, watchOptions, projects, errors } =
-        parseBuildCommand(commandLineArgs.slice(1));
+      const { buildOptions, watchOptions, projects, errors } = parseBuildCommand(commandLineArgs.slice(1));
       if (buildOptions.generateCpuProfile && system.enableCPUProfiler) {
-        system.enableCPUProfiler(buildOptions.generateCpuProfile, () =>
-          performBuild(system, cb, buildOptions, watchOptions, projects, errors)
+        system.enableCPUProfiler(
+          buildOptions.generateCpuProfile,
+          () => performBuild(system, cb, buildOptions, watchOptions, projects, errors),
         );
       } else {
         return performBuild(
@@ -944,17 +943,16 @@ namespace ts {
           buildOptions,
           watchOptions,
           projects,
-          errors
+          errors,
         );
       }
     }
 
-    const commandLine = parseCommandLine(commandLineArgs, (path) =>
-      system.readFile(path)
-    );
+    const commandLine = parseCommandLine(commandLineArgs, (path) => system.readFile(path));
     if (commandLine.options.generateCpuProfile && system.enableCPUProfiler) {
-      system.enableCPUProfiler(commandLine.options.generateCpuProfile, () =>
-        executeCommandLineWorker(system, cb, commandLine)
+      system.enableCPUProfiler(
+        commandLine.options.generateCpuProfile,
+        () => executeCommandLineWorker(system, cb, commandLine),
       );
     } else {
       return executeCommandLineWorker(system, cb, commandLine);
@@ -963,14 +961,14 @@ namespace ts {
 
   function reportWatchModeWithoutSysSupport(
     sys: System,
-    reportDiagnostic: DiagnosticReporter
+    reportDiagnostic: DiagnosticReporter,
   ) {
     if (!sys.watchFile || !sys.watchDirectory) {
       reportDiagnostic(
         createCompilerDiagnostic(
           Diagnostics.The_current_host_does_not_support_the_0_option,
-          "--watch"
-        )
+          "--watch",
+        ),
       );
       sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
       return true;
@@ -984,13 +982,13 @@ namespace ts {
     buildOptions: BuildOptions,
     watchOptions: WatchOptions | undefined,
     projects: string[],
-    errors: Diagnostic[]
+    errors: Diagnostic[],
   ) {
     // Update to pretty if host supports it
     const reportDiagnostic = updateReportDiagnostic(
       sys,
       createDiagnosticReporter(sys),
-      buildOptions
+      buildOptions,
     );
 
     if (buildOptions.locale) {
@@ -1015,15 +1013,15 @@ namespace ts {
     }
 
     if (
-      !sys.getModifiedTime ||
-      !sys.setModifiedTime ||
-      (buildOptions.clean && !sys.deleteFile)
+      !sys.getModifiedTime
+      || !sys.setModifiedTime
+      || (buildOptions.clean && !sys.deleteFile)
     ) {
       reportDiagnostic(
         createCompilerDiagnostic(
           Diagnostics.The_current_host_does_not_support_the_0_option,
-          "--build"
-        )
+          "--build",
+        ),
       );
       return sys.exit(ExitStatus.DiagnosticsPresent_OutputsSkipped);
     }
@@ -1035,14 +1033,14 @@ namespace ts {
         /*createProgram*/ undefined,
         reportDiagnostic,
         createBuilderStatusReporter(sys, shouldBePretty(sys, buildOptions)),
-        createWatchStatusReporter(sys, buildOptions)
+        createWatchStatusReporter(sys, buildOptions),
       );
       updateSolutionBuilderHost(sys, cb, buildHost);
       const builder = createSolutionBuilderWithWatch(
         buildHost,
         projects,
         buildOptions,
-        watchOptions
+        watchOptions,
       );
       builder.build();
       return builder;
@@ -1053,7 +1051,7 @@ namespace ts {
       /*createProgram*/ undefined,
       reportDiagnostic,
       createBuilderStatusReporter(sys, shouldBePretty(sys, buildOptions)),
-      createReportErrorSummary(sys, buildOptions)
+      createReportErrorSummary(sys, buildOptions),
     );
     updateSolutionBuilderHost(sys, cb, buildHost);
     const builder = createSolutionBuilder(buildHost, projects, buildOptions);
@@ -1064,13 +1062,13 @@ namespace ts {
 
   function createReportErrorSummary(
     sys: System,
-    options: CompilerOptions | BuildOptions
+    options: CompilerOptions | BuildOptions,
   ): ReportEmitErrorSummary | undefined {
     return shouldBePretty(sys, options)
       ? (errorCount, filesInError) =>
-          sys.write(
-            getErrorSummaryText(errorCount, filesInError, sys.newLine, sys)
-          )
+        sys.write(
+          getErrorSummaryText(errorCount, filesInError, sys.newLine, sys),
+        )
       : undefined;
   }
 
@@ -1078,21 +1076,19 @@ namespace ts {
     sys: System,
     cb: ExecuteCommandLineCallbacks,
     reportDiagnostic: DiagnosticReporter,
-    config: ParsedCommandLine
+    config: ParsedCommandLine,
   ) {
     const { fileNames, options, projectReferences } = config;
     const host = createCompilerHostWorker(
       options,
       /*setParentPos*/ undefined,
-      sys
+      sys,
     );
     const currentDirectory = host.getCurrentDirectory();
     const getCanonicalFileName = createGetCanonicalFileName(
-      host.useCaseSensitiveFileNames()
+      host.useCaseSensitiveFileNames(),
     );
-    changeCompilerHostLikeToUseCache(host, (fileName) =>
-      toPath(fileName, currentDirectory, getCanonicalFileName)
-    );
+    changeCompilerHostLikeToUseCache(host, (fileName) => toPath(fileName, currentDirectory, getCanonicalFileName));
     enableStatisticsAndTracing(sys, options, /*isBuildMode*/ false);
 
     const programOptions: CreateProgramOptions = {
@@ -1107,7 +1103,7 @@ namespace ts {
       program,
       reportDiagnostic,
       (s) => sys.write(s + sys.newLine),
-      createReportErrorSummary(sys, options)
+      createReportErrorSummary(sys, options),
     );
     reportStatistics(sys, program);
     cb(program);
@@ -1118,7 +1114,7 @@ namespace ts {
     sys: System,
     cb: ExecuteCommandLineCallbacks,
     reportDiagnostic: DiagnosticReporter,
-    config: ParsedCommandLine
+    config: ParsedCommandLine,
   ) {
     const { options, fileNames, projectReferences } = config;
     enableStatisticsAndTracing(sys, options, /*isBuildMode*/ false);
@@ -1143,7 +1139,7 @@ namespace ts {
   function updateSolutionBuilderHost(
     sys: System,
     cb: ExecuteCommandLineCallbacks,
-    buildHost: SolutionBuilderHostBase<EmitAndSemanticDiagnosticsBuilderProgram>
+    buildHost: SolutionBuilderHostBase<EmitAndSemanticDiagnosticsBuilderProgram>,
   ) {
     updateCreateProgram(sys, buildHost);
     buildHost.afterProgramEmitAndDiagnostics = (program) => {
@@ -1155,7 +1151,7 @@ namespace ts {
 
   function updateCreateProgram<T extends BuilderProgram>(
     sys: System,
-    host: { createProgram: CreateProgram<T> }
+    host: { createProgram: CreateProgram<T> },
   ) {
     const compileUsingBuilder = host.createProgram;
     host.createProgram = (
@@ -1164,10 +1160,10 @@ namespace ts {
       host,
       oldProgram,
       configFileParsingDiagnostics,
-      projectReferences
+      projectReferences,
     ) => {
       Debug.assert(
-        rootNames !== undefined || (options === undefined && !!oldProgram)
+        rootNames !== undefined || (options === undefined && !!oldProgram),
       );
       if (options !== undefined) {
         enableStatisticsAndTracing(sys, options, /*isBuildMode*/ true);
@@ -1178,7 +1174,7 @@ namespace ts {
         host,
         oldProgram,
         configFileParsingDiagnostics,
-        projectReferences
+        projectReferences,
       );
     };
   }
@@ -1186,7 +1182,7 @@ namespace ts {
   function updateWatchCompilationHost(
     sys: System,
     cb: ExecuteCommandLineCallbacks,
-    watchCompilerHost: WatchCompilerHost<EmitAndSemanticDiagnosticsBuilderProgram>
+    watchCompilerHost: WatchCompilerHost<EmitAndSemanticDiagnosticsBuilderProgram>,
   ) {
     updateCreateProgram(sys, watchCompilerHost);
     const emitFilesUsingBuilder = watchCompilerHost.afterProgramCreate!; // TODO: GH#18217
@@ -1199,7 +1195,7 @@ namespace ts {
 
   function createWatchStatusReporter(
     sys: System,
-    options: CompilerOptions | BuildOptions
+    options: CompilerOptions | BuildOptions,
   ) {
     return ts.createWatchStatusReporter(sys, shouldBePretty(sys, options));
   }
@@ -1211,7 +1207,7 @@ namespace ts {
     configParseResult: ParsedCommandLine,
     optionsToExtend: CompilerOptions,
     watchOptionsToExtend: WatchOptions | undefined,
-    extendedConfigCache: Map<ExtendedConfigCacheEntry>
+    extendedConfigCache: Map<ExtendedConfigCacheEntry>,
   ) {
     const watchCompilerHost = createWatchCompilerHostOfConfigFile({
       configFileName: configParseResult.options.configFilePath!,
@@ -1221,7 +1217,7 @@ namespace ts {
       reportDiagnostic,
       reportWatchStatus: createWatchStatusReporter(
         system,
-        configParseResult.options
+        configParseResult.options,
       ),
     });
     updateWatchCompilationHost(system, cb, watchCompilerHost);
@@ -1236,7 +1232,7 @@ namespace ts {
     reportDiagnostic: DiagnosticReporter,
     rootFiles: string[],
     options: CompilerOptions,
-    watchOptions: WatchOptions | undefined
+    watchOptions: WatchOptions | undefined,
   ) {
     const watchCompilerHost = createWatchCompilerHostOfFilesAndCompilerOptions({
       rootFiles,
@@ -1252,11 +1248,11 @@ namespace ts {
 
   function canReportDiagnostics(
     system: System,
-    compilerOptions: CompilerOptions
+    compilerOptions: CompilerOptions,
   ) {
     return (
-      system === sys &&
-      (compilerOptions.diagnostics || compilerOptions.extendedDiagnostics)
+      system === sys
+      && (compilerOptions.diagnostics || compilerOptions.extendedDiagnostics)
     );
   }
 
@@ -1267,7 +1263,7 @@ namespace ts {
   function enableStatisticsAndTracing(
     system: System,
     compilerOptions: CompilerOptions,
-    isBuildMode: boolean
+    isBuildMode: boolean,
   ) {
     if (canReportDiagnostics(system, compilerOptions)) {
       performance.enable(system);
@@ -1277,7 +1273,7 @@ namespace ts {
       startTracing(
         isBuildMode ? "build" : "project",
         compilerOptions.generateTrace!,
-        compilerOptions.configFilePath
+        compilerOptions.configFilePath,
       );
     }
   }
@@ -1310,16 +1306,16 @@ namespace ts {
           reduceLeftIterator(
             lineCounts.values(),
             (sum, count) => sum + count,
-            0
-          )
+            0,
+          ),
         );
         reportCountStatistic(
           "Nodes",
           reduceLeftIterator(
             nodeCounts.values(),
             (sum, count) => sum + count,
-            0
-          )
+            0,
+          ),
         );
       }
 
@@ -1331,7 +1327,7 @@ namespace ts {
       if (memoryUsed >= 0) {
         reportStatisticalValue(
           "Memory used",
-          Math.round(memoryUsed / 1000) + "K"
+          Math.round(memoryUsed / 1000) + "K",
         );
       }
 
@@ -1355,9 +1351,7 @@ namespace ts {
         reportCountStatistic("Subtype cache size", caches.subtype);
         reportCountStatistic("Strict subtype cache size", caches.strictSubtype);
         if (isPerformanceEnabled) {
-          performance.forEachMeasure((name, duration) =>
-            reportTimeStatistic(`${name} time`, duration)
-          );
+          performance.forEachMeasure((name, duration) => reportTimeStatistic(`${name} time`, duration));
         }
       } else if (isPerformanceEnabled) {
         // Individual component times.
@@ -1374,7 +1368,7 @@ namespace ts {
       if (isPerformanceEnabled) {
         reportTimeStatistic(
           "Total time",
-          programTime + bindTime + checkTime + emitTime
+          programTime + bindTime + checkTime + emitTime,
         );
       }
       reportStatistics();
@@ -1382,7 +1376,7 @@ namespace ts {
         sys.write(
           Diagnostics
             .Performance_timings_for_diagnostics_or_extendedDiagnostics_are_not_available_in_this_session_A_native_implementation_of_the_Web_Performance_API_could_not_be_found
-            .message + "\n"
+            .message + "\n",
         );
       } else {
         performance.disable();
@@ -1404,9 +1398,9 @@ namespace ts {
 
       for (const { name, value } of statistics) {
         sys.write(
-          padRight(name + ":", nameSize + 2) +
-            padLeft(value.toString(), valueSize) +
-            sys.newLine
+          padRight(name + ":", nameSize + 2)
+            + padLeft(value.toString(), valueSize)
+            + sys.newLine,
         );
       }
     }
@@ -1428,7 +1422,7 @@ namespace ts {
     sys: System,
     reportDiagnostic: DiagnosticReporter,
     options: CompilerOptions,
-    fileNames: string[]
+    fileNames: string[],
   ) {
     const currentDirectory = sys.getCurrentDirectory();
     const file = normalizePath(combinePaths(currentDirectory, "tsconfig.json"));
@@ -1436,8 +1430,8 @@ namespace ts {
       reportDiagnostic(
         createCompilerDiagnostic(
           Diagnostics.A_tsconfig_json_file_is_already_defined_at_Colon_0,
-          file
-        )
+          file,
+        ),
       );
     } else {
       sys.writeFile(file, generateTSConfig(options, fileNames, sys.newLine));
@@ -1446,12 +1440,12 @@ namespace ts {
         ...getHeader(sys, "Created a new tsconfig.json with:"),
       ];
       output.push(
-        getCompilerOptionsDiffValue(options, sys.newLine) +
-          sys.newLine +
-          sys.newLine
+        getCompilerOptionsDiffValue(options, sys.newLine)
+          + sys.newLine
+          + sys.newLine,
       );
       output.push(
-        `You can learn more at https://aka.ms/tsconfig` + sys.newLine
+        `You can learn more at https://aka.ms/tsconfig` + sys.newLine,
       );
       for (const line of output) {
         sys.write(line);

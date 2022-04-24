@@ -35,11 +35,11 @@ namespace ts.formatting {
     ]);
     const keywords = tokenRangeFromRange(
       SyntaxKind.FirstKeyword,
-      SyntaxKind.LastKeyword
+      SyntaxKind.LastKeyword,
     );
     const binaryOperators = tokenRangeFromRange(
       SyntaxKind.FirstBinaryOperator,
-      SyntaxKind.LastBinaryOperator
+      SyntaxKind.LastBinaryOperator,
     );
     const binaryKeywordOperators = [
       SyntaxKind.InKeyword,
@@ -125,14 +125,14 @@ namespace ts.formatting {
         anyToken,
         comments,
         anyContext,
-        RuleAction.StopProcessingSpaceActions
+        RuleAction.StopProcessingSpaceActions,
       ),
       rule(
         "IgnoreAfterLineComment",
         SyntaxKind.SingleLineCommentTrivia,
         anyToken,
         anyContext,
-        RuleAction.StopProcessingSpaceActions
+        RuleAction.StopProcessingSpaceActions,
       ),
 
       rule(
@@ -144,14 +144,14 @@ namespace ts.formatting {
           isNotBinaryOpContext,
           isNotTypeAnnotationContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "SpaceAfterColon",
         SyntaxKind.ColonToken,
         anyToken,
         [isNonJsxSameLineTokenContext, isNotBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBeforeQuestionMark",
@@ -162,7 +162,7 @@ namespace ts.formatting {
           isNotBinaryOpContext,
           isNotTypeAnnotationContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       // insert space after '?' only when it is used in conditional operator
       rule(
@@ -170,7 +170,7 @@ namespace ts.formatting {
         SyntaxKind.QuestionToken,
         anyToken,
         [isNonJsxSameLineTokenContext, isConditionalOperatorContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // in other cases there should be no space between '?' and next token
@@ -179,7 +179,7 @@ namespace ts.formatting {
         SyntaxKind.QuestionToken,
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -187,14 +187,14 @@ namespace ts.formatting {
         anyToken,
         [SyntaxKind.DotToken, SyntaxKind.QuestionDotToken],
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterDot",
         [SyntaxKind.DotToken, SyntaxKind.QuestionDotToken],
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -202,7 +202,7 @@ namespace ts.formatting {
         SyntaxKind.ImportKeyword,
         SyntaxKind.OpenParenToken,
         [isNonJsxSameLineTokenContext, isImportTypeContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Special handling of unary operators.
@@ -213,35 +213,35 @@ namespace ts.formatting {
         unaryPrefixOperators,
         unaryPrefixExpressions,
         [isNonJsxSameLineTokenContext, isNotBinaryOpContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterUnaryPreincrementOperator",
         SyntaxKind.PlusPlusToken,
         unaryPreincrementExpressions,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterUnaryPredecrementOperator",
         SyntaxKind.MinusMinusToken,
         unaryPredecrementExpressions,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeUnaryPostincrementOperator",
         unaryPostincrementExpressions,
         SyntaxKind.PlusPlusToken,
         [isNonJsxSameLineTokenContext, isNotStatementConditionContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeUnaryPostdecrementOperator",
         unaryPostdecrementExpressions,
         SyntaxKind.MinusMinusToken,
         [isNonJsxSameLineTokenContext, isNotStatementConditionContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // More unary operator special-casing.
@@ -254,42 +254,42 @@ namespace ts.formatting {
         SyntaxKind.PlusPlusToken,
         SyntaxKind.PlusToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterAddWhenFollowedByUnaryPlus",
         SyntaxKind.PlusToken,
         SyntaxKind.PlusToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterAddWhenFollowedByPreincrement",
         SyntaxKind.PlusToken,
         SyntaxKind.PlusPlusToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterPostdecrementWhenFollowedBySubtract",
         SyntaxKind.MinusMinusToken,
         SyntaxKind.MinusToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterSubtractWhenFollowedByUnaryMinus",
         SyntaxKind.MinusToken,
         SyntaxKind.MinusToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterSubtractWhenFollowedByPredecrement",
         SyntaxKind.MinusToken,
         SyntaxKind.MinusMinusToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -297,7 +297,7 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         [SyntaxKind.CommaToken, SyntaxKind.SemicolonToken],
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       // For functions and control block place } on a new line [multi-line rule]
       rule(
@@ -305,7 +305,7 @@ namespace ts.formatting {
         anyTokenIncludingMultilineComments,
         SyntaxKind.CloseBraceToken,
         [isMultilineBlockContext],
-        RuleAction.InsertNewLine
+        RuleAction.InsertNewLine,
       ),
 
       // Space/new line after }.
@@ -314,7 +314,7 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         anyTokenExcept(SyntaxKind.CloseParenToken),
         [isNonJsxSameLineTokenContext, isAfterCodeBlockContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       // Special case for (}, else) and (}, while) since else & while tokens are not part of the tree which makes SpaceAfterCloseBrace rule not applied
       // Also should not apply to })
@@ -323,21 +323,21 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         SyntaxKind.ElseKeyword,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBetweenCloseBraceAndWhile",
         SyntaxKind.CloseBraceToken,
         SyntaxKind.WhileKeyword,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBetweenEmptyBraceBrackets",
         SyntaxKind.OpenBraceToken,
         SyntaxKind.CloseBraceToken,
         [isNonJsxSameLineTokenContext, isObjectContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Add a space after control dec context if the next character is an open bracket ex: 'if (false)[a, b] = [1, 2];' -> 'if (false) [a, b] = [1, 2];'
@@ -346,7 +346,7 @@ namespace ts.formatting {
         SyntaxKind.CloseParenToken,
         SyntaxKind.OpenBracketToken,
         [isControlDeclContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -354,14 +354,14 @@ namespace ts.formatting {
         SyntaxKind.FunctionKeyword,
         SyntaxKind.AsteriskToken,
         [isFunctionDeclarationOrFunctionExpressionContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "SpaceAfterStarInGeneratorDeclaration",
         SyntaxKind.AsteriskToken,
         SyntaxKind.Identifier,
         [isFunctionDeclarationOrFunctionExpressionContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -369,7 +369,7 @@ namespace ts.formatting {
         SyntaxKind.FunctionKeyword,
         anyToken,
         [isFunctionDeclContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       // Insert new line after { and before } in multi-line contexts.
       rule(
@@ -377,7 +377,7 @@ namespace ts.formatting {
         SyntaxKind.OpenBraceToken,
         anyToken,
         [isMultilineBlockContext],
-        RuleAction.InsertNewLine
+        RuleAction.InsertNewLine,
       ),
 
       // For get/set members, we check for (identifier,identifier) since get/set don't have tokens and they are represented as just an identifier token.
@@ -389,7 +389,7 @@ namespace ts.formatting {
         [SyntaxKind.GetKeyword, SyntaxKind.SetKeyword],
         SyntaxKind.Identifier,
         [isFunctionDeclContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -397,14 +397,14 @@ namespace ts.formatting {
         SyntaxKind.YieldKeyword,
         SyntaxKind.AsteriskToken,
         [isNonJsxSameLineTokenContext, isYieldOrYieldStarWithOperand],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "SpaceBetweenYieldOrYieldStarAndOperand",
         [SyntaxKind.YieldKeyword, SyntaxKind.AsteriskToken],
         anyToken,
         [isNonJsxSameLineTokenContext, isYieldOrYieldStarWithOperand],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -412,7 +412,7 @@ namespace ts.formatting {
         SyntaxKind.ReturnKeyword,
         SyntaxKind.SemicolonToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "SpaceAfterCertainKeywords",
@@ -427,14 +427,14 @@ namespace ts.formatting {
         ],
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterLetConstInVariableDeclaration",
         [SyntaxKind.LetKeyword, SyntaxKind.ConstKeyword],
         anyToken,
         [isNonJsxSameLineTokenContext, isStartOfVariableDeclarationList],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBeforeOpenParenInFuncCall",
@@ -445,7 +445,7 @@ namespace ts.formatting {
           isFunctionCallOrNewContext,
           isPreviousTokenNotComma,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Special case for binary operators (that are keywords). For these we have to add a space and shouldn't follow any user options.
@@ -454,14 +454,14 @@ namespace ts.formatting {
         anyToken,
         binaryKeywordOperators,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterBinaryKeywordOperator",
         binaryKeywordOperators,
         anyToken,
         [isNonJsxSameLineTokenContext, isBinaryOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -469,7 +469,7 @@ namespace ts.formatting {
         SyntaxKind.VoidKeyword,
         anyToken,
         [isNonJsxSameLineTokenContext, isVoidOpContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // Async-await
@@ -478,14 +478,14 @@ namespace ts.formatting {
         SyntaxKind.AsyncKeyword,
         SyntaxKind.OpenParenToken,
         [isArrowFunctionContext, isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBetweenAsyncAndFunctionKeyword",
         SyntaxKind.AsyncKeyword,
         [SyntaxKind.FunctionKeyword, SyntaxKind.Identifier],
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // Template string
@@ -494,7 +494,7 @@ namespace ts.formatting {
         [SyntaxKind.Identifier, SyntaxKind.CloseParenToken],
         [SyntaxKind.NoSubstitutionTemplateLiteral, SyntaxKind.TemplateHead],
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // JSX opening elements
@@ -503,35 +503,35 @@ namespace ts.formatting {
         anyToken,
         SyntaxKind.Identifier,
         [isNextTokenParentJsxAttribute, isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBeforeSlashInJsxOpeningElement",
         anyToken,
         SyntaxKind.SlashToken,
         [isJsxSelfClosingElementContext, isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBeforeGreaterThanTokenInJsxOpeningElement",
         SyntaxKind.SlashToken,
         SyntaxKind.GreaterThanToken,
         [isJsxSelfClosingElementContext, isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeEqualInJsxAttribute",
         anyToken,
         SyntaxKind.EqualsToken,
         [isJsxAttributeContext, isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterEqualInJsxAttribute",
         SyntaxKind.EqualsToken,
         anyToken,
         [isJsxAttributeContext, isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // TypeScript-specific rules
@@ -541,7 +541,7 @@ namespace ts.formatting {
         [SyntaxKind.ModuleKeyword, SyntaxKind.RequireKeyword],
         SyntaxKind.OpenParenToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       // Add a space around certain TypeScript keywords
       rule(
@@ -573,7 +573,7 @@ namespace ts.formatting {
         ],
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBeforeCertainTypeScriptKeywords",
@@ -584,7 +584,7 @@ namespace ts.formatting {
           SyntaxKind.FromKeyword,
         ],
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       // Treat string literals in module names as identifiers, and add a space between the literal and the opening Brace braces, e.g.: module "m2" {
       rule(
@@ -592,7 +592,7 @@ namespace ts.formatting {
         SyntaxKind.StringLiteral,
         SyntaxKind.OpenBraceToken,
         [isModuleDeclContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // Lambda expressions
@@ -601,14 +601,14 @@ namespace ts.formatting {
         anyToken,
         SyntaxKind.EqualsGreaterThanToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterArrow",
         SyntaxKind.EqualsGreaterThanToken,
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // Optional parameters and let args
@@ -617,14 +617,14 @@ namespace ts.formatting {
         SyntaxKind.DotDotDotToken,
         SyntaxKind.Identifier,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterOptionalParameters",
         SyntaxKind.QuestionToken,
         [SyntaxKind.CloseParenToken, SyntaxKind.CommaToken],
         [isNonJsxSameLineTokenContext, isNotBinaryOpContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Remove spaces in empty interface literals. e.g.: x: {}
@@ -633,7 +633,7 @@ namespace ts.formatting {
         SyntaxKind.OpenBraceToken,
         SyntaxKind.CloseBraceToken,
         [isNonJsxSameLineTokenContext, isObjectTypeContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // generics and type assertions
@@ -645,7 +645,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeArgumentOrParameterOrAssertionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBetweenCloseParenAndAngularBracket",
@@ -655,7 +655,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeArgumentOrParameterOrAssertionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterOpenAngularBracket",
@@ -665,7 +665,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeArgumentOrParameterOrAssertionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeCloseAngularBracket",
@@ -675,7 +675,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeArgumentOrParameterOrAssertionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterCloseAngularBracket",
@@ -689,9 +689,9 @@ namespace ts.formatting {
         [
           isNonJsxSameLineTokenContext,
           isTypeArgumentOrParameterOrAssertionContext,
-          isNotFunctionDeclContext /*To prevent an interference with the SpaceBeforeOpenParenInFuncDecl rule*/,
+          isNotFunctionDeclContext, /*To prevent an interference with the SpaceBeforeOpenParenInFuncDecl rule*/
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // decorators
@@ -700,14 +700,14 @@ namespace ts.formatting {
         [SyntaxKind.CloseParenToken, SyntaxKind.Identifier],
         SyntaxKind.AtToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterAt",
         SyntaxKind.AtToken,
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       // Insert space after @ in decorator
       rule(
@@ -729,7 +729,7 @@ namespace ts.formatting {
           SyntaxKind.AsteriskToken,
         ],
         [isEndOfDecoratorContextOnSameLine],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       rule(
@@ -737,21 +737,21 @@ namespace ts.formatting {
         anyToken,
         SyntaxKind.ExclamationToken,
         [isNonJsxSameLineTokenContext, isNonNullAssertionContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterNewKeywordOnConstructorSignature",
         SyntaxKind.NewKeyword,
         SyntaxKind.OpenParenToken,
         [isNonJsxSameLineTokenContext, isConstructorSignatureContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "SpaceLessThanAndNonJSXTypeAnnotation",
         SyntaxKind.LessThanToken,
         SyntaxKind.LessThanToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
     ];
 
@@ -766,7 +766,7 @@ namespace ts.formatting {
           isOptionEnabled("insertSpaceAfterConstructor"),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterConstructor",
@@ -776,7 +776,7 @@ namespace ts.formatting {
           isOptionDisabledOrUndefined("insertSpaceAfterConstructor"),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -790,7 +790,7 @@ namespace ts.formatting {
           isNextTokenNotCloseBracket,
           isNextTokenNotCloseParen,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterComma",
@@ -801,7 +801,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isNonJsxElementOrFragmentContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space after function keyword for anonymous functions
@@ -811,11 +811,11 @@ namespace ts.formatting {
         SyntaxKind.OpenParenToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterFunctionKeywordForAnonymousFunctions"
+            "insertSpaceAfterFunctionKeywordForAnonymousFunctions",
           ),
           isFunctionDeclContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterAnonymousFunctionKeyword",
@@ -823,11 +823,11 @@ namespace ts.formatting {
         SyntaxKind.OpenParenToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterFunctionKeywordForAnonymousFunctions"
+            "insertSpaceAfterFunctionKeywordForAnonymousFunctions",
           ),
           isFunctionDeclContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space after keywords in control flow statements
@@ -839,7 +839,7 @@ namespace ts.formatting {
           isOptionEnabled("insertSpaceAfterKeywordsInControlFlowStatements"),
           isControlDeclContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterKeywordInControl",
@@ -847,11 +847,11 @@ namespace ts.formatting {
         SyntaxKind.OpenParenToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterKeywordsInControlFlowStatements"
+            "insertSpaceAfterKeywordsInControlFlowStatements",
           ),
           isControlDeclContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space after opening and before closing nonempty parenthesis
@@ -861,11 +861,11 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBeforeCloseParen",
@@ -873,11 +873,11 @@ namespace ts.formatting {
         SyntaxKind.CloseParenToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBetweenOpenParens",
@@ -885,18 +885,18 @@ namespace ts.formatting {
         SyntaxKind.OpenParenToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBetweenParens",
         SyntaxKind.OpenParenToken,
         SyntaxKind.CloseParenToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterOpenParen",
@@ -904,11 +904,11 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeCloseParen",
@@ -916,11 +916,11 @@ namespace ts.formatting {
         SyntaxKind.CloseParenToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space after opening and before closing nonempty brackets
@@ -930,11 +930,11 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBeforeCloseBracket",
@@ -942,18 +942,18 @@ namespace ts.formatting {
         SyntaxKind.CloseBracketToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBetweenBrackets",
         SyntaxKind.OpenBracketToken,
         SyntaxKind.CloseBracketToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterOpenBracket",
@@ -961,11 +961,11 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeCloseBracket",
@@ -973,11 +973,11 @@ namespace ts.formatting {
         SyntaxKind.CloseBracketToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert a space after { and before } in single-line contexts, but remove space from empty object literals {}.
@@ -987,11 +987,11 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionEnabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces",
           ),
           isBraceWrappedContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBeforeCloseBrace",
@@ -999,18 +999,18 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         [
           isOptionEnabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces",
           ),
           isBraceWrappedContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBetweenEmptyBraceBrackets",
         SyntaxKind.OpenBraceToken,
         SyntaxKind.CloseBraceToken,
         [isNonJsxSameLineTokenContext, isObjectContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterOpenBrace",
@@ -1018,11 +1018,11 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeCloseBrace",
@@ -1030,11 +1030,11 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         [
           isOptionDisabled(
-            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert a space after opening and before closing empty brace brackets
@@ -1043,7 +1043,7 @@ namespace ts.formatting {
         SyntaxKind.OpenBraceToken,
         SyntaxKind.CloseBraceToken,
         [isOptionEnabled("insertSpaceAfterOpeningAndBeforeClosingEmptyBraces")],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBetweenEmptyBraceBrackets",
@@ -1051,11 +1051,11 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         [
           isOptionDisabled(
-            "insertSpaceAfterOpeningAndBeforeClosingEmptyBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingEmptyBraces",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space after opening and before closing template string braces
@@ -1065,12 +1065,12 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces",
           ),
           isNonJsxTextContext,
         ],
         RuleAction.InsertSpace,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
       rule(
         "SpaceBeforeTemplateMiddleAndTail",
@@ -1078,11 +1078,11 @@ namespace ts.formatting {
         [SyntaxKind.TemplateMiddle, SyntaxKind.TemplateTail],
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterTemplateHeadAndMiddle",
@@ -1090,12 +1090,12 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces",
           ),
           isNonJsxTextContext,
         ],
         RuleAction.DeleteSpace,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
       rule(
         "NoSpaceBeforeTemplateMiddleAndTail",
@@ -1103,11 +1103,11 @@ namespace ts.formatting {
         [SyntaxKind.TemplateMiddle, SyntaxKind.TemplateTail],
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces",
           ),
           isNonJsxSameLineTokenContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // No space after { and before } in JSX expression
@@ -1117,12 +1117,12 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces",
           ),
           isNonJsxSameLineTokenContext,
           isJsxExpressionContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceBeforeCloseBraceInJsxExpression",
@@ -1130,12 +1130,12 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         [
           isOptionEnabled(
-            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces",
           ),
           isNonJsxSameLineTokenContext,
           isJsxExpressionContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterOpenBraceInJsxExpression",
@@ -1143,12 +1143,12 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces",
           ),
           isNonJsxSameLineTokenContext,
           isJsxExpressionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceBeforeCloseBraceInJsxExpression",
@@ -1156,12 +1156,12 @@ namespace ts.formatting {
         SyntaxKind.CloseBraceToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces"
+            "insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces",
           ),
           isNonJsxSameLineTokenContext,
           isJsxExpressionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space after semicolon in for statement
@@ -1174,7 +1174,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isForContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterSemicolonInFor",
@@ -1182,12 +1182,12 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceAfterSemicolonInForStatements"
+            "insertSpaceAfterSemicolonInForStatements",
           ),
           isNonJsxSameLineTokenContext,
           isForContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Insert space before and after binary operators
@@ -1200,7 +1200,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isBinaryOpContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "SpaceAfterBinaryOperator",
@@ -1211,7 +1211,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isBinaryOpContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBeforeBinaryOperator",
@@ -1219,12 +1219,12 @@ namespace ts.formatting {
         binaryOperators,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceBeforeAndAfterBinaryOperators"
+            "insertSpaceBeforeAndAfterBinaryOperators",
           ),
           isNonJsxSameLineTokenContext,
           isBinaryOpContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterBinaryOperator",
@@ -1232,12 +1232,12 @@ namespace ts.formatting {
         anyToken,
         [
           isOptionDisabledOrUndefined(
-            "insertSpaceBeforeAndAfterBinaryOperators"
+            "insertSpaceBeforeAndAfterBinaryOperators",
           ),
           isNonJsxSameLineTokenContext,
           isBinaryOpContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -1249,7 +1249,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isFunctionDeclContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBeforeOpenParenInFuncDecl",
@@ -1260,7 +1260,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isFunctionDeclContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // Open Brace braces after control block
@@ -1274,7 +1274,7 @@ namespace ts.formatting {
           isBeforeMultilineBlockContext,
         ],
         RuleAction.InsertNewLine,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
 
       // Open Brace braces after function
@@ -1289,7 +1289,7 @@ namespace ts.formatting {
           isBeforeMultilineBlockContext,
         ],
         RuleAction.InsertNewLine,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
       // Open Brace braces after TypeScript module/class/interface
       rule(
@@ -1302,7 +1302,7 @@ namespace ts.formatting {
           isBeforeMultilineBlockContext,
         ],
         RuleAction.InsertNewLine,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
 
       rule(
@@ -1314,7 +1314,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeAssertionContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceAfterTypeAssertion",
@@ -1325,7 +1325,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeAssertionContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -1337,7 +1337,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeAnnotationContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       rule(
         "NoSpaceBeforeTypeAnnotation",
@@ -1348,7 +1348,7 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isTypeAnnotationContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -1359,7 +1359,7 @@ namespace ts.formatting {
           optionEquals("semicolons", SemicolonPreference.Remove),
           isSemicolonDeletionContext,
         ],
-        RuleAction.DeleteToken
+        RuleAction.DeleteToken,
       ),
       rule(
         "OptionalSemicolon",
@@ -1369,7 +1369,7 @@ namespace ts.formatting {
           optionEquals("semicolons", SemicolonPreference.Insert),
           isSemicolonInsertionContext,
         ],
-        RuleAction.InsertTrailingSemicolon
+        RuleAction.InsertTrailingSemicolon,
       ),
     ];
 
@@ -1381,7 +1381,7 @@ namespace ts.formatting {
         anyToken,
         SyntaxKind.SemicolonToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       rule(
@@ -1390,14 +1390,14 @@ namespace ts.formatting {
         SyntaxKind.OpenBraceToken,
         [
           isOptionDisabledOrUndefinedOrTokensOnSameLine(
-            "placeOpenBraceOnNewLineForControlBlocks"
+            "placeOpenBraceOnNewLineForControlBlocks",
           ),
           isControlDeclContext,
           isNotFormatOnEnter,
           isSameLineTokenOrBeforeBlockContext,
         ],
         RuleAction.InsertSpace,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
       rule(
         "SpaceBeforeOpenBraceInFunction",
@@ -1405,7 +1405,7 @@ namespace ts.formatting {
         SyntaxKind.OpenBraceToken,
         [
           isOptionDisabledOrUndefinedOrTokensOnSameLine(
-            "placeOpenBraceOnNewLineForFunctions"
+            "placeOpenBraceOnNewLineForFunctions",
           ),
           isFunctionDeclContext,
           isBeforeBlockContext,
@@ -1413,7 +1413,7 @@ namespace ts.formatting {
           isSameLineTokenOrBeforeBlockContext,
         ],
         RuleAction.InsertSpace,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
       rule(
         "SpaceBeforeOpenBraceInTypeScriptDeclWithBlock",
@@ -1421,14 +1421,14 @@ namespace ts.formatting {
         SyntaxKind.OpenBraceToken,
         [
           isOptionDisabledOrUndefinedOrTokensOnSameLine(
-            "placeOpenBraceOnNewLineForFunctions"
+            "placeOpenBraceOnNewLineForFunctions",
           ),
           isTypeScriptDeclWithBlockContext,
           isNotFormatOnEnter,
           isSameLineTokenOrBeforeBlockContext,
         ],
         RuleAction.InsertSpace,
-        RuleFlags.CanDeleteNewLines
+        RuleFlags.CanDeleteNewLines,
       ),
 
       rule(
@@ -1436,7 +1436,7 @@ namespace ts.formatting {
         anyToken,
         SyntaxKind.CommaToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
 
       // No space before and after indexer `x[]`
@@ -1445,7 +1445,7 @@ namespace ts.formatting {
         anyTokenExcept(SyntaxKind.AsyncKeyword, SyntaxKind.CaseKeyword),
         SyntaxKind.OpenBracketToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "NoSpaceAfterCloseBracket",
@@ -1455,14 +1455,14 @@ namespace ts.formatting {
           isNonJsxSameLineTokenContext,
           isNotBeforeBlockInFunctionDeclarationContext,
         ],
-        RuleAction.DeleteSpace
+        RuleAction.DeleteSpace,
       ),
       rule(
         "SpaceAfterSemicolon",
         SyntaxKind.SemicolonToken,
         anyToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // Remove extra space between for and await
@@ -1471,7 +1471,7 @@ namespace ts.formatting {
         SyntaxKind.ForKeyword,
         SyntaxKind.AwaitKeyword,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
 
       // Add a space between statements. All keywords except (do,else,case) has open/close parens after them.
@@ -1490,7 +1490,7 @@ namespace ts.formatting {
           isNonJsxElementOrFragmentContext,
           isNotForContext,
         ],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
       // This low-pri rule takes care of "try {", "catch {" and "finally {" in case the rule SpaceBeforeOpenBraceInControl didn't execute on FormatOnEnter.
       rule(
@@ -1502,7 +1502,7 @@ namespace ts.formatting {
         ],
         SyntaxKind.OpenBraceToken,
         [isNonJsxSameLineTokenContext],
-        RuleAction.InsertSpace
+        RuleAction.InsertSpace,
       ),
     ];
 
@@ -1531,7 +1531,7 @@ namespace ts.formatting {
     right: SyntaxKind | readonly SyntaxKind[] | TokenRange,
     context: readonly ContextPredicate[],
     action: RuleAction,
-    flags: RuleFlags = RuleFlags.None
+    flags: RuleFlags = RuleFlags.None,
   ): RuleSpec {
     return {
       leftTokenRange: toTokenRange(left),
@@ -1545,7 +1545,7 @@ namespace ts.formatting {
   }
 
   function toTokenRange(
-    arg: SyntaxKind | readonly SyntaxKind[] | TokenRange
+    arg: SyntaxKind | readonly SyntaxKind[] | TokenRange,
   ): TokenRange {
     return typeof arg === "number"
       ? tokenRangeFrom([arg])
@@ -1557,7 +1557,7 @@ namespace ts.formatting {
   function tokenRangeFromRange(
     from: SyntaxKind,
     to: SyntaxKind,
-    except: readonly SyntaxKind[] = []
+    except: readonly SyntaxKind[] = [],
   ): TokenRange {
     const tokens: SyntaxKind[] = [];
     for (let token = from; token <= to; token++) {
@@ -1574,56 +1574,55 @@ namespace ts.formatting {
 
   function optionEquals<K extends keyof FormatCodeSettings>(
     optionName: K,
-    optionValue: FormatCodeSettings[K]
+    optionValue: FormatCodeSettings[K],
   ): (context: FormattingContext) => boolean {
-    return (context) =>
-      context.options && context.options[optionName] === optionValue;
+    return (context) => context.options && context.options[optionName] === optionValue;
   }
 
   function isOptionEnabled(
-    optionName: keyof FormatCodeSettings
+    optionName: keyof FormatCodeSettings,
   ): (context: FormattingContext) => boolean {
     return (context) =>
-      context.options &&
-      context.options.hasOwnProperty(optionName) &&
-      !!context.options[optionName];
+      context.options
+      && context.options.hasOwnProperty(optionName)
+      && !!context.options[optionName];
   }
 
   function isOptionDisabled(
-    optionName: keyof FormatCodeSettings
+    optionName: keyof FormatCodeSettings,
   ): (context: FormattingContext) => boolean {
     return (context) =>
-      context.options &&
-      context.options.hasOwnProperty(optionName) &&
-      !context.options[optionName];
+      context.options
+      && context.options.hasOwnProperty(optionName)
+      && !context.options[optionName];
   }
 
   function isOptionDisabledOrUndefined(
-    optionName: keyof FormatCodeSettings
+    optionName: keyof FormatCodeSettings,
   ): (context: FormattingContext) => boolean {
     return (context) =>
-      !context.options ||
-      !context.options.hasOwnProperty(optionName) ||
-      !context.options[optionName];
+      !context.options
+      || !context.options.hasOwnProperty(optionName)
+      || !context.options[optionName];
   }
 
   function isOptionDisabledOrUndefinedOrTokensOnSameLine(
-    optionName: keyof FormatCodeSettings
+    optionName: keyof FormatCodeSettings,
   ): (context: FormattingContext) => boolean {
     return (context) =>
-      !context.options ||
-      !context.options.hasOwnProperty(optionName) ||
-      !context.options[optionName] ||
-      context.TokensAreOnSameLine();
+      !context.options
+      || !context.options.hasOwnProperty(optionName)
+      || !context.options[optionName]
+      || context.TokensAreOnSameLine();
   }
 
   function isOptionEnabledOrUndefined(
-    optionName: keyof FormatCodeSettings
+    optionName: keyof FormatCodeSettings,
   ): (context: FormattingContext) => boolean {
     return (context) =>
-      !context.options ||
-      !context.options.hasOwnProperty(optionName) ||
-      !!context.options[optionName];
+      !context.options
+      || !context.options.hasOwnProperty(optionName)
+      || !!context.options[optionName];
   }
 
   function isForContext(context: FormattingContext): boolean {
@@ -1638,8 +1637,8 @@ namespace ts.formatting {
     switch (context.contextNode.kind) {
       case SyntaxKind.BinaryExpression:
         return (
-          (context.contextNode as BinaryExpression).operatorToken.kind !==
-          SyntaxKind.CommaToken
+          (context.contextNode as BinaryExpression).operatorToken.kind
+            !== SyntaxKind.CommaToken
         );
       case SyntaxKind.ConditionalExpression:
       case SyntaxKind.ConditionalType:
@@ -1652,6 +1651,7 @@ namespace ts.formatting {
         return true;
 
       // equals in binding elements: function foo([[x, y] = [1, 2]])
+
       case SyntaxKind.BindingElement:
       // equals in type X = ...
       // falls through
@@ -1672,8 +1672,8 @@ namespace ts.formatting {
       case SyntaxKind.PropertyDeclaration:
       case SyntaxKind.PropertySignature:
         return (
-          context.currentTokenSpan.kind === SyntaxKind.EqualsToken ||
-          context.nextTokenSpan.kind === SyntaxKind.EqualsToken
+          context.currentTokenSpan.kind === SyntaxKind.EqualsToken
+          || context.nextTokenSpan.kind === SyntaxKind.EqualsToken
         );
       // "in" keyword in for (let x in []) { }
       case SyntaxKind.ForInStatement:
@@ -1681,16 +1681,16 @@ namespace ts.formatting {
       // falls through
       case SyntaxKind.TypeParameter:
         return (
-          context.currentTokenSpan.kind === SyntaxKind.InKeyword ||
-          context.nextTokenSpan.kind === SyntaxKind.InKeyword ||
-          context.currentTokenSpan.kind === SyntaxKind.EqualsToken ||
-          context.nextTokenSpan.kind === SyntaxKind.EqualsToken
+          context.currentTokenSpan.kind === SyntaxKind.InKeyword
+          || context.nextTokenSpan.kind === SyntaxKind.InKeyword
+          || context.currentTokenSpan.kind === SyntaxKind.EqualsToken
+          || context.nextTokenSpan.kind === SyntaxKind.EqualsToken
         );
       // Technically, "of" is not a binary operator, but format it the same way as "in"
       case SyntaxKind.ForOfStatement:
         return (
-          context.currentTokenSpan.kind === SyntaxKind.OfKeyword ||
-          context.nextTokenSpan.kind === SyntaxKind.OfKeyword
+          context.currentTokenSpan.kind === SyntaxKind.OfKeyword
+          || context.nextTokenSpan.kind === SyntaxKind.OfKeyword
         );
     }
     return false;
@@ -1707,58 +1707,58 @@ namespace ts.formatting {
   function isTypeAnnotationContext(context: FormattingContext): boolean {
     const contextKind = context.contextNode.kind;
     return (
-      contextKind === SyntaxKind.PropertyDeclaration ||
-      contextKind === SyntaxKind.PropertySignature ||
-      contextKind === SyntaxKind.Parameter ||
-      contextKind === SyntaxKind.VariableDeclaration ||
-      isFunctionLikeKind(contextKind)
+      contextKind === SyntaxKind.PropertyDeclaration
+      || contextKind === SyntaxKind.PropertySignature
+      || contextKind === SyntaxKind.Parameter
+      || contextKind === SyntaxKind.VariableDeclaration
+      || isFunctionLikeKind(contextKind)
     );
   }
 
   function isConditionalOperatorContext(context: FormattingContext): boolean {
     return (
-      context.contextNode.kind === SyntaxKind.ConditionalExpression ||
-      context.contextNode.kind === SyntaxKind.ConditionalType
+      context.contextNode.kind === SyntaxKind.ConditionalExpression
+      || context.contextNode.kind === SyntaxKind.ConditionalType
     );
   }
 
   function isSameLineTokenOrBeforeBlockContext(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return context.TokensAreOnSameLine() || isBeforeBlockContext(context);
   }
 
   function isBraceWrappedContext(context: FormattingContext): boolean {
     return (
-      context.contextNode.kind === SyntaxKind.ObjectBindingPattern ||
-      context.contextNode.kind === SyntaxKind.MappedType ||
-      isSingleLineBlockContext(context)
+      context.contextNode.kind === SyntaxKind.ObjectBindingPattern
+      || context.contextNode.kind === SyntaxKind.MappedType
+      || isSingleLineBlockContext(context)
     );
   }
 
   // This check is done before an open brace in a control construct, a function, or a typescript block declaration
   function isBeforeMultilineBlockContext(context: FormattingContext): boolean {
     return (
-      isBeforeBlockContext(context) &&
-      !(context.NextNodeAllOnSameLine() || context.NextNodeBlockIsOnOneLine())
+      isBeforeBlockContext(context)
+      && !(context.NextNodeAllOnSameLine() || context.NextNodeBlockIsOnOneLine())
     );
   }
 
   function isMultilineBlockContext(context: FormattingContext): boolean {
     return (
-      isBlockContext(context) &&
-      !(
-        context.ContextNodeAllOnSameLine() ||
-        context.ContextNodeBlockIsOnOneLine()
+      isBlockContext(context)
+      && !(
+        context.ContextNodeAllOnSameLine()
+        || context.ContextNodeBlockIsOnOneLine()
       )
     );
   }
 
   function isSingleLineBlockContext(context: FormattingContext): boolean {
     return (
-      isBlockContext(context) &&
-      (context.ContextNodeAllOnSameLine() ||
-        context.ContextNodeBlockIsOnOneLine())
+      isBlockContext(context)
+      && (context.ContextNodeAllOnSameLine()
+        || context.ContextNodeBlockIsOnOneLine())
     );
   }
 
@@ -1819,16 +1819,16 @@ namespace ts.formatting {
   }
 
   function isFunctionDeclarationOrFunctionExpressionContext(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return (
-      context.contextNode.kind === SyntaxKind.FunctionDeclaration ||
-      context.contextNode.kind === SyntaxKind.FunctionExpression
+      context.contextNode.kind === SyntaxKind.FunctionDeclaration
+      || context.contextNode.kind === SyntaxKind.FunctionExpression
     );
   }
 
   function isTypeScriptDeclWithBlockContext(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return nodeIsTypeScriptDeclWithBlockContext(context.contextNode);
   }
@@ -1864,9 +1864,9 @@ namespace ts.formatting {
         const blockParent = context.currentTokenParent.parent;
         // In a codefix scenario, we can't rely on parents being set. So just always return true.
         if (
-          !blockParent ||
-          (blockParent.kind !== SyntaxKind.ArrowFunction &&
-            blockParent.kind !== SyntaxKind.FunctionExpression)
+          !blockParent
+          || (blockParent.kind !== SyntaxKind.ArrowFunction
+            && blockParent.kind !== SyntaxKind.FunctionExpression)
         ) {
           return true;
         }
@@ -1935,8 +1935,8 @@ namespace ts.formatting {
 
   function isNonJsxSameLineTokenContext(context: FormattingContext): boolean {
     return (
-      context.TokensAreOnSameLine() &&
-      context.contextNode.kind !== SyntaxKind.JsxText
+      context.TokensAreOnSameLine()
+      && context.contextNode.kind !== SyntaxKind.JsxText
     );
   }
 
@@ -1945,18 +1945,18 @@ namespace ts.formatting {
   }
 
   function isNonJsxElementOrFragmentContext(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return (
-      context.contextNode.kind !== SyntaxKind.JsxElement &&
-      context.contextNode.kind !== SyntaxKind.JsxFragment
+      context.contextNode.kind !== SyntaxKind.JsxElement
+      && context.contextNode.kind !== SyntaxKind.JsxFragment
     );
   }
 
   function isJsxExpressionContext(context: FormattingContext): boolean {
     return (
-      context.contextNode.kind === SyntaxKind.JsxExpression ||
-      context.contextNode.kind === SyntaxKind.JsxSpreadAttribute
+      context.contextNode.kind === SyntaxKind.JsxExpression
+      || context.contextNode.kind === SyntaxKind.JsxSpreadAttribute
     );
   }
 
@@ -1973,19 +1973,19 @@ namespace ts.formatting {
   }
 
   function isNotBeforeBlockInFunctionDeclarationContext(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return !isFunctionDeclContext(context) && !isBeforeBlockContext(context);
   }
 
   function isEndOfDecoratorContextOnSameLine(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return (
-      context.TokensAreOnSameLine() &&
-      !!context.contextNode.decorators &&
-      nodeIsInDecoratorContext(context.currentTokenParent) &&
-      !nodeIsInDecoratorContext(context.nextTokenParent)
+      context.TokensAreOnSameLine()
+      && !!context.contextNode.decorators
+      && nodeIsInDecoratorContext(context.currentTokenParent)
+      && !nodeIsInDecoratorContext(context.nextTokenParent)
     );
   }
 
@@ -1997,12 +1997,12 @@ namespace ts.formatting {
   }
 
   function isStartOfVariableDeclarationList(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return (
-      context.currentTokenParent.kind === SyntaxKind.VariableDeclarationList &&
-      context.currentTokenParent.getStart(context.sourceFile) ===
-        context.currentTokenSpan.pos
+      context.currentTokenParent.kind === SyntaxKind.VariableDeclarationList
+      && context.currentTokenParent.getStart(context.sourceFile)
+        === context.currentTokenSpan.pos
     );
   }
 
@@ -2026,11 +2026,11 @@ namespace ts.formatting {
 
   function isTypeArgumentOrParameterOrAssertion(
     token: TextRangeWithKind,
-    parent: Node
+    parent: Node,
   ): boolean {
     if (
-      token.kind !== SyntaxKind.LessThanToken &&
-      token.kind !== SyntaxKind.GreaterThanToken
+      token.kind !== SyntaxKind.LessThanToken
+      && token.kind !== SyntaxKind.GreaterThanToken
     ) {
       return false;
     }
@@ -2058,16 +2058,16 @@ namespace ts.formatting {
   }
 
   function isTypeArgumentOrParameterOrAssertionContext(
-    context: FormattingContext
+    context: FormattingContext,
   ): boolean {
     return (
       isTypeArgumentOrParameterOrAssertion(
         context.currentTokenSpan,
-        context.currentTokenParent
-      ) ||
-      isTypeArgumentOrParameterOrAssertion(
+        context.currentTokenParent,
+      )
+      || isTypeArgumentOrParameterOrAssertion(
         context.nextTokenSpan,
-        context.nextTokenParent
+        context.nextTokenParent,
       )
     );
   }
@@ -2078,15 +2078,15 @@ namespace ts.formatting {
 
   function isVoidOpContext(context: FormattingContext): boolean {
     return (
-      context.currentTokenSpan.kind === SyntaxKind.VoidKeyword &&
-      context.currentTokenParent.kind === SyntaxKind.VoidExpression
+      context.currentTokenSpan.kind === SyntaxKind.VoidKeyword
+      && context.currentTokenParent.kind === SyntaxKind.VoidExpression
     );
   }
 
   function isYieldOrYieldStarWithOperand(context: FormattingContext): boolean {
     return (
-      context.contextNode.kind === SyntaxKind.YieldExpression &&
-      (context.contextNode as YieldExpression).expression !== undefined
+      context.contextNode.kind === SyntaxKind.YieldExpression
+      && (context.contextNode as YieldExpression).expression !== undefined
     );
   }
 
@@ -2117,14 +2117,13 @@ namespace ts.formatting {
     let nextTokenKind = context.nextTokenSpan.kind;
     let nextTokenStart = context.nextTokenSpan.pos;
     if (isTrivia(nextTokenKind)) {
-      const nextRealToken =
-        context.nextTokenParent === context.currentTokenParent
-          ? findNextToken(
-              context.currentTokenParent,
-              findAncestor(context.currentTokenParent, (a) => !a.parent)!,
-              context.sourceFile
-            )
-          : context.nextTokenParent.getFirstToken(context.sourceFile);
+      const nextRealToken = context.nextTokenParent === context.currentTokenParent
+        ? findNextToken(
+          context.currentTokenParent,
+          findAncestor(context.currentTokenParent, (a) => !a.parent)!,
+          context.sourceFile,
+        )
+        : context.nextTokenParent.getFirstToken(context.sourceFile);
       if (!nextRealToken) {
         return true;
       }
@@ -2133,27 +2132,26 @@ namespace ts.formatting {
     }
 
     const startLine = context.sourceFile.getLineAndCharacterOfPosition(
-      context.currentTokenSpan.pos
+      context.currentTokenSpan.pos,
     ).line;
-    const endLine =
-      context.sourceFile.getLineAndCharacterOfPosition(nextTokenStart).line;
+    const endLine = context.sourceFile.getLineAndCharacterOfPosition(nextTokenStart).line;
     if (startLine === endLine) {
       return (
-        nextTokenKind === SyntaxKind.CloseBraceToken ||
-        nextTokenKind === SyntaxKind.EndOfFileToken
+        nextTokenKind === SyntaxKind.CloseBraceToken
+        || nextTokenKind === SyntaxKind.EndOfFileToken
       );
     }
 
     if (
-      nextTokenKind === SyntaxKind.SemicolonClassElement ||
-      nextTokenKind === SyntaxKind.SemicolonToken
+      nextTokenKind === SyntaxKind.SemicolonClassElement
+      || nextTokenKind === SyntaxKind.SemicolonToken
     ) {
       return false;
     }
 
     if (
-      context.contextNode.kind === SyntaxKind.InterfaceDeclaration ||
-      context.contextNode.kind === SyntaxKind.TypeAliasDeclaration
+      context.contextNode.kind === SyntaxKind.InterfaceDeclaration
+      || context.contextNode.kind === SyntaxKind.TypeAliasDeclaration
     ) {
       // Can’t remove semicolon after `foo`; it would parse as a method declaration:
       //
@@ -2162,9 +2160,9 @@ namespace ts.formatting {
       //   (): void
       // }
       return (
-        !isPropertySignature(context.currentTokenParent) ||
-        !!context.currentTokenParent.type ||
-        nextTokenKind !== SyntaxKind.OpenParenToken
+        !isPropertySignature(context.currentTokenParent)
+        || !!context.currentTokenParent.type
+        || nextTokenKind !== SyntaxKind.OpenParenToken
       );
     }
 
@@ -2173,20 +2171,20 @@ namespace ts.formatting {
     }
 
     return (
-      context.currentTokenParent.kind !== SyntaxKind.ForStatement &&
-      context.currentTokenParent.kind !== SyntaxKind.EmptyStatement &&
-      context.currentTokenParent.kind !== SyntaxKind.SemicolonClassElement &&
-      nextTokenKind !== SyntaxKind.OpenBracketToken &&
-      nextTokenKind !== SyntaxKind.OpenParenToken &&
-      nextTokenKind !== SyntaxKind.PlusToken &&
-      nextTokenKind !== SyntaxKind.MinusToken &&
-      nextTokenKind !== SyntaxKind.SlashToken &&
-      nextTokenKind !== SyntaxKind.RegularExpressionLiteral &&
-      nextTokenKind !== SyntaxKind.CommaToken &&
-      nextTokenKind !== SyntaxKind.TemplateExpression &&
-      nextTokenKind !== SyntaxKind.TemplateHead &&
-      nextTokenKind !== SyntaxKind.NoSubstitutionTemplateLiteral &&
-      nextTokenKind !== SyntaxKind.DotToken
+      context.currentTokenParent.kind !== SyntaxKind.ForStatement
+      && context.currentTokenParent.kind !== SyntaxKind.EmptyStatement
+      && context.currentTokenParent.kind !== SyntaxKind.SemicolonClassElement
+      && nextTokenKind !== SyntaxKind.OpenBracketToken
+      && nextTokenKind !== SyntaxKind.OpenParenToken
+      && nextTokenKind !== SyntaxKind.PlusToken
+      && nextTokenKind !== SyntaxKind.MinusToken
+      && nextTokenKind !== SyntaxKind.SlashToken
+      && nextTokenKind !== SyntaxKind.RegularExpressionLiteral
+      && nextTokenKind !== SyntaxKind.CommaToken
+      && nextTokenKind !== SyntaxKind.TemplateExpression
+      && nextTokenKind !== SyntaxKind.TemplateHead
+      && nextTokenKind !== SyntaxKind.NoSubstitutionTemplateLiteral
+      && nextTokenKind !== SyntaxKind.DotToken
     );
   }
 
@@ -2194,7 +2192,7 @@ namespace ts.formatting {
     return positionIsASICandidate(
       context.currentTokenSpan.end,
       context.currentTokenParent,
-      context.sourceFile
+      context.sourceFile,
     );
   }
 }

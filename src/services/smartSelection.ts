@@ -2,17 +2,18 @@
 namespace ts.SmartSelectionRange {
   export function getSmartSelectionRange(
     pos: number,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): SelectionRange {
     let selectionRange: SelectionRange = {
       textSpan: createTextSpanFromBounds(
         sourceFile.getFullStart(),
-        sourceFile.getEnd()
+        sourceFile.getEnd(),
       ),
     };
 
     let parentNode: Node = sourceFile;
-    outer: while (true) {
+    outer:
+    while (true) {
       const children = getSelectionChildren(parentNode);
       if (!children.length) break;
       for (let i = 0; i < children.length; i++) {
@@ -25,7 +26,7 @@ namespace ts.SmartSelectionRange {
         }
 
         const comment = singleOrUndefined(
-          getTrailingCommentRanges(sourceFile.text, node.end)
+          getTrailingCommentRanges(sourceFile.text, node.end),
         );
         if (comment && comment.kind === SyntaxKind.SingleLineCommentTrivia) {
           pushSelectionCommentRange(comment.pos, comment.end);
@@ -39,20 +40,20 @@ namespace ts.SmartSelectionRange {
           // 4. A lone VariableDeclaration in a VaraibleDeclaration feels redundant with the VariableStatement.
           // Dive in without pushing a selection range.
           if (
-            isBlock(node) ||
-            isTemplateSpan(node) ||
-            isTemplateHead(node) ||
-            isTemplateTail(node) ||
-            (prevNode && isTemplateHead(prevNode)) ||
-            (isVariableDeclarationList(node) &&
-              isVariableStatement(parentNode)) ||
-            (isSyntaxList(node) && isVariableDeclarationList(parentNode)) ||
-            (isVariableDeclaration(node) &&
-              isSyntaxList(parentNode) &&
-              children.length === 1) ||
-            isJSDocTypeExpression(node) ||
-            isJSDocSignature(node) ||
-            isJSDocTypeLiteral(node)
+            isBlock(node)
+            || isTemplateSpan(node)
+            || isTemplateHead(node)
+            || isTemplateTail(node)
+            || (prevNode && isTemplateHead(prevNode))
+            || (isVariableDeclarationList(node)
+              && isVariableStatement(parentNode))
+            || (isSyntaxList(node) && isVariableDeclarationList(parentNode))
+            || (isVariableDeclaration(node)
+              && isSyntaxList(parentNode)
+              && children.length === 1)
+            || isJSDocTypeExpression(node)
+            || isJSDocSignature(node)
+            || isJSDocTypeLiteral(node)
           ) {
             parentNode = node;
             break;
@@ -60,9 +61,9 @@ namespace ts.SmartSelectionRange {
 
           // Synthesize a stop for '${ ... }' since '${' and '}' actually belong to siblings.
           if (
-            isTemplateSpan(parentNode) &&
-            nextNode &&
-            isTemplateMiddleOrTemplateTail(nextNode)
+            isTemplateSpan(parentNode)
+            && nextNode
+            && isTemplateMiddleOrTemplateTail(nextNode)
           ) {
             const start = node.getFullStart() - "${".length;
             const end = nextNode.getStart() + "}".length;
@@ -71,14 +72,13 @@ namespace ts.SmartSelectionRange {
 
           // Blocks with braces, brackets, parens, or JSX tags on separate lines should be
           // selected from open to close, including whitespace but not including the braces/etc. themselves.
-          const isBetweenMultiLineBookends =
-            isSyntaxList(node) &&
-            isListOpener(prevNode) &&
-            isListCloser(nextNode) &&
-            !positionsAreOnSameLine(
+          const isBetweenMultiLineBookends = isSyntaxList(node)
+            && isListOpener(prevNode)
+            && isListCloser(nextNode)
+            && !positionsAreOnSameLine(
               prevNode.getStart(),
               nextNode.getStart(),
-              sourceFile
+              sourceFile,
             );
           const start = isBetweenMultiLineBookends
             ? prevNode.getEnd()
@@ -118,11 +118,11 @@ namespace ts.SmartSelectionRange {
       if (start !== end) {
         const textSpan = createTextSpanFromBounds(start, end);
         if (
-          !selectionRange ||
+          !selectionRange
           // Skip ranges that are identical to the parent
-          (!textSpansEqual(textSpan, selectionRange.textSpan) &&
+          || (!textSpansEqual(textSpan, selectionRange.textSpan)
             // Skip ranges that don’t contain the original position
-            textSpanIntersectsWithPosition(textSpan, pos))
+            && textSpanIntersectsWithPosition(textSpan, pos))
         ) {
           selectionRange = {
             textSpan,
@@ -155,7 +155,7 @@ namespace ts.SmartSelectionRange {
   function positionShouldSnapToNode(
     sourceFile: SourceFile,
     pos: number,
-    node: Node
+    node: Node,
   ) {
     // Can’t use 'ts.positionBelongsToNode()' here because it cleverly accounts
     // for missing nodes, which can’t really be considered when deciding what
@@ -206,18 +206,18 @@ namespace ts.SmartSelectionRange {
       const groupedWithPlusMinusTokens = groupChildren(
         children,
         (child) =>
-          child === node.readonlyToken ||
-          child.kind === SyntaxKind.ReadonlyKeyword ||
-          child === node.questionToken ||
-          child.kind === SyntaxKind.QuestionToken
+          child === node.readonlyToken
+          || child.kind === SyntaxKind.ReadonlyKeyword
+          || child === node.questionToken
+          || child.kind === SyntaxKind.QuestionToken,
       );
       // Group type parameter with surrounding brackets
       const groupedWithBrackets = groupChildren(
         groupedWithPlusMinusTokens,
         ({ kind }) =>
-          kind === SyntaxKind.OpenBracketToken ||
-          kind === SyntaxKind.TypeParameter ||
-          kind === SyntaxKind.CloseBracketToken
+          kind === SyntaxKind.OpenBracketToken
+          || kind === SyntaxKind.TypeParameter
+          || kind === SyntaxKind.CloseBracketToken,
       );
       return [
         openBraceToken,
@@ -225,8 +225,8 @@ namespace ts.SmartSelectionRange {
         createSyntaxList(
           splitChildren(
             groupedWithBrackets,
-            ({ kind }) => kind === SyntaxKind.ColonToken
-          )
+            ({ kind }) => kind === SyntaxKind.ColonToken,
+          ),
         ),
         closeBraceToken,
       ];
@@ -236,11 +236,11 @@ namespace ts.SmartSelectionRange {
     if (isPropertySignature(node)) {
       const children = groupChildren(
         node.getChildren(),
-        (child) => child === node.name || contains(node.modifiers, child)
+        (child) => child === node.name || contains(node.modifiers, child),
       );
       return splitChildren(
         children,
-        ({ kind }) => kind === SyntaxKind.ColonToken
+        ({ kind }) => kind === SyntaxKind.ColonToken,
       );
     }
 
@@ -248,16 +248,15 @@ namespace ts.SmartSelectionRange {
     if (isParameter(node)) {
       const groupedDotDotDotAndName = groupChildren(
         node.getChildren(),
-        (child) => child === node.dotDotDotToken || child === node.name
+        (child) => child === node.dotDotDotToken || child === node.name,
       );
       const groupedWithQuestionToken = groupChildren(
         groupedDotDotDotAndName,
-        (child) =>
-          child === groupedDotDotDotAndName[0] || child === node.questionToken
+        (child) => child === groupedDotDotDotAndName[0] || child === node.questionToken,
       );
       return splitChildren(
         groupedWithQuestionToken,
-        ({ kind }) => kind === SyntaxKind.EqualsToken
+        ({ kind }) => kind === SyntaxKind.EqualsToken,
       );
     }
 
@@ -265,7 +264,7 @@ namespace ts.SmartSelectionRange {
     if (isBindingElement(node)) {
       return splitChildren(
         node.getChildren(),
-        ({ kind }) => kind === SyntaxKind.EqualsToken
+        ({ kind }) => kind === SyntaxKind.EqualsToken,
       );
     }
 
@@ -278,7 +277,7 @@ namespace ts.SmartSelectionRange {
    */
   function groupChildren(
     children: Node[],
-    groupOn: (child: Node) => boolean
+    groupOn: (child: Node) => boolean,
   ): Node[] {
     const result: Node[] = [];
     let group: Node[] | undefined;
@@ -317,7 +316,7 @@ namespace ts.SmartSelectionRange {
   function splitChildren(
     children: Node[],
     pivotOn: (child: Node) => boolean,
-    separateTrailingSemicolon = true
+    separateTrailingSemicolon = true,
   ): Node[] {
     if (children.length < 2) {
       return children;
@@ -329,11 +328,10 @@ namespace ts.SmartSelectionRange {
     const leftChildren = children.slice(0, splitTokenIndex);
     const splitToken = children[splitTokenIndex];
     const lastToken = last(children);
-    const separateLastToken =
-      separateTrailingSemicolon && lastToken.kind === SyntaxKind.SemicolonToken;
+    const separateLastToken = separateTrailingSemicolon && lastToken.kind === SyntaxKind.SemicolonToken;
     const rightChildren = children.slice(
       splitTokenIndex + 1,
-      separateLastToken ? children.length - 1 : undefined
+      separateLastToken ? children.length - 1 : undefined,
     );
     const result = compact([
       leftChildren.length ? createSyntaxList(leftChildren) : undefined,
@@ -348,27 +346,27 @@ namespace ts.SmartSelectionRange {
     return setTextRangePosEnd(
       parseNodeFactory.createSyntaxList(children),
       children[0].pos,
-      last(children).end
+      last(children).end,
     );
   }
 
   function isListOpener(token: Node | undefined): token is Node {
     const kind = token && token.kind;
     return (
-      kind === SyntaxKind.OpenBraceToken ||
-      kind === SyntaxKind.OpenBracketToken ||
-      kind === SyntaxKind.OpenParenToken ||
-      kind === SyntaxKind.JsxOpeningElement
+      kind === SyntaxKind.OpenBraceToken
+      || kind === SyntaxKind.OpenBracketToken
+      || kind === SyntaxKind.OpenParenToken
+      || kind === SyntaxKind.JsxOpeningElement
     );
   }
 
   function isListCloser(token: Node | undefined): token is Node {
     const kind = token && token.kind;
     return (
-      kind === SyntaxKind.CloseBraceToken ||
-      kind === SyntaxKind.CloseBracketToken ||
-      kind === SyntaxKind.CloseParenToken ||
-      kind === SyntaxKind.JsxClosingElement
+      kind === SyntaxKind.CloseBraceToken
+      || kind === SyntaxKind.CloseBracketToken
+      || kind === SyntaxKind.CloseParenToken
+      || kind === SyntaxKind.JsxClosingElement
     );
   }
 

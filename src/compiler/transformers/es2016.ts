@@ -44,52 +44,52 @@ namespace ts {
       if (isElementAccessExpression(left)) {
         // Transforms `a[x] **= b` into `(_a = a)[_x = x] = Math.pow(_a[_x], b)`
         const expressionTemp = factory.createTempVariable(
-          hoistVariableDeclaration
+          hoistVariableDeclaration,
         );
         const argumentExpressionTemp = factory.createTempVariable(
-          hoistVariableDeclaration
+          hoistVariableDeclaration,
         );
         target = setTextRange(
           factory.createElementAccessExpression(
             setTextRange(
               factory.createAssignment(expressionTemp, left.expression),
-              left.expression
+              left.expression,
             ),
             setTextRange(
               factory.createAssignment(
                 argumentExpressionTemp,
-                left.argumentExpression
+                left.argumentExpression,
               ),
-              left.argumentExpression
-            )
+              left.argumentExpression,
+            ),
           ),
-          left
+          left,
         );
         value = setTextRange(
           factory.createElementAccessExpression(
             expressionTemp,
-            argumentExpressionTemp
+            argumentExpressionTemp,
           ),
-          left
+          left,
         );
       } else if (isPropertyAccessExpression(left)) {
         // Transforms `a.x **= b` into `(_a = a).x = Math.pow(_a.x, b)`
         const expressionTemp = factory.createTempVariable(
-          hoistVariableDeclaration
+          hoistVariableDeclaration,
         );
         target = setTextRange(
           factory.createPropertyAccessExpression(
             setTextRange(
               factory.createAssignment(expressionTemp, left.expression),
-              left.expression
+              left.expression,
             ),
-            left.name
+            left.name,
           ),
-          left
+          left,
         );
         value = setTextRange(
           factory.createPropertyAccessExpression(expressionTemp, left.name),
-          left
+          left,
         );
       } else {
         // Transforms `a **= b` into `a = Math.pow(a, b)`
@@ -101,10 +101,10 @@ namespace ts {
           target,
           setTextRange(
             factory.createGlobalMethodCall("Math", "pow", [value, right]),
-            node
-          )
+            node,
+          ),
         ),
-        node
+        node,
       );
     }
 
@@ -114,7 +114,7 @@ namespace ts {
       const right = visitNode(node.right, visitor, isExpression);
       return setTextRange(
         factory.createGlobalMethodCall("Math", "pow", [left, right]),
-        node
+        node,
       );
     }
   }

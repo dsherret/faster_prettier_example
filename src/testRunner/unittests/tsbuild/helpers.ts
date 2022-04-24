@@ -1,6 +1,6 @@
 namespace ts {
   export function errorDiagnostic(
-    message: fakes.ExpectedDiagnosticMessage
+    message: fakes.ExpectedDiagnosticMessage,
   ): fakes.ExpectedErrorDiagnostic {
     return { message };
   }
@@ -29,7 +29,7 @@ namespace ts {
     fs: vfs.FileSystem,
     path: string,
     oldText: string,
-    newText: string
+    newText: string,
   ) {
     if (!fs.statSync(path).isFile()) {
       throw new Error(`File ${path} does not exist`);
@@ -45,7 +45,7 @@ namespace ts {
   export function prependText(
     fs: vfs.FileSystem,
     path: string,
-    additionalContent: string
+    additionalContent: string,
   ) {
     if (!fs.statSync(path).isFile()) {
       throw new Error(`File ${path} does not exist`);
@@ -57,7 +57,7 @@ namespace ts {
   export function appendText(
     fs: vfs.FileSystem,
     path: string,
-    additionalContent: string
+    additionalContent: string,
   ) {
     if (!fs.statSync(path).isFile()) {
       throw new Error(`File ${path} does not exist`);
@@ -77,7 +77,7 @@ namespace ts {
   export function lastIndexOf(
     fs: vfs.FileSystem,
     path: string,
-    searchStr: string
+    searchStr: string,
   ) {
     if (!fs.statSync(path).isFile()) {
       throw new Error(`File ${path} does not exist`);
@@ -89,7 +89,7 @@ namespace ts {
   export function expectedLocationIndexOf(
     fs: vfs.FileSystem,
     file: string,
-    searchStr: string
+    searchStr: string,
   ): fakes.ExpectedDiagnosticLocation {
     return {
       file,
@@ -101,7 +101,7 @@ namespace ts {
   export function expectedLocationLastIndexOf(
     fs: vfs.FileSystem,
     file: string,
-    searchStr: string
+    searchStr: string,
   ): fakes.ExpectedDiagnosticLocation {
     return {
       file,
@@ -150,14 +150,14 @@ interface Symbol {
    */
   export function loadProjectFromDisk(
     root: string,
-    libContentToAppend?: string
+    libContentToAppend?: string,
   ): vfs.FileSystem {
     const resolver = vfs.createResolver(Harness.IO);
     const fs = new vfs.FileSystem(/*ignoreCase*/ true, {
       files: {
         ["/src"]: new vfs.Mount(
           vpath.resolve(Harness.IO.getWorkspaceRoot(), root),
-          resolver
+          resolver,
         ),
       },
       cwd: "/",
@@ -172,7 +172,7 @@ interface Symbol {
    */
   export function loadProjectFromFiles(
     files: vfs.FileSet,
-    libContentToAppend?: string
+    libContentToAppend?: string,
   ): vfs.FileSystem {
     const fs = new vfs.FileSystem(/*ignoreCase*/ true, {
       files,
@@ -185,12 +185,12 @@ interface Symbol {
 
   function addLibAndMakeReadonly(
     fs: vfs.FileSystem,
-    libContentToAppend?: string
+    libContentToAppend?: string,
   ) {
     fs.mkdirSync("/lib");
     fs.writeFileSync(
       "/lib/lib.d.ts",
-      libContentToAppend ? `${libContent}${libContentToAppend}` : libContent
+      libContentToAppend ? `${libContent}${libContentToAppend}` : libContent,
     );
     fs.makeReadonly();
   }
@@ -217,7 +217,7 @@ interface Symbol {
 
   export function verifyOutputsPresent(
     fs: vfs.FileSystem,
-    outputs: readonly string[]
+    outputs: readonly string[],
   ) {
     for (const output of outputs) {
       assert(fs.existsSync(output), `Expect file ${output} to exist`);
@@ -226,29 +226,27 @@ interface Symbol {
 
   export function verifyOutputsAbsent(
     fs: vfs.FileSystem,
-    outputs: readonly string[]
+    outputs: readonly string[],
   ) {
     for (const output of outputs) {
       assert.isFalse(
         fs.existsSync(output),
-        `Expect file ${output} to not exist`
+        `Expect file ${output} to not exist`,
       );
     }
   }
 
   export function generateSourceMapBaselineFiles(
-    sys: System & { writtenFiles: ReadonlyCollection<Path> }
+    sys: System & { writtenFiles: ReadonlyCollection<Path> },
   ) {
-    const mapFileNames = mapDefinedIterator(sys.writtenFiles.keys(), (f) =>
-      f.endsWith(".map") ? f : undefined
-    );
+    const mapFileNames = mapDefinedIterator(sys.writtenFiles.keys(), (f) => f.endsWith(".map") ? f : undefined);
     while (true) {
       const result = mapFileNames.next();
       if (result.done) break;
       const mapFile = result.value;
       const text = Harness.SourceMapRecorder.getSourceMapRecordWithSystem(
         sys,
-        mapFile
+        mapFile,
       );
       sys.writeFile(`${mapFile}.baseline.txt`, text);
     }
@@ -259,23 +257,24 @@ interface Symbol {
     originalReadCall: System["readFile"],
     baselineRecorder: Harness.Compiler.WriterAggregator,
     bundleFileInfo: BundleFileInfo | undefined,
-    outFile: string | undefined
+    outFile: string | undefined,
   ) {
     if (!length(bundleFileInfo && bundleFileInfo.sections) && !outFile) return; // Nothing to baseline
 
-    const content =
-      outFile && sys.fileExists(outFile)
-        ? originalReadCall.call(sys, outFile, "utf8")!
-        : "";
+    const content = outFile && sys.fileExists(outFile)
+      ? originalReadCall.call(sys, outFile, "utf8")!
+      : "";
     baselineRecorder.WriteLine(
-      "======================================================================"
+      "======================================================================",
     );
     baselineRecorder.WriteLine(`File:: ${outFile}`);
-    for (const section of bundleFileInfo
-      ? bundleFileInfo.sections
-      : emptyArray) {
+    for (
+      const section of bundleFileInfo
+        ? bundleFileInfo.sections
+        : emptyArray
+    ) {
       baselineRecorder.WriteLine(
-        "----------------------------------------------------------------------"
+        "----------------------------------------------------------------------",
       );
       writeSectionHeader(section);
       if (section.kind !== BundleFileSectionKind.Prepend) {
@@ -285,7 +284,7 @@ interface Symbol {
         Debug.assert(section.end === last(section.texts).end);
         for (const text of section.texts) {
           baselineRecorder.WriteLine(
-            ">>--------------------------------------------------------------------"
+            ">>--------------------------------------------------------------------",
           );
           writeSectionHeader(text);
           writeTextOfSection(text.pos, text.end);
@@ -295,7 +294,7 @@ interface Symbol {
       }
     }
     baselineRecorder.WriteLine(
-      "======================================================================"
+      "======================================================================",
     );
 
     function writeTextOfSection(pos: number, end: number) {
@@ -307,13 +306,11 @@ interface Symbol {
 
     function writeSectionHeader(section: BundleFileSection) {
       baselineRecorder.WriteLine(
-        `${section.kind}: (${section.pos}-${section.end})${
-          section.data ? ":: " + section.data : ""
-        }${
+        `${section.kind}: (${section.pos}-${section.end})${section.data ? ":: " + section.data : ""}${
           section.kind === BundleFileSectionKind.Prepend
             ? " texts:: " + section.texts.length
             : ""
-        }`
+        }`,
       );
     }
   }
@@ -340,17 +337,16 @@ interface Symbol {
     sys: System,
     originalWriteFile: System["writeFile"],
     buildInfoPath: string,
-    buildInfo: BuildInfo
+    buildInfo: BuildInfo,
   ) {
     const fileInfos: ReadableProgramBuildInfo["fileInfos"] = {};
     buildInfo.program?.fileInfos.forEach(
-      (fileInfo, index) =>
-        (fileInfos[toFileName((index + 1) as ProgramBuildInfoFileId)] =
-          toBuilderStateFileInfo(fileInfo))
+      (
+        fileInfo,
+        index,
+      ) => (fileInfos[toFileName((index + 1) as ProgramBuildInfoFileId)] = toBuilderStateFileInfo(fileInfo)),
     );
-    const fileNamesList = buildInfo.program?.fileIdsList?.map((fileIdsListId) =>
-      fileIdsListId.map(toFileName)
-    );
+    const fileNamesList = buildInfo.program?.fileIdsList?.map((fileIdsListId) => fileIdsListId.map(toFileName));
     const program: ReadableProgramBuildInfo | undefined = buildInfo.program && {
       fileNames: buildInfo.program.fileNames,
       fileNamesList,
@@ -358,12 +354,11 @@ interface Symbol {
       options: buildInfo.program.options,
       referencedMap: toMapOfReferencedSet(buildInfo.program.referencedMap),
       exportedModulesMap: toMapOfReferencedSet(
-        buildInfo.program.exportedModulesMap
+        buildInfo.program.exportedModulesMap,
       ),
-      semanticDiagnosticsPerFile:
-        buildInfo.program.semanticDiagnosticsPerFile?.map((d) =>
-          isNumber(d) ? toFileName(d) : [toFileName(d[0]), d[1]]
-        ),
+      semanticDiagnosticsPerFile: buildInfo.program.semanticDiagnosticsPerFile?.map((d) =>
+        isNumber(d) ? toFileName(d) : [toFileName(d[0]), d[1]]
+      ),
       affectedFilesPendingEmit: buildInfo.program.affectedFilesPendingEmit?.map(
         ([fileId, emitKind]) => [
           toFileName(fileId),
@@ -372,11 +367,10 @@ interface Symbol {
             : emitKind === BuilderFileEmit.Full
             ? "Full"
             : Debug.assertNever(emitKind),
-        ]
+        ],
       ),
     };
-    const version =
-      buildInfo.version === ts.version ? fakes.version : buildInfo.version;
+    const version = buildInfo.version === ts.version ? fakes.version : buildInfo.version;
     const result: ReadableBuildInfo = {
       bundle: buildInfo.bundle,
       program,
@@ -387,7 +381,7 @@ interface Symbol {
     originalWriteFile.call(
       sys,
       `${buildInfoPath}.readable.baseline.txt`,
-      JSON.stringify(result, /*replacer*/ undefined, 2)
+      JSON.stringify(result, /*replacer*/ undefined, 2),
     );
 
     function toFileName(fileId: ProgramBuildInfoFileId) {
@@ -399,7 +393,7 @@ interface Symbol {
     }
 
     function toMapOfReferencedSet(
-      referenceMap: ProgramBuildInfoReferencedMap | undefined
+      referenceMap: ProgramBuildInfoReferencedMap | undefined,
     ): MapLike<string[]> | undefined {
       if (!referenceMap) return undefined;
       const result: MapLike<string[]> = {};
@@ -414,7 +408,7 @@ interface Symbol {
     return toPath(
       fileName,
       sys.getCurrentDirectory(),
-      createGetCanonicalFileName(sys.useCaseSensitiveFileNames)
+      createGetCanonicalFileName(sys.useCaseSensitiveFileNames),
     );
   }
 
@@ -422,38 +416,40 @@ interface Symbol {
     options: CompilerOptions,
     sys: System & { writtenFiles: ReadonlyCollection<Path> },
     originalReadCall?: System["readFile"],
-    originalWriteFile?: System["writeFile"]
+    originalWriteFile?: System["writeFile"],
   ) {
     const buildInfoPath = getTsBuildInfoEmitOutputFilePath(options);
     if (
-      !buildInfoPath ||
-      !sys.writtenFiles.has(toPathWithSystem(sys, buildInfoPath))
-    )
+      !buildInfoPath
+      || !sys.writtenFiles.has(toPathWithSystem(sys, buildInfoPath))
+    ) {
       return;
+    }
     if (!sys.fileExists(buildInfoPath)) return;
 
     const buildInfo = getBuildInfo(
-      (originalReadCall || sys.readFile).call(sys, buildInfoPath, "utf8")!
+      (originalReadCall || sys.readFile).call(sys, buildInfoPath, "utf8")!,
     );
     generateBuildInfoProgramBaseline(
       sys,
       originalWriteFile || sys.writeFile,
       buildInfoPath,
-      buildInfo
+      buildInfo,
     );
 
     if (!outFile(options)) return;
     const { jsFilePath, declarationFilePath } = getOutputPathsForBundle(
       options,
-      /*forceDts*/ false
+      /*forceDts*/ false,
     );
     const bundle = buildInfo.bundle;
     if (
-      !bundle ||
-      (!length(bundle.js && bundle.js.sections) &&
-        !length(bundle.dts && bundle.dts.sections))
-    )
+      !bundle
+      || (!length(bundle.js && bundle.js.sections)
+        && !length(bundle.dts && bundle.dts.sections))
+    ) {
       return;
+    }
 
     // Write the baselines:
     const baselineRecorder = new Harness.Compiler.WriterAggregator();
@@ -462,21 +458,21 @@ interface Symbol {
       originalReadCall || sys.readFile,
       baselineRecorder,
       bundle.js,
-      jsFilePath
+      jsFilePath,
     );
     generateBundleFileSectionInfo(
       sys,
       originalReadCall || sys.readFile,
       baselineRecorder,
       bundle.dts,
-      declarationFilePath
+      declarationFilePath,
     );
     baselineRecorder.Close();
     const text = baselineRecorder.lines.join("\r\n");
     (originalWriteFile || sys.writeFile).call(
       sys,
       `${buildInfoPath}.baseline.txt`,
-      text
+      text,
     );
   }
 
@@ -493,7 +489,7 @@ interface Symbol {
   function verifyIncrementalCorrectness(
     input: () => VerifyIncrementalCorrectness,
     index: number,
-    subScenario: TscCompile["subScenario"]
+    subScenario: TscCompile["subScenario"],
   ) {
     it(`Verify emit output file text is same when built clean for incremental scenario at:: ${index} ${subScenario}`, () => {
       const {
@@ -527,24 +523,24 @@ interface Symbol {
           // Check only presence and absence and not text as we will do that for readable baseline
           assert.isTrue(
             sys.fileExists(`${outputFile}.readable.baseline.txt`),
-            `Readable baseline should be present in clean build:: File:: ${outputFile}`
+            `Readable baseline should be present in clean build:: File:: ${outputFile}`,
           );
           assert.isTrue(
             newSys.fileExists(`${outputFile}.readable.baseline.txt`),
-            `Readable baseline should be present in incremental build:: File:: ${outputFile}`
+            `Readable baseline should be present in incremental build:: File:: ${outputFile}`,
           );
           if (descrepancyInClean === undefined) {
             verifyPresenceAbsence(
               incrementalBuildText,
               cleanBuildText,
-              `Incremental and clean tsbuildinfo file presence should match:: File:: ${outputFile}`
+              `Incremental and clean tsbuildinfo file presence should match:: File:: ${outputFile}`,
             );
           } else {
             verifyTextEqual(
               incrementalBuildText,
               cleanBuildText,
               descrepancyInClean,
-              `File: ${outputFile}`
+              `File: ${outputFile}`,
             );
           }
         } else if (
@@ -554,7 +550,7 @@ interface Symbol {
             incrementalBuildText,
             cleanBuildText,
             descrepancyInClean,
-            `File: ${outputFile}`
+            `File: ${outputFile}`,
           );
         } else if (incrementalBuildText !== cleanBuildText) {
           // Verify build info without affectedFilesPendingEmit
@@ -570,7 +566,7 @@ interface Symbol {
             incrementalBuildInfo,
             cleanBuildInfo,
             descrepancyInClean,
-            `TsBuild info text without affectedFilesPendingEmit ${subScenario}:: ${outputFile}::\nIncremental buildInfoText:: ${incrementalBuildText}\nClean buildInfoText:: ${cleanBuildText}`
+            `TsBuild info text without affectedFilesPendingEmit ${subScenario}:: ${outputFile}::\nIncremental buildInfoText:: ${incrementalBuildText}\nClean buildInfoText:: ${cleanBuildText}`,
           );
           if (descrepancyInClean === undefined) {
             // Verify file info sigantures
@@ -579,17 +575,19 @@ interface Symbol {
               cleanReadableBuildInfo?.program?.fileInfos,
               (key, incrementalFileInfo, cleanFileInfo) => {
                 if (
-                  incrementalFileInfo.signature !== cleanFileInfo.signature &&
-                  incrementalFileInfo.signature !== incrementalFileInfo.version
+                  incrementalFileInfo.signature !== cleanFileInfo.signature
+                  && incrementalFileInfo.signature !== incrementalFileInfo.version
                 ) {
                   assert.fail(
-                    `Incremental signature should either be dts signature or file version for File:: ${key}:: Incremental:: ${JSON.stringify(
-                      incrementalFileInfo
-                    )}, Clean:: ${JSON.stringify(cleanFileInfo)}}`
+                    `Incremental signature should either be dts signature or file version for File:: ${key}:: Incremental:: ${
+                      JSON.stringify(
+                        incrementalFileInfo,
+                      )
+                    }, Clean:: ${JSON.stringify(cleanFileInfo)}}`,
                   );
                 }
               },
-              `FileInfos:: File:: ${outputFile}`
+              `FileInfos:: File:: ${outputFile}`,
             );
             // Verify exportedModulesMap
             verifyMapLike(
@@ -597,24 +595,30 @@ interface Symbol {
               cleanReadableBuildInfo?.program?.exportedModulesMap,
               (key, incrementalReferenceSet, cleanReferenceSet) => {
                 if (
-                  !arrayIsEqualTo(incrementalReferenceSet, cleanReferenceSet) &&
-                  !arrayIsEqualTo(
+                  !arrayIsEqualTo(incrementalReferenceSet, cleanReferenceSet)
+                  && !arrayIsEqualTo(
                     incrementalReferenceSet,
-                    incrementalReadableBuildInfo!.program!.referencedMap![key]
+                    incrementalReadableBuildInfo!.program!.referencedMap![key],
                   )
                 ) {
                   assert.fail(
-                    `Incremental Reference set should either be from dts or files reference map for File:: ${key}:: Incremental:: ${JSON.stringify(
-                      incrementalReferenceSet
-                    )}, Clean:: ${JSON.stringify(
-                      cleanReferenceSet
-                    )}, referenceMap:: ${JSON.stringify(
-                      incrementalReadableBuildInfo!.program!.referencedMap![key]
-                    )}}`
+                    `Incremental Reference set should either be from dts or files reference map for File:: ${key}:: Incremental:: ${
+                      JSON.stringify(
+                        incrementalReferenceSet,
+                      )
+                    }, Clean:: ${
+                      JSON.stringify(
+                        cleanReferenceSet,
+                      )
+                    }, referenceMap:: ${
+                      JSON.stringify(
+                        incrementalReadableBuildInfo!.program!.referencedMap![key],
+                      )
+                    }}`,
                   );
                 }
               },
-              `exportedModulesMap:: File:: ${outputFile}`
+              `exportedModulesMap:: File:: ${outputFile}`,
             );
             // Verify that incrementally pending affected file emit are in clean build since clean build can contain more files compared to incremental depending of noEmitOnError option
             if (
@@ -622,7 +626,7 @@ interface Symbol {
             ) {
               assert.isDefined(
                 cleanReadableBuildInfo?.program?.affectedFilesPendingEmit,
-                `Incremental build contains affectedFilesPendingEmit, clean build should also have it: ${outputFile}::\nIncremental buildInfoText:: ${incrementalBuildText}\nClean buildInfoText:: ${cleanBuildText}`
+                `Incremental build contains affectedFilesPendingEmit, clean build should also have it: ${outputFile}::\nIncremental buildInfoText:: ${incrementalBuildText}\nClean buildInfoText:: ${cleanBuildText}`,
               );
               let expectedIndex = 0;
               incrementalReadableBuildInfo.program.affectedFilesPendingEmit.forEach(
@@ -630,15 +634,15 @@ interface Symbol {
                   expectedIndex = findIndex(
                     cleanReadableBuildInfo!.program!.affectedFilesPendingEmit!,
                     ([expectedFile]) => actualFile === expectedFile,
-                    expectedIndex
+                    expectedIndex,
                   );
                   assert.notEqual(
                     expectedIndex,
                     -1,
-                    `Incremental build contains ${actualFile} file as pending emit, clean build should also have it: ${outputFile}::\nIncremental buildInfoText:: ${incrementalBuildText}\nClean buildInfoText:: ${cleanBuildText}`
+                    `Incremental build contains ${actualFile} file as pending emit, clean build should also have it: ${outputFile}::\nIncremental buildInfoText:: ${incrementalBuildText}\nClean buildInfoText:: ${cleanBuildText}`,
                   );
                   expectedIndex++;
-                }
+                },
               );
             }
           }
@@ -649,7 +653,7 @@ interface Symbol {
         incrementalText: string | undefined,
         cleanText: string | undefined,
         descrepancyInClean: CleanBuildDescrepancy | undefined,
-        message: string
+        message: string,
       ) {
         if (descrepancyInClean === undefined) {
           assert.equal(incrementalText, cleanText, message);
@@ -659,22 +663,22 @@ interface Symbol {
           case CleanBuildDescrepancy.CleanFileTextDifferent:
             assert.isDefined(
               incrementalText,
-              `Incremental file should be present:: ${message}`
+              `Incremental file should be present:: ${message}`,
             );
             assert.isDefined(
               cleanText,
-              `Clean file should be present present:: ${message}`
+              `Clean file should be present present:: ${message}`,
             );
             assert.notEqual(incrementalText, cleanText, message);
             return;
           case CleanBuildDescrepancy.CleanFilePresent:
             assert.isUndefined(
               incrementalText,
-              `Incremental file should be absent:: ${message}`
+              `Incremental file should be absent:: ${message}`,
             );
             assert.isDefined(
               cleanText,
-              `Clean file should be present:: ${message}`
+              `Clean file should be present:: ${message}`,
             );
             return;
           default:
@@ -686,12 +690,12 @@ interface Symbol {
         incremental: MapLike<T> | undefined,
         clean: MapLike<T> | undefined,
         verifyValue: (key: string, incrementalValue: T, cleanValue: T) => void,
-        message: string
+        message: string,
       ) {
         verifyPresenceAbsence(
           incremental,
           clean,
-          `Incremental and clean presence should match:: ${message}`
+          `Incremental and clean presence should match:: ${message}`,
         );
         if (!incremental) return;
         const incrementalMap = new Map(getEntries(incremental));
@@ -699,21 +703,29 @@ interface Symbol {
         assert.equal(
           incrementalMap.size,
           cleanMap.size,
-          `Incremental and clean size of map should match:: ${message}, Incremental keys: ${arrayFrom(
-            incrementalMap.keys()
-          )} Clean: ${arrayFrom(
-            cleanMap.keys()
-          )}${TestFSWithWatch.getDiffInKeys(
-            incrementalMap,
-            arrayFrom(cleanMap.keys())
-          )}`
+          `Incremental and clean size of map should match:: ${message}, Incremental keys: ${
+            arrayFrom(
+              incrementalMap.keys(),
+            )
+          } Clean: ${
+            arrayFrom(
+              cleanMap.keys(),
+            )
+          }${
+            TestFSWithWatch.getDiffInKeys(
+              incrementalMap,
+              arrayFrom(cleanMap.keys()),
+            )
+          }`,
         );
         cleanMap.forEach((cleanValue, key) => {
           assert.isTrue(
             incrementalMap.has(key),
-            `Expected to contain ${key} in incremental map:: ${message}, Incremental keys: ${arrayFrom(
-              incrementalMap.keys()
-            )}`
+            `Expected to contain ${key} in incremental map:: ${message}, Incremental keys: ${
+              arrayFrom(
+                incrementalMap.keys(),
+              )
+            }`,
           );
           verifyValue(key, incrementalMap.get(key)!, cleanValue);
         });
@@ -724,16 +736,16 @@ interface Symbol {
   function verifyPresenceAbsence<T>(
     actual: T | undefined,
     expected: T | undefined,
-    message: string
+    message: string,
   ) {
     (expected !== undefined ? assert.isDefined : assert.isUndefined)(
       actual,
-      message
+      message,
     );
   }
 
   function getBuildInfoForIncrementalCorrectnessCheck(
-    text: string | undefined
+    text: string | undefined,
   ): {
     buildInfo: string | undefined;
     readableBuildInfo?: ReadableBuildInfo;
@@ -772,7 +784,7 @@ interface Symbol {
           size: undefined, // Size doesnt need to be equal
         },
         /*replacer*/ undefined,
-        2
+        2,
       ),
       readableBuildInfo,
     };
@@ -820,102 +832,107 @@ interface Symbol {
     baselinePrograms,
     incrementalScenarios,
   }: VerifyTsBuildInputWorker) {
-    describe(`tsc ${commandLineArgs.join(
-      " "
-    )} ${scenario}:: ${subScenario}`, () => {
-      let tick: () => void;
-      let sys: TscCompileSystem;
-      let baseFs: vfs.FileSystem;
-      before(() => {
-        ({ fs: baseFs, tick } = getFsWithTime(fs()));
-        sys = tscCompile({
-          scenario,
-          subScenario,
-          fs: () => baseFs.makeReadonly(),
-          commandLineArgs,
-          modifyFs: (fs) => {
-            if (modifyFs) modifyFs(fs);
-            tick();
-          },
-          baselineSourceMap,
-          baselineReadFileCalls,
-          baselinePrograms,
-        });
-        Debug.assert(
-          !!incrementalScenarios.length,
-          `${scenario}/${subScenario}:: No incremental scenarios, you probably want to use verifyTsc instead.`
-        );
-      });
-      after(() => {
-        baseFs = undefined!;
-        sys = undefined!;
-        tick = undefined!;
-      });
-      describe("initialBuild", () => {
-        verifyTscBaseline(() => sys);
-      });
-
-      incrementalScenarios.forEach(
-        (
-          {
-            buildKind,
-            modifyFs: incrementalModifyFs,
-            subScenario: incrementalSubScenario,
-            commandLineArgs: incrementalCommandLineArgs,
-            cleanBuildDiscrepancies,
-          },
-          index
-        ) => {
-          describe(incrementalSubScenario || buildKind, () => {
-            let newSys: TscCompileSystem;
-            before(() => {
-              Debug.assert(
-                buildKind !== BuildKind.Initial,
-                "Incremental edit cannot be initial compilation"
-              );
+    describe(
+      `tsc ${
+        commandLineArgs.join(
+          " ",
+        )
+      } ${scenario}:: ${subScenario}`,
+      () => {
+        let tick: () => void;
+        let sys: TscCompileSystem;
+        let baseFs: vfs.FileSystem;
+        before(() => {
+          ({ fs: baseFs, tick } = getFsWithTime(fs()));
+          sys = tscCompile({
+            scenario,
+            subScenario,
+            fs: () => baseFs.makeReadonly(),
+            commandLineArgs,
+            modifyFs: (fs) => {
+              if (modifyFs) modifyFs(fs);
               tick();
-              newSys = tscCompile({
-                scenario,
-                subScenario: incrementalSubScenario || subScenario,
-                buildKind,
-                fs: () => sys.vfs,
-                commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
-                modifyFs: (fs) => {
-                  tick();
-                  incrementalModifyFs(fs);
-                  tick();
-                },
-                baselineSourceMap,
-                baselineReadFileCalls,
-                baselinePrograms,
-              });
-            });
-            after(() => {
-              newSys = undefined!;
-            });
-            verifyTscBaseline(() => newSys);
-            verifyIncrementalCorrectness(
-              () => ({
-                scenario,
-                baseFs,
-                newSys,
-                commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
-                cleanBuildDiscrepancies,
-                incrementalModifyFs,
-                modifyFs,
-                tick,
-              }),
-              index,
-              incrementalSubScenario || subScenario
-            );
+            },
+            baselineSourceMap,
+            baselineReadFileCalls,
+            baselinePrograms,
           });
-        }
-      );
-    });
+          Debug.assert(
+            !!incrementalScenarios.length,
+            `${scenario}/${subScenario}:: No incremental scenarios, you probably want to use verifyTsc instead.`,
+          );
+        });
+        after(() => {
+          baseFs = undefined!;
+          sys = undefined!;
+          tick = undefined!;
+        });
+        describe("initialBuild", () => {
+          verifyTscBaseline(() => sys);
+        });
+
+        incrementalScenarios.forEach(
+          (
+            {
+              buildKind,
+              modifyFs: incrementalModifyFs,
+              subScenario: incrementalSubScenario,
+              commandLineArgs: incrementalCommandLineArgs,
+              cleanBuildDiscrepancies,
+            },
+            index,
+          ) => {
+            describe(incrementalSubScenario || buildKind, () => {
+              let newSys: TscCompileSystem;
+              before(() => {
+                Debug.assert(
+                  buildKind !== BuildKind.Initial,
+                  "Incremental edit cannot be initial compilation",
+                );
+                tick();
+                newSys = tscCompile({
+                  scenario,
+                  subScenario: incrementalSubScenario || subScenario,
+                  buildKind,
+                  fs: () => sys.vfs,
+                  commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
+                  modifyFs: (fs) => {
+                    tick();
+                    incrementalModifyFs(fs);
+                    tick();
+                  },
+                  baselineSourceMap,
+                  baselineReadFileCalls,
+                  baselinePrograms,
+                });
+              });
+              after(() => {
+                newSys = undefined!;
+              });
+              verifyTscBaseline(() => newSys);
+              verifyIncrementalCorrectness(
+                () => ({
+                  scenario,
+                  baseFs,
+                  newSys,
+                  commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
+                  cleanBuildDiscrepancies,
+                  incrementalModifyFs,
+                  modifyFs,
+                  tick,
+                }),
+                index,
+                incrementalSubScenario || subScenario,
+              );
+            });
+          },
+        );
+      },
+    );
   }
 
   export function verifyTscSerializedIncrementalEdits(
-    input: VerifyTsBuildInput
+    input: VerifyTsBuildInput,
   ) {
     verifyTscSerializedIncrementalEditsWorker(input);
     if (input.baselineIncremental) {
@@ -937,126 +954,130 @@ interface Symbol {
     baselinePrograms,
     incrementalScenarios,
   }: VerifyTsBuildInputWorker) {
-    describe(`tsc ${commandLineArgs.join(
-      " "
-    )} ${scenario}:: ${subScenario} serializedEdits`, () => {
-      Debug.assert(
-        !!incrementalScenarios.length,
-        `${scenario}/${subScenario}:: No incremental scenarios, you probably want to use verifyTsc instead.`
-      );
-      let tick: () => void;
-      let sys: TscCompileSystem;
-      let baseFs: vfs.FileSystem;
-      let incrementalSys: TscCompileSystem[];
-      before(() => {
-        ({ fs: baseFs, tick } = getFsWithTime(fs()));
-        sys = tscCompile({
-          scenario,
-          subScenario,
-          fs: () => baseFs.makeReadonly(),
-          commandLineArgs,
-          modifyFs: (fs) => {
-            if (modifyFs) modifyFs(fs);
-            tick();
-          },
-          baselineSourceMap,
-          baselineReadFileCalls,
-          baselinePrograms,
-        });
-        incrementalScenarios.forEach(
-          (
-            {
-              buildKind,
-              modifyFs,
-              subScenario: incrementalSubScenario,
-              commandLineArgs: incrementalCommandLineArgs,
+    describe(
+      `tsc ${
+        commandLineArgs.join(
+          " ",
+        )
+      } ${scenario}:: ${subScenario} serializedEdits`,
+      () => {
+        Debug.assert(
+          !!incrementalScenarios.length,
+          `${scenario}/${subScenario}:: No incremental scenarios, you probably want to use verifyTsc instead.`,
+        );
+        let tick: () => void;
+        let sys: TscCompileSystem;
+        let baseFs: vfs.FileSystem;
+        let incrementalSys: TscCompileSystem[];
+        before(() => {
+          ({ fs: baseFs, tick } = getFsWithTime(fs()));
+          sys = tscCompile({
+            scenario,
+            subScenario,
+            fs: () => baseFs.makeReadonly(),
+            commandLineArgs,
+            modifyFs: (fs) => {
+              if (modifyFs) modifyFs(fs);
+              tick();
             },
-            index
-          ) => {
-            Debug.assert(
-              buildKind !== BuildKind.Initial,
-              "Incremental edit cannot be initial compilation"
-            );
-            tick();
-            (incrementalSys || (incrementalSys = [])).push(
-              tscCompile({
-                scenario,
-                subScenario: incrementalSubScenario || subScenario,
+            baselineSourceMap,
+            baselineReadFileCalls,
+            baselinePrograms,
+          });
+          incrementalScenarios.forEach(
+            (
+              {
                 buildKind,
-                fs: () =>
-                  index === 0 ? sys.vfs : incrementalSys[index - 1].vfs,
-                commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
-                modifyFs: (fs) => {
-                  tick();
-                  modifyFs(fs);
-                  tick();
-                },
-                baselineSourceMap,
-                baselineReadFileCalls,
-                baselinePrograms,
-              })
-            );
-          }
-        );
-      });
-      after(() => {
-        baseFs = undefined!;
-        sys = undefined!;
-        tick = undefined!;
-        incrementalSys = undefined!;
-      });
-      describe("serializedBuild", () => {
-        verifyTscBaseline(() => ({
-          baseLine: () => {
-            const { file, text } = sys.baseLine();
-            const texts: string[] = [text];
-            incrementalSys.forEach((sys, index) => {
-              const incrementalScenario = incrementalScenarios[index];
-              texts.push("");
-              texts.push(
-                `Change:: ${
-                  incrementalScenario.subScenario ||
-                  incrementalScenario.buildKind
-                }`
-              );
-              texts.push(sys.baseLine().text);
-            });
-            return { file, text: texts.join("\r\n") };
-          },
-        }));
-      });
-      describe("incremental correctness", () => {
-        incrementalScenarios.forEach(
-          (
-            {
-              commandLineArgs: incrementalCommandLineArgs,
-              subScenario,
-              buildKind,
-              cleanBuildDiscrepancies,
-            },
-            index
-          ) =>
-            verifyIncrementalCorrectness(
-              () => ({
-                scenario,
-                baseFs,
-                newSys: incrementalSys[index],
-                commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
-                cleanBuildDiscrepancies,
-                incrementalModifyFs: (fs) => {
-                  for (let i = 0; i <= index; i++) {
-                    incrementalScenarios[i].modifyFs(fs);
-                  }
-                },
                 modifyFs,
-                tick,
-              }),
+                subScenario: incrementalSubScenario,
+                commandLineArgs: incrementalCommandLineArgs,
+              },
               index,
-              subScenario || buildKind
-            )
-        );
-      });
-    });
+            ) => {
+              Debug.assert(
+                buildKind !== BuildKind.Initial,
+                "Incremental edit cannot be initial compilation",
+              );
+              tick();
+              (incrementalSys || (incrementalSys = [])).push(
+                tscCompile({
+                  scenario,
+                  subScenario: incrementalSubScenario || subScenario,
+                  buildKind,
+                  fs: () => index === 0 ? sys.vfs : incrementalSys[index - 1].vfs,
+                  commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
+                  modifyFs: (fs) => {
+                    tick();
+                    modifyFs(fs);
+                    tick();
+                  },
+                  baselineSourceMap,
+                  baselineReadFileCalls,
+                  baselinePrograms,
+                }),
+              );
+            },
+          );
+        });
+        after(() => {
+          baseFs = undefined!;
+          sys = undefined!;
+          tick = undefined!;
+          incrementalSys = undefined!;
+        });
+        describe("serializedBuild", () => {
+          verifyTscBaseline(() => ({
+            baseLine: () => {
+              const { file, text } = sys.baseLine();
+              const texts: string[] = [text];
+              incrementalSys.forEach((sys, index) => {
+                const incrementalScenario = incrementalScenarios[index];
+                texts.push("");
+                texts.push(
+                  `Change:: ${
+                    incrementalScenario.subScenario
+                    || incrementalScenario.buildKind
+                  }`,
+                );
+                texts.push(sys.baseLine().text);
+              });
+              return { file, text: texts.join("\r\n") };
+            },
+          }));
+        });
+        describe("incremental correctness", () => {
+          incrementalScenarios.forEach(
+            (
+              {
+                commandLineArgs: incrementalCommandLineArgs,
+                subScenario,
+                buildKind,
+                cleanBuildDiscrepancies,
+              },
+              index,
+            ) =>
+              verifyIncrementalCorrectness(
+                () => ({
+                  scenario,
+                  baseFs,
+                  newSys: incrementalSys[index],
+                  commandLineArgs: incrementalCommandLineArgs || commandLineArgs,
+                  cleanBuildDiscrepancies,
+                  incrementalModifyFs: (fs) => {
+                    for (let i = 0; i <= index; i++) {
+                      incrementalScenarios[i].modifyFs(fs);
+                    }
+                  },
+                  modifyFs,
+                  tick,
+                }),
+                index,
+                subScenario || buildKind,
+              ),
+          );
+        });
+      },
+    );
   }
 
   export function enableStrict(fs: vfs.FileSystem, path: string) {
@@ -1066,26 +1087,26 @@ interface Symbol {
   export function addTestPrologue(
     fs: vfs.FileSystem,
     path: string,
-    prologue: string
+    prologue: string,
   ) {
     prependText(
       fs,
       path,
       `${prologue}
-`
+`,
     );
   }
 
   export function addShebang(
     fs: vfs.FileSystem,
     project: string,
-    file: string
+    file: string,
   ) {
     prependText(
       fs,
       `src/${project}/${file}.ts`,
       `#!someshebang ${project} ${file}
-`
+`,
     );
   }
 
@@ -1106,20 +1127,20 @@ const { b, ...rest } = { a: 10, b: 30, yy: 30 };
   export function removeRest(
     fs: vfs.FileSystem,
     project: string,
-    file: string
+    file: string,
   ) {
     replaceText(
       fs,
       `src/${project}/${file}.ts`,
       restContent(project, file),
-      nonrestContent(project, file)
+      nonrestContent(project, file),
     );
   }
 
   export function addStubFoo(
     fs: vfs.FileSystem,
     project: string,
-    file: string
+    file: string,
   ) {
     appendText(fs, `src/${project}/${file}.ts`, nonrestContent(project, file));
   }
@@ -1127,13 +1148,13 @@ const { b, ...rest } = { a: 10, b: 30, yy: 30 };
   export function changeStubToRest(
     fs: vfs.FileSystem,
     project: string,
-    file: string
+    file: string,
   ) {
     replaceText(
       fs,
       `src/${project}/${file}.ts`,
       nonrestContent(project, file),
-      restContent(project, file)
+      restContent(project, file),
     );
   }
 
@@ -1145,7 +1166,7 @@ const { b, ...rest } = { a: 10, b: 30, yy: 30 };
       `${content}
 function ${project}${file}Spread(...b: number[]) { }
 const ${project}${file}_ar = [20, 30];
-${project}${file}Spread(10, ...${project}${file}_ar);`
+${project}${file}Spread(10, ...${project}${file}_ar);`,
     );
 
     replaceText(
@@ -1153,7 +1174,7 @@ ${project}${file}Spread(10, ...${project}${file}_ar);`
       `src/${project}/tsconfig.json`,
       `"strict": false,`,
       `"strict": false,
-    "downlevelIteration": true,`
+    "downlevelIteration": true,`,
     );
   }
 
@@ -1164,18 +1185,18 @@ ${project}${file}Spread(10, ...${project}${file}_ar);`
   export function addTripleSlashRef(
     fs: vfs.FileSystem,
     project: string,
-    file: string
+    file: string,
   ) {
     fs.writeFileSync(
       getTripleSlashRef(project),
-      `declare class ${project}${file} { }`
+      `declare class ${project}${file} { }`,
     );
     prependText(
       fs,
       `src/${project}/${file}.ts`,
       `///<reference path="./tripleRef.d.ts"/>
 const ${file}Const = new ${project}${file}();
-`
+`,
     );
   }
 }

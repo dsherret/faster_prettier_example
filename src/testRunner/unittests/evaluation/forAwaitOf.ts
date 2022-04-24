@@ -20,7 +20,7 @@ describe("unittests:: evaluation:: forAwaitOfEvaluation", () => {
                 output.push(item);
             }
         }`,
-      { downlevelIteration: true }
+      { downlevelIteration: true },
     );
     await result.main();
     assert.strictEqual(result.output[0], 1);
@@ -49,7 +49,7 @@ describe("unittests:: evaluation:: forAwaitOfEvaluation", () => {
                 output.push(item);
             }
         }`,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     await result.main();
     assert.strictEqual(result.output[0], 1);
@@ -78,7 +78,7 @@ describe("unittests:: evaluation:: forAwaitOfEvaluation", () => {
                 output.push(item);
             }
         }`,
-      { downlevelIteration: true }
+      { downlevelIteration: true },
     );
     await result.main();
     assert.strictEqual(result.output[0], 1);
@@ -107,7 +107,7 @@ describe("unittests:: evaluation:: forAwaitOfEvaluation", () => {
                 output.push(item);
             }
         }`,
-      { target: ts.ScriptTarget.ES2015 }
+      { target: ts.ScriptTarget.ES2015 },
     );
     await result.main();
     assert.strictEqual(result.output[0], 1);

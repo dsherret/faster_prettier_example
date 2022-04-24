@@ -3,54 +3,54 @@ describe("unittests:: services:: PreProcessFile:", () => {
     sourceText: string,
     readImportFile: boolean,
     detectJavaScriptImports: boolean,
-    expectedPreProcess: ts.PreProcessedFileInfo
+    expectedPreProcess: ts.PreProcessedFileInfo,
   ): void {
     const resultPreProcess = ts.preProcessFile(
       sourceText,
       readImportFile,
-      detectJavaScriptImports
+      detectJavaScriptImports,
     );
 
     assert.equal(
       resultPreProcess.isLibFile,
       expectedPreProcess.isLibFile,
-      "Pre-processed file has different value for isLibFile. Expected: " +
-        expectedPreProcess.isLibFile +
-        ". Actual: " +
-        resultPreProcess.isLibFile
+      "Pre-processed file has different value for isLibFile. Expected: "
+        + expectedPreProcess.isLibFile
+        + ". Actual: "
+        + resultPreProcess.isLibFile,
     );
 
     checkFileReferenceList(
       "Imported files",
       expectedPreProcess.importedFiles,
-      resultPreProcess.importedFiles
+      resultPreProcess.importedFiles,
     );
     checkFileReferenceList(
       "Referenced files",
       expectedPreProcess.referencedFiles,
-      resultPreProcess.referencedFiles
+      resultPreProcess.referencedFiles,
     );
     checkFileReferenceList(
       "Type reference directives",
       expectedPreProcess.typeReferenceDirectives,
-      resultPreProcess.typeReferenceDirectives
+      resultPreProcess.typeReferenceDirectives,
     );
     checkFileReferenceList(
       "Lib reference directives",
       expectedPreProcess.libReferenceDirectives,
-      resultPreProcess.libReferenceDirectives
+      resultPreProcess.libReferenceDirectives,
     );
 
     assert.deepEqual(
       resultPreProcess.ambientExternalModules,
-      expectedPreProcess.ambientExternalModules
+      expectedPreProcess.ambientExternalModules,
     );
   }
 
   function checkFileReferenceList(
     kind: string,
     expected: ts.FileReference[],
-    actual: ts.FileReference[]
+    actual: ts.FileReference[],
   ) {
     if (expected === actual) {
       return;
@@ -58,22 +58,24 @@ describe("unittests:: services:: PreProcessFile:", () => {
     assert.deepEqual(
       actual,
       expected,
-      `Expected [${kind}] ${JSON.stringify(expected)}, got ${JSON.stringify(
-        actual
-      )}`
+      `Expected [${kind}] ${JSON.stringify(expected)}, got ${
+        JSON.stringify(
+          actual,
+        )
+      }`,
     );
   }
 
   describe("Test preProcessFiles,", () => {
     it("Correctly return referenced files from triple slash", () => {
       test(
-        '///<reference path = "refFile1.ts" />' +
-          "\n" +
-          '///<reference path ="refFile2.ts"/>' +
-          "\n" +
-          '///<reference path="refFile3.ts" />' +
-          "\n" +
-          '///<reference path= "..\\refFile4d.ts" />',
+        "///<reference path = \"refFile1.ts\" />"
+          + "\n"
+          + "///<reference path =\"refFile2.ts\"/>"
+          + "\n"
+          + "///<reference path=\"refFile3.ts\" />"
+          + "\n"
+          + "///<reference path= \"..\\refFile4d.ts\" />",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -88,19 +90,19 @@ describe("unittests:: services:: PreProcessFile:", () => {
           libReferenceDirectives: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Do not return reference path because of invalid triple-slash syntax", () => {
       test(
-        '///<reference path"refFile1.ts" />' +
-          "\n" +
-          '///<reference path ="refFile2.ts">' +
-          "\n" +
-          '///<referencepath="refFile3.ts" />' +
-          "\n" +
-          '///<reference pat= "refFile4d.ts" />',
+        "///<reference path\"refFile1.ts\" />"
+          + "\n"
+          + "///<reference path =\"refFile2.ts\">"
+          + "\n"
+          + "///<referencepath=\"refFile3.ts\" />"
+          + "\n"
+          + "///<reference pat= \"refFile4d.ts\" />",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -110,7 +112,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           libReferenceDirectives: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
@@ -126,7 +128,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           libReferenceDirectives: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
@@ -142,13 +144,13 @@ describe("unittests:: services:: PreProcessFile:", () => {
           libReferenceDirectives: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly return imported files", () => {
       test(
-        'import i1 = require("r1.ts"); import i2 =require("r2.ts"); import i3= require("r3.ts"); import i4=require("r4.ts"); import i5 = require  ("r5.ts");',
+        "import i1 = require(\"r1.ts\"); import i2 =require(\"r2.ts\"); import i3= require(\"r3.ts\"); import i4=require(\"r4.ts\"); import i5 = require  (\"r5.ts\");",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -164,13 +166,13 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Do not return imported files if readImportFiles argument is false", () => {
       test(
-        'import i1 = require("r1.ts"); import i2 =require("r2.ts"); import i3= require("r3.ts"); import i4=require("r4.ts"); import i5 = require  ("r5.ts");',
+        "import i1 = require(\"r1.ts\"); import i2 =require(\"r2.ts\"); import i3= require(\"r3.ts\"); import i4=require(\"r4.ts\"); import i5 = require  (\"r5.ts\");",
         /*readImportFile*/ false,
         /*detectJavaScriptImports*/ false,
         {
@@ -180,13 +182,13 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [] as ts.FileReference[],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Do not return import path because of invalid import syntax", () => {
       test(
-        'import i1 require("r1.ts"); import = require("r2.ts") import i3= require("r3.ts"); import i5',
+        "import i1 require(\"r1.ts\"); import = require(\"r2.ts\") import i3= require(\"r3.ts\"); import i5",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -196,17 +198,17 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "r3.ts", pos: 73, end: 78 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly return referenced files and import files", () => {
       test(
-        '///<reference path="refFile1.ts" />' +
-          "\n" +
-          '///<reference path ="refFile2.ts"/>' +
-          "\n" +
-          'import i1 = require("r1.ts"); import i2 =require("r2.ts");',
+        "///<reference path=\"refFile1.ts\" />"
+          + "\n"
+          + "///<reference path =\"refFile2.ts\"/>"
+          + "\n"
+          + "import i1 = require(\"r1.ts\"); import i2 =require(\"r2.ts\");",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -222,17 +224,17 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly return referenced files and import files even with some invalid syntax", () => {
       test(
-        '///<reference path="refFile1.ts" />' +
-          "\n" +
-          '///<reference path "refFile2.ts"/>' +
-          "\n" +
-          'import i1 = require("r1.ts"); import = require("r2.ts"); import i2 = require("r3.ts");',
+        "///<reference path=\"refFile1.ts\" />"
+          + "\n"
+          + "///<reference path \"refFile2.ts\"/>"
+          + "\n"
+          + "import i1 = require(\"r1.ts\"); import = require(\"r2.ts\"); import i2 = require(\"r3.ts\");",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -245,26 +247,26 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly return ES6 imports", () => {
       test(
-        'import * as ns from "m1";' +
-          "\n" +
-          'import def, * as ns from "m2";' +
-          "\n" +
-          'import def from "m3";' +
-          "\n" +
-          'import {a} from "m4";' +
-          "\n" +
-          'import {a as A} from "m5";' +
-          "\n" +
-          'import {a as A, b, c as C} from "m6";' +
-          "\n" +
-          'import def , {a, b, c as C} from "m7";' +
-          "\n",
+        "import * as ns from \"m1\";"
+          + "\n"
+          + "import def, * as ns from \"m2\";"
+          + "\n"
+          + "import def from \"m3\";"
+          + "\n"
+          + "import {a} from \"m4\";"
+          + "\n"
+          + "import {a as A} from \"m5\";"
+          + "\n"
+          + "import {a as A, b, c as C} from \"m6\";"
+          + "\n"
+          + "import def , {a, b, c as C} from \"m7\";"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -282,40 +284,40 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly ignore commented imports following template expression", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        "/**" +
-          "\n" +
-          " * Before" +
-          "\n" +
-          " * ```" +
-          "\n" +
-          ' * import * as a from "a";' +
-          "\n" +
-          " * ```" +
-          "\n" +
-          " */" +
-          "\n" +
-          "type Foo = `${string}`;" +
-          "\n" +
-          "/**" +
-          "\n" +
-          " * After" +
-          "\n" +
-          " * ```" +
-          "\n" +
-          ' * import { B } from "b";' +
-          "\n" +
-          ' * import * as c from "c";' +
-          "\n" +
-          " * ```" +
-          "\n" +
-          " */",
+        "/**"
+          + "\n"
+          + " * Before"
+          + "\n"
+          + " * ```"
+          + "\n"
+          + " * import * as a from \"a\";"
+          + "\n"
+          + " * ```"
+          + "\n"
+          + " */"
+          + "\n"
+          + "type Foo = `${string}`;"
+          + "\n"
+          + "/**"
+          + "\n"
+          + " * After"
+          + "\n"
+          + " * ```"
+          + "\n"
+          + " * import { B } from \"b\";"
+          + "\n"
+          + " * import * as c from \"c\";"
+          + "\n"
+          + " * ```"
+          + "\n"
+          + " */",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -325,7 +327,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -333,7 +335,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
     it("Correctly returns imports after a template expression", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        '`${foo}`; import "./foo";',
+        "`${foo}`; import \"./foo\";",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -343,7 +345,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "./foo", pos: 17, end: 22 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -351,11 +353,11 @@ describe("unittests:: services:: PreProcessFile:", () => {
     it("Correctly returns dynamic imports from template expression", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        "`${(<div>Text `` ${} text {} " +
-          "\n" +
-          '${import("a")} {import("b")} ' +
-          "\n" +
-          '${/* A comment */} ${/* import("ignored") */} </div>)}`',
+        "`${(<div>Text `` ${} text {} "
+          + "\n"
+          + "${import(\"a\")} {import(\"b\")} "
+          + "\n"
+          + "${/* A comment */} ${/* import(\"ignored\") */} </div>)}`",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -368,7 +370,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -376,7 +378,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
     it("Correctly returns dynamic imports from nested template expression", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        '`${foo(`${bar(`${import("a")} ${import("b")}`, `${baz(`${import("c") ${import("d")}`)}`)}`)}`',
+        "`${foo(`${bar(`${import(\"a\")} ${import(\"b\")}`, `${baz(`${import(\"c\") ${import(\"d\")}`)}`)}`)}`",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -391,7 +393,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -399,7 +401,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
     it("Correctly returns dynamic imports from tagged template expression", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        'foo`${ fn({ a: 100 }, import("a"), `${import("b")}`, import("c"), `${import("d")} foo`, import("e")) }`',
+        "foo`${ fn({ a: 100 }, import(\"a\"), `${import(\"b\")}`, import(\"c\"), `${import(\"d\")} foo`, import(\"e\")) }`",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -415,7 +417,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -423,9 +425,9 @@ describe("unittests:: services:: PreProcessFile:", () => {
     it("Correctly returns dynamic imports from template expression and imports following it", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        'const x = `hello ${await import("a").default}`;' +
-          "\n\n" +
-          'import { y } from "b";',
+        "const x = `hello ${await import(\"a\").default}`;"
+          + "\n\n"
+          + "import { y } from \"b\";",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -438,7 +440,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -446,13 +448,13 @@ describe("unittests:: services:: PreProcessFile:", () => {
     it("Correctly returns dynamic imports from template expressions and other imports", () => {
       /* eslint-disable no-template-curly-in-string */
       test(
-        'const x = `x ${await import("a").default}`;' +
-          "\n\n" +
-          'import { y } from "b";' +
-          "\n" +
-          'const y = `y ${import("c")}`;' +
-          "\n\n" +
-          'import { d } from "d";',
+        "const x = `x ${await import(\"a\").default}`;"
+          + "\n\n"
+          + "import { y } from \"b\";"
+          + "\n"
+          + "const y = `y ${import(\"c\")}`;"
+          + "\n\n"
+          + "import { d } from \"d\";",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -467,7 +469,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
@@ -485,21 +487,21 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
       /* eslint-enable no-template-curly-in-string */
     });
 
     it("Correctly return ES6 exports", () => {
       test(
-        'export * from "m1";' +
-          "\n" +
-          'export {a} from "m2";' +
-          "\n" +
-          'export {a as A} from "m3";' +
-          "\n" +
-          'export {a as A, b, c as C} from "m4";' +
-          "\n",
+        "export * from \"m1\";"
+          + "\n"
+          + "export {a} from \"m2\";"
+          + "\n"
+          + "export {a as A} from \"m3\";"
+          + "\n"
+          + "export {a as A, b, c as C} from \"m4\";"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -514,36 +516,36 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly handles import types", () => {
       test(
-        'import type * as ns from "m1";' +
-          "\n" +
-          'import type def, * as ns from "m2";' +
-          "\n" +
-          'import type def from "m3";' +
-          "\n" +
-          'import type {a} from "m4";' +
-          "\n" +
-          'import type {a as A} from "m5";' +
-          "\n" +
-          'import type {a as A, b, c as C} from "m6";' +
-          "\n" +
-          'import type def , {a, b, c as C} from "m7";' +
-          "\n" +
-          'import type from "m8";' +
-          "\n" +
-          'import type T = require("m9");' +
-          "\n" +
-          'import type = require("m10");' +
-          "\n" +
-          'export import type T = require("m11");' +
-          "\n" +
-          'export import type = require("m12");' +
-          "\n",
+        "import type * as ns from \"m1\";"
+          + "\n"
+          + "import type def, * as ns from \"m2\";"
+          + "\n"
+          + "import type def from \"m3\";"
+          + "\n"
+          + "import type {a} from \"m4\";"
+          + "\n"
+          + "import type {a as A} from \"m5\";"
+          + "\n"
+          + "import type {a as A, b, c as C} from \"m6\";"
+          + "\n"
+          + "import type def , {a, b, c as C} from \"m7\";"
+          + "\n"
+          + "import type from \"m8\";"
+          + "\n"
+          + "import type T = require(\"m9\");"
+          + "\n"
+          + "import type = require(\"m10\");"
+          + "\n"
+          + "export import type T = require(\"m11\");"
+          + "\n"
+          + "export import type = require(\"m12\");"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -566,20 +568,20 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly handles export types", () => {
       test(
-        'export type * from "m1";' +
-          "\n" +
-          'export type {a} from "m2";' +
-          "\n" +
-          'export type {a as A} from "m3";' +
-          "\n" +
-          'export type {a as A, b, c as C} from "m4";' +
-          "\n",
+        "export type * from \"m1\";"
+          + "\n"
+          + "export type {a} from \"m2\";"
+          + "\n"
+          + "export type {a as A} from \"m3\";"
+          + "\n"
+          + "export type {a as A, b, c as C} from \"m4\";"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -594,18 +596,18 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly handles import type node", () => {
       test(
-        'const x: import("m1") = { x: 0, y: 0 };' +
-          "\n" +
-          'let y: import("m2").Bar.I = { a: "", b: 0 };' +
-          "\n" +
-          'let shim: typeof import("m3") = { Bar: Bar2 };' +
-          "\n",
+        "const x: import(\"m1\") = { x: 0, y: 0 };"
+          + "\n"
+          + "let y: import(\"m2\").Bar.I = { a: \"\", b: 0 };"
+          + "\n"
+          + "let shim: typeof import(\"m3\") = { Bar: Bar2 };"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -619,7 +621,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
@@ -640,13 +642,13 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [],
           ambientExternalModules: ["B"],
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly handles export import declarations", () => {
       test(
-        'export import a = require("m1");',
+        "export import a = require(\"m1\");",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -656,7 +658,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "m1", pos: 26, end: 28 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("Correctly handles export require calls in JavaScript files", () => {
@@ -681,7 +683,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("Correctly handles dependency lists in define([deplist]) calls in JavaScript files", () => {
@@ -702,7 +704,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
@@ -724,7 +726,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
@@ -746,7 +748,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "../Observable", pos: 28, end: 41 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in external modules - 2", () => {
@@ -770,7 +772,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in external modules - 3", () => {
@@ -794,7 +796,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in external modules - 4", () => {
@@ -815,7 +817,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "../Observable", pos: 28, end: 41 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in external modules - 5", () => {
@@ -836,7 +838,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "../Observable", pos: 28, end: 41 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in external modules - 6", () => {
@@ -856,7 +858,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [{ fileName: "../Observable", pos: 28, end: 41 }],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in ambient external modules - 1", () => {
@@ -881,7 +883,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: ["m1"],
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly handles augmentations in ambient external modules - 2", () => {
@@ -908,7 +910,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: ["m1"],
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly recognizes type reference directives", () => {
@@ -934,7 +936,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
     it("correctly recognizes lib reference directives", () => {
@@ -960,20 +962,20 @@ describe("unittests:: services:: PreProcessFile:", () => {
           importedFiles: [],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly handles dynamic imports with template literals", () => {
       test(
-        "const m1 = import('mod1');" +
-          "\n" +
-          "const m2 = import(`mod2`);" +
-          "\n" +
-          "Promise.all([import('mod3'), import(`mod4`)]);" +
-          "\n" +
-          "import(/* webpackChunkName: 'module5' */ `mod5`);" +
-          "\n",
+        "const m1 = import('mod1');"
+          + "\n"
+          + "const m2 = import(`mod2`);"
+          + "\n"
+          + "Promise.all([import('mod3'), import(`mod4`)]);"
+          + "\n"
+          + "import(/* webpackChunkName: 'module5' */ `mod5`);"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ false,
         {
@@ -989,18 +991,18 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
     it("Correctly handles require calls with template literals in JS files", () => {
       test(
-        "const m1 = require(`mod1`);" +
-          "\n" +
-          "f(require(`mod2`));" +
-          "\n" +
-          "const a = { x: require(`mod3`) };" +
-          "\n",
+        "const m1 = require(`mod1`);"
+          + "\n"
+          + "f(require(`mod2`));"
+          + "\n"
+          + "const a = { x: require(`mod3`) };"
+          + "\n",
         /*readImportFile*/ true,
         /*detectJavaScriptImports*/ true,
         {
@@ -1014,7 +1016,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
 
@@ -1033,7 +1035,7 @@ describe("unittests:: services:: PreProcessFile:", () => {
           ],
           ambientExternalModules: undefined,
           isLibFile: false,
-        }
+        },
       );
     });
   });

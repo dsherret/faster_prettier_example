@@ -21,7 +21,7 @@ namespace ts {
         case SyntaxKind.CallExpression: {
           const updated = visitNonOptionalCallExpression(
             node as CallExpression,
-            /*captureThisArg*/ false
+            /*captureThisArg*/ false,
           );
           Debug.assertNotNode(updated, isSyntheticReference);
           return updated;
@@ -32,7 +32,7 @@ namespace ts {
             const updated = visitOptionalExpression(
               node,
               /*captureThisArg*/ false,
-              /*isDelete*/ false
+              /*isDelete*/ false,
             );
             Debug.assertNotNode(updated, isSyntheticReference);
             return updated;
@@ -40,11 +40,11 @@ namespace ts {
           return visitEachChild(node, visitor, context);
         case SyntaxKind.BinaryExpression:
           if (
-            (node as BinaryExpression).operatorToken.kind ===
-            SyntaxKind.QuestionQuestionToken
+            (node as BinaryExpression).operatorToken.kind
+              === SyntaxKind.QuestionQuestionToken
           ) {
             return transformNullishCoalescingExpression(
-              node as BinaryExpression
+              node as BinaryExpression,
             );
           }
           return visitEachChild(node, visitor, context);
@@ -61,7 +61,7 @@ namespace ts {
       while (!chain.questionDotToken && !isTaggedTemplateExpression(chain)) {
         chain = cast(
           skipPartiallyEmittedExpressions(chain.expression),
-          isOptionalChain
+          isOptionalChain,
         );
         Debug.assertNotNode(chain, isNonNullChain);
         links.unshift(chain);
@@ -72,19 +72,19 @@ namespace ts {
     function visitNonOptionalParenthesizedExpression(
       node: ParenthesizedExpression,
       captureThisArg: boolean,
-      isDelete: boolean
+      isDelete: boolean,
     ): Expression {
       const expression = visitNonOptionalExpression(
         node.expression,
         captureThisArg,
-        isDelete
+        isDelete,
       );
       if (isSyntheticReference(expression)) {
         // `(a.b)` -> { expression `((_a = a).b)`, thisArg: `_a` }
         // `(a[b])` -> { expression `((_a = a)[b])`, thisArg: `_a` }
         return factory.createSyntheticReferenceExpression(
           factory.updateParenthesizedExpression(node, expression.expression),
-          expression.thisArg
+          expression.thisArg,
         );
       }
       return factory.updateParenthesizedExpression(node, expression);
@@ -93,7 +93,7 @@ namespace ts {
     function visitNonOptionalPropertyOrElementAccessExpression(
       node: AccessExpression,
       captureThisArg: boolean,
-      isDelete: boolean
+      isDelete: boolean,
     ): Expression {
       if (isOptionalChain(node)) {
         // If `node` is an optional chain, then it is the outermost chain of an optional expression.
@@ -103,7 +103,7 @@ namespace ts {
       let expression: Expression = visitNode(
         node.expression,
         visitor,
-        isExpression
+        isExpression,
       );
       Debug.assertNotNode(expression, isSyntheticReference);
 
@@ -117,18 +117,17 @@ namespace ts {
         }
       }
 
-      expression =
-        node.kind === SyntaxKind.PropertyAccessExpression
-          ? factory.updatePropertyAccessExpression(
-              node,
-              expression,
-              visitNode(node.name, visitor, isIdentifier)
-            )
-          : factory.updateElementAccessExpression(
-              node,
-              expression,
-              visitNode(node.argumentExpression, visitor, isExpression)
-            );
+      expression = node.kind === SyntaxKind.PropertyAccessExpression
+        ? factory.updatePropertyAccessExpression(
+          node,
+          expression,
+          visitNode(node.name, visitor, isIdentifier),
+        )
+        : factory.updateElementAccessExpression(
+          node,
+          expression,
+          visitNode(node.argumentExpression, visitor, isExpression),
+        );
       return thisArg
         ? factory.createSyntheticReferenceExpression(expression, thisArg)
         : expression;
@@ -136,25 +135,25 @@ namespace ts {
 
     function visitNonOptionalCallExpression(
       node: CallExpression,
-      captureThisArg: boolean
+      captureThisArg: boolean,
     ): Expression {
       if (isOptionalChain(node)) {
         // If `node` is an optional chain, then it is the outermost chain of an optional expression.
         return visitOptionalExpression(
           node,
           captureThisArg,
-          /*isDelete*/ false
+          /*isDelete*/ false,
         );
       }
       if (
-        isParenthesizedExpression(node.expression) &&
-        isOptionalChain(skipParentheses(node.expression))
+        isParenthesizedExpression(node.expression)
+        && isOptionalChain(skipParentheses(node.expression))
       ) {
         // capture thisArg for calls of parenthesized optional chains like `(foo?.bar)()`
         const expression = visitNonOptionalParenthesizedExpression(
           node.expression,
           /*captureThisArg*/ true,
-          /*isDelete*/ false
+          /*isDelete*/ false,
         );
         const args = visitNodes(node.arguments, visitor, isExpression);
         if (isSyntheticReference(expression)) {
@@ -162,16 +161,16 @@ namespace ts {
             factory.createFunctionCallCall(
               expression.expression,
               expression.thisArg,
-              args
+              args,
             ),
-            node
+            node,
           );
         }
         return factory.updateCallExpression(
           node,
           expression,
           /*typeArguments*/ undefined,
-          args
+          args,
         );
       }
       return visitEachChild(node, visitor, context);
@@ -180,26 +179,26 @@ namespace ts {
     function visitNonOptionalExpression(
       node: Expression,
       captureThisArg: boolean,
-      isDelete: boolean
+      isDelete: boolean,
     ): Expression {
       switch (node.kind) {
         case SyntaxKind.ParenthesizedExpression:
           return visitNonOptionalParenthesizedExpression(
             node as ParenthesizedExpression,
             captureThisArg,
-            isDelete
+            isDelete,
           );
         case SyntaxKind.PropertyAccessExpression:
         case SyntaxKind.ElementAccessExpression:
           return visitNonOptionalPropertyOrElementAccessExpression(
             node as AccessExpression,
             captureThisArg,
-            isDelete
+            isDelete,
           );
         case SyntaxKind.CallExpression:
           return visitNonOptionalCallExpression(
             node as CallExpression,
-            captureThisArg
+            captureThisArg,
           );
         default:
           return visitNode(node, visitor, isExpression);
@@ -209,20 +208,20 @@ namespace ts {
     function visitOptionalExpression(
       node: OptionalChain,
       captureThisArg: boolean,
-      isDelete: boolean
+      isDelete: boolean,
     ): Expression {
       const { expression, chain } = flattenChain(node);
       const left = visitNonOptionalExpression(
         skipPartiallyEmittedExpressions(expression),
         isCallChain(chain[0]),
-        /*isDelete*/ false
+        /*isDelete*/ false,
       );
       let leftThisArg = isSyntheticReference(left) ? left.thisArg : undefined;
       let capturedLeft = isSyntheticReference(left) ? left.expression : left;
       let leftExpression = factory.restoreOuterExpressions(
         expression,
         capturedLeft,
-        OuterExpressionKinds.PartiallyEmittedExpressions
+        OuterExpressionKinds.PartiallyEmittedExpressions,
       );
       if (!isSimpleCopiableExpression(capturedLeft)) {
         capturedLeft = factory.createTempVariable(hoistVariableDeclaration);
@@ -240,22 +239,21 @@ namespace ts {
                 thisArg = factory.createTempVariable(hoistVariableDeclaration);
                 rightExpression = factory.createAssignment(
                   thisArg,
-                  rightExpression
+                  rightExpression,
                 );
               } else {
                 thisArg = rightExpression;
               }
             }
-            rightExpression =
-              segment.kind === SyntaxKind.PropertyAccessExpression
-                ? factory.createPropertyAccessExpression(
-                    rightExpression,
-                    visitNode(segment.name, visitor, isIdentifier)
-                  )
-                : factory.createElementAccessExpression(
-                    rightExpression,
-                    visitNode(segment.argumentExpression, visitor, isExpression)
-                  );
+            rightExpression = segment.kind === SyntaxKind.PropertyAccessExpression
+              ? factory.createPropertyAccessExpression(
+                rightExpression,
+                visitNode(segment.name, visitor, isIdentifier),
+              )
+              : factory.createElementAccessExpression(
+                rightExpression,
+                visitNode(segment.argumentExpression, visitor, isExpression),
+              );
             break;
           case SyntaxKind.CallExpression:
             if (i === 0 && leftThisArg) {
@@ -268,13 +266,13 @@ namespace ts {
                 leftThisArg.kind === SyntaxKind.SuperKeyword
                   ? factory.createThis()
                   : leftThisArg,
-                visitNodes(segment.arguments, visitor, isExpression)
+                visitNodes(segment.arguments, visitor, isExpression),
               );
             } else {
               rightExpression = factory.createCallExpression(
                 rightExpression,
                 /*typeArguments*/ undefined,
-                visitNodes(segment.arguments, visitor, isExpression)
+                visitNodes(segment.arguments, visitor, isExpression),
               );
             }
             break;
@@ -284,27 +282,27 @@ namespace ts {
 
       const target = isDelete
         ? factory.createConditionalExpression(
-            createNotNullCondition(
-              leftExpression,
-              capturedLeft,
-              /*invert*/ true
-            ),
-            /*questionToken*/ undefined,
-            factory.createTrue(),
-            /*colonToken*/ undefined,
-            factory.createDeleteExpression(rightExpression)
-          )
+          createNotNullCondition(
+            leftExpression,
+            capturedLeft,
+            /*invert*/ true,
+          ),
+          /*questionToken*/ undefined,
+          factory.createTrue(),
+          /*colonToken*/ undefined,
+          factory.createDeleteExpression(rightExpression),
+        )
         : factory.createConditionalExpression(
-            createNotNullCondition(
-              leftExpression,
-              capturedLeft,
-              /*invert*/ true
-            ),
-            /*questionToken*/ undefined,
-            factory.createVoidZero(),
-            /*colonToken*/ undefined,
-            rightExpression
-          );
+          createNotNullCondition(
+            leftExpression,
+            capturedLeft,
+            /*invert*/ true,
+          ),
+          /*questionToken*/ undefined,
+          factory.createVoidZero(),
+          /*colonToken*/ undefined,
+          rightExpression,
+        );
       setTextRange(target, node);
       return thisArg
         ? factory.createSyntheticReferenceExpression(target, thisArg)
@@ -314,7 +312,7 @@ namespace ts {
     function createNotNullCondition(
       left: Expression,
       right: Expression,
-      invert?: boolean
+      invert?: boolean,
     ) {
       return factory.createBinaryExpression(
         factory.createBinaryExpression(
@@ -322,22 +320,22 @@ namespace ts {
           factory.createToken(
             invert
               ? SyntaxKind.EqualsEqualsEqualsToken
-              : SyntaxKind.ExclamationEqualsEqualsToken
+              : SyntaxKind.ExclamationEqualsEqualsToken,
           ),
-          factory.createNull()
+          factory.createNull(),
         ),
         factory.createToken(
-          invert ? SyntaxKind.BarBarToken : SyntaxKind.AmpersandAmpersandToken
+          invert ? SyntaxKind.BarBarToken : SyntaxKind.AmpersandAmpersandToken,
         ),
         factory.createBinaryExpression(
           right,
           factory.createToken(
             invert
               ? SyntaxKind.EqualsEqualsEqualsToken
-              : SyntaxKind.ExclamationEqualsEqualsToken
+              : SyntaxKind.ExclamationEqualsEqualsToken,
           ),
-          factory.createVoidZero()
-        )
+          factory.createVoidZero(),
+        ),
       );
     }
 
@@ -354,26 +352,26 @@ namespace ts {
           /*questionToken*/ undefined,
           right,
           /*colonToken*/ undefined,
-          visitNode(node.right, visitor, isExpression)
+          visitNode(node.right, visitor, isExpression),
         ),
-        node
+        node,
       );
     }
 
     function visitDeleteExpression(node: DeleteExpression) {
       return isOptionalChain(skipParentheses(node.expression))
         ? setOriginalNode(
-            visitNonOptionalExpression(
-              node.expression,
-              /*captureThisArg*/ false,
-              /*isDelete*/ true
-            ),
-            node
-          )
+          visitNonOptionalExpression(
+            node.expression,
+            /*captureThisArg*/ false,
+            /*isDelete*/ true,
+          ),
+          node,
+        )
         : factory.updateDeleteExpression(
-            node,
-            visitNode(node.expression, visitor, isExpression)
-          );
+          node,
+          visitNode(node.expression, visitor, isExpression),
+        );
     }
   }
 }

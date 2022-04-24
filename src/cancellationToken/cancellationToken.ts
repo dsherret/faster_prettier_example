@@ -43,14 +43,13 @@ function createCancellationToken(args: string[]): ServerCancellationToken {
     const namePrefix = cancellationPipeName.slice(0, -1);
     if (namePrefix.length === 0 || namePrefix.indexOf("*") >= 0) {
       throw new Error(
-        "Invalid name for template cancellation pipe: it should have length greater than 2 characters and contain only one '*'."
+        "Invalid name for template cancellation pipe: it should have length greater than 2 characters and contain only one '*'.",
       );
     }
     let perRequestPipeName: string | undefined;
     let currentRequestId: number;
     return {
-      isCancellationRequested: () =>
-        perRequestPipeName !== undefined && pipeExists(perRequestPipeName),
+      isCancellationRequested: () => perRequestPipeName !== undefined && pipeExists(perRequestPipeName),
       setRequest(requestId: number) {
         currentRequestId = requestId;
         perRequestPipeName = namePrefix + requestId;
@@ -58,7 +57,7 @@ function createCancellationToken(args: string[]): ServerCancellationToken {
       resetRequest(requestId: number) {
         if (currentRequestId !== requestId) {
           throw new Error(
-            `Mismatched request id, expected ${currentRequestId}, actual ${requestId}`
+            `Mismatched request id, expected ${currentRequestId}, actual ${requestId}`,
           );
         }
         perRequestPipeName = undefined;

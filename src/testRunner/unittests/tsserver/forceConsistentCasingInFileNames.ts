@@ -4,7 +4,7 @@ namespace ts.projectSystem {
       const rootPath = "/Users/username/dev/project";
       const file1: File = {
         path: `${rootPath}/index.ts`,
-        content: 'import {x} from "file2";',
+        content: "import {x} from \"file2\";",
       };
       const file2: File = {
         path: `${rootPath}/file2.js`,
@@ -34,7 +34,7 @@ namespace ts.projectSystem {
         [file1, file2, file2Dts, libFile, tsconfig, tsconfigAll],
         {
           useCaseSensitiveFileNames: false,
-        }
+        },
       );
       const session = createSession(host);
 
@@ -78,7 +78,7 @@ namespace ts.projectSystem {
       });
       openFilesForSession(
         [{ file: loggerFile, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       verifyGetErrRequest({ session, host, files: [loggerFile] });
 
@@ -93,13 +93,13 @@ namespace ts.projectSystem {
             projectRootPath: tscWatch.projectRoot,
           },
         ],
-        session
+        session,
       );
 
       // Apply edits for rename
       openFilesForSession(
         [{ file: anotherFile, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       session.executeCommandSeq<protocol.UpdateOpenRequest>({
         command: protocol.CommandTypes.UpdateOpen,
@@ -112,7 +112,7 @@ namespace ts.projectSystem {
                   newText: "./logger",
                   ...protocolTextSpanFromSubstring(
                     anotherFile.content,
-                    "./Logger"
+                    "./Logger",
                   ),
                 },
               ],
@@ -130,7 +130,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "forceConsistentCasingInFileNames",
         "works when renaming file with different casing",
-        session
+        session,
       );
     });
 
@@ -163,7 +163,7 @@ namespace ts.projectSystem {
       });
       openFilesForSession(
         [{ file: anotherFile, projectRootPath: tscWatch.projectRoot }],
-        session
+        session,
       );
       verifyGetErrRequest({ session, host, files: [anotherFile] });
 
@@ -178,7 +178,7 @@ namespace ts.projectSystem {
                   newText: "./logger",
                   ...protocolTextSpanFromSubstring(
                     anotherFile.content,
-                    "./Logger"
+                    "./Logger",
                   ),
                 },
               ],
@@ -192,7 +192,7 @@ namespace ts.projectSystem {
       baselineTsserverLogs(
         "forceConsistentCasingInFileNames",
         "when changing module name with different casing",
-        session
+        session,
       );
     });
   });

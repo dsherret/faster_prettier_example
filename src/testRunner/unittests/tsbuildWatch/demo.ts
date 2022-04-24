@@ -54,16 +54,15 @@ namespace ts.tscWatch {
     {
       "path": "../zoo"
     }
-  ]`
-          )
+  ]`,
+          ),
         );
         return sys;
       },
       changes: [
         {
           caption: "Fix error",
-          change: (sys) =>
-            sys.writeFile(coreFiles[0].path, coreFiles[0].content),
+          change: (sys) => sys.writeFile(coreFiles[0].path, coreFiles[0].content),
           timeouts: (sys) => {
             sys.checkTimeoutQueueLengthAndRun(1); // build core
             sys.checkTimeoutQueueLengthAndRun(1); // build animals
@@ -86,7 +85,7 @@ namespace ts.tscWatch {
         sys.writeFile(
           coreFiles[1].path,
           `import * as A from '../animals';
-${coreFiles[1].content}`
+${coreFiles[1].content}`,
         );
         return sys;
       },
@@ -98,7 +97,7 @@ ${coreFiles[1].content}`
               coreFiles[1].path,
               `
 import * as A from '../animals';
-${coreFiles[1].content}`
+${coreFiles[1].content}`,
             ),
           // build core
           timeouts: checkSingleTimeoutQueueLengthAndRunAndVerifyNoTimeout,
@@ -108,7 +107,7 @@ ${coreFiles[1].content}`
 
     function subProjectFiles(
       subProject: string,
-      fileNames: readonly string[]
+      fileNames: readonly string[],
     ): File[] {
       return fileNames.map((file) => projectFile(`${subProject}/${file}`));
     }

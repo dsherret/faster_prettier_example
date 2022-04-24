@@ -25,7 +25,7 @@ namespace ts {
    */
   export function transpileModule(
     input: string,
-    transpileOptions: TranspileOptions
+    transpileOptions: TranspileOptions,
   ): TranspileOutput {
     const diagnostics: Diagnostic[] = [];
 
@@ -54,15 +54,14 @@ namespace ts {
     const newLine = getNewLineCharacter(options);
     // Create a compilerHost object to allow the compiler to read and write files
     const compilerHost: CompilerHost = {
-      getSourceFile: (fileName) =>
-        fileName === normalizePath(inputFileName) ? sourceFile : undefined,
+      getSourceFile: (fileName) => fileName === normalizePath(inputFileName) ? sourceFile : undefined,
       writeFile: (name, text) => {
         if (fileExtensionIs(name, ".map")) {
           Debug.assertEqual(
             sourceMapText,
             undefined,
             "Unexpected multiple source map outputs, file:",
-            name
+            name,
           );
           sourceMapText = text;
         } else {
@@ -70,7 +69,7 @@ namespace ts {
             outputText,
             undefined,
             "Unexpected multiple outputs, file:",
-            name
+            name,
           );
           outputText = text;
         }
@@ -87,9 +86,8 @@ namespace ts {
     };
 
     // if jsx is specified then treat file as .tsx
-    const inputFileName =
-      transpileOptions.fileName ||
-      (transpileOptions.compilerOptions && transpileOptions.compilerOptions.jsx
+    const inputFileName = transpileOptions.fileName
+      || (transpileOptions.compilerOptions && transpileOptions.compilerOptions.jsx
         ? "module.tsx"
         : "module.ts");
     const sourceFile = createSourceFile(inputFileName, input, {
@@ -98,7 +96,7 @@ namespace ts {
         toPath(inputFileName, "", compilerHost.getCanonicalFileName),
         /*cache*/ undefined,
         compilerHost,
-        options
+        options,
       ),
       setExternalModuleIndicator: getSetExternalModuleIndicator(options),
     });
@@ -108,7 +106,7 @@ namespace ts {
 
     if (transpileOptions.renamedDependencies) {
       sourceFile.renamedDependencies = new Map(
-        getEntries(transpileOptions.renamedDependencies)
+        getEntries(transpileOptions.renamedDependencies),
       );
     }
 
@@ -121,7 +119,7 @@ namespace ts {
     if (transpileOptions.reportDiagnostics) {
       addRange(
         /*to*/ diagnostics,
-        /*from*/ program.getSyntacticDiagnostics(sourceFile)
+        /*from*/ program.getSyntacticDiagnostics(sourceFile),
       );
       addRange(/*to*/ diagnostics, /*from*/ program.getOptionsDiagnostics());
     }
@@ -131,7 +129,7 @@ namespace ts {
       /*writeFile*/ undefined,
       /*cancellationToken*/ undefined,
       /*emitOnlyDtsFiles*/ undefined,
-      transpileOptions.transformers
+      transpileOptions.transformers,
     );
 
     if (outputText === undefined) return Debug.fail("Output generation failed");
@@ -147,7 +145,7 @@ namespace ts {
     compilerOptions?: CompilerOptions,
     fileName?: string,
     diagnostics?: Diagnostic[],
-    moduleName?: string
+    moduleName?: string,
   ): string {
     const output = transpileModule(input, {
       compilerOptions,
@@ -166,16 +164,15 @@ namespace ts {
   /*@internal*/
   export function fixupCompilerOptions(
     options: CompilerOptions,
-    diagnostics: Diagnostic[]
+    diagnostics: Diagnostic[],
   ): CompilerOptions {
     // Lazily create this value to fix module loading errors.
-    commandLineOptionsStringToEnum =
-      commandLineOptionsStringToEnum ||
-      (filter(
+    commandLineOptionsStringToEnum = commandLineOptionsStringToEnum
+      || (filter(
         optionDeclarations,
         (o) =>
-          typeof o.type === "object" &&
-          !forEachEntry(o.type, (v) => typeof v !== "number")
+          typeof o.type === "object"
+          && !forEachEntry(o.type, (v) => typeof v !== "number"),
       ) as CommandLineOptionOfCustomType[]);
 
     options = cloneCompilerOptions(options);

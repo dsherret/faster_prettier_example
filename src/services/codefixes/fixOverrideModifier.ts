@@ -50,69 +50,87 @@ namespace ts.codefix {
 
   const errorCodeFixIdMap: Record<number, ErrorCodeFixInfo> = {
     // case #1:
-    [Diagnostics
-      .This_member_must_have_an_override_modifier_because_it_overrides_a_member_in_the_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_member_must_have_an_override_modifier_because_it_overrides_a_member_in_the_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Add_override_modifier,
       fixId: fixAddOverrideId,
       fixAllDescriptions: Diagnostics.Add_all_missing_override_modifiers,
     },
-    [Diagnostics
-      .This_member_must_have_a_JSDoc_comment_with_an_override_tag_because_it_overrides_a_member_in_the_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_member_must_have_a_JSDoc_comment_with_an_override_tag_because_it_overrides_a_member_in_the_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Add_override_modifier,
       fixId: fixAddOverrideId,
       fixAllDescriptions: Diagnostics.Add_all_missing_override_modifiers,
     },
     // case #2:
-    [Diagnostics
-      .This_member_cannot_have_an_override_modifier_because_its_containing_class_0_does_not_extend_another_class
-      .code]: {
+    [
+      Diagnostics
+        .This_member_cannot_have_an_override_modifier_because_its_containing_class_0_does_not_extend_another_class
+        .code
+    ]: {
       descriptions: Diagnostics.Remove_override_modifier,
       fixId: fixRemoveOverrideId,
       fixAllDescriptions: Diagnostics.Remove_all_unnecessary_override_modifiers,
     },
-    [Diagnostics
-      .This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_containing_class_0_does_not_extend_another_class
-      .code]: {
+    [
+      Diagnostics
+        .This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_containing_class_0_does_not_extend_another_class
+        .code
+    ]: {
       descriptions: Diagnostics.Remove_override_modifier,
       fixId: fixRemoveOverrideId,
       fixAllDescriptions: Diagnostics.Remove_override_modifier,
     },
     // case #3:
-    [Diagnostics
-      .This_parameter_property_must_have_an_override_modifier_because_it_overrides_a_member_in_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_parameter_property_must_have_an_override_modifier_because_it_overrides_a_member_in_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Add_override_modifier,
       fixId: fixAddOverrideId,
       fixAllDescriptions: Diagnostics.Add_all_missing_override_modifiers,
     },
-    [Diagnostics
-      .This_parameter_property_must_have_a_JSDoc_comment_with_an_override_tag_because_it_overrides_a_member_in_the_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_parameter_property_must_have_a_JSDoc_comment_with_an_override_tag_because_it_overrides_a_member_in_the_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Add_override_modifier,
       fixId: fixAddOverrideId,
       fixAllDescriptions: Diagnostics.Add_all_missing_override_modifiers,
     },
     // case #4:
-    [Diagnostics
-      .This_member_must_have_an_override_modifier_because_it_overrides_an_abstract_method_that_is_declared_in_the_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_member_must_have_an_override_modifier_because_it_overrides_an_abstract_method_that_is_declared_in_the_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Add_override_modifier,
       fixId: fixAddOverrideId,
       fixAllDescriptions: Diagnostics.Remove_all_unnecessary_override_modifiers,
     },
     // case #5:
-    [Diagnostics
-      .This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Remove_override_modifier,
       fixId: fixRemoveOverrideId,
       fixAllDescriptions: Diagnostics.Remove_all_unnecessary_override_modifiers,
     },
-    [Diagnostics
-      .This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_it_is_not_declared_in_the_base_class_0
-      .code]: {
+    [
+      Diagnostics
+        .This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_it_is_not_declared_in_the_base_class_0
+        .code
+    ]: {
       descriptions: Diagnostics.Remove_override_modifier,
       fixId: fixRemoveOverrideId,
       fixAllDescriptions: Diagnostics.Remove_all_unnecessary_override_modifiers,
@@ -122,7 +140,7 @@ namespace ts.codefix {
   registerCodeFix({
     errorCodes,
     getCodeActions: function getCodeActionsToFixOverrideModifierIssues(
-      context
+      context,
     ) {
       const { errorCode, span } = context;
 
@@ -130,8 +148,9 @@ namespace ts.codefix {
       if (!info) return emptyArray;
 
       const { descriptions, fixId, fixAllDescriptions } = info;
-      const changes = textChanges.ChangeTracker.with(context, (changes) =>
-        dispatchChanges(changes, context, errorCode, span.start)
+      const changes = textChanges.ChangeTracker.with(
+        context,
+        (changes) => dispatchChanges(changes, context, errorCode, span.start),
       );
 
       return [
@@ -140,7 +159,7 @@ namespace ts.codefix {
           changes,
           descriptions,
           fixId,
-          fixAllDescriptions
+          fixAllDescriptions,
         ),
       ];
     },
@@ -161,7 +180,7 @@ namespace ts.codefix {
     changeTracker: textChanges.ChangeTracker,
     context: CodeFixContext | CodeFixAllContext,
     errorCode: number,
-    pos: number
+    pos: number,
   ) {
     switch (errorCode) {
       case Diagnostics
@@ -182,7 +201,7 @@ namespace ts.codefix {
         return doAddOverrideModifierChange(
           changeTracker,
           context.sourceFile,
-          pos
+          pos,
         );
       case Diagnostics
         .This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0
@@ -199,7 +218,7 @@ namespace ts.codefix {
         return doRemoveOverrideModifierChange(
           changeTracker,
           context.sourceFile,
-          pos
+          pos,
         );
       default:
         Debug.fail("Unexpected error code: " + errorCode);
@@ -209,7 +228,7 @@ namespace ts.codefix {
   function doAddOverrideModifierChange(
     changeTracker: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ) {
     const classElement = findContainerClassElementLike(sourceFile, pos);
     if (isSourceFileJS(sourceFile)) {
@@ -221,9 +240,7 @@ namespace ts.codefix {
     const modifiers = classElement.modifiers || emptyArray;
     const staticModifier = find(modifiers, isStaticModifier);
     const abstractModifier = find(modifiers, isAbstractModifier);
-    const accessibilityModifier = find(modifiers, (m) =>
-      isAccessibilityModifier(m.kind)
-    );
+    const accessibilityModifier = find(modifiers, (m) => isAccessibilityModifier(m.kind));
     const modifierPos = abstractModifier
       ? abstractModifier.end
       : staticModifier
@@ -233,37 +250,35 @@ namespace ts.codefix {
       : classElement.decorators
       ? skipTrivia(sourceFile.text, classElement.decorators.end)
       : classElement.getStart(sourceFile);
-    const options =
-      accessibilityModifier || staticModifier || abstractModifier
-        ? { prefix: " " }
-        : { suffix: " " };
+    const options = accessibilityModifier || staticModifier || abstractModifier
+      ? { prefix: " " }
+      : { suffix: " " };
     changeTracker.insertModifierAt(
       sourceFile,
       modifierPos,
       SyntaxKind.OverrideKeyword,
-      options
+      options,
     );
   }
 
   function doRemoveOverrideModifierChange(
     changeTracker: textChanges.ChangeTracker,
     sourceFile: SourceFile,
-    pos: number
+    pos: number,
   ) {
     const classElement = findContainerClassElementLike(sourceFile, pos);
     if (isSourceFileJS(sourceFile)) {
       changeTracker.filterJSDocTags(
         sourceFile,
         classElement,
-        not(isJSDocOverrideTag)
+        not(isJSDocOverrideTag),
       );
       return;
     }
-    const overrideModifier =
-      classElement.modifiers &&
-      find(
+    const overrideModifier = classElement.modifiers
+      && find(
         classElement.modifiers,
-        (modifier) => modifier.kind === SyntaxKind.OverrideKeyword
+        (modifier) => modifier.kind === SyntaxKind.OverrideKeyword,
       );
     Debug.assertIsDefined(overrideModifier);
 
@@ -271,7 +286,7 @@ namespace ts.codefix {
   }
 
   function isClassElementLikeHasJSDoc(
-    node: Node
+    node: Node,
   ): node is ClassElementLikeHasJSDoc {
     switch (node.kind) {
       case SyntaxKind.Constructor:

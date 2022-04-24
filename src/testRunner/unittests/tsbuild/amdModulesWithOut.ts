@@ -57,16 +57,16 @@ namespace ts {
               appendText(
                 fs,
                 relName(sources[Project.lib][Source.ts][1]),
-                "console.log(x);"
+                "console.log(x);",
               ),
           },
           ...(modifyAgainFs
             ? [
-                {
-                  buildKind: BuildKind.IncrementalHeadersChange,
-                  modifyFs: modifyAgainFs,
-                },
-              ]
+              {
+                buildKind: BuildKind.IncrementalHeadersChange,
+                modifyFs: modifyAgainFs,
+              },
+            ]
             : emptyArray),
         ],
       });
@@ -86,35 +86,35 @@ namespace ts {
             addTestPrologue(
               fs,
               sources[Project.lib][Source.ts][0],
-              `"myPrologue"`
+              `"myPrologue"`,
             );
             addTestPrologue(
               fs,
               sources[Project.lib][Source.ts][2],
-              `"myPrologueFile"`
+              `"myPrologueFile"`,
             );
             addTestPrologue(
               fs,
               sources[Project.lib][Source.ts][3],
-              `"myPrologue3"`
+              `"myPrologue3"`,
             );
             enableStrict(fs, sources[Project.app][Source.config]);
             addTestPrologue(
               fs,
               sources[Project.app][Source.ts][0],
-              `"myPrologue"`
+              `"myPrologue"`,
             );
             addTestPrologue(
               fs,
               sources[Project.app][Source.ts][1],
-              `"myPrologue2";`
+              `"myPrologue2";`,
             );
           },
           modifyAgainFs: (fs) =>
             addTestPrologue(
               fs,
               relName(sources[Project.lib][Source.ts][1]),
-              `"myPrologue5"`
+              `"myPrologue5"`,
             ),
         });
       });
@@ -166,13 +166,13 @@ namespace ts {
             sources[Project.app][Source.config],
             `"composite": true,`,
             `"composite": true,
-"stripInternal": true,`
+"stripInternal": true,`,
           );
           replaceText(
             fs,
             sources[Project.lib][Source.ts][0],
             "const",
-            `${internal} const`
+            `${internal} const`,
           );
           appendText(
             fs,
@@ -202,7 +202,7 @@ ${internal} export namespace internalOther.something { export class someClass {}
 ${internal} export import internalImport = internalNamespace.someClass;
 ${internal} export type internalType = internalC;
 ${internal} export const internalConst = 10;
-${internal} export enum internalEnum { a, b, c }`
+${internal} export enum internalEnum { a, b, c }`,
           );
         }
 
@@ -215,7 +215,7 @@ ${internal} export enum internalEnum { a, b, c }`
               fs,
               sources[Project.lib][Source.ts][1],
               `export const`,
-              `/*@internal*/ export const`
+              `/*@internal*/ export const`,
             ),
         });
       });
@@ -227,14 +227,14 @@ ${internal} export enum internalEnum { a, b, c }`
             fs,
             sources[Project.lib][Source.config],
             `"outFile": "module.js"`,
-            `"outFile": "../module.js", "rootDir": "../"`
+            `"outFile": "../module.js", "rootDir": "../"`,
           );
           // Change reference to file1 module to resolve to lib/file1
           replaceText(
             fs,
             sources[Project.app][Source.ts][0],
             "file1",
-            "lib/file1"
+            "lib/file1",
           );
         }
 

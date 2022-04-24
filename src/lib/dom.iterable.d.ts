@@ -32,7 +32,7 @@ interface NodeList {
    */
   forEach(
     callbackfn: (value: Node, index: number, listObj: NodeList) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   /**
    * Returns an list of keys in the list
@@ -62,9 +62,9 @@ interface NodeListOf<TNode extends Node> {
     callbackfn: (
       value: TNode,
       index: number,
-      listObj: NodeListOf<TNode>
+      listObj: NodeListOf<TNode>,
     ) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void;
   /**
    * Returns an list of keys in the list

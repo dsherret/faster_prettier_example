@@ -8,7 +8,7 @@ namespace ts.projectSystem {
       dependencyTs: File,
       dependencyConfig: File,
       usageTs: File,
-      usageConfig: File
+      usageConfig: File,
     ) {
       function usageProjectDiagnostics(): GetErrForProjectDiagnostics {
         return { project: usageTs, files: [usageTs, dependencyTs] };
@@ -117,7 +117,7 @@ fnErr();
         dependencyTs,
         dependencyConfig,
         usageTs,
-        usageConfig
+        usageConfig,
       );
     });
 
@@ -156,7 +156,7 @@ fnErr();
         dependencyTs,
         dependencyConfig,
         usageTs,
-        usageConfig
+        usageConfig,
       );
     });
   });

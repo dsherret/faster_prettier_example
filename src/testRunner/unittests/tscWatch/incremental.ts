@@ -14,7 +14,7 @@ namespace ts.tscWatch {
       modifyFs?: (host: WatchedSystem) => void;
     }
     function verifyIncrementalWatchEmit(
-      input: VerifyIncrementalWatchEmitInput
+      input: VerifyIncrementalWatchEmitInput,
     ) {
       describe(input.subScenario, () => {
         it("with tsc --w", () => {
@@ -33,10 +33,10 @@ namespace ts.tscWatch {
         optionsToExtend,
         modifyFs,
       }: VerifyIncrementalWatchEmitInput,
-      incremental: boolean
+      incremental: boolean,
     ) {
       const { sys, baseline, oldSnap } = createBaseline(
-        createWatchedSystem(files(), { currentDirectory: project })
+        createWatchedSystem(files(), { currentDirectory: project }),
       );
       if (incremental) sys.exit = (exitCode) => (sys.exitCode = exitCode);
       const argsToPass = [
@@ -54,12 +54,10 @@ namespace ts.tscWatch {
       }
 
       Harness.Baseline.runBaseline(
-        `${
-          isBuild(argsToPass) ? "tsbuild/watchMode" : "tscWatch"
-        }/incremental/${subScenario.split(" ").join("-")}-${
+        `${isBuild(argsToPass) ? "tsbuild/watchMode" : "tscWatch"}/incremental/${subScenario.split(" ").join("-")}-${
           incremental ? "incremental" : "watch"
         }.js`,
-        baseline.join("\r\n")
+        baseline.join("\r\n"),
       );
 
       function build(oldSnap: SystemSnap) {
@@ -87,7 +85,7 @@ namespace ts.tscWatch {
       describe("own file emit without errors", () => {
         function verify(
           subScenario: string,
-          optionsToExtend?: readonly string[]
+          optionsToExtend?: readonly string[],
         ) {
           const modifiedFile2Content = file2.content
             .replace("y", "z")
@@ -96,8 +94,7 @@ namespace ts.tscWatch {
             files: () => [libFile, file1, file2, configFile],
             optionsToExtend,
             subScenario: `own file emit without errors/${subScenario}`,
-            modifyFs: (host) =>
-              host.writeFile(file2.path, modifiedFile2Content),
+            modifyFs: (host) => host.writeFile(file2.path, modifiedFile2Content),
           });
         }
         verify("without commandline options");
@@ -118,8 +115,7 @@ namespace ts.tscWatch {
           },
         ],
         subScenario: "own file emit with errors",
-        modifyFs: (host) =>
-          host.writeFile(file1.path, file1.content.replace("x", "z")),
+        modifyFs: (host) => host.writeFile(file1.path, file1.content.replace("x", "z")),
       });
 
       verifyIncrementalWatchEmit({
@@ -160,7 +156,7 @@ namespace ts.tscWatch {
         modifyFs: (host) =>
           host.writeFile(
             file2.path,
-            file2.content.replace("y", "z").replace("20", "10")
+            file2.content.replace("y", "z").replace("20", "10"),
           ),
       });
 
@@ -176,14 +172,14 @@ namespace ts.tscWatch {
           modifyFs: (host) =>
             host.writeFile(
               file1.path,
-              file1.content.replace("x = 10", "z = 10")
+              file1.content.replace("x = 10", "z = 10"),
             ),
         });
 
         it("verify that state is read correctly", () => {
           const system = createWatchedSystem(
             [libFile, file1, fileModified, config],
-            { currentDirectory: project }
+            { currentDirectory: project },
           );
           const reportDiagnostic = createDiagnosticReporter(system);
           const parsedConfig = parseConfigFileWithSystem(
@@ -192,14 +188,13 @@ namespace ts.tscWatch {
             /*extendedConfigCache*/ undefined,
             /*watchOptionsToExtend*/ undefined,
             system,
-            reportDiagnostic
+            reportDiagnostic,
           )!;
           performIncrementalCompilation({
             rootNames: parsedConfig.fileNames,
             options: parsedConfig.options,
             projectReferences: parsedConfig.projectReferences,
-            configFileParsingDiagnostics:
-              getConfigFileParsingDiagnostics(parsedConfig),
+            configFileParsingDiagnostics: getConfigFileParsingDiagnostics(parsedConfig),
             reportDiagnostic,
             system,
           });
@@ -210,14 +205,13 @@ namespace ts.tscWatch {
             /*extendedConfigCache*/ undefined,
             /*watchOptionsToExtend*/ undefined,
             system,
-            noop
+            noop,
           )!;
           const builderProgram = createIncrementalProgram({
             rootNames: command.fileNames,
             options: command.options,
             projectReferences: command.projectReferences,
-            configFileParsingDiagnostics:
-              getConfigFileParsingDiagnostics(command),
+            configFileParsingDiagnostics: getConfigFileParsingDiagnostics(command),
             host: createIncrementalCompilerHost(command.options, system),
           });
 
@@ -256,11 +250,11 @@ namespace ts.tscWatch {
           assert.equal(state.semanticDiagnosticsPerFile!.size, 3);
           assert.deepEqual(
             state.semanticDiagnosticsPerFile!.get(libFile.path as Path),
-            emptyArray
+            emptyArray,
           );
           assert.deepEqual(
             state.semanticDiagnosticsPerFile!.get(file1.path as Path),
-            emptyArray
+            emptyArray,
           );
           assert.deepEqual(
             state.semanticDiagnosticsPerFile!.get(file2.path as Path),
@@ -270,17 +264,15 @@ namespace ts.tscWatch {
                 start: 13,
                 length: 1,
                 code: Diagnostics.Type_0_is_not_assignable_to_type_1.code,
-                category:
-                  Diagnostics.Type_0_is_not_assignable_to_type_1.category,
-                messageText:
-                  "Type 'number' is not assignable to type 'string'.",
+                category: Diagnostics.Type_0_is_not_assignable_to_type_1.category,
+                messageText: "Type 'number' is not assignable to type 'string'.",
                 relatedInformation: undefined,
                 reportsUnnecessary: undefined,
                 reportsDeprecated: undefined,
                 source: undefined,
                 skippedOn: undefined,
               },
-            ]
+            ],
           );
         });
       });
@@ -361,7 +353,7 @@ export interface A {
     b: B;
     foo: any;
 }
-`
+`,
         ),
     });
 
@@ -441,7 +433,7 @@ export const Fragment: unique symbol;
                 ...jsxImportSourceOptions,
                 jsxImportSource: "preact",
               },
-            })
+            }),
           ),
         optionsToExtend: ["--explainFiles"],
       });
@@ -467,11 +459,11 @@ export const Fragment: unique symbol;
           host.createDirectory(`${project}/node_modules/react/jsx-runtime`);
           host.writeFile(
             `${project}/node_modules/react/jsx-runtime/index.d.ts`,
-            jsxLibraryContent
+            jsxLibraryContent,
           );
           host.writeFile(
             `${project}/node_modules/react/package.json`,
-            JSON.stringify({ name: "react", version: "0.0.1" })
+            JSON.stringify({ name: "react", version: "0.0.1" }),
           );
         },
       });
@@ -501,7 +493,7 @@ export const Fragment: unique symbol;
         ],
         modifyFs: (host) => {
           host.deleteFile(
-            `${project}/node_modules/react/jsx-runtime/index.d.ts`
+            `${project}/node_modules/react/jsx-runtime/index.d.ts`,
           );
           host.deleteFile(`${project}/node_modules/react/package.json`);
         },
@@ -565,7 +557,7 @@ export const Fragment: unique symbol;
           // delete 'foo'
           host.writeFile(
             `${project}/src/types/classnames.d.ts`,
-            `export {}; declare module "classnames" { interface Result {} }`
+            `export {}; declare module "classnames" { interface Result {} }`,
           );
         },
       });

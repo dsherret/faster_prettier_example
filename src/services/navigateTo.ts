@@ -14,7 +14,7 @@ namespace ts.NavigateTo {
     cancellationToken: CancellationToken,
     searchValue: string,
     maxResultCount: number | undefined,
-    excludeDtsFiles: boolean
+    excludeDtsFiles: boolean,
   ): NavigateToItem[] {
     const patternMatcher = createPatternMatcher(searchValue);
     if (!patternMatcher) return emptyArray;
@@ -35,7 +35,7 @@ namespace ts.NavigateTo {
           declarations,
           checker,
           sourceFile.fileName,
-          rawItems
+          rawItems,
         );
       });
     }
@@ -54,7 +54,7 @@ namespace ts.NavigateTo {
     declarations: readonly Declaration[],
     checker: TypeChecker,
     fileName: string,
-    rawItems: Push<RawNavigateToItem>
+    rawItems: Push<RawNavigateToItem>,
   ): void {
     // First do a quick check to see if the name of the declaration matches the
     // last portion of the (possibly) dotted name they're searching for.
@@ -70,7 +70,7 @@ namespace ts.NavigateTo {
         // If the pattern has dots in it, then also see if the declaration container matches as well.
         const fullMatch = patternMatcher.getFullMatch(
           getContainers(declaration),
-          name
+          name,
         );
         if (fullMatch) {
           rawItems.push({
@@ -95,7 +95,7 @@ namespace ts.NavigateTo {
 
   function shouldKeepItem(
     declaration: Declaration,
-    checker: TypeChecker
+    checker: TypeChecker,
   ): boolean {
     switch (declaration.kind) {
       case SyntaxKind.ImportClause:
@@ -107,7 +107,7 @@ namespace ts.NavigateTo {
               | ImportClause
               | ImportSpecifier
               | ImportEqualsDeclaration
-          ).name!
+          ).name!,
         )!; // TODO: GH#18217
         const imported = checker.getAliasedSymbol(importer);
         return importer.escapedName !== imported.escapedName;
@@ -118,14 +118,14 @@ namespace ts.NavigateTo {
 
   function tryAddSingleDeclarationName(
     declaration: Declaration,
-    containers: Push<string>
+    containers: Push<string>,
   ): boolean {
     const name = getNameOfDeclaration(declaration);
     return (
-      !!name &&
-      (pushLiteral(name, containers) ||
-        (name.kind === SyntaxKind.ComputedPropertyName &&
-          tryAddComputedPropertyName(name.expression, containers)))
+      !!name
+      && (pushLiteral(name, containers)
+        || (name.kind === SyntaxKind.ComputedPropertyName
+          && tryAddComputedPropertyName(name.expression, containers)))
     );
   }
 
@@ -134,20 +134,20 @@ namespace ts.NavigateTo {
   //      [X.Y.Z]() { }
   function tryAddComputedPropertyName(
     expression: Expression,
-    containers: Push<string>
+    containers: Push<string>,
   ): boolean {
     return (
-      pushLiteral(expression, containers) ||
-      (isPropertyAccessExpression(expression) &&
-        (containers.push(expression.name.text), true) &&
-        tryAddComputedPropertyName(expression.expression, containers))
+      pushLiteral(expression, containers)
+      || (isPropertyAccessExpression(expression)
+        && (containers.push(expression.name.text), true)
+        && tryAddComputedPropertyName(expression.expression, containers))
     );
   }
 
   function pushLiteral(node: Node, containers: Push<string>): boolean {
     return (
-      isPropertyNameLiteral(node) &&
-      (containers.push(getTextOfIdentifierOrLiteral(node)), true)
+      isPropertyNameLiteral(node)
+      && (containers.push(getTextOfIdentifierOrLiteral(node)), true)
     );
   }
 
@@ -158,9 +158,9 @@ namespace ts.NavigateTo {
     // portion into the container array.
     const name = getNameOfDeclaration(declaration);
     if (
-      name &&
-      name.kind === SyntaxKind.ComputedPropertyName &&
-      !tryAddComputedPropertyName(name.expression, containers)
+      name
+      && name.kind === SyntaxKind.ComputedPropertyName
+      && !tryAddComputedPropertyName(name.expression, containers)
     ) {
       return emptyArray;
     }
@@ -183,12 +183,12 @@ namespace ts.NavigateTo {
 
   function compareNavigateToItems(
     i1: RawNavigateToItem,
-    i2: RawNavigateToItem
+    i2: RawNavigateToItem,
   ) {
     // TODO(cyrusn): get the gamut of comparisons that VS already uses here.
     return (
-      compareValues(i1.matchKind, i2.matchKind) ||
-      compareStringsCaseSensitiveUI(i1.name, i2.name)
+      compareValues(i1.matchKind, i2.matchKind)
+      || compareStringsCaseSensitiveUI(i1.name, i2.name)
     );
   }
 

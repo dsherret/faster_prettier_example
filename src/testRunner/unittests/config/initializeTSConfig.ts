@@ -6,12 +6,14 @@ namespace ts {
         const initResult = generateTSConfig(
           commandLine.options,
           commandLine.fileNames,
-          "\n"
+          "\n",
         );
-        const outputFileName = `tsConfig/${name.replace(
-          /[^a-z0-9\-. ]/gi,
-          ""
-        )}/tsconfig.json`;
+        const outputFileName = `tsConfig/${
+          name.replace(
+            /[^a-z0-9\-. ]/gi,
+            "",
+          )
+        }/tsconfig.json`;
 
         it(`Correct output for ${outputFileName}`, () => {
           Harness.Baseline.runBaseline(outputFileName, initResult);
@@ -30,12 +32,12 @@ namespace ts {
 
     initTSConfigCorrectly(
       "Initialized TSConfig with boolean value compiler options",
-      ["--init", "--noUnusedLocals"]
+      ["--init", "--noUnusedLocals"],
     );
 
     initTSConfigCorrectly(
       "Initialized TSConfig with enum value compiler options",
-      ["--init", "--target", "es5", "--jsx", "react"]
+      ["--init", "--target", "es5", "--jsx", "react"],
     );
 
     initTSConfigCorrectly("Initialized TSConfig with list compiler options", [
@@ -46,17 +48,17 @@ namespace ts {
 
     initTSConfigCorrectly(
       "Initialized TSConfig with list compiler options with enum value",
-      ["--init", "--lib", "es5,es2015.core"]
+      ["--init", "--lib", "es5,es2015.core"],
     );
 
     initTSConfigCorrectly(
       "Initialized TSConfig with incorrect compiler option",
-      ["--init", "--someNonExistOption"]
+      ["--init", "--someNonExistOption"],
     );
 
     initTSConfigCorrectly(
       "Initialized TSConfig with incorrect compiler option value",
-      ["--init", "--lib", "nonExistLib,es5,es2015.promise"]
+      ["--init", "--lib", "nonExistLib,es5,es2015.promise"],
     );
 
     initTSConfigCorrectly("Initialized TSConfig with advanced options", [

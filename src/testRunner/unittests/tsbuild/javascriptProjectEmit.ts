@@ -87,7 +87,7 @@ namespace ts {
                         }
                     }`,
           },
-          symbolLibContent
+          symbolLibContent,
         ),
       commandLineArgs: ["-b", "/src"],
     });
@@ -181,14 +181,13 @@ namespace ts {
                         }
                     }`,
           },
-          symbolLibContent
+          symbolLibContent,
         ),
       commandLineArgs: ["-b", "/src"],
       incrementalScenarios: [
         {
           buildKind: BuildKind.IncrementalDtsUnchanged,
-          modifyFs: (fs) =>
-            replaceText(fs, "/src/sub-project/index.js", "null", "undefined"),
+          modifyFs: (fs) => replaceText(fs, "/src/sub-project/index.js", "null", "undefined"),
         },
       ],
     });
@@ -279,7 +278,7 @@ namespace ts {
                         }
                     }`,
           },
-          symbolLibContent
+          symbolLibContent,
         ),
       commandLineArgs: ["-b", "/src"],
     });

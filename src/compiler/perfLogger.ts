@@ -28,9 +28,8 @@ namespace ts {
   // See https://github.com/microsoft/typescript-etw for more information
   let etwModule;
   try {
-    const etwModulePath =
-      process.env.TS_ETW_MODULE_PATH ??
-      "./node_modules/@microsoft/typescript-etw";
+    const etwModulePath = process.env.TS_ETW_MODULE_PATH
+      ?? "./node_modules/@microsoft/typescript-etw";
 
     // require() will throw an exception if the module is not found
     // It may also return undefined if not installed properly
@@ -40,6 +39,5 @@ namespace ts {
   }
 
   /** Performance logger that will generate ETW events if possible - check for `logEvent` member, as `etwModule` will be `{}` when browserified */
-  export const perfLogger: PerfLogger =
-    etwModule && etwModule.logEvent ? etwModule : nullLogger;
+  export const perfLogger: PerfLogger = etwModule && etwModule.logEvent ? etwModule : nullLogger;
 }

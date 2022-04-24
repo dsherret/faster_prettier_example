@@ -26,23 +26,23 @@ namespace documents {
       return new TextDocument(
         file.unitName,
         file.content,
-        file.fileOptions &&
-          Object.keys(file.fileOptions).reduce(
+        file.fileOptions
+          && Object.keys(file.fileOptions).reduce(
             (meta, key) => meta.set(key, file.fileOptions[key]),
-            new Map<string, string>()
-          )
+            new Map<string, string>(),
+          ),
       );
     }
 
     public asTestFile() {
       return (
-        this._testFile ||
-        (this._testFile = {
+        this._testFile
+        || (this._testFile = {
           unitName: this.file,
           content: this.text,
           fileOptions: Array.from(this.meta).reduce(
             (obj, [key, value]) => ((obj[key] = value), obj),
-            {} as Record<string, string>
+            {} as Record<string, string>,
           ),
         })
       );
@@ -81,19 +81,15 @@ namespace documents {
     public readonly names: readonly string[] | undefined;
 
     private static readonly _mappingRegExp = /([A-Za-z0-9+/]+),?|(;)|./g;
-    private static readonly _sourceMappingURLRegExp =
-      /^\/\/[#@]\s*sourceMappingURL\s*=\s*(.*?)\s*$/gim;
-    private static readonly _dataURLRegExp =
-      /^data:application\/json;base64,([a-z0-9+/=]+)$/i;
-    private static readonly _base64Chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    private static readonly _sourceMappingURLRegExp = /^\/\/[#@]\s*sourceMappingURL\s*=\s*(.*?)\s*$/gim;
+    private static readonly _dataURLRegExp = /^data:application\/json;base64,([a-z0-9+/=]+)$/i;
+    private static readonly _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     private _emittedLineMappings: Mapping[][] = [];
     private _sourceLineMappings: Mapping[][][] = [];
 
     constructor(mapFile: string | undefined, data: string | RawSourceMap) {
-      this.raw =
-        typeof data === "string" ? (JSON.parse(data) as RawSourceMap) : data;
+      this.raw = typeof data === "string" ? (JSON.parse(data) as RawSourceMap) : data;
       this.mapFile = mapFile;
       this.version = this.raw.version;
       this.file = this.raw.file;
@@ -115,9 +111,9 @@ namespace documents {
         if (match[1]) {
           const segment = SourceMap._decodeVLQ(match[1]);
           if (
-            segment.length !== 1 &&
-            segment.length !== 4 &&
-            segment.length !== 5
+            segment.length !== 1
+            && segment.length !== 4
+            && segment.length !== 5
           ) {
             throw new Error("Invalid VLQ");
           }
@@ -144,17 +140,14 @@ namespace documents {
 
           mappings.push(mapping);
 
-          const mappingsForEmittedLine =
-            this._emittedLineMappings[mapping.emittedLine] ||
-            (this._emittedLineMappings[mapping.emittedLine] = []);
+          const mappingsForEmittedLine = this._emittedLineMappings[mapping.emittedLine]
+            || (this._emittedLineMappings[mapping.emittedLine] = []);
           mappingsForEmittedLine.push(mapping);
 
-          const mappingsForSource =
-            this._sourceLineMappings[mapping.sourceIndex] ||
-            (this._sourceLineMappings[mapping.sourceIndex] = []);
-          const mappingsForSourceLine =
-            mappingsForSource[mapping.sourceLine] ||
-            (mappingsForSource[mapping.sourceLine] = []);
+          const mappingsForSource = this._sourceLineMappings[mapping.sourceIndex]
+            || (this._sourceLineMappings[mapping.sourceIndex] = []);
+          const mappingsForSourceLine = mappingsForSource[mapping.sourceLine]
+            || (mappingsForSource[mapping.sourceLine] = []);
           mappingsForSourceLine.push(mapping);
         } else if (match[2]) {
           emittedLine++;
@@ -189,14 +182,14 @@ namespace documents {
     }
 
     public getMappingsForEmittedLine(
-      emittedLine: number
+      emittedLine: number,
     ): readonly Mapping[] | undefined {
       return this._emittedLineMappings[emittedLine];
     }
 
     public getMappingsForSourceLine(
       sourceIndex: number,
-      sourceLine: number
+      sourceLine: number,
     ): readonly Mapping[] | undefined {
       const mappingsForSource = this._sourceLineMappings[sourceIndex];
       return mappingsForSource && mappingsForSource[sourceLine];

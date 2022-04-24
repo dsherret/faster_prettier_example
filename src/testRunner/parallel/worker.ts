@@ -27,7 +27,7 @@ namespace Harness.Parallel.Worker {
      * @param base The base class constructor.
      * @param mixins The mixins to apply to the constructor.
      */
-    function mixin<T extends new (...args: any[]) => any>(
+    function mixin<T extends new(...args: any[]) => any>(
       base: T,
       ...mixins: ((klass: T) => T)[]
     ) {
@@ -65,7 +65,7 @@ namespace Harness.Parallel.Worker {
      * Mixes in an override for `clone` to support parallel test execution in a worker.
      */
     function Clone<T extends typeof Mocha.Suite | typeof Mocha.Test>(base: T) {
-      return class extends (base as new (...args: any[]) => { clone(): any }) {
+      return class extends (base as new(...args: any[]) => { clone(): any }) {
         clone() {
           const cloned = super.clone();
           Object.setPrototypeOf(cloned, this.constructor.prototype);
@@ -102,57 +102,52 @@ namespace Harness.Parallel.Worker {
      */
     function shimTestInterface(
       rootSuite: Mocha.Suite,
-      context: Mocha.MochaGlobals
+      context: Mocha.MochaGlobals,
     ) {
       const suites = [rootSuite];
       context.before = (
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn?: Mocha.Func | Mocha.AsyncFunc
+        fn?: Mocha.Func | Mocha.AsyncFunc,
       ) => suites[0].beforeAll(title as string, fn);
       context.after = (
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn?: Mocha.Func | Mocha.AsyncFunc
+        fn?: Mocha.Func | Mocha.AsyncFunc,
       ) => suites[0].afterAll(title as string, fn);
       context.beforeEach = (
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn?: Mocha.Func | Mocha.AsyncFunc
+        fn?: Mocha.Func | Mocha.AsyncFunc,
       ) => suites[0].beforeEach(title as string, fn);
       context.afterEach = (
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn?: Mocha.Func | Mocha.AsyncFunc
+        fn?: Mocha.Func | Mocha.AsyncFunc,
       ) => suites[0].afterEach(title as string, fn);
       context.describe = context.context = ((
         title: string,
-        fn: (this: Mocha.Suite) => void
+        fn: (this: Mocha.Suite) => void,
       ) => addSuite(title, fn)) as Mocha.SuiteFunction;
-      context.describe.skip =
-        context.xdescribe =
-        context.xcontext =
-          (title: string) => addSuite(title, /*fn*/ undefined);
+      context.describe.skip = context.xdescribe = context.xcontext = (title: string) =>
+        addSuite(title, /*fn*/ undefined);
       context.describe.only = (
         title: string,
-        fn?: (this: Mocha.Suite) => void
+        fn?: (this: Mocha.Suite) => void,
       ) => addSuite(title, fn);
       context.it = context.specify = ((
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn?: Mocha.Func | Mocha.AsyncFunc
+        fn?: Mocha.Func | Mocha.AsyncFunc,
       ) => addTest(title, fn)) as Mocha.TestFunction;
-      context.it.skip =
-        context.xit =
-        context.xspecify =
-          (title: string | Mocha.Func | Mocha.AsyncFunc) =>
-            addTest(
-              typeof title === "function" ? title.name : title,
-              /*fn*/ undefined
-            );
+      context.it.skip = context.xit = context.xspecify = (title: string | Mocha.Func | Mocha.AsyncFunc) =>
+        addTest(
+          typeof title === "function" ? title.name : title,
+          /*fn*/ undefined,
+        );
       context.it.only = (
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn?: Mocha.Func | Mocha.AsyncFunc
+        fn?: Mocha.Func | Mocha.AsyncFunc,
       ) => addTest(title, fn);
 
       function addSuite(
         title: string,
-        fn: ((this: Mocha.Suite) => void) | undefined
+        fn: ((this: Mocha.Suite) => void) | undefined,
       ): Mocha.Suite {
         const suite = new Suite(title, suites[0].ctx);
         suites[0].addSuite(suite);
@@ -167,7 +162,7 @@ namespace Harness.Parallel.Worker {
 
       function addTest(
         title: string | Mocha.Func | Mocha.AsyncFunc,
-        fn: Mocha.Func | Mocha.AsyncFunc | undefined
+        fn: Mocha.Func | Mocha.AsyncFunc | undefined,
       ): Mocha.Test {
         if (typeof title === "function") {
           fn = title;
@@ -192,7 +187,7 @@ namespace Harness.Parallel.Worker {
 
     function executeUnitTests(
       task: UnitTestTask,
-      fn: (payload: TaskResult) => void
+      fn: (payload: TaskResult) => void,
     ) {
       if (!unitTestSuiteMap && unitTestSuite.suites.length) {
         unitTestSuiteMap = new ts.Map<string, Mocha.Suite>();
@@ -209,7 +204,7 @@ namespace Harness.Parallel.Worker {
 
       if (!unitTestSuiteMap && !unitTestTestMap) {
         throw new Error(
-          `Asked to run unit test ${task.file}, but no unit tests were discovered!`
+          `Asked to run unit test ${task.file}, but no unit tests were discovered!`,
         );
       }
 
@@ -217,7 +212,7 @@ namespace Harness.Parallel.Worker {
       const test = unitTestTestMap.get(task.file);
       if (!suite && !test) {
         throw new Error(
-          `Unit test with name "${task.file}" was asked to be run, but such a test does not exist!`
+          `Unit test with name "${task.file}" was asked to be run, but such a test does not exist!`,
         );
       }
 
@@ -245,8 +240,9 @@ namespace Harness.Parallel.Worker {
 
     function runFileTests(task: RunnerTask, fn: (result: TaskResult) => void) {
       let instance = runners.get(task.runner);
-      if (!instance)
-        runners.set(task.runner, (instance = createRunner(task.runner)));
+      if (!instance) {
+        runners.set(task.runner, instance = createRunner(task.runner));
+      }
       instance.tests = [task.file];
 
       const suite = new Suite("", new Mocha.Context());
@@ -261,7 +257,7 @@ namespace Harness.Parallel.Worker {
     function runSuite(
       task: Task,
       suite: Mocha.Suite,
-      fn: (result: TaskResult) => void
+      fn: (result: TaskResult) => void,
     ) {
       const errors: ErrorInfo[] = [];
       const passes: TestInfo[] = [];
@@ -325,10 +321,10 @@ namespace Harness.Parallel.Worker {
      */
     function validateBatch(tasks: Task[]) {
       return (
-        !!tasks &&
-        Array.isArray(tasks) &&
-        tasks.length > 0 &&
-        tasks.every(validateTest)
+        !!tasks
+        && Array.isArray(tasks)
+        && tasks.length > 0
+        && tasks.every(validateTest)
       );
     }
 
@@ -351,7 +347,7 @@ namespace Harness.Parallel.Worker {
     function processTest(task: Task, last: boolean, fn?: () => void) {
       runTests(task, (payload) => {
         sendMessage(
-          last ? { type: "result", payload } : { type: "progress", payload }
+          last ? { type: "result", payload } : { type: "progress", payload },
         );
         if (fn) fn();
       });

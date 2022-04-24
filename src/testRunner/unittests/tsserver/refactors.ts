@@ -9,30 +9,28 @@ namespace ts.projectSystem {
       const session = createSession(host);
       openFilesForSession([file], session);
 
-      const response0 =
-        session.executeCommandSeq<server.protocol.ConfigureRequest>({
-          command: server.protocol.CommandTypes.Configure,
-          arguments: {
-            formatOptions: {
-              indentSize: 2,
-            },
+      const response0 = session.executeCommandSeq<server.protocol.ConfigureRequest>({
+        command: server.protocol.CommandTypes.Configure,
+        arguments: {
+          formatOptions: {
+            indentSize: 2,
           },
-        }).response;
+        },
+      }).response;
       assert.deepEqual(response0, /*expected*/ undefined);
 
-      const response1 =
-        session.executeCommandSeq<server.protocol.GetEditsForRefactorRequest>({
-          command: server.protocol.CommandTypes.GetEditsForRefactor,
-          arguments: {
-            refactor: "Extract Symbol",
-            action: "function_scope_1",
-            file: "/a.ts",
-            startLine: 2,
-            startOffset: 3,
-            endLine: 2,
-            endOffset: 4,
-          },
-        }).response;
+      const response1 = session.executeCommandSeq<server.protocol.GetEditsForRefactorRequest>({
+        command: server.protocol.CommandTypes.GetEditsForRefactor,
+        arguments: {
+          refactor: "Extract Symbol",
+          action: "function_scope_1",
+          file: "/a.ts",
+          startLine: 2,
+          startOffset: 3,
+          endLine: 2,
+          endOffset: 4,
+        },
+      }).response;
       assert.deepEqual(response1, {
         edits: [
           {
@@ -63,25 +61,24 @@ namespace ts.projectSystem {
       };
       const tsconfig = {
         path: "/tsconfig.json",
-        content: '{ "files": ["./a.ts"] }',
+        content: "{ \"files\": [\"./a.ts\"] }",
       };
 
       const session = createSession(createServerHost([aTs, tsconfig]));
       openFilesForSession([aTs], session);
 
-      const response1 =
-        session.executeCommandSeq<server.protocol.GetEditsForRefactorRequest>({
-          command: server.protocol.CommandTypes.GetEditsForRefactor,
-          arguments: {
-            refactor: "Move to a new file",
-            action: "Move to a new file",
-            file: "/a.ts",
-            startLine: 1,
-            startOffset: 1,
-            endLine: 1,
-            endOffset: 20,
-          },
-        }).response;
+      const response1 = session.executeCommandSeq<server.protocol.GetEditsForRefactorRequest>({
+        command: server.protocol.CommandTypes.GetEditsForRefactor,
+        arguments: {
+          refactor: "Move to a new file",
+          action: "Move to a new file",
+          file: "/a.ts",
+          startLine: 1,
+          startOffset: 1,
+          endLine: 1,
+          endOffset: 20,
+        },
+      }).response;
       assert.deepEqual(response1, {
         edits: [
           {
@@ -100,7 +97,7 @@ namespace ts.projectSystem {
               {
                 start: { line: 1, offset: 21 },
                 end: { line: 1, offset: 21 },
-                newText: ', "./a.1.ts"',
+                newText: ", \"./a.1.ts\"",
               },
             ],
           },
@@ -124,7 +121,7 @@ namespace ts.projectSystem {
       const aTs: File = { path: "/Foo/a.ts", content: "const x = 0;" };
       const tsconfig: File = {
         path: "/Foo/tsconfig.json",
-        content: '{ "files": ["./a.ts"] }',
+        content: "{ \"files\": [\"./a.ts\"] }",
       };
       const session = createSession(createServerHost([aTs, tsconfig]));
       openFilesForSession([aTs], session);
@@ -159,7 +156,7 @@ namespace ts.projectSystem {
               {
                 start: { line: 1, offset: 21 },
                 end: { line: 1, offset: 21 },
-                newText: ', "./x.ts"',
+                newText: ", \"./x.ts\"",
               },
             ],
           },

@@ -64,8 +64,7 @@ declare type MyNominal<T, Name extends string> = T & {
 
     verifyTsc({
       scenario: "declarationEmit",
-      subScenario:
-        "when declaration file is referenced through triple slash but uses no references",
+      subScenario: "when declaration file is referenced through triple slash but uses no references",
       fs: () =>
         loadProjectFromFiles({
           ...getFiles(),
@@ -80,8 +79,7 @@ declare type MyNominal<T, Name extends string> = T & {
 
     verifyTsc({
       scenario: "declarationEmit",
-      subScenario:
-        "when declaration file used inferred type from referenced project",
+      subScenario: "when declaration file used inferred type from referenced project",
       fs: () =>
         loadProjectFromFiles({
           "/src/tsconfig.json": JSON.stringify({

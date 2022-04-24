@@ -33,7 +33,7 @@ namespace ts.tscWatch {
             },
             libFile,
           ],
-          { currentDirectory: projectRoot }
+          { currentDirectory: projectRoot },
         ),
       commandLineArgs: ["--b", "-w"],
       changes: [
@@ -45,20 +45,18 @@ namespace ts.tscWatch {
               `${projectRoot}/tsconfig.json`,
               ",",
               `,
-        "declaration": true,`
+        "declaration": true,`,
             ),
           timeouts: build,
         },
         {
           caption: "reports syntax errors after change to ts file",
-          change: (sys) =>
-            replaceFileText(sys, `${projectRoot}/a.ts`, "foo", "fooBar"),
+          change: (sys) => replaceFileText(sys, `${projectRoot}/a.ts`, "foo", "fooBar"),
           timeouts: build,
         },
         {
           caption: "reports error when there is no change to tsconfig file",
-          change: (sys) =>
-            replaceFileText(sys, `${projectRoot}/tsconfig.json`, "", ""),
+          change: (sys) => replaceFileText(sys, `${projectRoot}/tsconfig.json`, "", ""),
           timeouts: build,
         },
         {
@@ -69,7 +67,7 @@ namespace ts.tscWatch {
               JSON.stringify({
                 compilerOptions: { composite: true, declaration: true },
                 files: ["a.ts", "b.ts"],
-              })
+              }),
             ),
           timeouts: build,
         },

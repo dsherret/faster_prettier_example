@@ -29,7 +29,7 @@ namespace ts.tscWatch {
       const parsedCommandResult = parseJsonConfigFileContent(
         configFileJson,
         host,
-        config.path
+        config.path,
       );
       compilerHost.resolveModuleNames = (moduleNames, containingFile) =>
         moduleNames.map((m) => {
@@ -37,7 +37,7 @@ namespace ts.tscWatch {
             m,
             containingFile,
             parsedCommandResult.options,
-            compilerHost
+            compilerHost,
           );
           const resolvedModule = result.resolvedModule!;
           return {
@@ -80,7 +80,7 @@ namespace ts.tscWatch {
         _,
         __,
         ___,
-        errorCount
+        errorCount,
       ) => {
         watchedErrorCount = errorCount;
       };
@@ -93,7 +93,7 @@ namespace ts.tscWatch {
       assert.equal(
         watchedErrorCount,
         2,
-        "The error count was expected to be 2 for the file change"
+        "The error count was expected to be 2 for the file change",
       );
     });
   });
@@ -157,7 +157,7 @@ namespace ts.tscWatch {
             isMixedContent: true,
             scriptKind: ScriptKind.Deferred,
           },
-        ]
+        ],
       );
       const watch = createWatchProgram(watchCompilerHost);
       checkProgramActualFiles(watch.getProgram().getProgram(), [
@@ -183,20 +183,20 @@ namespace ts.tscWatch {
       config: File,
       optionsToExtend: CompilerOptions | undefined,
       sys: System,
-      createProgram: CreateProgram<T>
+      createProgram: CreateProgram<T>,
     ) {
       const watchCompilerHost = createWatchCompilerHost(
         config.path,
         optionsToExtend,
         sys,
-        createProgram
+        createProgram,
       );
       return createWatchProgram(watchCompilerHost);
     }
 
     function setup<T extends BuilderProgram>(
       createProgram: CreateProgram<T>,
-      configText: string
+      configText: string,
     ) {
       const config: File = {
         path: `${projectRoot}/tsconfig.json`,
@@ -216,17 +216,19 @@ namespace ts.tscWatch {
     }
 
     function verifyOutputs(sys: System, emitSys: System) {
-      for (const output of [
-        `${projectRoot}/main.js`,
-        `${projectRoot}/main.d.ts`,
-        `${projectRoot}/other.js`,
-        `${projectRoot}/other.d.ts`,
-        `${projectRoot}/tsconfig.tsbuildinfo`,
-      ]) {
+      for (
+        const output of [
+          `${projectRoot}/main.js`,
+          `${projectRoot}/main.d.ts`,
+          `${projectRoot}/other.js`,
+          `${projectRoot}/other.d.ts`,
+          `${projectRoot}/tsconfig.tsbuildinfo`,
+        ]
+      ) {
         assert.strictEqual(
           sys.readFile(output),
           emitSys.readFile(output),
-          `Output file text for ${output}`
+          `Output file text for ${output}`,
         );
       }
     }
@@ -237,19 +239,19 @@ namespace ts.tscWatch {
       emitSys: System,
       createProgram: CreateProgram<T>,
       createEmitProgram: CreateProgram<U>,
-      optionsToExtend?: CompilerOptions
+      optionsToExtend?: CompilerOptions,
     ) {
       const watch = getWatch(
         config,
         /*optionsToExtend*/ optionsToExtend,
         sys,
-        createProgram
+        createProgram,
       );
       const emitWatch = getWatch(
         config,
         /*optionsToExtend*/ optionsToExtend,
         emitSys,
-        createEmitProgram
+        createEmitProgram,
       );
       verifyOutputs(sys, emitSys);
       watch.close();
@@ -259,7 +261,7 @@ namespace ts.tscWatch {
     it("verifies that noEmit is handled on createSemanticDiagnosticsBuilderProgram and typechecking happens only on affected files", () => {
       const { sys, watch, mainFile, otherFile } = setup(
         createSemanticDiagnosticsBuilderProgram,
-        "{}"
+        "{}",
       );
       checkProgramActualFiles(watch.getProgram().getProgram(), [
         mainFile.path,
@@ -271,16 +273,16 @@ namespace ts.tscWatch {
       const program = watch.getProgram().getProgram();
       assert.deepEqual(
         program.getCachedSemanticDiagnostics(
-          program.getSourceFile(mainFile.path)
+          program.getSourceFile(mainFile.path),
         ),
-        []
+        [],
       );
       // Should not retrieve diagnostics for other file thats not changed
       assert.deepEqual(
         program.getCachedSemanticDiagnostics(
-          program.getSourceFile(otherFile.path)
+          program.getSourceFile(otherFile.path),
         ),
-        /*expected*/ undefined
+        /*expected*/ undefined,
       );
     });
 
@@ -290,11 +292,11 @@ namespace ts.tscWatch {
       });
       const { sys, watch, config, mainFile } = setup(
         createSemanticDiagnosticsBuilderProgram,
-        configText
+        configText,
       );
       const { sys: emitSys, watch: emitWatch } = setup(
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        configText
+        configText,
       );
       verifyOutputs(sys, emitSys);
 
@@ -307,7 +309,7 @@ namespace ts.tscWatch {
         sys,
         emitSys,
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        createEmitAndSemanticDiagnosticsBuilderProgram
+        createEmitAndSemanticDiagnosticsBuilderProgram,
       );
 
       // Change file
@@ -321,7 +323,7 @@ namespace ts.tscWatch {
         emitSys,
         createSemanticDiagnosticsBuilderProgram,
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        { noEmit: true }
+        { noEmit: true },
       );
 
       // Emit on both sys should result in same output
@@ -330,7 +332,7 @@ namespace ts.tscWatch {
         sys,
         emitSys,
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        createEmitAndSemanticDiagnosticsBuilderProgram
+        createEmitAndSemanticDiagnosticsBuilderProgram,
       );
 
       // Change file
@@ -343,7 +345,7 @@ namespace ts.tscWatch {
         sys,
         emitSys,
         createSemanticDiagnosticsBuilderProgram,
-        createEmitAndSemanticDiagnosticsBuilderProgram
+        createEmitAndSemanticDiagnosticsBuilderProgram,
       );
     });
 
@@ -375,7 +377,7 @@ namespace ts.tscWatch {
         emitSys,
         createSemanticDiagnosticsBuilderProgram,
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        { noEmitOnError: true }
+        { noEmitOnError: true },
       );
 
       // Change file
@@ -389,7 +391,7 @@ namespace ts.tscWatch {
         emitSys,
         createSemanticDiagnosticsBuilderProgram,
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        { noEmitOnError: true }
+        { noEmitOnError: true },
       );
 
       // Fix error
@@ -404,7 +406,7 @@ namespace ts.tscWatch {
         emitSys,
         createSemanticDiagnosticsBuilderProgram,
         createEmitAndSemanticDiagnosticsBuilderProgram,
-        { noEmitOnError: true }
+        { noEmitOnError: true },
       );
     });
   });
@@ -457,13 +459,12 @@ namespace ts.tscWatch {
         system,
         optionsToExtend: { extendedDiagnostics: true },
       });
-      compilerHost.useSourceOfProjectReferenceRedirect =
-        useSourceOfProjectReferenceRedirect;
+      compilerHost.useSourceOfProjectReferenceRedirect = useSourceOfProjectReferenceRedirect;
       const calledGetParsedCommandLine = new Set<string>();
       compilerHost.getParsedCommandLine = (fileName) => {
         assert.isFalse(
           calledGetParsedCommandLine.has(fileName),
-          `Already called on ${fileName}`
+          `Already called on ${fileName}`,
         );
         calledGetParsedCommandLine.add(fileName);
         return getParsedCommandLineOfConfigFile(
@@ -477,7 +478,7 @@ namespace ts.tscWatch {
             readDirectory: (path, extensions, excludes, includes, depth) =>
               system.readDirectory(path, extensions, excludes, includes, depth),
             onUnRecoverableConfigFileDiagnostic: noop,
-          }
+          },
         );
       };
       const watch = createWatchProgram(compilerHost);
@@ -485,12 +486,10 @@ namespace ts.tscWatch {
     }
 
     it("when new file is added to the referenced project with host implementing getParsedCommandLine", () => {
-      const { watch, baseline, config2, calledGetParsedCommandLine } =
-        setup(returnTrue);
+      const { watch, baseline, config2, calledGetParsedCommandLine } = setup(returnTrue);
       runWatchBaseline({
         scenario: "watchApi",
-        subScenario:
-          "when new file is added to the referenced project with host implementing getParsedCommandLine",
+        subScenario: "when new file is added to the referenced project with host implementing getParsedCommandLine",
         commandLineArgs: ["--w", "-p", config2.path, "--extendedDiagnostics"],
         ...baseline,
         getPrograms: () => [
@@ -503,7 +502,7 @@ namespace ts.tscWatch {
               calledGetParsedCommandLine.clear();
               sys.writeFile(
                 `${projectRoot}/projects/project1/class3.ts`,
-                `class class3 {}`
+                `class class3 {}`,
               );
             },
             timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -522,7 +521,7 @@ namespace ts.tscWatch {
             change: (sys) =>
               sys.writeFile(
                 `${projectRoot}/projects/project1/class3.d.ts`,
-                `declare class class3 {}`
+                `declare class class3 {}`,
               ),
             timeouts: (sys) => sys.checkTimeoutQueueLength(0),
           },
@@ -549,7 +548,7 @@ namespace ts.tscWatch {
               calledGetParsedCommandLine.clear();
               sys.writeFile(
                 `${projectRoot}/projects/project1/class3.ts`,
-                `class class3 {}`
+                `class class3 {}`,
               );
             },
             timeouts: checkSingleTimeoutQueueLengthAndRun,
@@ -559,7 +558,7 @@ namespace ts.tscWatch {
             change: (sys) =>
               sys.writeFile(
                 `${projectRoot}/projects/project1/class3.d.ts`,
-                `declare class class3 {}`
+                `declare class class3 {}`,
               ),
             timeouts: checkSingleTimeoutQueueLengthAndRun,
           },
@@ -574,8 +573,7 @@ namespace ts.tscWatch {
           },
           {
             caption: "Delete output of class3",
-            change: (sys) =>
-              sys.deleteFile(`${projectRoot}/projects/project1/class3.d.ts`),
+            change: (sys) => sys.deleteFile(`${projectRoot}/projects/project1/class3.d.ts`),
             timeouts: checkSingleTimeoutQueueLengthAndRun,
           },
           {
@@ -583,7 +581,7 @@ namespace ts.tscWatch {
             change: (sys) =>
               sys.writeFile(
                 `${projectRoot}/projects/project1/class3.d.ts`,
-                `declare class class3 {}`
+                `declare class class3 {}`,
               ),
             timeouts: checkSingleTimeoutQueueLengthAndRun,
           },

@@ -3,12 +3,12 @@ namespace ts.formatting {
   const standardScanner = createScanner(
     ScriptTarget.Latest,
     /*skipTrivia*/ false,
-    LanguageVariant.Standard
+    LanguageVariant.Standard,
   );
   const jsxScanner = createScanner(
     ScriptTarget.Latest,
     /*skipTrivia*/ false,
-    LanguageVariant.JSX
+    LanguageVariant.JSX,
   );
 
   export interface FormattingScanner {
@@ -39,10 +39,9 @@ namespace ts.formatting {
     languageVariant: LanguageVariant,
     startPos: number,
     endPos: number,
-    cb: (scanner: FormattingScanner) => T
+    cb: (scanner: FormattingScanner) => T,
   ): T {
-    const scanner =
-      languageVariant === LanguageVariant.JSX ? jsxScanner : standardScanner;
+    const scanner = languageVariant === LanguageVariant.JSX ? jsxScanner : standardScanner;
 
     scanner.setText(text);
     scanner.setTextPos(startPos);
@@ -78,9 +77,8 @@ namespace ts.formatting {
       const isStarted = scanner.getStartPos() !== startPos;
 
       if (isStarted) {
-        wasNewLine =
-          !!trailingTrivia &&
-          last(trailingTrivia).kind === SyntaxKind.NewLineTrivia;
+        wasNewLine = !!trailingTrivia
+          && last(trailingTrivia).kind === SyntaxKind.NewLineTrivia;
       } else {
         scanner.scan();
       }
@@ -151,16 +149,16 @@ namespace ts.formatting {
 
     function shouldRescanTemplateToken(container: Node): boolean {
       return (
-        container.kind === SyntaxKind.TemplateMiddle ||
-        container.kind === SyntaxKind.TemplateTail
+        container.kind === SyntaxKind.TemplateMiddle
+        || container.kind === SyntaxKind.TemplateTail
       );
     }
 
     function shouldRescanJsxAttributeValue(node: Node): boolean {
       return (
-        node.parent &&
-        isJsxAttribute(node.parent) &&
-        node.parent.initializer === node
+        node.parent
+        && isJsxAttribute(node.parent)
+        && node.parent.initializer === node
       );
     }
 
@@ -209,7 +207,7 @@ namespace ts.formatting {
       const token = createTextRangeWithKind(
         scanner.getStartPos(),
         scanner.getTextPos(),
-        currentToken
+        currentToken,
       );
 
       // consume trailing trivia
@@ -224,7 +222,7 @@ namespace ts.formatting {
         const trivia = createTextRangeWithKind(
           scanner.getStartPos(),
           scanner.getTextPos(),
-          currentToken
+          currentToken,
         );
 
         if (!trailingTrivia) {
@@ -293,7 +291,7 @@ namespace ts.formatting {
       return createTextRangeWithKind(
         scanner.getStartPos(),
         scanner.getTextPos(),
-        SyntaxKind.EndOfFileToken
+        SyntaxKind.EndOfFileToken,
       );
     }
 

@@ -6,35 +6,36 @@ namespace evaluator {
 
   // Define a custom "Symbol" constructor to attach missing built-in symbols without
   // modifying the global "Symbol" constructor
-  const FakeSymbol: SymbolConstructor = ((description?: string) =>
-    Symbol(description)) as any;
+  const FakeSymbol: SymbolConstructor = ((description?: string) => Symbol(description)) as any;
   (FakeSymbol as any).prototype = Symbol.prototype;
   for (const key of Object.getOwnPropertyNames(Symbol)) {
     Object.defineProperty(
       FakeSymbol,
       key,
-      Object.getOwnPropertyDescriptor(Symbol, key)!
+      Object.getOwnPropertyDescriptor(Symbol, key)!,
     );
   }
 
   // Add "asyncIterator" if missing
-  if (!ts.hasProperty(FakeSymbol, "asyncIterator"))
+  if (!ts.hasProperty(FakeSymbol, "asyncIterator")) {
     Object.defineProperty(FakeSymbol, "asyncIterator", {
       value: Symbol.for("Symbol.asyncIterator"),
       configurable: true,
     });
+  }
 
   export function evaluateTypeScript(
     source: string | { files: vfs.FileSet; rootFiles: string[]; main: string },
     options?: ts.CompilerOptions,
-    globals?: Record<string, any>
+    globals?: Record<string, any>,
   ) {
-    if (typeof source === "string")
+    if (typeof source === "string") {
       source = {
         files: { [sourceFile]: source },
         rootFiles: [sourceFile],
         main: sourceFile,
       };
+    }
     const fs = vfs.createFromFileSystem(Harness.IO, /*ignoreCase*/ false, {
       files: source.files,
     });
@@ -48,17 +49,17 @@ namespace evaluator {
     const result = compiler.compileFiles(
       host,
       source.rootFiles,
-      compilerOptions
+      compilerOptions,
     );
     if (ts.some(result.diagnostics)) {
       assert.ok(
         /*value*/ false,
-        "Syntax error in evaluation source text:\n" +
-          ts.formatDiagnostics(result.diagnostics, {
+        "Syntax error in evaluation source text:\n"
+          + ts.formatDiagnostics(result.diagnostics, {
             getCanonicalFileName: (file) => file,
             getCurrentDirectory: () => "",
             getNewLine: () => "\n",
-          })
+          }),
       );
     }
 
@@ -72,7 +73,7 @@ namespace evaluator {
   export function evaluateJavaScript(
     sourceText: string,
     globals?: Record<string, any>,
-    sourceFile = sourceFileJs
+    sourceFile = sourceFileJs,
   ) {
     globals = { Symbol: FakeSymbol, ...globals };
     const fs = new vfs.FileSystem(/*ignoreCase*/ false, {
@@ -84,7 +85,7 @@ namespace evaluator {
   function getLoader(
     compilerOptions: ts.CompilerOptions,
     fs: vfs.FileSystem,
-    globals: Record<string, any>
+    globals: Record<string, any>,
   ): Loader<unknown> {
     const moduleKind = ts.getEmitModuleKind(compilerOptions);
     switch (moduleKind) {
@@ -97,7 +98,7 @@ namespace evaluator {
       case ts.ModuleKind.None:
       default:
         throw new Error(
-          `ModuleKind '${ts.ModuleKind[moduleKind]}' not supported by evaluator.`
+          `ModuleKind '${ts.ModuleKind[moduleKind]}' not supported by evaluator.`,
         );
     }
   }
@@ -120,17 +121,18 @@ namespace evaluator {
     protected abstract evaluate(
       text: string,
       file: string,
-      module: TModule
+      module: TModule,
     ): void;
     protected abstract createModule(file: string): TModule;
     protected abstract getExports(module: TModule): any;
 
     protected load(file: string): TModule {
-      if (!ts.isExternalModuleNameRelative(file))
+      if (!ts.isExternalModuleNameRelative(file)) {
         throw new Error(`Module '${file}' could not be found.`);
+      }
       let module = this.moduleCache.get(file);
       if (module) return module;
-      this.moduleCache.set(file, (module = this.createModule(file)));
+      this.moduleCache.set(file, module = this.createModule(file));
       try {
         const sourceText = this.fs.readFileSync(file, "utf8");
         this.evaluate(sourceText, file, module);
@@ -146,8 +148,9 @@ namespace evaluator {
     }
 
     import(id: string, base = this.fs.cwd()) {
-      if (!ts.isExternalModuleNameRelative(id))
+      if (!ts.isExternalModuleNameRelative(id)) {
         throw new Error(`Module '${id}' could not be found.`);
+      }
       const file = this.resolve(id, base);
       const module = this.load(file);
       if (!module) throw new Error(`Module '${id}' could not be found.`);
@@ -188,8 +191,7 @@ namespace evaluator {
 
     protected resolve(id: string, base: string) {
       const file = vpath.resolve(base, id);
-      const resolved =
-        this.resolveAsFile(file) || this.resolveAsDirectory(file);
+      const resolved = this.resolveAsFile(file) || this.resolveAsDirectory(file);
       if (!resolved) throw new Error(`Module '${id}' could not be found.`);
       return resolved;
     }
@@ -205,7 +207,7 @@ namespace evaluator {
     protected evaluate(
       text: string,
       file: string,
-      module: CommonJSModule
+      module: CommonJSModule,
     ): void {
       const globalNames: string[] = [];
       const globalArgs: any[] = [];
@@ -217,9 +219,11 @@ namespace evaluator {
       }
       const base = vpath.dirname(file);
       const localRequire = (id: string) => this.import(id, base);
-      const evaluateText = `(function (module, exports, require, __dirname, __filename, ${globalNames.join(
-        ", "
-      )}) { ${text} })`;
+      const evaluateText = `(function (module, exports, require, __dirname, __filename, ${
+        globalNames.join(
+          ", ",
+        )
+      }) { ${text} })`;
       // eslint-disable-next-line no-eval
       const evaluateThunk = (void 0, eval)(evaluateText) as (
         module: any,
@@ -236,7 +240,7 @@ namespace evaluator {
         localRequire,
         vpath.dirname(file),
         file,
-        ...globalArgs
+        ...globalArgs,
       );
     }
   }
@@ -284,7 +288,7 @@ namespace evaluator {
 
   type SystemModuleRegisterCallback = (
     exporter: SystemModuleExporter,
-    context: SystemModuleContext
+    context: SystemModuleContext,
   ) => SystemModuleDeclaration;
   type SystemModuleDependencySetter = (dependency: any) => void;
 
@@ -296,7 +300,7 @@ namespace evaluator {
   interface SystemGlobal {
     register(
       dependencies: string[],
-      declare: SystemModuleRegisterCallback
+      declare: SystemModuleRegisterCallback,
     ): void;
   }
 
@@ -341,7 +345,7 @@ namespace evaluator {
     protected evaluate(
       text: string,
       _file: string,
-      module: SystemModule
+      module: SystemModule,
     ): void {
       const globalNames: string[] = [];
       const globalArgs: any[] = [];
@@ -352,12 +356,13 @@ namespace evaluator {
         }
       }
       const localSystem: SystemGlobal = {
-        register: (dependencies, declare) =>
-          this.instantiateModule(module, dependencies, declare),
+        register: (dependencies, declare) => this.instantiateModule(module, dependencies, declare),
       };
-      const evaluateText = `(function (System, ${globalNames.join(
-        ", "
-      )}) { ${text} })`;
+      const evaluateText = `(function (System, ${
+        globalNames.join(
+          ", ",
+        )
+      }) { ${text} })`;
       try {
         // eslint-disable-next-line no-eval
         const evaluateThunk = (void 0, eval)(evaluateText) as (
@@ -374,7 +379,7 @@ namespace evaluator {
     private instantiateModule(
       module: SystemModule,
       dependencies: string[],
-      registration?: SystemModuleRegisterCallback
+      registration?: SystemModuleRegisterCallback,
     ) {
       function exporter<T>(name: string, value: T): T;
       function exporter<T>(value: T): T;
@@ -402,12 +407,14 @@ namespace evaluator {
         meta: {
           url: ts.isUrl(module.file)
             ? module.file
-            : `file:///${ts
+            : `file:///${
+              ts
                 .normalizeSlashes(module.file)
                 .replace(/^\//, "")
                 .split("/")
                 .map(encodeURIComponent)
-                .join("/")}`,
+                .join("/")
+            }`,
         },
       };
 
@@ -483,8 +490,8 @@ namespace evaluator {
                 if (setter) {
                   dependency.setters.push(setter);
                   if (
-                    dependency.hasExports ||
-                    dependency.state === SystemModuleState.Ready
+                    dependency.hasExports
+                    || dependency.state === SystemModuleState.Ready
                   ) {
                     // wire hoisted exports or ready dependencies.
                     setter(dependency.exports);
@@ -528,8 +535,9 @@ namespace evaluator {
     }
 
     private evaluateModule(module: SystemModule, stack: SystemModule[]) {
-      if (module.state < SystemModuleState.Linked)
+      if (module.state < SystemModuleState.Linked) {
         throw new Error("Invalid state for evaluation.");
+      }
       if (module.state !== SystemModuleState.Linked) return;
 
       if (stack.lastIndexOf(module) !== -1) {

@@ -2,20 +2,20 @@
 namespace ts.OutliningElementsCollector {
   export function collectElements(
     sourceFile: SourceFile,
-    cancellationToken: CancellationToken
+    cancellationToken: CancellationToken,
   ): OutliningSpan[] {
     const res: OutliningSpan[] = [];
     addNodeOutliningSpans(sourceFile, cancellationToken, res);
     addRegionOutliningSpans(sourceFile, res);
     return res.sort(
-      (span1, span2) => span1.textSpan.start - span2.textSpan.start
+      (span1, span2) => span1.textSpan.start - span2.textSpan.start,
     );
   }
 
   function addNodeOutliningSpans(
     sourceFile: SourceFile,
     cancellationToken: CancellationToken,
-    out: Push<OutliningSpan>
+    out: Push<OutliningSpan>,
   ): void {
     let depthRemaining = 40;
     let current = 0;
@@ -34,7 +34,7 @@ namespace ts.OutliningElementsCollector {
           statements[current],
           sourceFile,
           cancellationToken,
-          out
+          out,
         );
         current++;
       }
@@ -45,11 +45,11 @@ namespace ts.OutliningElementsCollector {
             findChildOfKind(
               statements[firstImport],
               SyntaxKind.ImportKeyword,
-              sourceFile
+              sourceFile,
             )!.getStart(sourceFile),
             statements[lastImport].getEnd(),
-            OutliningSpanKind.Imports
-          )
+            OutliningSpanKind.Imports,
+          ),
         );
       }
     }
@@ -59,30 +59,30 @@ namespace ts.OutliningElementsCollector {
       cancellationToken.throwIfCancellationRequested();
 
       if (
-        isDeclaration(n) ||
-        isVariableStatement(n) ||
-        isReturnStatement(n) ||
-        isCallOrNewExpression(n) ||
-        n.kind === SyntaxKind.EndOfFileToken
+        isDeclaration(n)
+        || isVariableStatement(n)
+        || isReturnStatement(n)
+        || isCallOrNewExpression(n)
+        || n.kind === SyntaxKind.EndOfFileToken
       ) {
         addOutliningForLeadingCommentsForNode(
           n,
           sourceFile,
           cancellationToken,
-          out
+          out,
         );
       }
 
       if (
-        isFunctionLike(n) &&
-        isBinaryExpression(n.parent) &&
-        isPropertyAccessExpression(n.parent.left)
+        isFunctionLike(n)
+        && isBinaryExpression(n.parent)
+        && isPropertyAccessExpression(n.parent.left)
       ) {
         addOutliningForLeadingCommentsForNode(
           n.parent.left,
           sourceFile,
           cancellationToken,
-          out
+          out,
         );
       }
 
@@ -91,7 +91,7 @@ namespace ts.OutliningElementsCollector {
           n.statements.end,
           sourceFile,
           cancellationToken,
-          out
+          out,
         );
       }
 
@@ -100,7 +100,7 @@ namespace ts.OutliningElementsCollector {
           n.members.end,
           sourceFile,
           cancellationToken,
-          out
+          out,
         );
       }
 
@@ -115,9 +115,9 @@ namespace ts.OutliningElementsCollector {
         n.arguments.forEach(visitNonImportNode);
         n.typeArguments?.forEach(visitNonImportNode);
       } else if (
-        isIfStatement(n) &&
-        n.elseStatement &&
-        isIfStatement(n.elseStatement)
+        isIfStatement(n)
+        && n.elseStatement
+        && isIfStatement(n.elseStatement)
       ) {
         // Consider an 'else if' to be on the same depth as the 'if'.
         visitNonImportNode(n.expression);
@@ -134,7 +134,7 @@ namespace ts.OutliningElementsCollector {
 
   function addRegionOutliningSpans(
     sourceFile: SourceFile,
-    out: Push<OutliningSpan>
+    out: Push<OutliningSpan>,
   ): void {
     const regions: OutliningSpan[] = [];
     const lineStarts = sourceFile.getLineStarts();
@@ -149,7 +149,7 @@ namespace ts.OutliningElementsCollector {
       if (!result[1]) {
         const span = createTextSpanFromBounds(
           sourceFile.text.indexOf("//", currentLineStart),
-          lineEnd
+          lineEnd,
         );
         regions.push(
           createOutliningSpan(
@@ -157,8 +157,8 @@ namespace ts.OutliningElementsCollector {
             OutliningSpanKind.Region,
             span,
             /*autoCollapse*/ false,
-            result[2] || "#region"
-          )
+            result[2] || "#region",
+          ),
         );
       } else {
         const region = regions.pop();
@@ -187,7 +187,7 @@ namespace ts.OutliningElementsCollector {
     pos: number,
     sourceFile: SourceFile,
     cancellationToken: CancellationToken,
-    out: Push<OutliningSpan>
+    out: Push<OutliningSpan>,
   ): void {
     const comments = getLeadingCommentRanges(sourceFile.text, pos);
     if (!comments) return;
@@ -219,7 +219,7 @@ namespace ts.OutliningElementsCollector {
         case SyntaxKind.MultiLineCommentTrivia:
           combineAndAddMultipleSingleLineComments();
           out.push(
-            createOutliningSpanFromBounds(pos, end, OutliningSpanKind.Comment)
+            createOutliningSpanFromBounds(pos, end, OutliningSpanKind.Comment),
           );
           singleLineCommentCount = 0;
           break;
@@ -236,8 +236,8 @@ namespace ts.OutliningElementsCollector {
           createOutliningSpanFromBounds(
             firstSingleLineCommentStart,
             lastSingleLineCommentEnd,
-            OutliningSpanKind.Comment
-          )
+            OutliningSpanKind.Comment,
+          ),
         );
       }
     }
@@ -247,28 +247,28 @@ namespace ts.OutliningElementsCollector {
     n: Node,
     sourceFile: SourceFile,
     cancellationToken: CancellationToken,
-    out: Push<OutliningSpan>
+    out: Push<OutliningSpan>,
   ): void {
     if (isJsxText(n)) return;
     addOutliningForLeadingCommentsForPos(
       n.pos,
       sourceFile,
       cancellationToken,
-      out
+      out,
     );
   }
 
   function createOutliningSpanFromBounds(
     pos: number,
     end: number,
-    kind: OutliningSpanKind
+    kind: OutliningSpanKind,
   ): OutliningSpan {
     return createOutliningSpan(createTextSpanFromBounds(pos, end), kind);
   }
 
   function getOutliningSpanForNode(
     n: Node,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): OutliningSpan | undefined {
     switch (n.kind) {
       case SyntaxKind.Block:
@@ -297,7 +297,7 @@ namespace ts.OutliningElementsCollector {
               const node = findChildOfKind(
                 tryStatement,
                 SyntaxKind.FinallyKeyword,
-                sourceFile
+                sourceFile,
               );
               if (node) return spanForNode(node);
             }
@@ -307,7 +307,7 @@ namespace ts.OutliningElementsCollector {
             // the span of the block, independent of any parent span.
             return createOutliningSpan(
               createTextSpanFromNode(n, sourceFile),
-              OutliningSpanKind.Code
+              OutliningSpanKind.Code,
             );
         }
       case SyntaxKind.ModuleBlock:
@@ -325,7 +325,7 @@ namespace ts.OutliningElementsCollector {
           n,
           /*autoCollapse*/ false,
           /*useFullStart*/ !isTupleTypeNode(n.parent),
-          SyntaxKind.OpenBracketToken
+          SyntaxKind.OpenBracketToken,
         );
       case SyntaxKind.CaseClause:
       case SyntaxKind.DefaultClause:
@@ -344,14 +344,14 @@ namespace ts.OutliningElementsCollector {
       case SyntaxKind.TemplateExpression:
       case SyntaxKind.NoSubstitutionTemplateLiteral:
         return spanForTemplateLiteral(
-          n as TemplateExpression | NoSubstitutionTemplateLiteral
+          n as TemplateExpression | NoSubstitutionTemplateLiteral,
         );
       case SyntaxKind.ArrayBindingPattern:
         return spanForNode(
           n,
           /*autoCollapse*/ false,
           /*useFullStart*/ !isBindingElement(n.parent),
-          SyntaxKind.OpenBracketToken
+          SyntaxKind.OpenBracketToken,
         );
       case SyntaxKind.ArrowFunction:
         return spanForArrowFunction(n as ArrowFunction);
@@ -362,7 +362,7 @@ namespace ts.OutliningElementsCollector {
     }
 
     function spanForCallExpression(
-      node: CallExpression
+      node: CallExpression,
     ): OutliningSpan | undefined {
       if (!node.arguments.length) {
         return undefined;
@@ -370,17 +370,17 @@ namespace ts.OutliningElementsCollector {
       const openToken = findChildOfKind(
         node,
         SyntaxKind.OpenParenToken,
-        sourceFile
+        sourceFile,
       );
       const closeToken = findChildOfKind(
         node,
         SyntaxKind.CloseParenToken,
-        sourceFile
+        sourceFile,
       );
       if (
-        !openToken ||
-        !closeToken ||
-        positionsAreOnSameLine(openToken.pos, closeToken.pos, sourceFile)
+        !openToken
+        || !closeToken
+        || positionsAreOnSameLine(openToken.pos, closeToken.pos, sourceFile)
       ) {
         return undefined;
       }
@@ -391,39 +391,39 @@ namespace ts.OutliningElementsCollector {
         node,
         sourceFile,
         /*autoCollapse*/ false,
-        /*useFullStart*/ true
+        /*useFullStart*/ true,
       );
     }
 
     function spanForArrowFunction(
-      node: ArrowFunction
+      node: ArrowFunction,
     ): OutliningSpan | undefined {
       if (
-        isBlock(node.body) ||
-        isParenthesizedExpression(node.body) ||
-        positionsAreOnSameLine(
+        isBlock(node.body)
+        || isParenthesizedExpression(node.body)
+        || positionsAreOnSameLine(
           node.body.getFullStart(),
           node.body.getEnd(),
-          sourceFile
+          sourceFile,
         )
       ) {
         return undefined;
       }
       const textSpan = createTextSpanFromBounds(
         node.body.getFullStart(),
-        node.body.getEnd()
+        node.body.getEnd(),
       );
       return createOutliningSpan(
         textSpan,
         OutliningSpanKind.Code,
-        createTextSpanFromNode(node)
+        createTextSpanFromNode(node),
       );
     }
 
     function spanForJSXElement(node: JsxElement): OutliningSpan | undefined {
       const textSpan = createTextSpanFromBounds(
         node.openingElement.getStart(sourceFile),
-        node.closingElement.getEnd()
+        node.closingElement.getEnd(),
       );
       const tagName = node.openingElement.tagName.getText(sourceFile);
       const bannerText = "<" + tagName + ">...</" + tagName + ">";
@@ -432,14 +432,14 @@ namespace ts.OutliningElementsCollector {
         OutliningSpanKind.Code,
         textSpan,
         /*autoCollapse*/ false,
-        bannerText
+        bannerText,
       );
     }
 
     function spanForJSXFragment(node: JsxFragment): OutliningSpan | undefined {
       const textSpan = createTextSpanFromBounds(
         node.openingFragment.getStart(sourceFile),
-        node.closingFragment.getEnd()
+        node.closingFragment.getEnd(),
       );
       const bannerText = "<>...</>";
       return createOutliningSpan(
@@ -447,12 +447,12 @@ namespace ts.OutliningElementsCollector {
         OutliningSpanKind.Code,
         textSpan,
         /*autoCollapse*/ false,
-        bannerText
+        bannerText,
       );
     }
 
     function spanForJSXAttributes(
-      node: JsxAttributes
+      node: JsxAttributes,
     ): OutliningSpan | undefined {
       if (node.properties.length === 0) {
         return undefined;
@@ -461,23 +461,23 @@ namespace ts.OutliningElementsCollector {
       return createOutliningSpanFromBounds(
         node.getStart(sourceFile),
         node.getEnd(),
-        OutliningSpanKind.Code
+        OutliningSpanKind.Code,
       );
     }
 
     function spanForTemplateLiteral(
-      node: TemplateExpression | NoSubstitutionTemplateLiteral
+      node: TemplateExpression | NoSubstitutionTemplateLiteral,
     ) {
       if (
-        node.kind === SyntaxKind.NoSubstitutionTemplateLiteral &&
-        node.text.length === 0
+        node.kind === SyntaxKind.NoSubstitutionTemplateLiteral
+        && node.text.length === 0
       ) {
         return undefined;
       }
       return createOutliningSpanFromBounds(
         node.getStart(sourceFile),
         node.getEnd(),
-        OutliningSpanKind.Code
+        OutliningSpanKind.Code,
       );
     }
 
@@ -485,7 +485,7 @@ namespace ts.OutliningElementsCollector {
       node: Node,
       open:
         | SyntaxKind.OpenBraceToken
-        | SyntaxKind.OpenBracketToken = SyntaxKind.OpenBraceToken
+        | SyntaxKind.OpenBracketToken = SyntaxKind.OpenBraceToken,
     ): OutliningSpan | undefined {
       // If the block has no leading keywords and is inside an array literal or call expression,
       // we only want to collapse the span of the block.
@@ -493,9 +493,9 @@ namespace ts.OutliningElementsCollector {
       return spanForNode(
         node,
         /*autoCollapse*/ false,
-        /*useFullStart*/ !isArrayLiteralExpression(node.parent) &&
-          !isCallExpression(node.parent),
-        open
+        /*useFullStart*/ !isArrayLiteralExpression(node.parent)
+          && !isCallExpression(node.parent),
+        open,
       );
     }
 
@@ -508,45 +508,46 @@ namespace ts.OutliningElementsCollector {
         | SyntaxKind.OpenBracketToken = SyntaxKind.OpenBraceToken,
       close: SyntaxKind = open === SyntaxKind.OpenBraceToken
         ? SyntaxKind.CloseBraceToken
-        : SyntaxKind.CloseBracketToken
+        : SyntaxKind.CloseBracketToken,
     ): OutliningSpan | undefined {
       const openToken = findChildOfKind(n, open, sourceFile);
       const closeToken = findChildOfKind(n, close, sourceFile);
       return (
-        openToken &&
-        closeToken &&
-        spanBetweenTokens(
+        openToken
+        && closeToken
+        && spanBetweenTokens(
           openToken,
           closeToken,
           hintSpanNode,
           sourceFile,
           autoCollapse,
-          useFullStart
+          useFullStart,
         )
       );
     }
 
     function spanForNodeArray(
-      nodeArray: NodeArray<Node>
+      nodeArray: NodeArray<Node>,
     ): OutliningSpan | undefined {
       return nodeArray.length
         ? createOutliningSpan(
-            createTextSpanFromRange(nodeArray),
-            OutliningSpanKind.Code
-          )
+          createTextSpanFromRange(nodeArray),
+          OutliningSpanKind.Code,
+        )
         : undefined;
     }
 
     function spanForParenthesizedExpression(
-      node: ParenthesizedExpression
+      node: ParenthesizedExpression,
     ): OutliningSpan | undefined {
-      if (positionsAreOnSameLine(node.getStart(), node.getEnd(), sourceFile))
+      if (positionsAreOnSameLine(node.getStart(), node.getEnd(), sourceFile)) {
         return undefined;
+      }
       const textSpan = createTextSpanFromBounds(node.getStart(), node.getEnd());
       return createOutliningSpan(
         textSpan,
         OutliningSpanKind.Code,
-        createTextSpanFromNode(node)
+        createTextSpanFromNode(node),
       );
     }
   }
@@ -554,23 +555,23 @@ namespace ts.OutliningElementsCollector {
   function functionSpan(
     node: SignatureDeclaration,
     body: Block,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): OutliningSpan | undefined {
     const openToken = tryGetFunctionOpenToken(node, body, sourceFile);
     const closeToken = findChildOfKind(
       body,
       SyntaxKind.CloseBraceToken,
-      sourceFile
+      sourceFile,
     );
     return (
-      openToken &&
-      closeToken &&
-      spanBetweenTokens(
+      openToken
+      && closeToken
+      && spanBetweenTokens(
         openToken,
         closeToken,
         node,
         sourceFile,
-        /*autoCollapse*/ node.kind !== SyntaxKind.ArrowFunction
+        /*autoCollapse*/ node.kind !== SyntaxKind.ArrowFunction,
       )
     );
   }
@@ -581,17 +582,17 @@ namespace ts.OutliningElementsCollector {
     hintSpanNode: Node,
     sourceFile: SourceFile,
     autoCollapse = false,
-    useFullStart = true
+    useFullStart = true,
   ): OutliningSpan {
     const textSpan = createTextSpanFromBounds(
       useFullStart ? openToken.getFullStart() : openToken.getStart(sourceFile),
-      closeToken.getEnd()
+      closeToken.getEnd(),
     );
     return createOutliningSpan(
       textSpan,
       OutliningSpanKind.Code,
       createTextSpanFromNode(hintSpanNode, sourceFile),
-      autoCollapse
+      autoCollapse,
     );
   }
 
@@ -600,7 +601,7 @@ namespace ts.OutliningElementsCollector {
     kind: OutliningSpanKind,
     hintSpan: TextSpan = textSpan,
     autoCollapse = false,
-    bannerText = "..."
+    bannerText = "...",
   ): OutliningSpan {
     return { textSpan, kind, hintSpan, bannerText, autoCollapse };
   }
@@ -608,13 +609,13 @@ namespace ts.OutliningElementsCollector {
   function tryGetFunctionOpenToken(
     node: SignatureDeclaration,
     body: Block,
-    sourceFile: SourceFile
+    sourceFile: SourceFile,
   ): Node | undefined {
     if (isNodeArrayMultiLine(node.parameters, sourceFile)) {
       const openParenToken = findChildOfKind(
         node,
         SyntaxKind.OpenParenToken,
-        sourceFile
+        sourceFile,
       );
       if (openParenToken) {
         return openParenToken;
