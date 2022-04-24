@@ -21,7 +21,7 @@ jobs:
         path: |
           ~/.npm
           ~/.cache/dprint
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/{package-lock,dprint}.json') }}
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
@@ -30,4 +30,4 @@ jobs:
     - name: prettier
       run: npm run prettier
     - name: dprint w/ dprint-plugin-prettier
-      run: npm run dprint
+      run: npm run fmt-check

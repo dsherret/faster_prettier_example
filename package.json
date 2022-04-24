@@ -4,12 +4,12 @@
   "version": "1.0.0",
   "scripts": {
     "prettier": "prettier --check --end-of-line lf \"src/**/*.{js,ts}\"",
-    "dprint": "dprint check"
+    "fmt-check": "dprint check"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "dprint": "^0.25.1",
+    "dprint": "^0.27.0",
     "prettier": "^2.6.2"
   }
 }
