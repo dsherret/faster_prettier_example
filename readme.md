@@ -7,3 +7,5 @@ First CI run:
 
 Second CI run using incremental cache:
 
+- prettier - 41s
+- dprint w/ dprint-plugin-prettier - 0s

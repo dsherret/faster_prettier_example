@@ -30,4 +30,4 @@ jobs:
     - name: prettier
       run: npm run prettier
     - name: dprint w/ dprint-plugin-prettier
-      run: npm run fmt-check
+      run: npm run dprint
