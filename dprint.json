@@ -1,11 +1,10 @@
 {
-  "incremental": true,
   "includes": [
     "src/**/*.{js,ts}"
   ],
   "excludes": [],
   "prettier": {
-    "lineWidth": 80
+    // prettier configuration goes here
   },
   "plugins": [
     "https://plugins.dprint.dev/prettier-0.7.0.json@4e846f43b32981258cef5095b3d732522947592e090ef52333801f9d6e8adb33"
